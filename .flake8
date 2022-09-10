@@ -1,0 +1,15 @@
+[flake8]
+max-line-length=110
+max-arguments = 6
+
+ignore = W503,
+        WPS305,
+        WPS115,
+        WPS306,  # Wrong multiline string use violation
+
+per-file-ignores =
+
+exclude =
+    .git,
+    __pycache__,
+    .devcontainer,
