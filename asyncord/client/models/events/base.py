@@ -10,6 +10,13 @@ class GatewayEvent(BaseModel):
     pass
 
 
+class HelloEvent(GatewayEvent):
+    """https://discord.com/developers/docs/topics/gateway#hello"""
+
+    heartbeat_interval: int
+    """the interval (in milliseconds) the client should heartbeat with"""
+
+
 class ReadyEvent(GatewayEvent):
     api_version: int = Field(alias='v')
     """gateway protocol version"""
