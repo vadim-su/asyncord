@@ -3,17 +3,22 @@ from __future__ import annotations
 import enum
 import random
 import asyncio
-from typing import Any, Final, Callable, cast, overload, get_type_hints
+from typing import Any, Final, Callable, MutableMapping, cast, overload, get_type_hints
 from datetime import datetime, timedelta
 from contextlib import suppress
 from collections import defaultdict
 from collections.abc import Awaitable
 
 import aiohttp
+from aiohttp import WSMsgType
 from pydantic import Field, BaseModel, validator
 
 from asyncord.urls import GATEWAY_URL
 from asyncord.typedefs import StrOrURL
+from asyncord.client.models.intents import Intent
+from asyncord.client.models.commands import (
+    Activity, ActivityType, ActivityEmoji, ActivityButton, IdentifyCommand, PresenceUpdateData,)
+from asyncord.client.models.events.base import HelloEvent, ReadyEvent
 
 
 @enum.unique
@@ -85,7 +90,7 @@ class GatewayMessage(BaseModel):
 
 class EventDispatcher:
     def __init__(self):
-        self._handlers = defaultdict(list)
+        self._handlers: MutableMapping[type[GatewayEvent], list[EventHandler]] = defaultdict(list)
 
     @overload
     def add_handler(self, event_type: type[GatewayEvent], event_handler: EventHandler):
@@ -116,7 +121,7 @@ class EventDispatcher:
 
         self._handlers[event_type].append(event_handler)
 
-    def dispatch(self, event: GatewayEvent):
+    async def dispatch(self, event: GatewayEvent):
         event_type = type(event)
         for event_handler in self._handlers.get(event_type, []):
             event_handler(event)
@@ -171,31 +176,69 @@ class Periodic:
 class AsyncGatewayClient:
     def __init__(self, ws_url: StrOrURL):
         self.ws_url = ws_url
+        self.ws = None
         self._session: aiohttp.ClientSession | None = None
         self._dispatcher = EventDispatcher()
-        self.ws_
 
     def add_handler(self, event_type, event_handler):
         self._dispatcher.add_handler(event_type, event_handler)
 
-    async def
-
     async def start(self):
         self._session = aiohttp.ClientSession()
-        async with self._session.ws_connect(self.ws_url) as ws:
-            async for msg in ws:
-                if msg.type == aiohttp.WSMsgType.TEXT:
-                    self._handle_message(GatewayMessage(**msg.json()))
-            else:
-                print('Connection closed')
 
-    def _handle_message(self, msg: GatewayMessage):
+        async with self._session.ws_connect(self.ws_url) as ws:
+            self.ws = ws
+            while True:
+                msg = await ws.receive()
+                if msg.type == WSMsgType.TEXT:
+                    await self._handle_message(GatewayMessage(**msg.json()))
+                elif msg.type in {WSMsgType.CLOSE, WSMsgType.CLOSING, WSMsgType.CLOSED}:
+                    print(f'Connection closed: {msg.data} {msg.extra}')
+                    break
+
+    async def identify(self, command_data: IdentifyCommand):
+        payload = command_data.dict(exclude_none=True)
+        await self._send_command(GatewayOpcodes.IDENTIFY, payload)
+
+    async def heartbeat(self):
+        await self._send_command(GatewayOpcodes.HEARTBEAT, None)
+
+    async def _send_command(self, op: GatewayOpcodes, command: Any):
+        if not self.ws:
+            raise RuntimeError('Client is not connected')
+
+        body = {'op': op, 'd': command}
+        await self.ws.send_json(body)
+
+    async def _handle_message(self, msg: GatewayMessage):
+        event = None
         match msg.opcode:
             case GatewayOpcodes.DISPATCH:
-                pass
-            case GatewayOpcodes.HELLO:
+                if msg.event_name == 'READY':
+                    event = ReadyEvent(**msg.msg_data)
+                else:
+                    print(f'Unhandled event: {msg.event_name}')
 
-        print(msg)
+            case GatewayOpcodes.HELLO:
+                event = HelloEvent.parse_obj(msg.msg_data)
+                await self.heartbeat()
+                identify_data = IdentifyCommand(
+                    token='OTM0NTY0MjI1NzY5MTQ4NDM2.Yex6wg.AAkUaqRS0ACw8__ERfQ6d8gOdkE',
+                    presence=PresenceUpdateData(
+                        activities=[
+                            Activity(
+                                name='with you',
+                                type=ActivityType.GAME,
+                                buttons=[ActivityButton(
+                                    label='!Invite!', url='https://trovo.live/s/Mr_Wolfych',
+                                )],
+                            ),
+                        ],
+                    ),
+                )
+                await self.identify(identify_data)
+            case _:
+                print(f'Unhandled message: {msg}')
 
 
 async def main():

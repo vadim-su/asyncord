@@ -6,7 +6,7 @@ from asyncord.client.resources import ClientSubresources
 from asyncord.client.http_proto import Response
 from asyncord.client.models.users import User
 from asyncord.client.models.guilds import PartialUserGuild
-from asyncord.client.models.member import Member
+from asyncord.client.models.members import Member
 from asyncord.client.models.channels import Channel
 
 

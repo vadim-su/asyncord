@@ -6,7 +6,7 @@ from asyncord.snowflake import Snowflake
 from asyncord.client.roles import Role
 from asyncord.client.models.users import User
 from asyncord.client.models.guilds import Guild
-from asyncord.client.models.member import Member
+from asyncord.client.models.members import Member
 from asyncord.client.models.gateway_events import GatewayEvent
 
 

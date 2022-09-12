@@ -5,7 +5,7 @@ from pydantic import Field, BaseModel
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
 from asyncord.client.models.guilds import UnavailableGuild
-from asyncord.client.models.member import Member
+from asyncord.client.models.members import Member
 from asyncord.client.models.channels import Channel, ChannelType, ThreadMember
 
 

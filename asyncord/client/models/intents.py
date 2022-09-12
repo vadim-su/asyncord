@@ -4,7 +4,7 @@ from enum import IntFlag, unique
 
 
 @unique
-class Intents(IntFlag):
+class Intent(IntFlag):
     """Gateway intents
 
     You can get more information about intent values and related events by the link:
@@ -28,24 +28,24 @@ class Intents(IntFlag):
     GUILD_SCHEDULED_EVENTS = 1 << 16  # it's not a mistake 16 after 14
 
 
-ALL_INTENTS: Intents = functools.reduce(operator.or_, Intents)
+ALL_INTENTS: Intent = functools.reduce(operator.or_, Intent)
 """Set of all available intents."""
 
 
 DEFAULT_INTENTS = (
-    Intents.GUILDS
-    | Intents.GUILD_MEMBERS
-    | Intents.GUILD_BANS
-    | Intents.GUILD_INVITES
-    | Intents.GUILD_VOICE_STATES
-    | Intents.GUILD_PRESENCES
-    | Intents.GUILD_MESSAGES
-    | Intents.GUILD_MESSAGE_REACTIONS
-    | Intents.GUILD_MESSAGE_TYPING
-    | Intents.DIRECT_MESSAGES
-    | Intents.DIRECT_MESSAGE_REACTIONS
-    | Intents.DIRECT_MESSAGE_TYPING
-    | Intents.GUILD_SCHEDULED_EVENTS
+    Intent.GUILDS
+    | Intent.GUILD_MEMBERS
+    | Intent.GUILD_BANS
+    | Intent.GUILD_INVITES
+    | Intent.GUILD_VOICE_STATES
+    | Intent.GUILD_PRESENCES
+    | Intent.GUILD_MESSAGES
+    | Intent.GUILD_MESSAGE_REACTIONS
+    | Intent.GUILD_MESSAGE_TYPING
+    | Intent.DIRECT_MESSAGES
+    | Intent.DIRECT_MESSAGE_REACTIONS
+    | Intent.DIRECT_MESSAGE_TYPING
+    | Intent.GUILD_SCHEDULED_EVENTS
 )
 """Set of default intents.
 

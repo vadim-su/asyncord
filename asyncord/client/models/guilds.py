@@ -10,14 +10,14 @@ from asyncord.snowflake import Snowflake
 from asyncord.client.models.roles import Role
 from asyncord.client.models.users import User
 
+# class CreateGuildChannelData(BaseModel):
+#     "name": "naming-things-is-hard",
+#   "type": 0,
+#   "id": 2,
+#   "parent_id": 1
+#   id	snowflake	the id of this channel
+#   type	integer	the type of channel
 
-class CreateGuildChannelData(BaseModel):
-    "name": "naming-things-is-hard",
-  "type": 0,
-  "id": 2,
-  "parent_id": 1
-  id	snowflake	the id of this channel
-  type	integer	the type of channel
 
 class CreateGuildData(BaseModel):
     """Data for creating a guild.

@@ -4,7 +4,7 @@ from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
 from asyncord.client.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import ClientResource, ClientSubresources
-from asyncord.client.models.member import Member, UpdateMemberData
+from asyncord.client.models.members import Member, UpdateMemberData
 
 
 class MemberResource(ClientSubresources):
