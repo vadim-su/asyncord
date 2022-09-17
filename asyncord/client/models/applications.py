@@ -183,4 +183,49 @@ class MembershipState(enum.Enum):
     """the user has accepted the team invite"""
 
 
+class GuildApplicationCommandPermissions(BaseModel):
+    """https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object"""
+
+    id: Snowflake
+    """ID of the command or the application ID"""
+
+    application_id: Snowflake
+    """ID of the application the command belongs to"""
+
+    guild_id: Snowflake
+    """ID of the guild"""
+
+    permissions: list[ApplicationCommandPermissions]
+    """Permissions for the command in the guild, max of 100"""
+
+
+class ApplicationCommandPermissions(BaseModel):
+    """https://discord.com/developers/docs/interactions/slash-commands#applicationcommandpermissions"""
+
+    id: Snowflake  # TODO: add permission constants support
+    """ID of the command or the application ID.
+
+    It can also be a permission constant (@everyone, @here...)"""
+
+    type: ApplicationCommandPermissionType
+    """Type of the permission"""
+
+    permission: bool
+    """Allow or deny permission"""
+
+
+@enum.unique
+class ApplicationCommandPermissionType(enum.IntEnum):
+    """https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type"""
+
+    ROLE = 1
+    """Role permission type"""
+
+    USER = 2
+    """User permission type"""
+
+    CHANNEL = 3
+    """Channel permission type"""
+
+
 Application.update_forward_refs()
