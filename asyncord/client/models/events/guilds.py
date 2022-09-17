@@ -1,4 +1,3 @@
-
 from typing import Any
 from datetime import datetime
 
@@ -7,7 +6,7 @@ from asyncord.client.roles import Role
 from asyncord.client.models.users import User
 from asyncord.client.models.guilds import Guild
 from asyncord.client.models.members import Member
-from asyncord.client.models.gateway_events import GatewayEvent
+from asyncord.client.models.events.base import GatewayEvent
 
 
 class GuildCreateEvent(GatewayEvent, Guild):

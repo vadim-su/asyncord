@@ -4,7 +4,7 @@ from datetime import datetime
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.members import Member
 from asyncord.client.models.channels import Channel, ChannelType, ThreadMember
-from asyncord.client.models.gateway_events import GatewayEvent
+from asyncord.client.models.events.base import GatewayEvent
 
 
 class ChannelCreateEvent(GatewayEvent, Channel):

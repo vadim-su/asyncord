@@ -23,6 +23,19 @@ class IdentifyConnectionProperties(BaseModel):
     """the library name of the bot"""
 
 
+class ResumeCommand(BaseModel):
+    """https://discord.com/developers/docs/topics/gateway#resume"""
+
+    token: str
+    """the session token"""
+
+    session_id: str
+    """the session id"""
+
+    seq: int
+    """the last sequence number received"""
+
+
 class IdentifyCommand(BaseModel):
     """https://discord.com/developers/docs/topics/gateway#identify"""
 
@@ -47,8 +60,6 @@ class IdentifyCommand(BaseModel):
 
     properties: IdentifyConnectionProperties = IdentifyConnectionProperties()
     """connection properties"""
-
-# create class for presence data
 
 
 @enum.unique

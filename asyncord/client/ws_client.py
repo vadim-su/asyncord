@@ -10,22 +10,37 @@ from collections import defaultdict
 from collections.abc import Awaitable
 
 import aiohttp
+from loguru import logger
 from aiohttp import WSMsgType
 from pydantic import Field, BaseModel, validator
+from rich.pretty import pretty_repr
+from rich.logging import RichHandler
 
 from asyncord.urls import GATEWAY_URL
 from asyncord.typedefs import StrOrURL
-from asyncord.client.models.intents import Intent
-from asyncord.client.models.commands import (
-    Activity, ActivityType, ActivityEmoji, ActivityButton, IdentifyCommand, PresenceUpdateData,)
-from asyncord.client.models.events.base import HelloEvent, ReadyEvent
+from asyncord.client.models.commands import ResumeCommand, IdentifyCommand
+from asyncord.client.models.events.base import (
+    HelloEvent,
+    ReadyEvent,
+    GatewayEvent,
+    ResumedEvent,
+    ReconnectEvent,
+    InvalidSessionEvent,
+)
+from asyncord.client.models.events.event_map import EVENT_MAP
+
+logger.configure(handlers=[{
+    'sink': RichHandler(
+        omit_repeated_times=False,
+        rich_tracebacks=True,
+    ),
+    'format': '{message}',
+    'level': 'INFO',
+}])
 
 
 @enum.unique
-class GatewayOpcodes(enum.IntEnum):
-    DISPATCH = 0
-    """An event was dispatched."""
-
+class GatewayCommandOpcode(enum.IntEnum):
     HEARTBEAT = 1
     """Fired periodically by the client to keep the connection alive."""
 
@@ -41,11 +56,17 @@ class GatewayOpcodes(enum.IntEnum):
     RESUME = 6
     """Resume a previous session that was disconnected."""
 
-    RECONNECT = 7
-    """You should attempt to reconnect and resume immediately."""
-
     REQUEST_GUILD_MEMBERS = 8
     """Request information about offline guild members in a large guild."""
+
+
+@enum.unique
+class GatewayEventOpcode(enum.IntEnum):
+    DISPATCH = 0
+    """An event was dispatched."""
+
+    RECONNECT = 7
+    """You should attempt to reconnect and resume immediately."""
 
     INVALID_SESSION = 9
     """The session has been invalidated. You should reconnect and identify / resume accordingly."""
@@ -57,20 +78,11 @@ class GatewayOpcodes(enum.IntEnum):
     """Sent in response to receiving a heartbeat to acknowledge that it has been received."""
 
 
-class GatewayEvent(BaseModel):
-    """Base class for all gateway events."""
-
-    opcode: GatewayOpcodes
-    event_data: Any
-    sequence_number: int
-    name: str
-
-
 EventHandler = Callable[[GatewayEvent], Awaitable[None]]
 
 
 class GatewayMessage(BaseModel):
-    opcode: GatewayOpcodes = Field(alias='op')
+    opcode: GatewayEventOpcode = Field(alias='op')
     msg_data: Any = Field(alias='d')
     sequence_number: int | None = Field(alias='s')
     event_name: str | None = Field(alias='t')
@@ -78,7 +90,7 @@ class GatewayMessage(BaseModel):
 
     @validator('event_name', 'sequence_number')
     def check_values_are_not_none(cls, value, values):  # noqa: N805,WPS110
-        if values['opcode'] == GatewayOpcodes.DISPATCH:
+        if values['opcode'] == GatewayEventOpcode.DISPATCH:
             if value is None:
                 raise ValueError('Event name and sequence number must be set')
 
@@ -188,57 +200,67 @@ class AsyncGatewayClient:
 
         async with self._session.ws_connect(self.ws_url) as ws:
             self.ws = ws
+            logger.info('Connected to gateway')
             while True:
                 msg = await ws.receive()
                 if msg.type == WSMsgType.TEXT:
                     await self._handle_message(GatewayMessage(**msg.json()))
                 elif msg.type in {WSMsgType.CLOSE, WSMsgType.CLOSING, WSMsgType.CLOSED}:
-                    print(f'Connection closed: {msg.data} {msg.extra}')
+                    logger.debug(f'Connection closed: {msg.data} {msg.extra}')
                     break
+                else:
+                    logger.warning(f'Unhandled websocket message type: {msg.type}')
 
     async def identify(self, command_data: IdentifyCommand):
         payload = command_data.dict(exclude_none=True)
-        await self._send_command(GatewayOpcodes.IDENTIFY, payload)
+        await self._send_command(GatewayCommandOpcode.IDENTIFY, payload)
 
     async def heartbeat(self):
-        await self._send_command(GatewayOpcodes.HEARTBEAT, None)
+        await self._send_command(GatewayCommandOpcode.HEARTBEAT, None)
 
-    async def _send_command(self, op: GatewayOpcodes, command: Any):
+    async def resume(self, command_data: ResumeCommand):
+        await self._send_command(GatewayCommandOpcode.RESUME, command_data.dict())
+
+    async def _send_command(self, op: GatewayCommandOpcode, command: Any):
         if not self.ws:
             raise RuntimeError('Client is not connected')
-
         body = {'op': op, 'd': command}
         await self.ws.send_json(body)
 
     async def _handle_message(self, msg: GatewayMessage):
-        event = None
-        match msg.opcode:
-            case GatewayOpcodes.DISPATCH:
-                if msg.event_name == 'READY':
-                    event = ReadyEvent(**msg.msg_data)
-                else:
-                    print(f'Unhandled event: {msg.event_name}')
+        logger.debug('Got message:\n{}', pretty_repr(msg))
 
-            case GatewayOpcodes.HELLO:
+        match msg.opcode:
+            case GatewayEventOpcode.DISPATCH:
+                event_class = EVENT_MAP.get(cast(str, msg.event_name))
+                if event_class:
+                    event = event_class.parse_obj(msg.msg_data)
+                    ...  # TODO: run event handlers
+                else:
+                    logger.warning("Event '{}' unhandled", msg.event_name)
+
+            case GatewayEventOpcode.RECONNECT:
+                event = ReconnectEvent.parse_obj(msg.msg_data)
+
+            case GatewayEventOpcode.INVALID_SESSION:
+                event = InvalidSessionEvent.parse_obj(msg.msg_data)
+
+            case GatewayEventOpcode.HELLO:
                 event = HelloEvent.parse_obj(msg.msg_data)
-                await self.heartbeat()
-                identify_data = IdentifyCommand(
-                    token='OTM0NTY0MjI1NzY5MTQ4NDM2.Yex6wg.AAkUaqRS0ACw8__ERfQ6d8gOdkE',
-                    presence=PresenceUpdateData(
-                        activities=[
-                            Activity(
-                                name='with you',
-                                type=ActivityType.GAME,
-                                buttons=[ActivityButton(
-                                    label='!Invite!', url='https://trovo.live/s/Mr_Wolfych',
-                                )],
-                            ),
-                        ],
-                    ),
-                )
-                await self.identify(identify_data)
+                await self._hello(event)
+
+            case GatewayEventOpcode.HEARTBEAT_ACK:
+                pass
+
             case _:
-                print(f'Unhandled message: {msg}')
+                logger.warning('Unhandled message:\n{}', pretty_repr(msg, max_depth=4))
+
+    async def _hello(self, event: HelloEvent):
+        await self.heartbeat()
+        identify_data = IdentifyCommand(
+            token='OTM0NTY0MjI1NzY5MTQ4NDM2.Yex6wg.AAkUaqRS0ACw8__ERfQ6d8gOdkE',
+        )
+        await self.identify(identify_data)
 
 
 async def main():

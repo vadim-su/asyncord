@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import NamedTuple
 
 from pydantic import Field, BaseModel
@@ -11,7 +12,13 @@ from asyncord.client.models.applications import ApplicationFlag
 
 
 class GatewayEvent(BaseModel):
-    pass
+    @classmethod
+    @property
+    def __event_name__(cls) -> str:
+        class_name_without_suffix = cls.__name__[:-5]
+        # make camel case into snake case
+        event_name = re.sub('(?<!^)(?=[A-Z])', '_', class_name_without_suffix)
+        return event_name.upper()
 
 
 class HelloEvent(GatewayEvent):
@@ -19,6 +26,19 @@ class HelloEvent(GatewayEvent):
 
     heartbeat_interval: int
     """the interval (in milliseconds) the client should heartbeat with"""
+
+
+class ResumedEvent(GatewayEvent):
+    """https://discord.com/developers/docs/topics/gateway#resume"""
+
+    token: str
+    """the session token"""
+
+    session_id: str
+    """the session id"""
+
+    seq: int
+    """the last sequence number received"""
 
 
 class ReadyEvent(GatewayEvent):
@@ -42,6 +62,17 @@ class ReadyEvent(GatewayEvent):
 
     application: ReadyEventApplication
     """application object"""
+
+
+class ReconnectEvent(BaseModel):
+    __root__: None
+
+
+class InvalidSessionEvent(GatewayEvent):
+    """https://discord.com/developers/docs/topics/gateway#invalid-session"""
+
+    is_resumable: bool
+    """whether or not the session can be resumed"""
 
 
 class Shard(NamedTuple):

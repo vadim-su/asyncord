@@ -152,10 +152,10 @@ class Guild(BaseModel):
     mfa_level: int
     """required MFA level for the guild"""
 
-    application_id: Snowflake
+    application_id: Snowflake | None
     """application id of the guild creator if it is bot - created"""
 
-    system_channel_id: Snowflake
+    system_channel_id: Snowflake | None
     """the id of the channel where guild notices such as welcome messages and boost events are posted"""
 
     system_channel_flags: int
