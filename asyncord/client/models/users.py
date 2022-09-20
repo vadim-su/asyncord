@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import enum
-import typing
 
 from pydantic import Field, BaseModel
 
@@ -34,7 +33,7 @@ class User(BaseModel):
     username: str
     """The user's username, not unique across the platform."""
 
-    discriminator: typing.Annotated[str, Field(min_len=4, max_len=4)]
+    discriminator: str = Field(min_len=4, max_len=4)
     """The user's 4 - digit discord-tag."""
 
     avatar: str

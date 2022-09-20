@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from pydantic import BaseModel
+
 from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
+from asyncord.snowflake import Snowflake
 from asyncord.client.resources import ClientSubresources
 from asyncord.client.http_proto import Response
 from asyncord.client.models.users import User
-from asyncord.client.models.guilds import PartialUserGuild
 from asyncord.client.models.members import Member
 from asyncord.client.models.channels import Channel
 
@@ -52,7 +54,7 @@ class UserResource(ClientSubresources):
         before: LikeSnowflake | None = None,
         after: LikeSnowflake | None = None,
         limit: int | None = None,
-    ) -> list[PartialUserGuild]:
+    ) -> list[UserGuild]:
         """Get the current user's guilds.
 
         This endpoint returns 200 guilds by default, which is the maximum
@@ -80,7 +82,7 @@ class UserResource(ClientSubresources):
 
         url = self.current_user_url / 'guilds' % url_params
         resp = await self._http.get(url)
-        return [PartialUserGuild(**guild) for guild in resp.body]
+        return [UserGuild(**guild) for guild in resp.body]
 
     async def get_current_user_guild_member(self, guild_id: LikeSnowflake) -> Member:
         """Get the current user's guild member.
@@ -141,3 +143,25 @@ class UserResource(ClientSubresources):
         url = self.current_user_url / 'channels'
         payload = {'recipient_ids': user_ids}
         return await self._http.post(url, payload)
+
+
+class UserGuild(BaseModel):
+    """A partial user guild object."""
+
+    id: Snowflake
+    """guild id"""
+
+    name: str
+    """guild name(2 - 100 characters, excluding trailing and leading whitespace)"""
+
+    icon: str | None = None
+    """icon hash"""
+
+    owner: bool | None = None
+    """true if the user is the owner of the guild"""
+
+    permissions: str | None = None
+    """total permissions for the user in the guild(excludes overwrites)"""
+
+    feature: dict | None = None
+    """strings	enabled guild features"""

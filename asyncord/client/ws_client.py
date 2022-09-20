@@ -19,14 +19,7 @@ from rich.logging import RichHandler
 from asyncord.urls import GATEWAY_URL
 from asyncord.typedefs import StrOrURL
 from asyncord.client.models.commands import ResumeCommand, IdentifyCommand
-from asyncord.client.models.events.base import (
-    HelloEvent,
-    ReadyEvent,
-    GatewayEvent,
-    ResumedEvent,
-    ReconnectEvent,
-    InvalidSessionEvent,
-)
+from asyncord.client.models.events.base import HelloEvent, GatewayEvent, ReconnectEvent, InvalidSessionEvent
 from asyncord.client.models.events.event_map import EVENT_MAP
 
 logger.configure(handlers=[{
@@ -35,7 +28,7 @@ logger.configure(handlers=[{
         rich_tracebacks=True,
     ),
     'format': '{message}',
-    'level': 'INFO',
+    # 'level': 'INFO',
 }])
 
 

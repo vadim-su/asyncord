@@ -6,7 +6,6 @@ from datetime import datetime
 
 from pydantic import Field, BaseModel, validator
 
-from asyncord.typedefs import LikeSnowflake
 from asyncord.snowflake import Snowflake
 
 from .users import User
@@ -34,6 +33,7 @@ class Channel(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#channel-object
     """
+
     id: Snowflake
     """channel id"""
 
@@ -51,9 +51,10 @@ class Channel(BaseModel):
     permission_overwrites: list[Overwrite] | None = None
     """explicit permission overwrites for members and roles."""
 
-    name: typing.Annotated[str, Field(min_length=1, max_length=100)] | None = None
+    name: str | None = Field(None, min_length=1, max_length=100)
+    """channel name (2-100 characters)"""
 
-    topic: typing.Annotated[str | None, Field(min_length=0, max_length=1024)]
+    topic: str | None = Field(min_length=0, max_length=1024)
     """The channel topic(0 - 1024 characters)."""
 
     nsfw: bool | None = None
@@ -71,7 +72,7 @@ class Channel(BaseModel):
     user_limit: int | None = None
     """The user limit of the voice channel."""
 
-    rate_limit_per_user: typing.Annotated[int | None, Field(min=0, max=21600)] = None
+    rate_limit_per_user: int | None = Field(None, min=0, max=21600)
     """Amount of seconds a user has to wait before sending another message(0 - 21600).
 
     Bots, as well as users with the permission manage_messages or manage_channel,
@@ -101,7 +102,7 @@ class Channel(BaseModel):
     Each parent category can contain up to 50 channels.
     """
 
-    last_pin_timestamp: datetime | None
+    last_pin_timestamp: datetime | None = None
     """Timestamp when the last pinned message was pinned.
 
     This may be null in events such as GUILD_CREATE when a message is not pinned.
@@ -149,6 +150,25 @@ class Channel(BaseModel):
     It's similar to message_count on message creation, but will not decrement
     the number when a message is deleted.
     """
+
+
+class ChannelMention(BaseModel):
+    """Channel mention object.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#channel-mention-object
+    """
+    id: Snowflake
+    """id of the channel"""
+
+    guild_id: Snowflake
+    """id of the guild containing the channel"""
+
+    type: ChannelType
+    """the type of channel"""
+
+    name: str
+    """the name of the channel"""
 
 
 @enum.unique
@@ -200,7 +220,7 @@ class OverwriteType(enum.IntEnum):
 
 class Overwrite(BaseModel):
     """https://discord.com/developers/docs/resources/channel#overwrite-object"""
-    id: LikeSnowflake
+    id: Snowflake
     """Role or user id"""
 
     type: OverwriteType

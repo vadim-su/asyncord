@@ -4,7 +4,6 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from asyncord.typedefs import LikeSnowflake
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
 
@@ -21,8 +20,6 @@ class Member(BaseModel):
 
     roles: list[Snowflake]
     """array of snowflakes"""
-
-    """array of role object ids"""
 
     joined_at: datetime
     """when the user joined the guild"""
@@ -56,7 +53,7 @@ class UpdateMemberData(BaseModel):
     nick: str | None = None
     """value to set user's nickname to MANAGE_NICKNAMES"""
 
-    roles: list[LikeSnowflake] | None = None
+    roles: list[Snowflake] | None = None
     """array of role ids the member is assigned MANAGE_ROLES"""
 
     mute: bool | None = None
@@ -71,7 +68,7 @@ class UpdateMemberData(BaseModel):
     Will throw a 400 error if the user is not in a voice channel DEAFEN_MEMBERS.
     """
 
-    channel_id: LikeSnowflake | None = None
+    channel_id: Snowflake | None = None
     """id of channel to move user to (if they are connected to voice) MOVE_MEMBERS"""
 
     communication_disabled_until: datetime | None = None

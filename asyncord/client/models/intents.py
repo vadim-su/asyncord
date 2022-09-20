@@ -25,7 +25,10 @@ class Intent(IntFlag):
     DIRECT_MESSAGES = 1 << 12
     DIRECT_MESSAGE_REACTIONS = 1 << 13
     DIRECT_MESSAGE_TYPING = 1 << 14
-    GUILD_SCHEDULED_EVENTS = 1 << 16  # it's not a mistake 16 after 14
+    MESSAGE_CONTENT = 1 << 15
+    GUILD_SCHEDULED_EVENTS = 1 << 16
+    AUTO_MODERATION_CONFIGURATION = 1 << 20
+    AUTO_MODERATION_EXECUTION = 1 << 21
 
 
 ALL_INTENTS: Intent = functools.reduce(operator.or_, Intent)
@@ -45,6 +48,7 @@ DEFAULT_INTENTS = (
     | Intent.DIRECT_MESSAGES
     | Intent.DIRECT_MESSAGE_REACTIONS
     | Intent.DIRECT_MESSAGE_TYPING
+    | Intent.MESSAGE_CONTENT
     | Intent.GUILD_SCHEDULED_EVENTS
 )
 """Set of default intents.

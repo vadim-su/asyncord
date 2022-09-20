@@ -5,7 +5,16 @@ from typing import Mapping, Generator
 from loguru import logger
 from rich.pretty import pretty_repr
 
-from asyncord.client.models.events import base, guilds, channels
+from asyncord.client.models.events import (
+    base,
+    guilds,
+    channels,
+    messages,
+    presence,
+    schedule,
+    moderation,
+    application,
+)
 
 
 def _get_all_event_classes(modules: list[object]) -> Generator[type[base.GatewayEvent], None, None]:
@@ -22,7 +31,16 @@ def _get_all_event_classes(modules: list[object]) -> Generator[type[base.Gateway
 
 EVENT_MAP: Mapping[str, type[base.GatewayEvent]] = MappingProxyType({
     event_class.__event_name__: event_class
-    for event_class in _get_all_event_classes([base, guilds, channels])
+    for event_class in _get_all_event_classes([
+        base,
+        guilds,
+        channels,
+        messages,
+        presence,
+        schedule,
+        moderation,
+        application,
+    ])
 })
 """Mapping of event names to event classes.
 

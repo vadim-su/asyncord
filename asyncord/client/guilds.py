@@ -1,14 +1,25 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from asyncord.urls import REST_API_URL
-from asyncord.typedefs import LikeSnowflake
 from asyncord.client.bans import BanResource
 from asyncord.client.roles import RoleResource
 from asyncord.client.headers import AUDIT_LOG_REASON
 from asyncord.client.members import MemberResource
 from asyncord.client.resources import ClientSubresources
-from asyncord.client.http_proto import Response
-from asyncord.client.models.guilds import Guild, Prune, MFALevel, VoiceRegion, CreateGuildData
+from asyncord.client.models.guilds import (
+    Guild,
+    Prune,
+    Invite,
+    MFALevel,
+    VoiceRegion,
+    GuildPreview,
+    CreateGuildData,
+)
+
+if TYPE_CHECKING:
+    from asyncord.typedefs import LikeSnowflake
 
 
 class GuildResource(ClientSubresources):
@@ -19,6 +30,9 @@ class GuildResource(ClientSubresources):
 
         Arguments:
             guild_id (LikeSnowflake): The ID of the guild to get the member subresource for.
+
+        Returns:
+            MemberResource: The member subresource for the guild.
         """
         return MemberResource(self, guild_id)
 
@@ -27,6 +41,9 @@ class GuildResource(ClientSubresources):
 
         Arguments:
             guild_id (LikeSnowflake): The ID of the guild to get the ban subresource for.
+
+        Returns:
+            BanResource: The ban subresource for the guild.
         """
         return BanResource(self, guild_id)
 
@@ -35,26 +52,35 @@ class GuildResource(ClientSubresources):
 
         Arguments:
             guild_id (LikeSnowflake): The ID of the guild to get the role subresource for.
+
+        Returns:
+            RoleResource: The role subresource for the guild.
         """
         return RoleResource(self, guild_id)
 
-    async def get(self, guild_id: LikeSnowflake, with_counts: bool | None = None) -> Response:
-        url = self.guilds_url / str(guild_id)
-        return await self._http.get(url)
+    async def get(self, guild_id: LikeSnowflake, with_counts: bool | None = None) -> Guild:
+        """Get a guild.
 
-    async def get_preview(self, guild_id: LikeSnowflake) -> Response:
+        Reference: https://discord.com/developers/docs/resources/guild#get-guild
+        """
+        url = self.guilds_url / str(guild_id)
+        resp = await self._http.get(url)
+        return Guild(**resp.body)
+
+    async def get_preview(self, guild_id: LikeSnowflake) -> GuildPreview:
         url = self.guilds_url / str(guild_id) / 'preview'
-        return await self._http.get(url)
+        resp = await self._http.get(url)
+        return GuildPreview(**resp.body)
 
     async def create(self, guild_data: CreateGuildData) -> Guild:
         """Create a new guild.
 
         This endpoint can be used only by bots in less than 10 guilds.
 
-        Reference: https://discord.com/developers/docs/resources/guild#create-guild
+        Reference: https: // discord.com / developers / docs / resources / guild  # create-guild
 
         Arguments:
-            guild_data (CreateGuildData): The data for the guild to create.
+            guild_data(CreateGuildData): The data for the guild to create.
 
         Returns:
             Guild: The created guild.
@@ -67,7 +93,7 @@ class GuildResource(ClientSubresources):
         """Delete a guild.
 
         Arguments:
-            guild_id (LikeSnowflake): The ID of the guild to delete.
+            guild_id(LikeSnowflake): The ID of the guild to delete.
         """
         url = self.guilds_url / str(guild_id)
         await self._http.delete(url)
@@ -75,11 +101,11 @@ class GuildResource(ClientSubresources):
     async def update_mfa(self, guild_id: LikeSnowflake, level: MFALevel) -> MFALevel:
         """Update the MFA level for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#modify-guild-mfa
+        Reference: https: // discord.com / developers / docs / resources / guild  # modify-guild-mfa
 
         Arguments:
-            guild_id (LikeSnowflake): The ID of the guild to update.
-            level (MFALevel): The MFA level to set.
+            guild_id(LikeSnowflake): The ID of the guild to update.
+            level(MFALevel): The MFA level to set.
 
         Returns:
             MFALevel: The updated MFA level.
@@ -98,15 +124,15 @@ class GuildResource(ClientSubresources):
     ) -> Prune:
         """Get the number of members that would be removed from a guild if pruned.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
+        Reference: https: // discord.com / developers / docs / resources / guild  # get-guild-prune-count
 
         Arguments:
-            guild_id (LikeSnowflake): The ID of the guild to get the prune count for.
-            days (int | None): The number of days to count prune for. Should be between 1 and 30.
+            guild_id(LikeSnowflake): The ID of the guild to get the prune count for.
+            days(int | None): The number of days to count prune for. Should be between 1 and 30.
                 Defaults to 7 if not specified.
-            include_roles (list[LikeSnowflake] | None): A list of role IDs to include in
+            include_roles(list[LikeSnowflake] | None): A list of role IDs to include in
                 the prune count.
-            reason (str | None): The reason for the prune.
+            reason(str | None): The reason for the prune.
 
         Returns:
             int: The number of members that would be removed from the guild.
@@ -144,16 +170,16 @@ class GuildResource(ClientSubresources):
         Any inactive user that has a subset of the provided role(s) will be
         included in the prune and users with additional roles will not.
 
-        Reference: https://discord.com/developers/docs/resources/guild#begin-guild-prune
+        Reference: https: // discord.com / developers / docs / resources / guild  # begin-guild-prune
 
         Arguments:
-            guild_id (LikeSnowflake): The ID of the guild to prune.
-            days (int | None): The number of days to count prune for. Should be between 1 and 30.
+            guild_id(LikeSnowflake): The ID of the guild to prune.
+            days(int | None): The number of days to count prune for. Should be between 1 and 30.
                 Defaults to 7 if not specified.
-            compute_prune_count (bool | None): Whether to compute the prune count.
+            compute_prune_count(bool | None): Whether to compute the prune count.
                 Defaults to True if not specified.
-            include_roles (list[LikeSnowflake] | None): A list of role IDs to include in the prune count.
-            reason (str | None): The reason for the prune.
+            include_roles(list[LikeSnowflake] | None): A list of role IDs to include in the prune count.
+            reason(str | None): The reason for the prune.
         """
         url_params = {}
         if days is not None:
@@ -175,13 +201,26 @@ class GuildResource(ClientSubresources):
     async def get_voice_regions(self, guild_id: LikeSnowflake) -> VoiceRegion:
         """Get the voice regions for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
+        Reference: https: // discord.com / developers / docs / resources / guild  # get-guild-voice-regions
 
         Arguments:
-            guild_id (LikeSnowflake): The ID of the guild to get the voice regions for.
+            guild_id(LikeSnowflake): The ID of the guild to get the voice regions for.
         """
         url = self.guilds_url / str(guild_id) / 'regions'
         resp = await self._http.get(url)
         return VoiceRegion(**resp.body)
 
-    async def get_invites(self, guild_id: LikeSnowflake) -> 
+    async def get_invites(self, guild_id: LikeSnowflake) -> list[Invite]:
+        """Get the invites for a guild.
+
+        Reference: https: // discord.com / developers / docs / resources / guild  # get-guild-invites
+
+        Arguments:
+            guild_id(LikeSnowflake): The ID of the guild to get the invites for.
+
+        Returns:
+            list[Invite]: The invites for the guild.
+        """
+        url = self.guilds_url / str(guild_id) / 'invites'
+        resp = await self._http.get(url)
+        return [Invite(**invite) for invite in resp.body]

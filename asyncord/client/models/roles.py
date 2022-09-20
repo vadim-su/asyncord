@@ -2,7 +2,7 @@ import typing
 
 from pydantic import BaseModel
 
-from asyncord.typedefs import LikeSnowflake
+from asyncord.snowflake import Snowflake
 
 
 class CreateRoleData(BaseModel):
@@ -56,10 +56,10 @@ class UpdateRoleData(BaseModel):
 
 
 class RoleTags(BaseModel):
-    bot_id: LikeSnowflake | None = None
+    bot_id: Snowflake | None = None
     """the id of the bot this role belongs to"""
 
-    integration_id: LikeSnowflake | None = None
+    integration_id: Snowflake | None = None
     """the id of the integration this role belongs to"""
 
     premium_subscriber: typing.Any = None
@@ -67,7 +67,7 @@ class RoleTags(BaseModel):
 
 
 class Role(BaseModel):
-    id: LikeSnowflake
+    id: Snowflake
     """role id"""
 
     name: str
@@ -102,7 +102,7 @@ class Role(BaseModel):
 
 
 class RolePosition(BaseModel):
-    id: LikeSnowflake
+    id: Snowflake
     """role id"""
 
     position: int | None = None

@@ -4,7 +4,6 @@ import enum
 
 from pydantic import Field, BaseModel, validator
 
-from asyncord.typedefs import LikeSnowflake
 from asyncord.snowflake import Snowflake
 
 FOUR_WEEKS = 2419200
@@ -197,7 +196,7 @@ class RuleActionMetadata(BaseModel):
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-metadata
     """
 
-    channel_id: LikeSnowflake | None = None
+    channel_id: Snowflake | None = None
     """channel to which user content should be logged"""
 
     duration_seconds: int | None = Field(None, le=FOUR_WEEKS)

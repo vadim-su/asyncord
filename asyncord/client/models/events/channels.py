@@ -37,6 +37,19 @@ class ChannelDeleteEvent(GatewayEvent):
     """
 
 
+class ChannelPinsUpdateEvent(GatewayEvent):
+    """https://discord.com/developers/docs/topics/gateway#channel-pins-update"""
+
+    guild_id: Snowflake
+    """the id of the guild"""
+
+    channel_id: Snowflake
+    """the id of the channel"""
+
+    last_pin_timestamp: datetime | None
+    """the time at which the most recent pinned message was pinned"""
+
+
 class ThreadCreateEvent(GatewayEvent, Channel):
     """https://discord.com/developers/docs/topics/gateway#thread-create"""
     # FIXME: read the docs and add the missing thread member object
@@ -101,16 +114,3 @@ class ThreadMembersUpdateEvent(GatewayEvent):
 
     removed_member_ids: list[Snowflake] | None = None
     """the ids of the users who were removed from the thread"""
-
-
-class ChannelPinsUpdateEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway#channel-pins-update"""
-
-    guild_id: Snowflake
-    """the id of the guild"""
-
-    channel_id: Snowflake
-    """the id of the channel"""
-
-    last_pin_timestamp: datetime | None
-    """the time at which the most recent pinned message was pinned"""
