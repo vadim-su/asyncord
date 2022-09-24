@@ -22,10 +22,8 @@ class CreateRoleData(BaseModel):
     """The role's icon image (if the guild has the ROLE_ICONS feature). Defaults to False."""
 
     unicode_emoji: str | None = None
-    """the role's unicode emoji as a standard emoji(if the guild has the ROLE_ICONS feature).
+    """the role's unicode emoji as a standard emoji(if the guild has the ROLE_ICONS feature)."""
 
-    Defaults to False.
-    """
     mentionable: bool = False
     """Whether the role should be mentionable. Defaults to False."""
 
@@ -37,10 +35,10 @@ class UpdateRoleData(BaseModel):
     permissions: str | None = None
     "bitwise value of the enabled/disabled permissions. Defaults to @everyone permissions in guild"
 
-    color: int = 0
-    """RGB color value of the role. Defaults to 0."""
+    color: int | None = None
+    """RGB color value of the role."""
 
-    hoist: bool = False
+    hoist: bool | None = None
     "Whether the role should be displayed separately in the sidebar. Defaults to False."
 
     icon: str | None = None
@@ -51,7 +49,7 @@ class UpdateRoleData(BaseModel):
 
     Defaults to False.
     """
-    mentionable: bool = False
+    mentionable: bool | None = None
     """Whether the role should be mentionable. Defaults to False."""
 
 
