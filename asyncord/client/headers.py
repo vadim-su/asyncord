@@ -6,6 +6,7 @@ from typing import Final
 
 AUTHORIZATION: Final[str] = 'Authorization'
 AUDIT_LOG_REASON: Final[str] = 'X-Audit-Log-Reason'
+JSON_CONTENT_TYPE: Final[str] = 'application/json'
 
 
 @enum.unique

@@ -5,52 +5,37 @@ import asyncio
 import logging
 from http import HTTPStatus
 from types import MappingProxyType
-from dataclasses import dataclass
 
 import aiohttp
+from rich.pretty import pretty_repr
+from rich.logging import RichHandler
+from aiohttp.client import ClientResponse
 
+from asyncord.client import client_errors as errors
 from asyncord.typedefs import StrOrURL
-from asyncord.client.headers import HttpMethod
+from asyncord.client.headers import JSON_CONTENT_TYPE, HttpMethod
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    handlers=[
+        RichHandler(
+            omit_repeated_times=False,
+            rich_tracebacks=True,
+        ),
+    ],
+    level=logging.DEBUG,
+)
 
 
 class Response(typing.NamedTuple):
+    """A response from the Discord API."""
     status: int
     headers: typing.Mapping[str, str]
     body: typing.Any
 
 
-@dataclass
-class FieldError:
-    code: str
-    message: str
-
-
-class DiscordError(Exception):
-    def __init__(
-        self,
-        message: str,
-        code: int,
-        field_errors: dict[str, list[FieldError]] | None = None,
-    ) -> None:
-        field_errors_message = ''
-        if field_errors:
-            for field, errors in field_errors.items():
-                field_errors_message += '\n'
-                field_errors_message += f'{field}: '
-                field_errors_message += '\n\t'.join(
-                    [f'{error.code} - {error.message}' for error in errors],
-                )
-        exc_message = f'({code}) {message}{field_errors_message}'
-
-        super().__init__(exc_message)
-        self.message = message
-        self.code = code
-        self.field_errors = field_errors
-
-
 class AsyncHttpClient:
+    """A client for the Discord API."""
+
     def __init__(self) -> None:
         asyncio.get_running_loop()
         self._session: aiohttp.ClientSession | None = None
@@ -61,7 +46,7 @@ class AsyncHttpClient:
         url: StrOrURL,
         headers: typing.Mapping[str, str] | None = None,
     ) -> Response:
-        return await self._request(HttpMethod.GET, url, headers)
+        return await self._request(HttpMethod.GET, url, headers=headers)
 
     async def post(
         self,
@@ -136,25 +121,46 @@ class AsyncHttpClient:
             resp_context = aiohttp.request(method, url, json=payload, headers=headers)
 
         async with resp_context as resp:
-            if resp.status == HTTPStatus.NO_CONTENT:
-                body = {}
-            else:
-                body = await resp.json()
+            body, message = await self._extract_body_and_message(resp)
 
-            if resp.status >= HTTPStatus.BAD_REQUEST:
-                # field_errors = {}
-                # if body.get('errors'):
-                #     for field, errors in body['errors']:
-                #         field_errors[field] = [
-                #             FieldError(error['code'], error['message'])
-                #             for error in errors['_errors']
-                #         ]
+            match resp.status:
+                case status if status < HTTPStatus.BAD_REQUEST:
+                    return Response(
+                        status=resp.status,
+                        headers=MappingProxyType(dict(resp.headers.items())),
+                        body=body,
+                    )
 
-                # TODO: This is a client error, not a server error which is a 500, need to handle this better
-                raise DiscordError(message=body['message'], code=body['code'])
+                case HTTPStatus.TOO_MANY_REQUESTS:
+                    raise errors.RateLimitError(
+                        message=message or 'Unknown error',
+                        resp=resp,
+                        retry_after=int(resp.headers.get('Retry-After', 0)) or None,
+                    )
 
-            return Response(
-                status=resp.status,
-                headers=MappingProxyType(dict(resp.headers.items())),
-                body=body,
-            )
+                case status if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
+                    raise errors.ClientError(
+                        message=message or 'Unknown error',
+                        resp=resp,
+                        code=body.get('code'),
+                    )
+
+                case _:
+                    raise errors.ServerError(
+                        message=message or 'Unknown error',
+                        resp=resp,
+                        status_code=resp.status,
+                    )
+
+    async def _extract_body_and_message(self, resp: ClientResponse):
+        if resp.status == HTTPStatus.NO_CONTENT:
+            body = {}
+            message = None
+        elif resp.headers.get('Content-Type') == JSON_CONTENT_TYPE:
+            body = await resp.json()
+            message = body.get('message') if isinstance(body, typing.Mapping) else None
+        else:
+            body = {}
+            message = await resp.text()
+
+        return body, message
