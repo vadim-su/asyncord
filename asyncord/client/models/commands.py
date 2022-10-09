@@ -64,7 +64,7 @@ class IdentifyCommand(BaseModel):
 
 
 @enum.unique
-class StatusType(str, enum.Enum):
+class StatusType(enum.StrEnum):
     """https://discord.com/developers/docs/topics/gateway#update-presence-status-types"""
 
     ONLINE = 'online'

@@ -412,7 +412,7 @@ class InviteChannel(BaseModel):
 
 
 @enum.unique
-class Feature(str, enum.Enum):
+class Feature(enum.StrEnum):
     """
     Guild features.
 

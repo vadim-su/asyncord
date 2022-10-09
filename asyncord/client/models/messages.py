@@ -244,7 +244,7 @@ class Embed(BaseModel):
 
 
 @enum.unique
-class EmbedType(str, enum.Enum):
+class EmbedType(enum.StrEnum):
     """Embed type.
 
     Embed types are "loosely defined" and, for the most part, are not used by our

@@ -15,7 +15,7 @@ JSONType = dict[str, typing.Any] | list[typing.Any]
 
 
 @enum.unique
-class HTTPMethod(str, enum.Enum):
+class HTTPMethod(enum.StrEnum):
     GET = 'GET'
     POST = 'POST'
     PUT = 'PUT'
