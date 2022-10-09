@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import datetime
 from typing import Literal
 
 from pydantic import Field, BaseModel
@@ -153,10 +154,10 @@ class Guild(BaseModel):
     explicit_content_filter: int
     """explicit content filter level"""
 
-    roles: Role | None = None
+    roles: list[Role] | None = None
     """roles in the guild"""
 
-    emojis: Emoji | None = None
+    emojis: list[Emoji] | None = None
     """custom guild emojis"""
 
     features: list[Feature]
@@ -175,7 +176,7 @@ class Guild(BaseModel):
     """system channel flags"""
 
     rules_channel_id: Snowflake | None
-    """the id of the channel where Community guilds can display rules and / or guidelines"""
+    """the id of the channel where Community guilds can display rules and/or guidelines"""
 
     max_presences: int | None = None
     """the maximum number of presences for the guild(null is always returned, apart from the largest of guilds)"""
@@ -213,10 +214,10 @@ class Guild(BaseModel):
     """the maximum amount of users in a video channel"""
 
     approximate_member_count: int | None = None
-    """approximate number of members in this guild, returned from the GET / guilds / <id > endpoint when with_counts is true"""
+    """approximate number of members in this guild, returned from the GET/guilds/<id > endpoint when with_counts is true"""
 
     approximate_presence_count: int | None = None
-    """approximate number of non - offline members in this guild, returned from the GET / guilds / <id > endpoint when with_counts is true"""
+    """approximate number of non - offline members in this guild, returned from the GET/guilds/<id > endpoint when with_counts is true"""
 
     welcome_screen: WelcomeScreen | None = None
     """the welcome screen of a Community guild, shown to new members, returned in an Invite's guild object"""
@@ -224,7 +225,7 @@ class Guild(BaseModel):
     nsfw_level: int
     """guild NSFW level"""
 
-    stickers: Sticker | None = None
+    stickers: list[Sticker] | None = None
     """custom guild stickers"""
 
     premium_progress_bar_enabled: bool
@@ -271,6 +272,22 @@ class GuildPreview(BaseModel):
     """the description for the guild, if the guild is discoverable"""
 
 
+class BeginPruneData(BaseModel):
+    """Data for begin prune.
+
+    https://discord.com/developers/docs/resources/guild#begin-guild-prune-query-string-params
+    """
+
+    days: int | None = None
+    """number of days to count prune for(1 or more)"""
+
+    compute_prune_count: bool | None = None
+    """whether 'pruned' is returned, discouraged for large guilds"""
+
+    include_roles: list[Snowflake] | None = None
+    """roles to include"""
+
+
 class Prune(BaseModel):
     """
     Object returned by the prune endpoints.
@@ -287,7 +304,7 @@ class VoiceRegion(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/voice#voice-region-object-voice-region-structure
     """
-    id: Snowflake
+    id: str
     """voice region id"""
 
     name: str
@@ -412,11 +429,149 @@ class InviteChannel(BaseModel):
 
 
 @enum.unique
+class IntegrationType(enum.StrEnum):
+    """
+    Type of integration.
+    """
+    TWITCH = 'twitch'
+    YOUTUBE = 'youtube'
+    DISCORD = 'discord'
+
+
+class GeneralIntegration(BaseModel):
+    """
+    Inntegration object for all types of integrations except Dicscord.
+
+    Reference: https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
+    """
+    id: Snowflake
+    """integration id"""
+
+    name: str
+    """integration name"""
+
+    type: Literal[IntegrationType.TWITCH, IntegrationType.YOUTUBE]
+    """integration type (twitch, youtube, or discord)"""
+
+    enabled: bool
+    """is this integration enabled"""
+
+    syncing: bool
+    """is this integration being synced"""
+
+    role_id: Snowflake
+    """id that this integration uses for "subscribers"""
+
+    enable_emoticons: bool
+    """whether emoticons should be synced for this integration (twitch only currently)"""
+
+    expire_behavior: ExpireBehavior
+    """the behavior of expiring subscribers"""
+
+    expire_grace_period: int
+    """the grace period (in days) before expiring subscribers"""
+
+    user: User
+    """user for this integration"""
+
+    account: IntegrationAccount
+    """integration account information"""
+
+    synced_at: datetime.datetime
+    """when this integration was last synced"""
+
+    subscriber_count: int
+    """how many subscribers this integration has"""
+
+    revoked: bool
+    """has this integration been revoked"""
+
+    application: IntegrationApplication | None = None
+    """the bot/OAuth2 application for discord integrations"""
+
+    scopes: list[str] | None = None
+    """the scopes the application has been authorized for"""
+
+
+class DiscordIntegration(BaseModel):
+    """
+    Integration object for Discord integrations.
+
+    Reference: https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
+    """
+
+    id: Snowflake
+    """integration id"""
+
+    name: str
+    """integration name"""
+
+    type: Literal[IntegrationType.DISCORD]
+    """integration type (twitch, youtube, or discord)"""
+
+    account: IntegrationAccount
+    """integration account information"""
+
+    application: IntegrationApplication | None = None
+    """the bot/OAuth2 application for discord integrations"""
+
+    scopes: list[str] | None = None
+    """the scopes the application has been authorized for"""
+
+
+IntegrationVariants = GeneralIntegration | DiscordIntegration
+
+
+@enum.unique
+class ExpireBehavior(enum.IntEnum):
+    """
+    The behavior of expiring subscribers.
+    """
+    REMOVE_ROLE = 0
+    KICK = 1
+
+
+class IntegrationAccount(BaseModel):
+    """
+    Integration Account Structure.
+
+    Reference: https://discord.com/developers/docs/resources/guild#integration-account-object
+    """
+    id: str
+    """id of the account"""
+
+    name: str
+    """name of the account"""
+
+
+class IntegrationApplication(BaseModel):
+    """
+    Integration Application Structure.
+
+    Reference: https://discord.com/developers/docs/resources/guild#integration-application-object
+    """
+    id: Snowflake
+    """id of the app"""
+
+    name: str
+    """name of the app"""
+
+    icon: str | None = None
+    """icon hash of the app"""
+
+    description: str
+    """description of the app"""
+
+    bot: User | None = None
+    """bot associated with this application"""
+
+
+@enum.unique
 class Feature(enum.StrEnum):
     """
     Guild features.
 
-    Reference: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
+    Reference: https://discord.com/developers/docs/resources/guild  # guild-object-guild-features
     """
     ANIMATED_BANNER = 'ANIMATED_BANNER'
     """guild has access to set an animated guild banner image"""
@@ -489,6 +644,23 @@ class Feature(enum.StrEnum):
     """guild has enabled the welcome screen"""
 
 
+class UpdateWelcomeScreenData(BaseModel):
+    """
+    Welcome screen update data.
+
+    Reference: https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
+    """
+    enabled: bool | None = None
+    """Whether the welcome screen is enabled"""
+
+    # FIXME: Field(max_items=5) is not working, pydantic bug
+    welcome_channels: list[WelcomeScreenChannel] | None = None
+    """The channels shown in the welcome screen, max 5"""
+
+    description: str | None = None
+    """The server description shown in the welcome screen"""
+
+
 class WelcomeScreen(BaseModel):
     """
     Welcome screen object.
@@ -499,7 +671,8 @@ class WelcomeScreen(BaseModel):
     description: str | None
     """The server description shown in the welcome screen"""
 
-    welcome_channels: list[WelcomeScreenChannel] = Field(max_items=5)
+    # FIXME: Field(max_items=5) is not working, pydantic bug
+    welcome_channels: list[WelcomeScreenChannel]
     """The channels shown in the welcome screen, up to 5"""
 
 
@@ -529,11 +702,13 @@ class DefaultMessageNotificationLevel(enum.IntEnum):
     """Members will receive notifications for all messages by default."""
 
     ONLY_MENTIONS = 1
-    """Members will receive notifications only for messages that @ mention them by default."""
+    """Members will receive notifications only for messages that @mention them by default."""
 
 
 @enum.unique
 class MFALevel(enum.IntEnum):
+    """Level of Multi Factor Authentication"""
+
     NONE = 0
     """guild has no MFA/2FA requirement for moderation actions"""
 
@@ -557,3 +732,9 @@ class UnavailableGuild(BaseModel):
 
     unavailable: bool
     """true if this guild is unavailable due to an outage"""
+
+
+Guild.update_forward_refs()
+GuildPreview.update_forward_refs()
+GeneralIntegration.update_forward_refs()
+DiscordIntegration.update_forward_refs()
