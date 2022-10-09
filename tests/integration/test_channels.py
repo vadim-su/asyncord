@@ -12,13 +12,13 @@ TEST_MEMBER_ID = '934564225769148436'
 TEST_ROLE_ID = '1010835042957787181'
 
 
-class TestMembers:
+class TestChannels:
     @pytest.fixture()
-    async def members(self, client: RestClient):
+    async def channels(self, client: RestClient):
         return client.channels
 
     async def test_get_channel(self, channels: ChannelResource):
-        channel = await channels.get_channel(TEST_CHANNEL_ID)
+        channel = await channels.get(TEST_CHANNEL_ID)
         assert channel.id == TEST_CHANNEL_ID
         assert channel.guild_id == TEST_GUILD_ID
         assert channel.type is ChannelType.GUILD_TEXT

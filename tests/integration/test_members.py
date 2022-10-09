@@ -4,7 +4,7 @@ import pytest
 
 from asyncord.client.rest import RestClient
 from asyncord.client.members import MemberResource
-from asyncord.client.http_client import DiscordError
+from asyncord.client.client_errors import ClientError
 
 TEST_GUILD_ID = '763522265874694144'
 TEST_MEMBER_ID = '934564225769148436'
@@ -67,5 +67,5 @@ class TestMembers:
         assert member.user
         await members.kick(verum_user_id, 'test')
 
-        with pytest.raises(DiscordError, match=r'\(\d*\) Unknown Member'):
+        with pytest.raises(ClientError, match=r'\(\d*\) Unknown Member'):
             member = await members.get(verum_user_id)

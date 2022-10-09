@@ -4,7 +4,7 @@ import pytest
 
 from asyncord.client.bans import BanResource
 from asyncord.client.rest import RestClient
-from asyncord.client.http_client import DiscordError
+from asyncord.client.client_errors import ClientError
 
 TEST_GUILD_ID = '763522265874694144'
 TEST_MEMBER_ID = '934564225769148436'
@@ -19,7 +19,7 @@ def ban_managment(client: RestClient):
 @pytest.mark.skip(reason='Dangerous operation. Needs manual control.')
 async def test_ban_managment(ban_managment: BanResource):
     verum_user_id = '559629484442255370'
-    with pytest.raises(DiscordError, match=r'\(\d*\) Unknown Ban'):
+    with pytest.raises(ClientError, match=r'\(\d*\) Unknown Ban'):
         await ban_managment.get(verum_user_id)
 
     bans = await ban_managment.get_list()
