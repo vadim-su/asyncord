@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 import datetime
+from typing import Literal
 
 from pydantic import Field, BaseModel, root_validator
 
@@ -13,12 +14,171 @@ from asyncord.client.models.channels import Channel, ChannelMention
 from asyncord.client.models.stickers import Sticker
 
 
+@enum.unique
+class MessageFlags(enum.IntFlag):
+    """Message flags.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#message-object-message-flags
+    """
+    CROSSPOSTED = 1 << 0
+    """this message has been published to subscribed channels (via Channel Following)"""
+
+    IS_CROSSPOST = 1 << 1
+    """this message originated from a message in another channel (via Channel Following)"""
+
+    SUPPRESS_EMBEDS = 1 << 2
+    """do not include any embeds when serializing this message"""
+
+    SOURCE_MESSAGE_DELETED = 1 << 3
+    """the source message for this crosspost has been deleted (via Channel Following)"""
+
+    URGENT = 1 << 4
+    """this message came from the urgent message system"""
+
+    HAS_THREAD = 1 << 5
+    """this message is only visible to the user who invoked the Interaction"""
+
+    EPHEMERAL = 1 << 6
+    """this message is only visible to the user who invoked the Interaction"""
+
+    LOADING = 1 << 7
+    """this message is an Interaction Response and the bot is 'thinking'"""
+
+    FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8
+    """this message failed to mention some roles and add their members to the thread"""
+
+
+class _MessageData(BaseModel):
+    @root_validator
+    def check_total_embed_text_length(cls, values):
+        """Check total embed text length.
+
+        Read more info at:
+        https://discord.com/developers/docs/resources/channel#message-object-message-structure
+        """
+        embeds: list[Embed] = values.get('embeds') or []
+
+        total_embed_text_length = 0
+        for embed in embeds:
+            total_embed_text_length += len(embed.title or '')
+            total_embed_text_length += len(embed.description or '')
+
+            if embed.footer:
+                total_embed_text_length += len(embed.footer.text or '')
+
+            if embed.author:
+                total_embed_text_length += len(embed.author.name or '')
+
+            if embed.fields:
+                for field in embed.fields:
+                    total_embed_text_length += len(field.name or '')
+                    total_embed_text_length += len(field.value or '')
+
+            if total_embed_text_length > 6000:
+                raise ValueError('Total embed text length must be less than 6000 characters.')
+
+        return values
+
+    @root_validator
+    def has_content_or_embeds(cls, values):
+        """Check if the message has content or embeds.
+
+        Read more info at:
+        https://discord.com/developers/docs/resources/channel#message-object-message-structure
+        """
+        has_any_content = bool(
+            values.get('content', False)
+            or values.get('embeds', False)
+            or values.get('sticker_ids', False)
+            or values.get('components', False)
+            # or values.get('files[n]', False) # FIXME: activate when attachments are implemented
+        )
+
+        if not has_any_content:
+            raise ValueError('Message must have content, embeds, stickers or components.')
+
+        return values
+
+
+class CreateMessageData(_MessageData):
+    """The data to create a message with.
+
+    More info at: https://discord.com/developers/docs/resources/channel#create-message
+    """
+
+    content: str | None = Field(None, max_length=2000)
+    """The message content."""
+
+    nonce: str | int | None = Field(None, max_length=25)
+    """Can be used to verify a message was sent.
+
+    Value will appear in the Message Create event.
+    """
+
+    tts: bool | None = None
+    """True if this is a TTS message."""
+
+    embeds: list[Embed] | None = None
+    """Embedded rich content."""
+
+    allowed_mentions: AllowedMentions | None = None
+    """Allowed mentions for the message."""
+
+    message_reference: MessageReference | None = None
+    """Reference data sent with crossposted messages."""
+
+    components: list[MessageComponent] | None = None
+    """Components to include with the message."""
+
+    sticker_ids: list[Snowflake] | None = None
+    """Sticker ids to include with the message."""
+
+    # FIXME: add attachments
+
+    flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
+    """The flags to use when sending the message.
+
+    Only MessageFlags.SUPPRESS_EMBEDS can be set.
+    """
+
+
+class UpdateMessageData(_MessageData):
+    """The data to update a message with.
+
+    More info at: https://discord.com/developers/docs/resources/channel#edit-message-json-params
+    """
+
+    content: str | None = Field(None, max_length=2000)
+    """The message content."""
+
+    embeds: list[Embed] | None = None
+    """Embedded rich content."""
+
+    flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
+    """The flags to use when sending the message.
+
+    Only MessageFlags.SUPPRESS_EMBEDS can be set.
+    """
+
+    allowed_mentions: AllowedMentions | None = None
+    """Allowed mentions for the message."""
+
+    # FIXME: add attachments
+    components: list[MessageComponent] | None = None
+    """Components to include with the message."""
+
+    sticker_ids: list[Snowflake] | None = None
+    """Sticker ids to include with the message."""
+
+
 class Message(BaseModel):
     """Message object.
 
     Read more info at:
     https://discord.com/developers/docs/resources/channel#message-object
     """
+
     id: Snowflake
     """id of the message"""
 
@@ -107,33 +267,6 @@ class Message(BaseModel):
 
     message: str | None = None
     """error message"""
-
-    @root_validator
-    def check_total_embed_text_length(cls, values):
-        """Check total embed text length.
-
-        Read more info at:
-        https://discord.com/developers/docs/resources/channel#message-object-message-structure
-        """
-        embeds: list[Embed] = values.get('embeds', [])
-
-        total_embed_text_length = 0
-        for embed in embeds:
-            total_embed_text_length += len(embed.title or '')
-            total_embed_text_length += len(embed.description or '')
-            if embed.footer:
-                total_embed_text_length += len(embed.footer.text or '')
-            if embed.author:
-                total_embed_text_length += len(embed.author.name or '')
-            if embed.fields:
-                for field in embed.fields:
-                    total_embed_text_length += len(field.name or '')
-                    total_embed_text_length += len(field.value or '')
-
-            if total_embed_text_length > 6000:
-                raise ValueError('Total embed text length must be less than 6000 characters.')
-
-        return values
 
 
 class Reaction(BaseModel):
@@ -527,6 +660,42 @@ class MessageApplication(BaseModel):
     """name of the application"""
 
 
+@enum.unique
+class AllowedMentionType(enum.Enum):
+    """Type of allowed mention.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types
+    """
+    ROLES = "roles"
+    """Controls role mentions."""
+
+    USERS = "users"
+    """Controls user mentions."""
+
+    EVERYONE = "everyone"
+    """Controls @everyone and @here mentions"""
+
+
+class AllowedMentions(BaseModel):
+    """Allowed mentions object.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#allowed-mentions-object
+    """
+    parse: list[AllowedMentionType] | None = None
+    """array of allowed mention types to parse from the content"""
+
+    roles: list[Snowflake] | None = Field(None, max_items=100)
+    """array of role_ids to mention"""
+
+    users: list[Snowflake] | None = Field(None, max_items=100)
+    """array of user_ids to mention"""
+
+    replied_user: bool | None = None
+    """for replies, whether to mention the author of the message being replied to"""
+
+
 class MessageReference(BaseModel):
     """Message reference object.
 
@@ -545,41 +714,6 @@ class MessageReference(BaseModel):
     fail_if_not_exists: bool | None = None
     """when sending, whether to error if the referenced message doesn't exist
     instead of sending as a normal (non-reply) message, default true"""
-
-
-@enum.unique
-class MessageFlags(enum.IntFlag):
-    """Message flags.
-
-    Read more info at:
-    https://discord.com/developers/docs/resources/channel#message-object-message-flags
-    """
-    CROSSPOSTED = 1 << 0
-    """this message has been published to subscribed channels (via Channel Following)"""
-
-    IS_CROSSPOST = 1 << 1
-    """this message originated from a message in another channel (via Channel Following)"""
-
-    SUPPRESS_EMBEDS = 1 << 2
-    """do not include any embeds when serializing this message"""
-
-    SOURCE_MESSAGE_DELETED = 1 << 3
-    """the source message for this crosspost has been deleted (via Channel Following)"""
-
-    URGENT = 1 << 4
-    """this message came from the urgent message system"""
-
-    HAS_THREAD = 1 << 5
-    """this message is only visible to the user who invoked the Interaction"""
-
-    EPHEMERAL = 1 << 6
-    """this message is only visible to the user who invoked the Interaction"""
-
-    LOADING = 1 << 7
-    """this message is an Interaction Response and the bot is 'thinking'"""
-
-    FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8
-    """this message failed to mention some roles and add their members to the thread"""
 
 
 class MessageComponent(BaseModel):
@@ -687,3 +821,4 @@ class InteractionType(enum.IntEnum):
 
 Message.update_forward_refs()
 Embed.update_forward_refs()
+MessageInteraction.update_forward_refs()

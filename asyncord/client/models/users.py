@@ -36,7 +36,7 @@ class User(BaseModel):
     discriminator: str = Field(min_len=4, max_len=4)
     """The user's 4 - digit discord-tag."""
 
-    avatar: str
+    avatar: str | None
     """The user's avatar hash."""
 
     bot: bool | None = None

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import enum
-import typing
 from datetime import datetime
 
 from pydantic import Field, BaseModel, validator
@@ -188,17 +187,17 @@ class ChannelType(enum.IntEnum):
     GUILD_CATEGORY = 4
     """An organizational category that contains up to 50 channels."""
 
-    GUILD_NEWS = 5
-    """A channel that users can follow and crosspost into their own server."""
+    GUILD_ANNOUNCEMENT = 5
+    """A channel that users can follow and crosspost into their own server.
 
-    GUILD_STORE = 6
-    """A channel in which game developers can sell their game on Discord."""
+    Formerly news channels.
+    """
 
-    GUILD_NEWS_THREAD = 10
-    """A temporary sub - channel within a `GUILD_NEWS` channel."""
+    ANNOUNCEMENT_THREAD = 10
+    """A temporary sub-channel within a GUILD_ANNOUNCEMENT channel."""
 
     GUILD_PUBLIC_THREAD = 11
-    """A temporary sub - channel within a `GUILD_TEXT` channel."""
+    """A temporary sub-channel within a GUILD_TEXT channel."""
 
     GUILD_PRIVATE_THREAD = 12
     """A temporary sub - channel within a `GUILD_TEXT` channel.
@@ -209,6 +208,9 @@ class ChannelType(enum.IntEnum):
 
     GUILD_STAGE_VOICE = 13
     """A voice channel for hosting events with an audience."""
+
+    GUILD_FORUM = 14
+    """Channel that can only contain threads."""
 
 
 @enum.unique
@@ -303,6 +305,10 @@ class ChannelFlag(enum.IntFlag):
 
     PINNED = 1 << 1
     """Whether the channel is pinned."""
+
+    REQUIRE_TAG = 1 << 4
+    """whether a tag is required to be specified when creating a thread in a GUILD_FORUM channel.
+    Tags are specified in the applied_tags field"""
 
 
 class ForumTag(BaseModel):
