@@ -6,9 +6,9 @@ import datetime
 from pydantic import Field, BaseModel
 
 from asyncord.snowflake import Snowflake
+from asyncord.gateway.events.base import GatewayEvent
 from asyncord.client.models.members import Member
 from asyncord.client.models.messages import Message
-from asyncord.gateway.events.base import GatewayEvent
 
 
 class MessageCreateEvent(GatewayEvent, Message):
@@ -69,6 +69,19 @@ class MessageDeleteBulkEvent(GatewayEvent):
     """the id of the guild"""
 
 
+class MessageReactionEmoji(BaseModel):
+    """https://discord.com/developers/docs/topics/gateway#message-reaction-add-message-reaction-add-event-fields"""
+
+    name: str
+    """the name of the emoji"""
+
+    id: Snowflake | None = None
+    """the id of the emoji"""
+
+    animated: bool | None = None
+    """whether this emoji is animated"""
+
+
 class MessageReactionAddEvent(GatewayEvent):
     """Sent when a user adds a reaction to a message.
 
@@ -92,19 +105,6 @@ class MessageReactionAddEvent(GatewayEvent):
 
     emoji: MessageReactionEmoji
     """the emoji used to react"""
-
-
-class MessageReactionEmoji(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#message-reaction-add-message-reaction-add-event-fields"""
-
-    name: str
-    """the name of the emoji"""
-
-    id: Snowflake | None = None
-    """the id of the emoji"""
-
-    animated: bool | None = None
-    """whether this emoji is animated"""
 
 
 class MessageReactionRemoveEvent(GatewayEvent):
