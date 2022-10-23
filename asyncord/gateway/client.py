@@ -248,8 +248,8 @@ class AsyncGatewayClient:
             await self.heartbeat()
             if self._check_heartbeat_ack_task:
                 self._check_heartbeat_ack_task.cancel()
-            next_run = max(heartbeat_period * random.random(), heartbeat_period / 4, 10)
-            next_run = round(next_run, 3)  # noqa: S311
+            next_run = max(heartbeat_period * random.random(), heartbeat_period / 4, 10)  # noqa: S311
+            next_run = round(next_run, 3)
             logger.debug('Heartbeat sent. Next run in {0} seconds', next_run)
 
             self._check_heartbeat_ack_task = asyncio.create_task(

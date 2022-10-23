@@ -8,7 +8,7 @@ ignore = W503,
         WPS306,  # Wrong multiline string use violation
 
 per-file-ignores =
-        test_*.py: D100, D101, D102, D103, S101, DAR101, WPS214
+        test_*.py: D100, D101, D102, D103, S101, DAR101, WPS214, WPS217, WPS437
 
 exclude =
     .git,
