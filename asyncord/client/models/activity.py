@@ -134,10 +134,10 @@ class ActivityEmoji(BaseModel):
 class ActivityParty(BaseModel):
     """https://discord.com/developers/docs/topics/gateway#activity-object-activity-party"""
 
-    id: str
+    id: str | None = None
     """the id of the party"""
 
-    size: tuple[int, int]
+    size: tuple[int, int] | None = None
     """used to show the party's current and maximum size"""
 
 
