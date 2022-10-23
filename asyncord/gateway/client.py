@@ -4,8 +4,7 @@ import random
 import asyncio
 import logging
 from math import floor
-from typing import Any, TypeVar, Protocol, cast
-from collections.abc import Callable, Awaitable
+from typing import Any, TypeVar, cast
 
 import aiohttp
 from loguru import logger
@@ -16,11 +15,12 @@ from rich.logging import RichHandler
 from asyncord.urls import GATEWAY_URL
 from asyncord.gateway import errors
 from asyncord.typedefs import StrOrURL
+from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 from asyncord.gateway.message import GatewayMessage, GatewayEventOpcode, GatewayCommandOpcode
+from asyncord.gateway.commands import ResumeCommand, IdentifyCommand, PresenceUpdateData
 from asyncord.gateway.dispatcher import EventDispatcher, EventHandlerType
 from asyncord.gateway.events.base import HelloEvent, ReadyEvent, GatewayEvent
 from asyncord.client.models.activity import Activity, ActivityType
-from asyncord.client.models.commands import ResumeCommand, IdentifyCommand, PresenceUpdateData
 from asyncord.gateway.events.messages import MessageCreateEvent
 from asyncord.gateway.events.event_map import EVENT_MAP
 
@@ -44,6 +44,7 @@ class AsyncGatewayClient:
         self,
         token: str,
         session: aiohttp.ClientSession | None = None,
+        intents: Intent = DEFAULT_INTENTS,
         ws_url: StrOrURL = GATEWAY_URL,
     ):
         """Initialize the client.
@@ -54,6 +55,7 @@ class AsyncGatewayClient:
             ws_url (StrOrURL): The URL to connect to. Defaults to the Discord Gateway URL.
         """
         self.token = token
+        self.intents = intents
         self.dispatcher = EventDispatcher()
         self.dispatcher.add_argument('gateway', self)
         self.ws = None
@@ -227,7 +229,7 @@ class AsyncGatewayClient:
                 seq=self._last_seq_number,
             ))
         else:
-            await self.identify(IdentifyCommand(token=self.token))
+            await self.identify(IdentifyCommand(token=self.token, intents=self.intents))
 
     async def _ready(self, event: ReadyEvent) -> None:
         """Handle the ready event."""

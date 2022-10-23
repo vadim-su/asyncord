@@ -3,11 +3,10 @@ from __future__ import annotations
 import enum
 import platform
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel
 
 from asyncord import __version__
-from asyncord.snowflake import Snowflake
-from asyncord.client.models.intents import DEFAULT_INTENTS, Intent
+from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 from asyncord.client.models.activity import Activity
 
 
