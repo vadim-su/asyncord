@@ -17,7 +17,7 @@ from asyncord.urls import GATEWAY_URL
 from asyncord.gateway import errors
 from asyncord.typedefs import StrOrURL
 from asyncord.gateway.message import GatewayMessage, GatewayEventOpcode, GatewayCommandOpcode
-from asyncord.gateway.dispatcher import HandlerType, EventDispatcher
+from asyncord.gateway.dispatcher import EventDispatcher, EventHandlerType
 from asyncord.gateway.events.base import HelloEvent, ReadyEvent, GatewayEvent
 from asyncord.client.models.activity import Activity, ActivityType
 from asyncord.client.models.commands import ResumeCommand, IdentifyCommand, PresenceUpdateData
@@ -34,7 +34,7 @@ logger.configure(handlers=[{
 }])
 
 
-EVENT_TYPE = TypeVar('EVENT_TYPE', bound=GatewayEvent)
+_EVENT_T = TypeVar('_EVENT_T', bound=GatewayEvent)
 
 
 class AsyncGatewayClient:
@@ -67,11 +67,11 @@ class AsyncGatewayClient:
         self._check_heartbeat_ack_task = None
         self._heartbeat_task = None
 
-    def add_handler(self, event_handler: HandlerType[EVENT_TYPE]) -> None:
+    def add_handler(self, event_handler: EventHandlerType[_EVENT_T, ...]) -> None:
         """Add an event handler.
 
         Arguments:
-            event_handler (Callable[[EVENT_TYPE], Awaitable[None]]): The event handler to add.
+            event_handler (EventHandlerType[_EVENT_T]): The event handler to add.
         """
         self.dispatcher.add_handler(event_handler)
 
