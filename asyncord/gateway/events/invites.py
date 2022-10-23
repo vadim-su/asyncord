@@ -3,7 +3,7 @@ import datetime
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
 from asyncord.client.models.invites import InviteTargetType
-from asyncord.client.models.events.base import GatewayEvent
+from asyncord.gateway.events.base import GatewayEvent
 from asyncord.client.models.applications import Application
 
 

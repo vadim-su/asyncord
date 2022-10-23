@@ -1,5 +1,5 @@
 
-from asyncord.client.models.events.base import GatewayEvent
+from asyncord.gateway.events.base import GatewayEvent
 from asyncord.client.models.applications import GuildApplicationCommandPermissions
 
 

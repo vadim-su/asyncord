@@ -6,7 +6,7 @@ from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
 from asyncord.client.models.members import Member
 from asyncord.client.models.activity import Activity
-from asyncord.client.models.events.base import GatewayEvent
+from asyncord.gateway.events.base import GatewayEvent
 
 
 class PresenceUpdateEvent(GatewayEvent):

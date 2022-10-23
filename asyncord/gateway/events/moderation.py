@@ -2,7 +2,7 @@
 which have the MANAGE_GUILD permission.
 """
 from asyncord.snowflake import Snowflake
-from asyncord.client.models.events.base import GatewayEvent
+from asyncord.gateway.events.base import GatewayEvent
 from asyncord.client.models.automoderation import RuleAction, TriggerType, AutoModerationRule
 
 

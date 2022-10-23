@@ -5,7 +5,7 @@ from typing import Mapping, Generator
 from loguru import logger
 from rich.pretty import pretty_repr
 
-from asyncord.client.models.events import (
+from asyncord.gateway.events import (
     base,
     guilds,
     channels,

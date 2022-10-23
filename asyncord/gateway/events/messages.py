@@ -8,7 +8,7 @@ from pydantic import Field, BaseModel
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.members import Member
 from asyncord.client.models.messages import Message
-from asyncord.client.models.events.base import GatewayEvent
+from asyncord.gateway.events.base import GatewayEvent
 
 
 class MessageCreateEvent(GatewayEvent, Message):

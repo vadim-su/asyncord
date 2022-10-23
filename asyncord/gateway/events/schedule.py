@@ -1,6 +1,6 @@
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.schedule import GuildScheduleEvent
-from asyncord.client.models.events.base import GatewayEvent
+from asyncord.gateway.events.base import GatewayEvent
 
 
 class GuildScheduledEventCreateEvent(GatewayEvent, GuildScheduleEvent):

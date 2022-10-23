@@ -91,8 +91,8 @@ class _MessageData(BaseModel):
             values.get('content', False)
             or values.get('embeds', False)
             or values.get('sticker_ids', False)
-            or values.get('components', False)
-            # or values.get('files[n]', False) # FIXME: activate when attachments are implemented
+            or values.get('components', False),
+            # or values.get('files[n]', False), # FIXME: activate when attachments are implemented
         )
 
         if not has_any_content:
