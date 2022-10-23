@@ -33,20 +33,3 @@ class RestClient(ClientResource):
 
     async def __aexit__(self, exc_type, exc, tb):
         await self.close()
-
-
-TOKEN = 'OTM0NTY0MjI1NzY5MTQ4NDM2.Yex6wg.AAkUaqRS0ACw8__ERfQ6d8gOdkE'
-
-KOSTOMEISTER_HABITATION = Snowflake(763522265874694144)
-
-
-async def main():
-    from pprint import pprint
-    async with RestClient(TOKEN) as client:
-        resp = await client.guilds.get_preview(KOSTOMEISTER_HABITATION)
-        pprint(resp.body)
-
-
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
