@@ -643,6 +643,23 @@ class Feature(enum.StrEnum):
     WELCOME_SCREEN_ENABLED = 'WELCOME_SCREEN_ENABLED'
     """guild has enabled the welcome screen"""
 
+    # The next values are not documented in the official documentation
+
+    TEXT_IN_VOICE_ENABLED = 'TEXT_IN_VOICE_ENABLED'
+    """guild has enabled text in voice channels"""
+
+    SEVEN_DAY_THREAD_ARCHIVE = 'SEVEN_DAY_THREAD_ARCHIVE'
+    """guild has enabled 7 day thread archive time"""
+
+    THREADS_ENABLED = 'THREADS_ENABLED'
+    """guild has enabled threads"""
+
+    THREE_DAY_THREAD_ARCHIVE = 'THREE_DAY_THREAD_ARCHIVE'
+    """guild has enabled 3 day thread archive time"""
+
+    MEMBER_PROFILES = 'MEMBER_PROFILES'
+    """guild has enabled member profiles"""
+
 
 class UpdateWelcomeScreenData(BaseModel):
     """
