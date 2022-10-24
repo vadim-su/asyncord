@@ -104,7 +104,6 @@ class AsyncGatewayClient:
 
     async def start(self) -> None:
         """Start the gateway client."""
-
         if self._session:
             session = self._session
         else:
