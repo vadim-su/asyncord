@@ -13,12 +13,23 @@ from typing import (  # noqa: WPS235  # Found too many imported names from a mod
 )
 from collections import defaultdict
 
+from loguru import logger
+
 from asyncord.gateway.events.base import GatewayEvent
 
 _EVENT_T = TypeVar('_EVENT_T', bound=GatewayEvent)
 _EVENT_HANDLERS_P = ParamSpec('_EVENT_HANDLERS_P')
 
 EventHandlerType = Callable[Concatenate[_EVENT_T, _EVENT_HANDLERS_P], Awaitable[None]]
+
+logger.configure(handlers=[{
+    'sink': RichHandler(
+        omit_repeated_times=False,
+        rich_tracebacks=True,
+    ),
+    'format': '{message}',
+    # 'level': 'INFO',
+}])
 
 
 class EventDispatcher(Generic[_EVENT_T]):
@@ -106,7 +117,10 @@ class EventDispatcher(Generic[_EVENT_T]):
         event_type = type(event)
         for event_handler in self._handlers.get(event_type, []):
             kwargs = self._arg_map[event_handler]
-            await event_handler(event, **kwargs)
+            try:
+                await event_handler(event, **kwargs)
+            except Exception as exc:
+                logger.exception(exc)
 
     def _update_handler_args(self, event_handler: EventHandlerType[_EVENT_T, ...]) -> None:
         """Update the arguments to pass to an event handler.
