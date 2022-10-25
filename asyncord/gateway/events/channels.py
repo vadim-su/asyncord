@@ -85,17 +85,20 @@ class ThreadListSyncEvent(GatewayEvent):
     members: list[Member]
 
 
-class ThreadMemberUpdate(ThreadMember):
+class ThreadMemberUpdateEvent(GatewayEvent, ThreadMember):
+    """https://discord.com/developers/docs/topics/gateway#thread-member-update"""
+
     guild_id: Snowflake
     """the id of the guild"""
 
+class ThreadMemberUpdate(ThreadMember):
+    """https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields"""
+
+    member: Member
+    """the member object"""
+
     presence: dict[str, Any] | None = None  # FIXME: Add presence object
     """https://discord.com/developers/docs/topics/gateway#presence"""
-
-
-class ThreadMemberUpdateEvent(GatewayEvent, ThreadMemberUpdate):
-    """https://discord.com/developers/docs/topics/gateway#thread-member-update"""
-
 
 class ThreadMembersUpdateEvent(GatewayEvent):
     """https://discord.com/developers/docs/topics/gateway#thread-members-update"""
