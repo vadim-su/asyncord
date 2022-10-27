@@ -7,7 +7,7 @@ from http import HTTPStatus
 from types import MappingProxyType
 
 import aiohttp
-from rich.pretty import pretty_repr
+from pydantic import Field, BaseModel
 from rich.logging import RichHandler
 from aiohttp.client import ClientResponse
 
@@ -31,6 +31,19 @@ class Response(typing.NamedTuple):
     status: int
     headers: typing.Mapping[str, str]
     body: typing.Any
+
+
+class RateLimitBody(BaseModel):
+    """The body of a rate limit response."""
+
+    message: str
+    """A message saying you are being rate limited."""
+
+    retry_after: float
+    """The number of seconds to wait before submitting another request."""
+
+    global_: bool = Field(alias='global')
+    """Whether this is a global rate limit."""
 
 
 class AsyncHttpClient:
@@ -132,11 +145,15 @@ class AsyncHttpClient:
                     )
 
                 case HTTPStatus.TOO_MANY_REQUESTS:
-                    raise errors.RateLimitError(
-                        message=message or 'Unknown error',
-                        resp=resp,
-                        retry_after=int(resp.headers.get('Retry-After', 0)) or None,
-                    )
+                    ratelimit = RateLimitBody(**body)
+                    if ratelimit.retry_after > 10:
+                        raise errors.RateLimitError(
+                            message=message or 'Unknown error',
+                            resp=resp,
+                            retry_after=ratelimit.retry_after or None,
+                        )
+                    await asyncio.sleep(ratelimit.retry_after + 0.1)
+                    await self._request(method, url, payload, headers)
 
                 case status if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
                     raise errors.ClientError(

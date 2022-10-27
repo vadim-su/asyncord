@@ -32,7 +32,7 @@ class RateLimitError(BaseDiscordError):
     This is usually due to too many requests (429).
     """
 
-    def __init__(self, message: str, resp: ClientResponse, retry_after: int | None = None) -> None:
+    def __init__(self, message: str, resp: ClientResponse, retry_after: float | None = None) -> None:
         super().__init__(message, resp)
         self.retry_after = retry_after
 
