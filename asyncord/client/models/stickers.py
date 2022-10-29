@@ -108,3 +108,6 @@ class StickerFormatType(enum.IntEnum):
 
     LOTTIE = 3
     """LOTTIE sticker format"""
+
+
+Sticker.update_forward_refs()
