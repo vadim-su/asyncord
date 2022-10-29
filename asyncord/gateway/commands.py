@@ -24,16 +24,19 @@ class IdentifyConnectionProperties(BaseModel):
 
 
 class ResumeCommand(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#resume"""
+    """Resume a connection to the gateway.
+
+    https://discord.com/developers/docs/topics/gateway-events#resume-resume-structure
+    """
 
     token: str
-    """the session token"""
+    """Session token."""
 
     session_id: str
-    """the session id"""
+    """Session ID."""
 
     seq: int
-    """the last sequence number received"""
+    """Last sequence number received."""
 
 
 class IdentifyCommand(BaseModel):
