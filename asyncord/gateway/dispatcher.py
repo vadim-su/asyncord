@@ -14,6 +14,7 @@ from typing import (  # noqa: WPS235  # Found too many imported names from a mod
 from collections import defaultdict
 
 from loguru import logger
+from rich.logging import RichHandler
 
 from asyncord.gateway.events.base import GatewayEvent
 
