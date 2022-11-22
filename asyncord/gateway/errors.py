@@ -22,3 +22,7 @@ class InvalidSessionError(Exception):
 
     def __init__(self, session_id: str):
         super().__init__(f"Session '{session_id}' is invalid")
+
+
+class NecessaryReconnectError(Exception):
+    """Raised when the client receives a reconnect event."""

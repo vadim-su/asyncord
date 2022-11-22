@@ -113,6 +113,7 @@ class AsyncGatewayClient:
             try:  # noqa: WPS229  # Found too long ``try`` body length
                 await self._ws_loop(session)
                 break
+
             except (
                 aiohttp.ClientConnectorError,
                 errors.HeartbeatAckTimeoutError,
@@ -120,6 +121,10 @@ class AsyncGatewayClient:
             ) as err:
                 logging.error(err)
                 await asyncio.sleep(5)
+
+            except errors.NecessaryReconnectError:
+                logging.info('Reconnect is necessary')
+
         else:
             if not self._session:
                 await session.close()
@@ -210,6 +215,11 @@ class AsyncGatewayClient:
 
             case GatewayEventOpcode.HEARTBEAT_ACK:
                 await self._heartbeat_ack()
+
+            case GatewayEventOpcode.RECONNECT:
+                self._session_id = None
+                self._last_seq_number = 0
+                raise errors.NecessaryReconnectError
 
             case _:
                 logger.warning('Unhandled message:\n{0}', pretty_repr(msg))
