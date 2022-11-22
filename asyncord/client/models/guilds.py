@@ -160,8 +160,11 @@ class Guild(BaseModel):
     emojis: list[Emoji] | None = None
     """custom guild emojis"""
 
-    features: list[Feature]
-    """enabled guild features"""
+    features: list[str]
+    """enabled guild features
+
+    Replaced by str because too often changes without any notifications.
+    """
 
     mfa_level: int
     """required MFA level for the guild"""
@@ -259,8 +262,11 @@ class GuildPreview(BaseModel):
     emojis: list[Emoji] | None = None
     """custom guild emojis"""
 
-    features: list[Feature] | None = None
-    """enabled guild features"""
+    features: list[str]
+    """enabled guild features
+
+    Replaced by str because too often changes without any notifications.
+    """
 
     approximate_member_count: int | None = None
     """approximate number of members in this guild"""
@@ -564,101 +570,6 @@ class IntegrationApplication(BaseModel):
 
     bot: User | None = None
     """bot associated with this application"""
-
-
-@enum.unique
-class Feature(enum.StrEnum):
-    """
-    Guild features.
-
-    Reference: https://discord.com/developers/docs/resources/guild  # guild-object-guild-features
-    """
-    ANIMATED_BANNER = 'ANIMATED_BANNER'
-    """guild has access to set an animated guild banner image"""
-
-    ANIMATED_ICON = 'ANIMATED_ICON'
-    """guild has access to set an animated guild icon"""
-
-    AUTO_MODERATION = 'AUTO_MODERATION'
-    """guild has set up auto moderation rules"""
-
-    BANNER = 'BANNER'
-    """guild has access to set a guild banner image"""
-
-    COMMUNITY = 'COMMUNITY'
-    """Guild can enable some additional community features.
-
-    Welcome screen, Membership Screening, stage channels and discovery,
-    and receives community updates
-    """
-
-    DISCOVERABLE = 'DISCOVERABLE'
-    """guild is able to be discovered in the directory"""
-
-    FEATURABLE = 'FEATURABLE'
-    """guild is able to be featured in the directory"""
-
-    INVITES_DISABLED = 'INVITES_DISABLED'
-    """guild has paused invites, preventing new users from joining"""
-
-    INVITE_SPLASH = 'INVITE_SPLASH'
-    """guild has access to set an invite splash background"""
-
-    MEMBER_VERIFICATION_GATE_ENABLED = 'MEMBER_VERIFICATION_GATE_ENABLED'
-    """guild has enabled Membership Screening"""
-
-    MONETIZATION_ENABLED = 'MONETIZATION_ENABLED'
-    """guild has enabled monetization"""
-
-    MORE_STICKERS = 'MORE_STICKERS'
-    """guild has increased custom sticker slots"""
-
-    NEWS = 'NEWS'
-    """guild has access to create announcement channels"""
-
-    PARTNERED = 'PARTNERED'
-    """guild is partnered"""
-
-    PREVIEW_ENABLED = 'PREVIEW_ENABLED'
-    """guild can be previewed before joining via Membership Screening or the directory"""
-
-    PRIVATE_THREADS = 'PRIVATE_THREADS'
-    """guild has access to create private threads"""
-
-    ROLE_ICONS = 'ROLE_ICONS'
-    """guild is able to set role icons"""
-
-    TICKETED_EVENTS_ENABLED = 'TICKETED_EVENTS_ENABLED'
-    """guild has enabled ticketed events"""
-
-    VANITY_URL = 'VANITY_URL'
-    """guild has access to set a vanity URL"""
-
-    VERIFIED = 'VERIFIED'
-    """guild is verified"""
-
-    VIP_REGIONS = 'VIP_REGIONS'
-    """guild has access to set 384kbps bitrate in voice"""
-
-    WELCOME_SCREEN_ENABLED = 'WELCOME_SCREEN_ENABLED'
-    """guild has enabled the welcome screen"""
-
-    # The next values are not documented in the official documentation
-
-    TEXT_IN_VOICE_ENABLED = 'TEXT_IN_VOICE_ENABLED'
-    """guild has enabled text in voice channels"""
-
-    SEVEN_DAY_THREAD_ARCHIVE = 'SEVEN_DAY_THREAD_ARCHIVE'
-    """guild has enabled 7 day thread archive time"""
-
-    THREADS_ENABLED = 'THREADS_ENABLED'
-    """guild has enabled threads"""
-
-    THREE_DAY_THREAD_ARCHIVE = 'THREE_DAY_THREAD_ARCHIVE'
-    """guild has enabled 3 day thread archive time"""
-
-    MEMBER_PROFILES = 'MEMBER_PROFILES'
-    """guild has enabled member profiles"""
 
 
 class UpdateWelcomeScreenData(BaseModel):
