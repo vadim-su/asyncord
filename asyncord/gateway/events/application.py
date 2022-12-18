@@ -4,4 +4,7 @@ from asyncord.client.models.applications import GuildApplicationCommandPermissio
 
 
 class GuildApplicationCommandPermissionsUpdateEvent(GatewayEvent, GuildApplicationCommandPermissions):
-    """https://discord.com/developers/docs/topics/gateway#application-command-permissions-update"""
+    """Sent when an application command's permissions are updated.
+
+    https://discord.com/developers/docs/topics/gateway-events#application-command-permissions-update
+    """

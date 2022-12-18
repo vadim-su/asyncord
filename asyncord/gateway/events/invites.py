@@ -2,69 +2,79 @@ import datetime
 
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
-from asyncord.client.models.invites import InviteTargetType
 from asyncord.gateway.events.base import GatewayEvent
+from asyncord.client.models.invites import InviteTargetType
 from asyncord.client.models.applications import Application
 
 
 class InviteCreateEvent(GatewayEvent):
     """Sent when a new invite to a channel is created.
 
-    https://discord.com/developers/docs/topics/gateway#invite-create
+    https://discord.com/developers/docs/topics/gateway-events#invite-create
     """
 
     channel_id: Snowflake
-    """the channel the invite is for"""
+    """Channel the invite is for."""
 
     code: str
-    """the unique invite[code](https://discord.com/developers/docs/resources/invite#invite-object)"""
+    """Unique invite [code](https://discord.com/developers/docs/resources/invite#invite-object)."""
 
     created_at: datetime.datetime
-    """the time at which the invite was created"""
+    """Time at which the invite was created."""
 
     guild_id: Snowflake | None = None
-    """	the guild of the invite"""
+    """Guild id of the invite."""
 
     inviter: User
-    """the user who created the invite"""
+    """User who created the invite."""
 
     max_age: int
-    """how long the invite is valid for (in seconds), or 0 if it doesn't expire"""
+    """How long the invite is valid for (in seconds).
+
+    0 if it doesn't expire.
+    """
 
     max_uses: int
-    """the maximum number of times the invite can be used, or 0 if there is no limit"""
+    """Maximum number of times the invite can be used.
+
+    0 if there is no limit.
+    """
 
     target_type: InviteTargetType | None = None
-    """the type of target for the voice channel invite"""
+    """Type of target for the voice channel invite."""
 
     target_user: User | None = None
-    """the user whose stream to display for this invite"""
+    """User whose stream to display for this invite."""
 
     # FIXME: There is should be a partial application object, but it is not documented
     target_application: Application | None = None
-    """the embedded application to open for this voice channel embedded application invite"""
+    """Embedded application to open for this voice channel embedded application invite."""
 
     temporary: bool
-    """whether the invite is temporary (invited users will be kicked
-    on disconnect unless they're assigned a role)
+    """Whether the invite is temporary.
+
+    Invited users will be kicked on disconnect unless they're assigned a role.
     """
 
     # TODO: WTF? Why is this always 0?
     uses: int
-    """the number of times the invite has been used (always will be 0)"""
+    """Number of times the invite has been used.
+
+    Always will be 0!
+    """
 
 
 class InviteDeleteEvent(GatewayEvent):
     """Sent when an invite is deleted.
 
-    https://discord.com/developers/docs/topics/gateway#invite-delete
+    https://discord.com/developers/docs/topics/gateway-events#invite-delete
     """
 
     channel_id: Snowflake
-    """the channel of the invite"""
+    """Channel of the invite."""
 
     guild_id: Snowflake | None = None
-    """the guild of the invite"""
+    """Guild of the invite."""
 
     code: str
-    """the unique invite[code](https://discord.com/developers/docs/resources/invite#invite-object)"""
+    """Unique invite [code](https://discord.com/developers/docs/resources/invite#invite-object)."""

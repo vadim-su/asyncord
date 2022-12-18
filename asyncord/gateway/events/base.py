@@ -12,6 +12,8 @@ from asyncord.client.models.applications import ApplicationFlag
 
 
 class GatewayEvent(BaseModel):
+    """Base class for all gateway events."""
+
     @classmethod
     @property
     def __event_name__(cls) -> str:
@@ -22,33 +24,53 @@ class GatewayEvent(BaseModel):
 
 
 class HelloEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway#hello"""
+    """Sent on connection to the websocket.
+
+    Defines the heartbeat interval that an app should heartbeat to.
+
+    https://discord.com/developers/docs/topics/gateway-events#hello
+    """
 
     heartbeat_interval: int
-    """the interval (in milliseconds) the client should heartbeat with"""
+    """Interval (in milliseconds) the client should heartbeat with."""
 
 
 class ReadyEvent(GatewayEvent):
+    """Dispatched when a client has successfully connected to the gateway.
+
+    The ready event can be the largest and most complex event the gateway will send,
+    as it contains all the state required for a client to begin interacting with
+    the rest of the platform.
+
+    https://discord.com/developers/docs/topics/gateway-events#ready
+    """
+
     api_version: int = Field(alias='v')
-    """gateway protocol version"""
+    """Gateway protocol version."""
 
     user: User
-    """user object"""
+    """User object."""
 
     guilds: list[UnavailableGuild]
-    """array of unavailable guild objects"""
+    """Array of unavailable guild objects."""
 
     session_id: str
-    """used for resuming connections"""
+    """Used for resuming connections."""
 
     resume_gateway_url: str
-    """The gateway url to use for resuming connections."""
+    """Gateway url to use for resuming connections."""
 
     shard: Shard | None = None
-    """the shard information associated with this session, if sent when identifying"""
+    """Shard information associated with this session.
+
+    If sent when identifying.
+    """
 
     application: ReadyEventApplication
-    """application object"""
+    """Application object.
+
+    Contains the application's id and flags.
+    """
 
 
 class ResumedEvent(GatewayEvent):
@@ -61,23 +83,37 @@ class ResumedEvent(GatewayEvent):
 
 
 class ReconnectEvent(BaseModel):
-    __root__: None
+    """Dispatched when the client should reconnect to the gateway.
+
+    https://discord.com/developers/docs/topics/gateway-events#reconnect
+    """
 
 
 class InvalidSessionEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway#invalid-session"""
+    """Dispatched when the client's session is no longer valid.
+
+    Sent to indicate one of at least three different situations:
+    - the gateway could not initialize a session after receiving an Identify event
+    - the gateway could not resume a session after receiving a Resume event
+    - the gateway has invalidated an active session and is requesting client action
+
+    https://discord.com/developers/docs/topics/gateway-events#invalid-session"""
 
     is_resumable: bool
-    """whether or not the session can be resumed"""
+    """Whether or not the session can be resumed."""
 
 
 class Shard(NamedTuple):
+    """Shard information associated with this session."""
     shard_id: int
     num_shards: int
 
 
 class ReadyEventApplication(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields"""
+    """Application object.
+
+    https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields
+    """
 
     id: Snowflake
     """the id of the application"""

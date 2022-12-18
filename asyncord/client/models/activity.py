@@ -8,100 +8,125 @@ from asyncord.snowflake import Snowflake
 
 
 class Activity(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#activity-object
+    """Represents a Discord activity.
 
     Bots are only able to send name, type, and optionally url.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object
     """
 
     name: str
-    """the activity's name"""
+    """Activity's name."""
 
     type: ActivityType
-    """activity type"""
+    """Activity type."""
 
     url: str | None = None
-    """stream url, is validated when type is `ActivityType.STREAMING`
+    """Stream url.
+
+    Is validated when type is `ActivityType.STREAMING`.
 
     Currently only supports Twitch and YouTube.
-    Only https://twitch.tv/ and https://youtube.com/ urls will work
+    Only https://twitch.tv/ and https://youtube.com/ urls will work.
     """
 
     created_at: int | None = None
-    """unix timestamp of when the activity was added to the user's session"""
+    """Unix timestamp of when the activity was added to the user's session."""
 
     timestamps: ActivityTimestamps | None = None
-    """unix timestamps for start and/or end of the game"""
+    """Unix timestamps for start and/or end of the game."""
 
     application_id: Snowflake | None = None
-    """application id for the game"""
+    """Application id for the game."""
 
     details: str | None = None
-    """what the player is currently doing"""
+    """What the player is currently doing."""
 
     state: str | None = None
-    """the user's current party status"""
+    """User's current party status."""
 
     emoji: ActivityEmoji | None = None
-    """emoji data for custom statuses"""
+    """Emoji data for custom statuses."""
 
     party: ActivityParty | None = None
-    """information for the current party of the player"""
+    """Information for the current party of the player."""
 
     assets: ActivityAssets | None = None
-    """images for the presence and their hover texts"""
+    """Images for the presence and their hover texts."""
 
     secrets: ActivitySecrets | None = None
-    """secrets for Rich Presence joining and spectating"""
+    """Secrets for Rich Presence joining and spectating."""
 
     instance: bool | None = None
-    """whether or not the activity is an instanced game session"""
+    """Whether or not the activity is an instanced game session."""
 
     flags: ActivityFlag | None = None
-    """activity flags ORd together, describes what the payload includes"""
+    """Activity flags OR d together.
 
-    buttons: list[ActivityButton] | None = None
+    Describes what the payload includes."""
+
+    buttons: list[ActivityButton] | None = Field(max_items=2)
+    """Custom buttons shown in the Rich Presence.
+
+    Maximum of 2 buttons.
+    """
 
 
 @enum.unique
 class ActivityType(enum.IntEnum):
-    """https://discord.com/developers/docs/topics/gateway#activity-object-activity-types"""
+    """Activity type.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
+    """
 
     GAME = 0
-    """Playing {name}
+    """User is playing a game.
+
+    `Playing {name}`.
 
     Example:
         `Playing Rocket League`
     """
 
     STREAMING = 1
-    """Streaming {details}
+    """User is streaming.
+
+    `Streaming {details}`.
 
     Example:
         `Streaming Rocket League`
     """
 
     LISTENING = 2
-    """Listening to {name}
+    """User is listening to music.
+
+    `Listening to {name}`.
 
     Example:
         `Listening to Spotify`
     """
     WATCHING = 3
-    """Watching {name}
+    """User is watching something.
+
+    `Watching {name}`.
 
     Example:
         `Watching YouTube Together`
     """
 
     CUSTOM = 4
-    """{emoji} {name}
+    """User is doing something with a custom emoji.
+
+    `{emoji} {text}`.
 
     Example:
         `:smile: I'm happy`
     """
 
     COMPETING = 5
-    """Competing in {name}
+    """User is competing in something.
+
+    `Competing in {name}`.
 
     Example:
         `Competing in Arena World Champions`
@@ -109,109 +134,136 @@ class ActivityType(enum.IntEnum):
 
 
 class ActivityTimestamps(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps"""
+    """Timestamps for start and/or end of the `Activity`.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
+    """
 
     start: int | None = None
-    """unix time (in milliseconds) of when the activity started"""
+    """Unix time (in milliseconds) of when the activity started."""
 
     end: int | None = None
-    """unix time (in milliseconds) of when the activity ends"""
+    """Unix time (in milliseconds) of when the activity ends."""
 
 
 class ActivityEmoji(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji"""
+    """Activity emoji.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji
+    """
 
     id: Snowflake | None = None
-    """the id of the emoji"""
+    """Id of the emoji."""
 
     name: str
-    """the name of the emoji"""
+    """Name of the emoji."""
 
     animated: bool | None = None
-    """whether this emoji is animated"""
+    """Whether this emoji is animated."""
 
 
 class ActivityParty(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#activity-object-activity-party"""
+    """Activity party.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party
+    """
 
     id: str | None = None
-    """the id of the party"""
+    """Id of the party."""
 
     size: tuple[int, int] | None = None
-    """used to show the party's current and maximum size"""
+    """Show the party's current and maximum size."""
 
 
 class ActivityAssets(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets"""
+    """Activity assets.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets
+    """
 
     # FIXME: Posible add support for large_image_text and small_image_text validation
-    # https://discord.com/developers/docs/topics/gateway#activity-object-activity-asset-image
+    # https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-asset-image
 
     large_image: str | None = None
-    """the id for a large asset of the activity, usually a snowflake"""
+    """Id for a large asset of the activity,
+
+    Usually a snowflake.
+    """
 
     large_text: str | None = None
-    """text displayed when hovering over the large image of the activity"""
+    """Text displayed when hovering over the large image of the activity."""
 
     small_image: str | None = None
-    """the id for a small asset of the activity, usually a snowflake"""
+    """Id for a small asset of the activity.
+
+    Usually a snowflake.
+    """
 
     small_text: str | None = None
-    """text displayed when hovering over the small image of the activity"""
+    """Text displayed when hovering over the small image of the activity."""
 
 
 class ActivitySecrets(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets"""
+    """Activity secrets.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets
+    """
 
     join: str | None = None
-    """the secret for joining a party"""
+    """Secret for joining a party."""
 
     spectate: str | None = None
-    """the secret for spectating a game"""
+    """Secret for spectating a game."""
 
     match: str | None = None
-    """the secret for a specific instanced match"""
+    """Secret for a specific instanced match."""
 
 
 class ActivityFlag(enum.IntFlag):
-    """https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags"""
+    """Activity flags.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags
+    """
 
     INSTANCE = 1 << 0
-    """this activity is an instanced game session"""
+    """Activity is an instanced game session."""
 
     JOIN = 1 << 1
-    """this activity is joinable"""
+    """Activity is joinable."""
 
     SPECTATE = 1 << 2
-    """this activity can be spectated"""
+    """Activity can be spectated."""
 
     JOIN_REQUEST = 1 << 3
-    """this activity allows asking to join"""
+    """Activity allows asking to join."""
 
     SYNC = 1 << 4
-    """this activity is a spotify track"""
+    """Activity is a spotify track."""
 
     PLAY = 1 << 5
-    """activity is an embedded youtube video"""
+    """Activity is an embedded youtube video."""
 
     PARTY_PRIVACY_FRIENDS = 1 << 6
-    """party privacy is set to friends only"""
+    """Party privacy is set to friends only."""
 
     PARTY_PRIVACY_VOICE_CHANNEL = 1 << 7
-    """party privacy is set to voice channel only"""
+    """Party privacy is set to voice channel only."""
 
     EMBEDDED = 1 << 8
-    """activity is an embedded something"""
+    """Activity is an embedded something."""
 
 
 class ActivityButton(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons"""
+    """Activity button.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
+    """
 
     label: str = Field(min_length=1, max_length=32)
-    """the text shown on the button (1-32 characters)"""
+    """Text shown on the button. Should be between 1-32 characters."""
 
     url: str = Field(min_length=1, max_length=512)
-    """a url for the button (1-512 characters)"""
+    """Url for the button. Should be between 1-512 characters."""
 
 
 Activity.update_forward_refs()

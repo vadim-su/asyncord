@@ -11,16 +11,19 @@ from asyncord.client.models.activity import Activity
 
 
 class IdentifyConnectionProperties(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#identify-identify-connection-properties"""
+    """Identify connection properties.
 
-    os: str = f'{platform.system()} {platform.node()} {platform.release()}'
-    """the operating system of the bot"""
+    https://discord.com/developers/docs/topics/gateway-events#identify-identify-connection-properties
+    """
+
+    os: str = f'{platform.system()} {platform.node()} {platform.release()}'  # noqa: WPS221
+    """Operating system of the bot."""
 
     browser: str = f'asyncord-{__version__}'
-    """the library name of the bot"""
+    """Library name of the bot."""
 
     device: str = f'asyncord-{__version__}'
-    """the library name of the bot"""
+    """Library name of the bot."""
 
 
 class ResumeCommand(BaseModel):
@@ -40,65 +43,79 @@ class ResumeCommand(BaseModel):
 
 
 class IdentifyCommand(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#identify"""
+    """Identify a connection to the gateway.
+
+    https://discord.com/developers/docs/topics/gateway-events#identify-identify-structure
+    """
 
     token: str
-    """authentication token"""
+    """Authentication token."""
 
     intents: Intent = DEFAULT_INTENTS
-    """the gateway intents you wish to receive"""
+    """Gateway intents you wish to receive."""
 
     presence: PresenceUpdateData | None = None
-    """the presence structure for initial presence information"""
+    """Presence structure for initial presence information."""
 
     large_threshold: int | None = None
-    """value between 50 and 250, total number of members where the gateway
-    will stop sending offline members in the guild member list. Defaults to 50"""
+    """Total number of members where the gateway will stop sending offline members.
+
+    Defaults to 50.
+    """
 
     compress: bool | None = None
-    """whether this connection supports compression of packets. Defaults to False"""
+    """Whether this connection supports compression of packets.
+
+    Defaults to False.
+    """
 
     shard: tuple[int, int] | None = None
-    """used for Guild Sharding"""
+    """Used for Guild Sharding."""
 
     properties: IdentifyConnectionProperties = IdentifyConnectionProperties()
-    """connection properties"""
+    """Connection properties."""
 
 
 @enum.unique
 class StatusType(enum.StrEnum):
-    """https://discord.com/developers/docs/topics/gateway#update-presence-status-types"""
+    """Possible statuses for a user.
+
+    https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types
+    """
 
     ONLINE = 'online'
-    """online"""
+    """Online"""
 
     DND = 'dnd'
-    """do not disturb"""
+    """Do not disturb."""
 
     IDLE = 'idle'
     """AFK"""
 
     INVISIBLE = 'invisible'
-    """Invisible and shown as offline"""
+    """Invisible and shown as offline."""
 
     OFFLINE = 'offline'
-    """offline"""
+    """Offline"""
 
 
 class PresenceUpdateData(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#update-presence-gateway-presence-update-structure"""
+    """https://discord.com/developers/docs/topics/gateway-events#update-presence-gateway-presence-update-structure"""
 
     since: int | None = None
-    """unix time (in milliseconds) of when the client went idle, or null if the client is not idle"""
+    """Unix time (in milliseconds) of when the client went idle.
+
+    None if the client is not idle.
+    """
 
     activities: list[Activity] | None = None
-    """the user's activities"""
+    """User's activities."""
 
     status: StatusType = StatusType.ONLINE
-    """the user's new status"""
+    """User's new status."""
 
     afk: bool = False
-    """whether or not the client is afk"""
+    """Whether or not the client is afk."""
 
 
 IdentifyCommand.update_forward_refs()

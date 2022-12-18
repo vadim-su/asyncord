@@ -4,15 +4,15 @@ from pydantic import BaseModel
 
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
+from asyncord.gateway.events.base import GatewayEvent
 from asyncord.client.models.members import Member
 from asyncord.client.models.activity import Activity
-from asyncord.gateway.events.base import GatewayEvent
 
 
 class PresenceUpdateEvent(GatewayEvent):
     """Sent when a user's presence or info, such as name or avatar, is updated.
 
-    https://discord.com/developers/docs/topics/gateway#presence-update
+    https://discord.com/developers/docs/topics/gateway-events#presence-update
     """
 
     user: PresenceUpdateUser
@@ -25,87 +25,93 @@ class PresenceUpdateEvent(GatewayEvent):
     """
 
     guild_id: Snowflake
-    """id of the guild"""
+    """Guild id."""
 
     status: str
-    """either 'idle', 'dnd', 'online', or 'offline'"""
+    """Presence status."""
 
     activities: list[Activity]
-    """user's current activities"""
+    """User's current activities."""
 
     client_status: ClientStatus
-    """user's platform-dependent status"""
+    """User's platform-dependent status."""
 
 
 class PresenceUpdateUser(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields"""
+    """User object sent in presence update events.
+
+    https://discord.com/developers/docs/topics/gateway-events#presence-update-presence-update-event-fields
+    """
 
     id: Snowflake
-    """the user's id"""
+    """User id."""
 
     username: str | None = None
-    """the user's username, not unique across the platform"""
+    """User's username.
+
+    Not unique across the platform.
+    """
 
     discriminator: str | None = None
-    """the user's 4-digit discord-tag"""
+    """User's 4-digit discord-tag."""
 
     avatar: str | None = None
-    """the user's avatar hash"""
+    """User's avatar hash."""
 
     bot: bool | None = None
-    """whether the user belongs to an OAuth2 application"""
+    """Whether the user belongs to an OAuth2 application."""
 
     system: bool | None = None
-    """whether the user is an Official Discord System user (part of the urgent message system)"""
+    """Whether the user is an Official Discord System user (part of the urgent message system)."""
 
     mfa_enabled: bool | None = None
-    """whether the user has two factor enabled on their account"""
+    """Whether the user has two factor enabled on their account."""
 
     locale: str | None = None
-    """the user's chosen language option"""
+    """User's chosen language option."""
 
     verified: bool | None = None
-    """whether the email on this account has been verified"""
+    """Whether the email on this account has been verified."""
 
     email: str | None = None
-    """the user's email"""
+    """User's email."""
 
     flags: int | None = None
-    """the flags on a user's account"""
+    """Flags on a user's account."""
 
     premium_type: int | None = None
-    """the type of Nitro subscription on a user's account"""
+    """Type of Nitro subscription on a user's account."""
 
     public_flags: int | None = None
-    """the public flags on a user's account"""
+    """Public flags on a user's account."""
 
 
 class TypingStartEvent(GatewayEvent):
     """Sent when a user starts typing in a channel.
 
-    https://discord.com/developers/docs/topics/gateway#typing-start
+    https://discord.com/developers/docs/topics/gateway-events#typing-start
     """
 
     channel_id: Snowflake
-    """the id of the channel"""
+    """Channel id."""
 
     guild_id: Snowflake | None = None
-    """the id of the guild"""
+    """Guild id."""
 
     user_id: Snowflake
-    """the id of the user"""
+    """User id."""
 
     timestamp: int
-    """unix time (in seconds) of when the user started typing"""
+    """Unix time (in seconds) of when the user started typing."""
 
     member: Member | None = None
-    """the member who started typing if this happened in a guild"""
+    """Member who started typing if this happened in a guild."""
 
 
 class UserUpdateEvent(GatewayEvent, User):
     """Sent when properties about the user change.
 
-    https://discord.com/developers/docs/topics/gateway#user-update
+    https://discord.com/developers/docs/topics/gateway-events#user-update
     """
 
 
@@ -114,17 +120,17 @@ class ClientStatus(BaseModel):
 
     If a user is offline or invisible, the corresponding field is not present.
 
-    https://discord.com/developers/docs/topics/gateway#client-status-object
+    https://discord.com/developers/docs/topics/gateway-events#client-status-object
     """
 
     desktop: str | None = None
-    """the user's status set for an active desktop (Windows, Linux, Mac) application session"""
+    """User's status set for an active desktop (Windows, Linux, Mac) application session."""
 
     mobile: str | None = None
-    """the user's status set for an active mobile (iOS, Android) application session"""
+    """User's status set for an active mobile (iOS, Android) application session."""
 
     web: str | None = None
-    """the user's status set for an active web (browser, bot account) application session"""
+    """User's status set for an active web (browser, bot account) application session."""
 
 
 PresenceUpdateEvent.update_forward_refs()

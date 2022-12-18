@@ -8,7 +8,7 @@ class Intent(IntFlag):
     """Gateway intents
 
     You can get more information about intent values and related events by the link:
-    https://discord.com/developers/docs/topics/gateway#gateway-intents
+    https://discord.com/developers/docs/topics/gateway-events#gateway-intents
     """
     GUILDS = 1 << 0  # noqa: WPS345
     GUILD_MEMBERS = 1 << 1

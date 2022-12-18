@@ -44,7 +44,7 @@ EVENT_MAP: Mapping[str, type[base.GatewayEvent]] = MappingProxyType({
 })
 """Mapping of event names to event classes.
 
-https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events
+https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events
 """
 
 logger.debug(pretty_repr(EVENT_MAP))

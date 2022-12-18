@@ -8,24 +8,35 @@ from asyncord.client.models.channels import Channel, ChannelType, ThreadMember
 
 
 class ChannelCreateEvent(GatewayEvent, Channel):
-    """https://discord.com/developers/docs/topics/gateway#channel-create"""
+    """Sent when a new guild channel is created.
+
+    Relevant to the current user.
+
+    https://discord.com/developers/docs/topics/gateway-events#channel-create
+    """
 
 
 class ChannelUpdateEvent(GatewayEvent, Channel):
-    """https://discord.com/developers/docs/topics/gateway#channel-update"""
+    """Sent when a channel is updated.
+
+    https://discord.com/developers/docs/topics/gateway-events#channel-update
+    """
 
 
 class ChannelDeleteEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway#channel-delete"""
+    """Sent when a channel is deleted.
+
+    https://discord.com/developers/docs/topics/gateway-events#channel-delete
+    """
 
     id: Snowflake
-    """channel id"""
+    """Channel id."""
 
     type: ChannelType
-    """The type of channel."""
+    """Channel type."""
 
     guild_id: Snowflake
-    """The id of the guild."""
+    """Guild id."""
 
     parent_id: Snowflake | None = None
     """Parent category or channel id.
@@ -38,10 +49,13 @@ class ChannelDeleteEvent(GatewayEvent):
 
 
 class ChannelPinsUpdateEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway#channel-pins-update"""
+    """Sent when a channel's pins are updated.
+
+    https://discord.com/developers/docs/topics/gateway-events#channel-pins-update
+    """
 
     guild_id: Snowflake
-    """the id of the guild"""
+    """Guild id."""
 
     channel_id: Snowflake
     """the id of the channel"""
@@ -51,7 +65,10 @@ class ChannelPinsUpdateEvent(GatewayEvent):
 
 
 class ThreadCreateEvent(GatewayEvent, Channel):
-    """https://discord.com/developers/docs/topics/gateway#thread-create"""
+    """Sent when a thread is created or when the current user is added to a private thread.
+
+    https://discord.com/developers/docs/topics/gateway-events#thread-create
+    """
     # FIXME: read the docs and add the missing thread member object
 
     newly_created: bool
@@ -59,61 +76,81 @@ class ThreadCreateEvent(GatewayEvent, Channel):
 
 
 class ThreadUpdateEvent(GatewayEvent, Channel):
-    """https://discord.com/developers/docs/topics/gateway#thread-update"""
+    """Sent when a thread is updated.
+
+    https://discord.com/developers/docs/topics/gateway-events#thread-update
+    """
 
 
 class ThreadDeleteEvent(GatewayEvent, Channel):
-    """https://discord.com/developers/docs/topics/gateway#thread-delete"""
+    """Sent when a thread is deleted.
+
+    https://discord.com/developers/docs/topics/gateway-events#thread-delete
+    """
 
 
 class ThreadListSyncEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway#thread-list-sync"""
+    """Sent when the current user gains access to a channel that contains threads.
+
+    https://discord.com/developers/docs/topics/gateway-events#thread-list-sync
+    """
 
     guild_id: Snowflake
-    """the id of the guild"""
+    """Guild id"""
 
     channel_ids: list[Snowflake]
-    """the parent channel ids whose threads are being synced.
+    """Parent channel ids whose threads are being synced.
+
     If omitted, then threads were synced for the entire guild.
+
     This array may contain channel_ids that have no active threads as well,
     so you know to clear that data.
     """
 
     threads: list[dict[str, Any]]  # FIXME: Add thread object
-    """all active threads in the given channels that the current user can access"""
+    """All active threads in the given channels that the current user can access."""
 
     members: list[Member]
+    """All thread member objects from the synced threads for the current user.
+
+    Indicating which threads the current user has been added to.
+    """
 
 
 class ThreadMemberUpdateEvent(GatewayEvent, ThreadMember):
-    """https://discord.com/developers/docs/topics/gateway#thread-member-update"""
+    """https://discord.com/developers/docs/topics/gateway-events#thread-member-update"""
 
     guild_id: Snowflake
-    """the id of the guild"""
+    """Guild id."""
+
 
 class ThreadMemberUpdate(ThreadMember):
     """https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields"""
 
     member: Member
-    """the member object"""
+    """Member object."""
 
     presence: dict[str, Any] | None = None  # FIXME: Add presence object
-    """https://discord.com/developers/docs/topics/gateway#presence"""
+    """https://discord.com/developers/docs/topics/gateway-events#presence"""
+
 
 class ThreadMembersUpdateEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway#thread-members-update"""
+    """https://discord.com/developers/docs/topics/gateway-events#thread-members-update"""
 
     id: Snowflake
     """the id of the thread"""
 
     guild_id: Snowflake
-    """the id of the guild"""
+    """Guild id."""
 
     member_count: int
-    """the approximate number of members in the thread, capped at 50"""
+    """Approximate number of members in the thread.
+
+    Limited to 50 members.
+    """
 
     added_members: list[ThreadMemberUpdate] | None = None
-    """the users who were added to the thread"""
+    """Users who were added to the thread."""
 
     removed_member_ids: list[Snowflake] | None = None
-    """the ids of the users who were removed from the thread"""
+    """Users ids who were removed from the thread."""

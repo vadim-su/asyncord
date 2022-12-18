@@ -184,19 +184,29 @@ class MembershipState(enum.Enum):
 
 
 class GuildApplicationCommandPermissions(BaseModel):
-    """https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object"""
+    """Returned when fetching the permissions for an app's command(s) in a guild.
+
+    https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object
+    """
 
     id: Snowflake
-    """ID of the command or the application ID"""
+    """ID of the command or the application ID.
+
+    When the id field is the application ID instead of a command ID,
+    the permissions apply to all commands that do not contain explicit overwrites.
+    """
 
     application_id: Snowflake
-    """ID of the application the command belongs to"""
+    """ID of the application the command belongs to."""
 
     guild_id: Snowflake
-    """ID of the guild"""
+    """Guild id."""
 
     permissions: list[ApplicationCommandPermissions]
-    """Permissions for the command in the guild, max of 100"""
+    """Permissions for the command in the guild.
+
+    Maximum of 100.
+    """
 
 
 class ApplicationCommandPermissions(BaseModel):
