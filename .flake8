@@ -2,10 +2,13 @@
 max-line-length=110
 max-arguments = 6
 
-ignore = W503,
+ignore =
+        # line break before binary operator
+        W503,
+        # Forbid f strings
         WPS305,
-        WPS115,
-        WPS306,  # Wrong multiline string use violation
+        # Wrong multiline string use violation
+        WPS306,
 
 per-file-ignores =
         test_*.py: D100, D101, D102, D103, S101, DAR101, WPS214, WPS217, WPS432,  WPS437
