@@ -28,19 +28,6 @@ class HelloEvent(GatewayEvent):
     """the interval (in milliseconds) the client should heartbeat with"""
 
 
-class ResumedEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway#resume"""
-
-    token: str
-    """the session token"""
-
-    session_id: str
-    """the session id"""
-
-    seq: int
-    """the last sequence number received"""
-
-
 class ReadyEvent(GatewayEvent):
     api_version: int = Field(alias='v')
     """gateway protocol version"""
@@ -62,6 +49,15 @@ class ReadyEvent(GatewayEvent):
 
     application: ReadyEventApplication
     """application object"""
+
+
+class ResumedEvent(GatewayEvent):
+    """Dispatched when a client has sent a resume payload to the gateway
+
+    For resuming existing sessions.
+
+    https://discord.com/developers/docs/topics/gateway-events#resume.
+    """
 
 
 class ReconnectEvent(BaseModel):
