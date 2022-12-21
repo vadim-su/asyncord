@@ -209,7 +209,10 @@ class ChannelType(enum.IntEnum):
     GUILD_STAGE_VOICE = 13
     """A voice channel for hosting events with an audience."""
 
-    GUILD_FORUM = 14
+    GUILD_DIRECTORY = 14
+    """Channel in a hub containing the listed servers."""
+
+    GUILD_FORUM = 15
     """Channel that can only contain threads."""
 
 
