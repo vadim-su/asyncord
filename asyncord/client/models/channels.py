@@ -1,3 +1,9 @@
+"""Channel models for Discord API.
+
+Discord channel documentation starts here:
+https://discord.com/developers/docs/resources/channel
+"""
+
 from __future__ import annotations
 
 import enum
@@ -6,73 +12,61 @@ from datetime import datetime
 from pydantic import Field, BaseModel, validator
 
 from asyncord.snowflake import Snowflake
-
-from .users import User
+from asyncord.client.models.users import User
 
 
 class Channel(BaseModel):
     """Channel object.
 
-    Example:
-    ::
-    {
-        "name": "my-category",
-        "type": 4,
-        "id": 1
-    }
-
-    ::
-    {
-        "name": "naming-things-is-hard",
-        "type": 0,
-        "id": 2,
-        "parent_id": 1
-    }
-
     Read more info at:
-    https://discord.com/developers/docs/resources/channel#channel-object
+    https://discord.com/developers/docs/resources/channel#channel-object-channel-structure
     """
 
     id: Snowflake
-    """channel id"""
+    """Channel id."""
 
     type: ChannelType
 
     guild_id: Snowflake | None = None
-    """The id of the guild.
+    """Guild id.
 
     May be missing for some channel objects received over gateway guild dispatches.
     """
 
     position: int | None = None
-    """sorting position of the channel"""
+    """Sorting position of the channel"""
 
     permission_overwrites: list[Overwrite] | None = None
-    """explicit permission overwrites for members and roles."""
+    """Explicit permission overwrites for members and roles."""
 
     name: str | None = Field(None, min_length=1, max_length=100)
-    """channel name (2-100 characters)"""
+    """Channel name (2-100 characters)"""
 
     topic: str | None = Field(min_length=0, max_length=1024)
-    """The channel topic(0 - 1024 characters)."""
+    """Channel topic.
+
+    Should be between 0 and 1024 characters.
+    """
 
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
     last_message_id: Snowflake | None = None
-    """The id of the last message sent in this channel.
+    """Last id message sent in this channel.
 
     May not point to an existing or valid message.
     """
 
     bitrate: int | None = None
-    """The bitrate ( in bits) of the voice channel."""
+    """Bitrate of the voice channel."""
 
     user_limit: int | None = None
-    """The user limit of the voice channel."""
+    """User limit of the voice channel."""
 
-    rate_limit_per_user: int | None = Field(None, min=0, max=21600)
-    """Amount of seconds a user has to wait before sending another message(0 - 21600).
+    rate_limit_per_user: int | None = Field(None, min=0, max=21600)  # noqa: WPS432  # Found magic number
+    """Amount of seconds a user has to wait before sending another message.
+
+    Should be between 0 and 21600.
 
     Bots, as well as users with the permission manage_messages or manage_channel,
     are unaffected. `rate_limit_per_user` also applies to thread creation.
@@ -81,13 +75,13 @@ class Channel(BaseModel):
     """
 
     recipients: list[User] | None = None
-    """The recipients of the DM."""
+    """Recipients of the DM."""
 
     icon: str | None = None
     """Icon hash."""
 
     owner_id: Snowflake | None = None
-    """ID of the creator of the group DM or thread."""
+    """Creator id of the group DM or thread."""
 
     application_id: Snowflake | None = None
     """Application id of the group DM creator if it is bot - created."""
@@ -111,16 +105,16 @@ class Channel(BaseModel):
     """Voice region id for the voice channel, automatic when set to null."""
 
     video_quality_mode: int | None = None
-    """The camera video quality mode of the voice channel, 1 when not present."""
+    """Camera video quality mode of the voice channel, 1 when not present."""
 
     message_count: int | None = None
-    """An approximate count of messages in a thread, stops counting at 50."""
+    """Approximate count of messages in a thread, stops counting at 50."""
 
     member_count: int | None = None
-    """An approximate count of users in a thread, stops counting at 50."""
+    """Approximate count of users in a thread, stops counting at 50."""
 
     thread_metadata: ThreadMetadata | None = None
-    """Thread - specific fields not needed by other channels."""
+    """Thread-specific fields not needed by other channels."""
 
     member: ThreadMember | None = None
     """Thread member object for the current user.
@@ -157,57 +151,64 @@ class ChannelMention(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#channel-mention-object
     """
+
     id: Snowflake
-    """id of the channel"""
+    """Channel id."""
 
     guild_id: Snowflake
-    """id of the guild containing the channel"""
+    """Guild id containing the channel."""
 
     type: ChannelType
-    """the type of channel"""
+    """Channel type."""
 
     name: str
-    """the name of the channel"""
+    """Channel name."""
 
 
 @enum.unique
 class ChannelType(enum.IntEnum):
+    """Channel type.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#channel-object-channel-types
+    """
+
     GUILD_TEXT = 0
-    """A text channel within a server."""
+    """Text channel within a server."""
 
     DM = 1
-    """A direct message between users."""
+    """Direct message between users."""
 
     GUILD_VOICE = 2
-    """A voice channel within a server"""
+    """Voice channel within a server."""
 
     GROUP_DM = 3
-    """A direct message between multiple users"""
+    """Direct message between multiple users."""
 
     GUILD_CATEGORY = 4
-    """An organizational category that contains up to 50 channels."""
+    """Organizational category that contains up to 50 channels."""
 
     GUILD_ANNOUNCEMENT = 5
-    """A channel that users can follow and crosspost into their own server.
+    """Channel that users can follow and crosspost into their own server.
 
     Formerly news channels.
     """
 
     ANNOUNCEMENT_THREAD = 10
-    """A temporary sub-channel within a GUILD_ANNOUNCEMENT channel."""
+    """Temporary sub-channel within a GUILD_ANNOUNCEMENT channel."""
 
     GUILD_PUBLIC_THREAD = 11
-    """A temporary sub-channel within a GUILD_TEXT channel."""
+    """Temporary sub-channel within a GUILD_TEXT channel."""
 
     GUILD_PRIVATE_THREAD = 12
-    """A temporary sub - channel within a `GUILD_TEXT` channel.
+    """Temporary sub-channel within a `GUILD_TEXT` channel.
 
     The channel is only viewable by those invited and those with
     the `MANAGE_THREADS` permission.
     """
 
     GUILD_STAGE_VOICE = 13
-    """A voice channel for hosting events with an audience."""
+    """Voice channel for hosting events with an audience."""
 
     GUILD_DIRECTORY = 14
     """Channel in a hub containing the listed servers."""
@@ -218,13 +219,22 @@ class ChannelType(enum.IntEnum):
 
 @enum.unique
 class OverwriteType(enum.IntEnum):
-    """Type of overwrite"""
+    """Type of overwrite."""
+
     ROLE = 0
     USER = 1
 
 
 class Overwrite(BaseModel):
-    """https://discord.com/developers/docs/resources/channel#overwrite-object"""
+    """Overwrite object.
+
+    See permissions for more info about `allow` and `deny` fields:
+    https://discord.com/developers/docs/topics/permissions#permissions
+
+    Structure defined at:
+    https://discord.com/developers/docs/resources/channel#overwrite-object
+    """
+
     id: Snowflake
     """Role or user id"""
 
@@ -246,7 +256,11 @@ class Overwrite(BaseModel):
 
 
 class ThreadMetadata(BaseModel):
-    """https://discord.com/developers/docs/resources/channel#thread-metadata-object"""
+    """Thread metadata object.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#thread-metadata-object
+    """
 
     archived: bool
     """Whether the thread is archived."""
@@ -258,8 +272,9 @@ class ThreadMetadata(BaseModel):
     """
 
     archive_timestamp: datetime
-    """Timestamp when the thread's archive status was last changed, used for
-    calculating recent activity.
+    """Timestamp when the thread's archive status was last changed.
+
+    Used for calculating recent activity.
     """
 
     locked: bool
@@ -276,32 +291,43 @@ class ThreadMetadata(BaseModel):
 
 
 class ThreadMember(BaseModel):
-    """https://discord.com/developers/docs/resources/channel#thread-member-object"""
+    """Thread member object.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#thread-member-object
+    """
 
     id: Snowflake | None = None
-    """The id of the thread.
+    """Thread id.
 
     These field is ommitted on the member sent within each thread in the `GUILD_CREATE` event.
     More info at https://discord.com/developers/docs/topics/gateway-events#guild-create
     """
 
     user_id: Snowflake | None = None
-    """The id of the user.
+    """User id.
 
     These field is ommitted on the member sent within each thread in the `GUILD_CREATE` event.
     More info at https://discord.com/developers/docs/topics/gateway-events#guild-create
     """
 
     join_timestamp: datetime
-    """The time the current user last joined the thread."""
+    """Time the current user last joined the thread."""
 
     flags: int
-    """Any user - thread settings, currently only used for notifications."""
+    """Any user-thread settings.
+
+    Currently only used for notifications.
+    """
 
 
 @enum.unique
 class ChannelFlag(enum.IntFlag):
-    """https://discord.com/developers/docs/resources/channel#channel-object-channel-flags"""
+    """Channel flags.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#channel-object-channel-flags
+    """
 
     NONE = 0
     """No flags set."""
@@ -310,28 +336,39 @@ class ChannelFlag(enum.IntFlag):
     """Whether the channel is pinned."""
 
     REQUIRE_TAG = 1 << 4
-    """whether a tag is required to be specified when creating a thread in a GUILD_FORUM channel.
-    Tags are specified in the applied_tags field"""
+    """Whether a tag is requiredin a GUILD_FORUM channel.
+
+    Tags are specified in the applied_tags field.
+    """
 
 
 class ForumTag(BaseModel):
-    id: Snowflake
-    """the id of the tag"""
+    """Forum tag representation.
 
-    name: str
-    """the name of the tag(0 - 20 characters)"""
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#forum-tag-object
+    """
+
+    id: Snowflake
+    """Tag id."""
+
+    name: str = Field(..., min_length=0, max_length=20)  # noqa: WPS432  # Found magic number
+    """Tag name.
+
+    Should be between 0 and 20 characters.
+    """
 
     moderated: bool
-    """whether this tag can only be added to or removed from threads by a member with the MANAGE_THREADS permission"""
+    """Whether this tag can only be used a member with the MANAGE_THREADS permission."""
 
     emoji_id: Snowflake | None
-    """the id of a guild's custom emoji *"""
+    """Id of a guild's custom emoji."""
 
     emoji_name: str | None
-    """the unicode character of the emoji *"""
+    """Unicode character of the emoji."""
 
     @validator('emoji_id')
-    def check_emoji(cls, value, values):
+    def check_emoji(cls, value, values):  # noqa: D102, N805, WPS110
         if value is not None and values.get('emoji_name') is not None:
             raise ValueError('emoji_id and emoji_name cannot be set at the same time')
 

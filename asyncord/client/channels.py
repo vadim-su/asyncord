@@ -1,3 +1,8 @@
+"""Channel Resource Endpoints.
+
+These endpoints are for managing channels. Classic CRUD operations and related
+endpoints like message creation.
+"""
 from __future__ import annotations
 
 from asyncord.urls import REST_API_URL
@@ -6,7 +11,6 @@ from asyncord.client.headers import AUDIT_LOG_REASON
 from asyncord.client.messages import MessageResource
 from asyncord.client.resources import ClientSubresources
 from asyncord.client.models.channels import Channel
-from asyncord.client.models.messages import Message, CreateMessageData, UpdateMessageData
 from asyncord.client.models.channel_data import CreateChannelData, UpdateChannelDataType
 
 
@@ -25,10 +29,10 @@ class ChannelResource(ClientSubresources):
         """Get the message resource for the channel.
 
         Arguments:
-            channel_id (LikeSnowflake): The ID of the channel.
+            channel_id (LikeSnowflake): Channel id.
 
         Returns:
-            MessageResource: The message resource.
+            MessageResource: Resource for managing messages.
         """
         return MessageResource(self, channel_id)
 
@@ -36,10 +40,10 @@ class ChannelResource(ClientSubresources):
         """Get a channel by ID.
 
         Arguments:
-            channel_id (LikeSnowflake): The ID of the channel.
+            channel_id (LikeSnowflake): Channel id.
 
         Returns:
-            Channel: The channel object.
+            Channel: Channel object.
         """
         url = self.channels_url / str(channel_id)
         resp = await self._http.get(url)
@@ -56,11 +60,12 @@ class ChannelResource(ClientSubresources):
         This endpoint can only be used on guilds.
 
         Arguments:
-            channel_data (UpdateChannelDataType): The data to create the channel with.
-            reason (str, optional): The reason for creating the channel.
+            guild_id (LikeSnowflake): Guild ID.
+            channel_data (UpdateChannelDataType): Data to create the channel with.
+            reason (str, optional): Reason for creating the channel.
 
         Returns:
-            Channel: The created channel object.
+            Channel: Created channel object.
         """
         url = REST_API_URL / 'guilds' / str(guild_id) / 'channels'
 
@@ -83,12 +88,12 @@ class ChannelResource(ClientSubresources):
         """Update a channel's settings.
 
         Arguments:
-            channel_id (LikeSnowflake): The ID of the channel.
+            channel_id (LikeSnowflake): Channel id.
             channel_data (UpdateChannelDataType): The data to update the channel with.
             reason (str, optional): The reason for updating the channel.
 
         Returns:
-            Channel: The updated channel object.
+            Channel: Updated channel object.
         """
         url = self.channels_url / str(channel_id)
 
@@ -114,8 +119,8 @@ class ChannelResource(ClientSubresources):
         the Community Updates channel cannot be deleted.
 
         Arguments:
-            channel_id (LikeSnowflake): The ID of the channel.
-            reason (str, optional): The reason for deleting the channel.
+            channel_id (LikeSnowflake): Channel id.
+            reason (str, optional): Reason for deleting the channel.
         """
         url = self.channels_url / str(channel_id)
 
