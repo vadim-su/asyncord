@@ -65,7 +65,9 @@ class Activity(BaseModel):
 
     Describes what the payload includes."""
 
-    buttons: list[ActivityButton] | None = Field(max_items=2)
+    # FIXME: set max_items to 2 when pydantic fixes the issue
+    # https://github.com/pydantic/pydantic/issues/4547
+    buttons: list[ActivityButton] | None = None
     """Custom buttons shown in the Rich Presence.
 
     Maximum of 2 buttons.
