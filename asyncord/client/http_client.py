@@ -122,7 +122,7 @@ class AsyncHttpClient:
         url: StrOrURL,
         payload: typing.Any | None = None,
         headers: typing.Mapping[str, str] | None = None,
-    ):
+    ) -> Response:
         if headers is None:
             headers = self._headers
         else:
@@ -145,6 +145,7 @@ class AsyncHttpClient:
                     )
 
                 case HTTPStatus.TOO_MANY_REQUESTS:
+                    # FIXME: It's a simple hack for now. Potentially 'endless' recursion
                     ratelimit = RateLimitBody(**body)
                     if ratelimit.retry_after > 10:
                         raise errors.RateLimitError(
@@ -152,8 +153,9 @@ class AsyncHttpClient:
                             resp=resp,
                             retry_after=ratelimit.retry_after or None,
                         )
+                    # FIXME: Move to decorator
                     await asyncio.sleep(ratelimit.retry_after + 0.1)
-                    await self._request(method, url, payload, headers)
+                    return await self._request(method, url, payload, headers)
 
                 case status if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
                     raise errors.ClientError(
