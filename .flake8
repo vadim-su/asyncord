@@ -11,6 +11,8 @@ ignore =
     WPS305,
     # Wrong multiline string usage
     WPS462,
+    # Found class without a base class
+    WPS306,
 
 extend-ignore =
     # Google Python style is not RST until after processed by Napoleon
@@ -31,6 +33,8 @@ per-file-ignores =
     # allow many module members for some modele modules
     # also disable general models checks
     asyncord/client/models/channels.py: WPS202, WPS322, WPS428, WPS462
+    # Allow empty methods with docstrings for interfaces
+    asyncord/client/http_proto.py: D102, WPS428
 
 exclude =
     __pycache__,
