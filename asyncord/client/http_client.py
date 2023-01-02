@@ -128,12 +128,7 @@ class AsyncHttpClient:
         else:
             headers = {**self._headers, **headers}
 
-        if self._session:
-            resp_context = self._session.request(method, url, json=payload, headers=headers)
-        else:
-            resp_context = aiohttp.request(method, url, json=payload, headers=headers)
-
-        async with resp_context as resp:
+        async with self._get_resp_context(method, url, payload, headers) as resp:
             body, message = await self._extract_body_and_message(resp)
 
             match resp.status:
@@ -183,3 +178,14 @@ class AsyncHttpClient:
             message = await resp.text()
 
         return body, message
+
+    def _get_resp_context(
+        self,
+        method: HttpMethod,
+        url: StrOrURL,
+        payload: typing.Any | None = None,
+        headers: typing.Mapping[str, str] | None = None,
+    ) -> typing.AsyncContextManager[ClientResponse]:
+        if self._session:
+            return self._session.request(method, url, json=payload, headers=headers)
+        return aiohttp.request(method, url, json=payload, headers=headers)
