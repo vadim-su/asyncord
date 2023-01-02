@@ -51,41 +51,20 @@ class MessageFlags(enum.IntFlag):
 
 class _MessageData(BaseModel):
     @root_validator
-    def check_total_embed_text_length(cls, values):
-        """Check total embed text length.
-
-        Read more info at:
-        https://discord.com/developers/docs/resources/channel#message-object-message-structure
-        """
-        embeds: list[Embed] = values.get('embeds') or []
-
-        total_embed_text_length = 0
-        for embed in embeds:
-            total_embed_text_length += len(embed.title or '')
-            total_embed_text_length += len(embed.description or '')
-
-            if embed.footer:
-                total_embed_text_length += len(embed.footer.text or '')
-
-            if embed.author:
-                total_embed_text_length += len(embed.author.name or '')
-
-            if embed.fields:
-                for field in embed.fields:
-                    total_embed_text_length += len(field.name or '')
-                    total_embed_text_length += len(field.value or '')
-
-            if total_embed_text_length > 6000:
-                raise ValueError('Total embed text length must be less than 6000 characters.')
-
-        return values
-
-    @root_validator
-    def has_content_or_embeds(cls, values):
+    def has_content_or_embeds(cls, values):  # noqa: N805, WPS110
         """Check if the message has content or embeds.
 
         Read more info at:
         https://discord.com/developers/docs/resources/channel#message-object-message-structure
+
+        Arguments:
+            values (dict): The values to validate.
+
+        Raises:
+            ValueError: If the message has no content or embeds.
+
+        Returns:
+            dict: The validated values.
         """
         has_any_content = bool(
             values.get('content', False)
@@ -99,6 +78,58 @@ class _MessageData(BaseModel):
             raise ValueError('Message must have content, embeds, stickers or components.')
 
         return values
+
+    @root_validator
+    def check_total_embed_text_length(cls, values):  # noqa: N805, WPS110
+        """Check total embed text length.
+
+        Read more info at:
+        https://discord.com/developers/docs/resources/channel#message-object-message-structure
+
+        Arguments:
+            values (dict): The values to validate.
+
+        Raises:
+            ValueError: If the total embed text length is more than 6000 characters.
+
+        Returns:
+            dict: The validated values.
+        """
+        embeds: list[Embed] = values.get('embeds', [])
+
+        total_embed_text_length = 0
+        for embed in embeds:
+            total_embed_text_length += cls._embed_text_length(embed)
+
+            if total_embed_text_length > MAX_EMBED_TEXT_LENGTH:
+                raise ValueError('Total embed text length must be less than 6000 characters.')
+
+        return values
+
+    @classmethod
+    def _embed_text_length(cls, embed: Embed) -> int:
+        """Get the length of the embed text.
+
+        Arguments:
+            embed (Embed): The embed to get the length of.
+
+        Returns:
+            int: The length of the embed text.
+        """
+        embed_text_length = len(embed.title or '')
+        embed_text_length += len(embed.description or '')
+
+        if embed.footer:
+            embed_text_length += len(embed.footer.text or '')
+
+        if embed.author:
+            embed_text_length += len(embed.author.name or '')
+
+        for field in (embed.fields or []):
+            embed_text_length += len(field.name or '')
+            embed_text_length += len(field.value or '')
+
+        return embed_text_length
 
 
 class CreateMessageData(_MessageData):
