@@ -31,7 +31,7 @@ class RoleResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#create-guild-role
 
-        Arguments:
+        Args:
             role_data (CreateRoleData): The data for the role to create.
 
         Returns:
@@ -46,7 +46,7 @@ class RoleResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
 
-        Arguments:
+        Args:
             role_positions (list[RolePosition]): The list of role positions to change.
 
         Returns:
@@ -60,7 +60,7 @@ class RoleResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#modify-guild-role
 
-        Arguments:
+        Args:
             role_id (LikeSnowflake): The ID of the role to update.
             role_data (UpdateRoleData): The data for the role to update.
 
@@ -77,7 +77,7 @@ class RoleResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#delete-guild-role
 
-        Arguments:
+        Args:
             role_id (LikeSnowflake): The ID of the role to delete.
             reason (str | None): The reason for deleting the role.
         """

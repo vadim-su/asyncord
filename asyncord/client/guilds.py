@@ -35,7 +35,7 @@ class GuildResource(ClientSubresources):
     def members(self, guild_id: LikeSnowflake) -> MemberResource:
         """Get the member subresource for a guild.
 
-        Arguments:
+        Args:
             guild_id (LikeSnowflake): The ID of the guild to get the member subresource for.
 
         Returns:
@@ -46,7 +46,7 @@ class GuildResource(ClientSubresources):
     def ban_managment(self, guild_id: LikeSnowflake) -> BanResource:
         """Get the ban subresource for a guild.
 
-        Arguments:
+        Args:
             guild_id (LikeSnowflake): The ID of the guild to get the ban subresource for.
 
         Returns:
@@ -57,7 +57,7 @@ class GuildResource(ClientSubresources):
     def roles(self, guild_id: LikeSnowflake) -> RoleResource:
         """Get the role subresource for a guild.
 
-        Arguments:
+        Args:
             guild_id (LikeSnowflake): The ID of the guild to get the role subresource for.
 
         Returns:
@@ -70,7 +70,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#et-guild
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to get.
             with_counts(bool | None): Whether to include approximate members.
 
@@ -94,7 +94,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#create-guild
 
-        Arguments:
+        Args:
             guild_data(CreateGuildData): The data for the guild to create.
 
         Returns:
@@ -107,7 +107,7 @@ class GuildResource(ClientSubresources):
     async def delete(self, guild_id: LikeSnowflake) -> None:
         """Delete a guild.
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to delete.
         """
         url = self.guilds_url / str(guild_id)
@@ -118,7 +118,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to update.
             level(MFALevel): The MFA level to set.
 
@@ -141,7 +141,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to get the prune count for.
             days(int | None): The number of days to count prune for. Should be between 1 and 30.
                 Defaults to 7 if not specified.
@@ -187,7 +187,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#begin-guild-prune
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to prune.
             days(int | None): The number of days to count prune for. Should be between 1 and 30.
                 Defaults to 7 if not specified.
@@ -222,7 +222,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to get the voice regions for.
 
         Returns:
@@ -237,7 +237,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-invites
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to get the invites for.
 
         Returns:
@@ -252,7 +252,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-channels
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to get the channels for.
 
         Returns:
@@ -267,7 +267,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-integrations
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to get the integrations for.
 
         Returns:
@@ -290,7 +290,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to delete the integration for.
             integration_id(LikeSnowflake): The ID of the integration to delete.
             reason(str | None): The reason for deleting the integration.
@@ -309,7 +309,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to get the welcome screen for.
 
         Returns:
@@ -329,7 +329,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#update-guild-welcome-screen
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to update the welcome screen for.
             welcome_screen_data(UpdateWelcomeScreenData): The welcome screen data to update.
             reason(str | None): The reason for updating the welcome screen.
@@ -359,7 +359,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to update the current user's voice state for.
             channel_id(LikeSnowflake | None): The ID of the channel to move the current user to.
             suppress(bool | None): Whether the current user should be suppressed.
@@ -388,7 +388,7 @@ class GuildResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/guild#modify-user-voice-state
 
-        Arguments:
+        Args:
             guild_id(LikeSnowflake): The ID of the guild to update the user's voice state for.
             user_id(LikeSnowflake): The ID of the user to update the voice state for.
             channel_id(LikeSnowflake | None): The ID of the channel to move the user to.

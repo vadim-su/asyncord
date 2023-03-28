@@ -63,7 +63,7 @@ class Channel(BaseModel):
     user_limit: int | None = None
     """User limit of the voice channel."""
 
-    rate_limit_per_user: int | None = Field(None, min=0, max=21600)  # noqa: WPS432  # Found magic number
+    rate_limit_per_user: int | None = Field(None, min=0, max=21600)  # noqa: WPS432 - Found magic number
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600.
@@ -352,7 +352,7 @@ class ForumTag(BaseModel):
     id: Snowflake
     """Tag id."""
 
-    name: str = Field(..., min_length=0, max_length=20)  # noqa: WPS432  # Found magic number
+    name: str = Field(..., min_length=0, max_length=20)  # noqa: WPS432 - Found magic number
     """Tag name.
 
     Should be between 0 and 20 characters.

@@ -27,7 +27,7 @@ class MemberResource(ClientSubresources):
         This endpoint is restricted according to whether the GUILD_MEMBERS Privileged
         Intent is enabled for your application.
 
-        Arguments:
+        Args:
             limit (int): The maximum number of members to return.
                 Should be between 1 and 1000.Defaults to 1.
             after (LikeSnowflake): The ID of the member to start at.
@@ -48,7 +48,7 @@ class MemberResource(ClientSubresources):
     async def search(self, nick_or_name: str, limit: int | None = 1) -> list[Member]:
         """Search members of a guild by username or nickname.
 
-        Arguments:
+        Args:
             nick_or_name (str): The name or nickname of the member to search for.
             limit (int): The maximum number of members to return.
                 Should be between 1 and 1000. Defaults to 1.
@@ -71,7 +71,7 @@ class MemberResource(ClientSubresources):
     ) -> Member:
         """Update a member.
 
-        Arguments:
+        Args:
             user_id (LikeSnowflake): The ID of the member to update.
             member_data (UpdateMemberData): The data to update.
             reason (str | None): The reason for the update. Defaults to None.
@@ -90,7 +90,7 @@ class MemberResource(ClientSubresources):
     async def update_current_member(self, nickname: str | None, reason: str | None = None) -> Member:
         """Update the current member.
 
-        Arguments:
+        Args:
             nickname (str | None): The nickname to update to.
                 None to reset to user's default nickname.
             reason (str | None): The reason for the update. Defaults to None.
@@ -112,7 +112,7 @@ class MemberResource(ClientSubresources):
     ) -> None:
         """Add a role to a member.
 
-        Arguments:
+        Args:
             user_id (LikeSnowflake): The ID of the member to add a role to.
             role_id (LikeSnowflake): The ID of the role to add.
             reason (str | None): The reason for adding the role to the member.
@@ -130,7 +130,7 @@ class MemberResource(ClientSubresources):
     ) -> None:
         """Remove a role from a member.
 
-        Arguments:
+        Args:
             user_id (LikeSnowflake): The ID of the member to remove a role from.
             role_id (LikeSnowflake): The ID of the role to remove.
             reason (str | None): The reason for removing the role from the member.
@@ -146,7 +146,7 @@ class MemberResource(ClientSubresources):
     async def kick(self, user_id: LikeSnowflake, reason: str | None = None) -> None:
         """Kick a member from the guild.
 
-        Arguments:
+        Args:
             user_id (LikeSnowflake): The ID of the member to kick.
             reason (str | None): The reason for kicking the member. Defaults to None.
         """

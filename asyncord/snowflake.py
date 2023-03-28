@@ -25,7 +25,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
     def __init__(self, raw_snowflake: int | str) -> None:
         """Create new snowflake object from raw int.
 
-        Arguments:
+        Args:
             raw_snowflake (int | str): raw value of snowflake.
         """
         self._raw_value = int(raw_snowflake)
@@ -40,7 +40,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
     ) -> Snowflake:
         """Build snowflake from separate parameters.
 
-        Arguments:
+        Args:
             timestamp (int | datetime): timestamp of snowflake.
             internal_worker_id (int): internal worker id.
             internal_process_id (int): internal process id.
@@ -124,7 +124,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
     def validate(cls, value: Any) -> Snowflake:
         """Pydantic auxiliary validation method.
 
-        Arguments:
+        Args:
             value (Any): value to validate.
 
         Raises:

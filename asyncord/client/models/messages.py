@@ -21,7 +21,8 @@ class MessageFlags(enum.IntFlag):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#message-object-message-flags
     """
-    CROSSPOSTED = 1 << 0
+
+    CROSSPOSTED = 1
     """this message has been published to subscribed channels (via Channel Following)"""
 
     IS_CROSSPOST = 1 << 1
@@ -57,7 +58,7 @@ class _MessageData(BaseModel):
         Read more info at:
         https://discord.com/developers/docs/resources/channel#message-object-message-structure
 
-        Arguments:
+        Args:
             values (dict): The values to validate.
 
         Raises:
@@ -86,7 +87,7 @@ class _MessageData(BaseModel):
         Read more info at:
         https://discord.com/developers/docs/resources/channel#message-object-message-structure
 
-        Arguments:
+        Args:
             values (dict): The values to validate.
 
         Raises:
@@ -110,11 +111,11 @@ class _MessageData(BaseModel):
     def _embed_text_length(cls, embed: Embed) -> int:
         """Get the length of the embed text.
 
-        Arguments:
-            embed (Embed): The embed to get the length of.
+        Args:
+            embed (Embed): Embed to get the length of.
 
         Returns:
-            int: The length of the embed text.
+            int: length of the embed text.
         """
         embed_text_length = len(embed.title or '')
         embed_text_length += len(embed.description or '')
@@ -138,10 +139,10 @@ class CreateMessageData(_MessageData):
     More info at: https://discord.com/developers/docs/resources/channel#create-message
     """
 
-    content: str | None = Field(None, max_length=2000)
+    content: str | None = Field(None, max_length=2000)  # noqa: WPS110, WPS432
     """The message content."""
 
-    nonce: str | int | None = Field(None, max_length=25)
+    nonce: str | int | None = Field(None, max_length=25)  # noqa: WPS432
     """Can be used to verify a message was sent.
 
     Value will appear in the Message Create event.
@@ -180,7 +181,7 @@ class UpdateMessageData(_MessageData):
     More info at: https://discord.com/developers/docs/resources/channel#edit-message-json-params
     """
 
-    content: str | None = Field(None, max_length=2000)
+    content: str | None = Field(None, max_length=2000)  # noqa: WPS110,WPS432
     """The message content."""
 
     embeds: list[Embed] | None = None
@@ -219,7 +220,7 @@ class Message(BaseModel):
     author: User
     """author of the message"""
 
-    content: str
+    content: str  # noqa: WPS110
     """contents of the message"""
 
     timestamp: datetime.datetime
@@ -306,6 +307,7 @@ class Reaction(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#reaction-object
     """
+
     count: int
     """times this emoji has been used to react"""
 
@@ -323,35 +325,36 @@ class Attachment(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#attachment-object
     """
+
     id: Snowflake
-    """attachment id"""
+    """Attachment id"""
 
     filename: str
-    """name of file attached"""
+    """Name of file attached"""
 
     description: str | None = Field(None, max_length=1024)
-    """description for the file (max 1024 characters)"""
+    """Description for the file (max 1024 characters)"""
 
     content_type: str | None = None
-    """the media type of the file"""
+    """Media type of the file"""
 
     size: int
-    """size of file in bytes"""
+    """Size of file in bytes"""
 
     url: str
-    """source url of file"""
+    """Source url of file"""
 
     proxy_url: str
-    """a proxied url of file"""
+    """Proxied url of file"""
 
     height: int | None = None
-    """height of file (if image)"""
+    """Height of file (if image)"""
 
     width: int | None = None
-    """width of file (if image)"""
+    """Width of file (if image)"""
 
     ephemeral: bool | None = None
-    """whether this attachment is ephemeral
+    """Whether this attachment is ephemeral
 
     Ephemeral attachments will automatically be removed after a set period of time.
     Ephemeral attachments on messages are guaranteed to be available as long as
@@ -365,13 +368,14 @@ class Embed(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#embed-object
     """
-    title: str | None = Field(None, max_length=256)
+
+    title: str | None = Field(None, max_length=256)  # noqa: WPS432
     """title of embed"""
 
     type: EmbedType | None = None
     """type of embed (always "rich" for webhook embeds)"""
 
-    description: str | None = Field(None, max_length=4096)
+    description: str | None = Field(None, max_length=4096)  # noqa: WPS432
     """description of embed"""
 
     url: str | None = None
@@ -401,7 +405,7 @@ class Embed(BaseModel):
     author: EmbedAuthor | None = None
     """author information"""
 
-    # FIXME= Field(None, max_items=25) doesn't work On field "fields"
+    # FIXME: Field(None, max_items=25) doesn't work On field "fields"
     # the following field constraints are set but not enforced: max_items.
     fields: list[EmbedField] | None = None
     """fields information"""
@@ -420,22 +424,22 @@ class EmbedType(enum.StrEnum):
     https://discord.com/developers/docs/resources/channel#embed-object-embed-types
     """
 
-    RICH = "rich"
+    RICH = 'rich'
     """generic embed rendered from embed attributes"""
 
-    IMAGE = "image"
+    IMAGE = 'image'
     """image embed"""
 
-    VIDEO = "video"
+    VIDEO = 'video'
     """video embed"""
 
-    GIFV = "gifv"
+    GIFV = 'gifv'
     """animated gif image embed rendered as a video embed"""
 
-    ARTICLE = "article"
+    ARTICLE = 'article'
     """article embed"""
 
-    LINK = "link"
+    LINK = 'link'
     """link embed"""
 
 
@@ -445,7 +449,9 @@ class EmbedFooter(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
     """
-    text: str = Field(max_length=2048)
+
+    # WPS432: Found magic number
+    text: str = Field(max_length=2048)  # noqa: WPS432
     """footer text"""
 
     icon_url: str | None = None
@@ -461,6 +467,7 @@ class EmbedImage(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
     """
+
     url: str
     """source url of image (only supports http(s) and attachments)"""
 
@@ -480,6 +487,7 @@ class EmbedThumbnail(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
     """
+
     url: str
     """source url of thumbnail (only supports http(s) and attachments)"""
 
@@ -499,6 +507,7 @@ class EmbedVideo(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
     """
+
     url: str | None = None
     """source url of video"""
 
@@ -518,6 +527,7 @@ class EmbedProvider(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
     """
+
     name: str | None = None
     """name of provider"""
 
@@ -531,6 +541,7 @@ class EmbedAuthor(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
     """
+
     name: str = Field(max_length=256)
     """name of author"""
 
@@ -550,10 +561,13 @@ class EmbedField(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
     """
-    name: str = Field(max_length=256)
+
+    name: str = Field(max_length=256)  # noqa: WPS432 - Found magic number
     """name of the field"""
 
-    value: str = Field(max_length=1024)
+    # WPS110: Found wrong variable name
+    # WPS432: Found magic number
+    value: str = Field(max_length=1024)  # noqa: WPS110, WPS432
     """value of the field"""
 
     inline: bool | None = None
@@ -567,6 +581,7 @@ class MessageType(enum.IntEnum):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#message-object-message-types
     """
+
     DEFAULT = 0
     """a default message"""
 
@@ -594,13 +609,13 @@ class MessageType(enum.IntEnum):
     GUILD_BOOST = 8
     """a user started boosting the guild"""
 
-    GUILD_BOOST_TIER_1 = 9
+    GUILD_BOOST_TIER_1 = 9  # noqa: WPS114
     """a user boosted the guild to tier 1"""
 
-    GUILD_BOOST_TIER_2 = 10
+    GUILD_BOOST_TIER_2 = 10  # noqa: WPS114
     """a user boosted the guild to tier 2"""
 
-    GUILD_BOOST_TIER_3 = 11
+    GUILD_BOOST_TIER_3 = 11  # noqa: WPS114
     """a user boosted the guild to tier 3"""
 
     CHANNEL_FOLLOW_ADD = 12
@@ -646,6 +661,7 @@ class MessageActivity(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure
     """
+
     type: MessageActivityType
     """type of message activity"""
 
@@ -659,6 +675,7 @@ class MessageActivityType(enum.IntEnum):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#message-object-message-activity-types
     """
+
     JOIN = 1
     """join a party"""
 
@@ -675,6 +692,7 @@ class MessageActivityType(enum.IntEnum):
 # FIXME: It's AI guess, need to be tested
 class MessageApplication(BaseModel):
     """Message application object."""
+
     id: Snowflake
     """id of the application"""
 
@@ -698,6 +716,7 @@ class AllowedMentionType(enum.Enum):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types
     """
+
     ROLES = "roles"
     """Controls role mentions."""
 
@@ -714,6 +733,7 @@ class AllowedMentions(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#allowed-mentions-object
     """
+
     parse: list[AllowedMentionType] | None = None
     """array of allowed mention types to parse from the content"""
 
@@ -733,6 +753,7 @@ class MessageReference(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/resources/channel#message-reference-object
     """
+
     message_id: Snowflake | None = None
     """id of the originating message"""
 
@@ -753,6 +774,7 @@ class MessageComponent(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/interactions/message-components#component-object
     """
+
     type: ComponentType
     """type of component"""
 
@@ -811,6 +833,7 @@ class MessageInteraction(BaseModel):
     Read more info at:
     https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object
     """
+
     id: Snowflake
     """id of the interaction"""
 
@@ -834,6 +857,7 @@ class InteractionType(enum.IntEnum):
     Read more info at:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
     """
+
     PING = 1
     """ping interaction"""
 

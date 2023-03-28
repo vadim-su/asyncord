@@ -28,7 +28,7 @@ class ChannelResource(ClientSubresources):
     def messages(self, channel_id: LikeSnowflake) -> MessageResource:
         """Get the message resource for the channel.
 
-        Arguments:
+        Args:
             channel_id (LikeSnowflake): Channel id.
 
         Returns:
@@ -37,9 +37,9 @@ class ChannelResource(ClientSubresources):
         return MessageResource(self, channel_id)
 
     async def get(self, channel_id: LikeSnowflake) -> Channel:
-        """Get a channel by ID.
+        """Get a channel by id.
 
-        Arguments:
+        Args:
             channel_id (LikeSnowflake): Channel id.
 
         Returns:
@@ -59,10 +59,10 @@ class ChannelResource(ClientSubresources):
 
         This endpoint can only be used on guilds.
 
-        Arguments:
-            guild_id (LikeSnowflake): Guild ID.
-            channel_data (UpdateChannelDataType): Data to create the channel with.
-            reason (str, optional): Reason for creating the channel.
+        Args:
+            guild_id (LikeSnowflake): Guild id.
+            channel_data (CreateChannelData): Data to create the channel with.
+            reason (str | optional): Reason for creating the channel.
 
         Returns:
             Channel: Created channel object.
@@ -87,10 +87,10 @@ class ChannelResource(ClientSubresources):
     ) -> Channel:
         """Update a channel's settings.
 
-        Arguments:
+        Args:
             channel_id (LikeSnowflake): Channel id.
             channel_data (UpdateChannelDataType): The data to update the channel with.
-            reason (str, optional): The reason for updating the channel.
+            reason (str | optional): The reason for updating the channel.
 
         Returns:
             Channel: Updated channel object.
@@ -118,9 +118,9 @@ class ChannelResource(ClientSubresources):
         For Community guilds, the Rules or Guidelines channel and
         the Community Updates channel cannot be deleted.
 
-        Arguments:
+        Args:
             channel_id (LikeSnowflake): Channel id.
-            reason (str, optional): Reason for deleting the channel.
+            reason (str | optional): Reason for deleting the channel.
         """
         url = self.channels_url / str(channel_id)
 

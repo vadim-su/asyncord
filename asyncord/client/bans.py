@@ -47,7 +47,7 @@ class BanResource(ClientSubresources):
     ) -> None:
         """Ban a user from a guild.
 
-        Arguments:
+        Args:
             user_id (LikeSnowflake): The ID of the user to ban.
             delete_message_days (int | None): The number of days to delete messages for.
                 Should be between 0 and 7. Defaults to 0.
@@ -70,7 +70,7 @@ class BanResource(ClientSubresources):
     async def unban(self, user_id: LikeSnowflake, reason: str | None = None,) -> None:
         """Unban a user from a guild.
 
-        Arguments:
+        Args:
             user_id (LikeSnowflake): The ID of the user to unban.
             reason (str | None): The reason for unbanning the user. Defaults to None.
         """

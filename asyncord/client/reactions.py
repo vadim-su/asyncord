@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
-from asyncord.client.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import ClientResource, ClientSubresources
 from asyncord.client.models.users import User
 
@@ -26,12 +25,14 @@ class ReactionResource(ClientSubresources):
     ) -> list[User]:
         """Get a list of users that reacted with this emoji.
 
-        Arguments:
+        Args:
             emoji (str): The emoji to get the reactions for.
-            after (LikeSnowflake, optional): Get users after this user ID.
-            limit (int, optional): The maximum number of users to return (1-100).
+            after (LikeSnowflake | None): Get users after this user ID.
+                Defaults to None.
+            limit (int | None): The maximum number of users to return (1-100).
+                Defaults to None.
         Returns:
-            list[User]: A list of user which reacted with this emoji.
+            list[User]: List of user which reacted with this emoji.
         """
         url_params = {}
         if after is not None:
@@ -48,7 +49,7 @@ class ReactionResource(ClientSubresources):
         emoji: str,
     ) -> None:
         """Create a reaction for the message.
-        Arguments:
+        Args:
             emoji (str): The emoji to react with.
             user_id (LikeSnowflake): The ID of the user to react as.
         """
@@ -57,7 +58,7 @@ class ReactionResource(ClientSubresources):
 
     async def delete_own_reaction(self, emoji: str) -> None:
         """Delete a reaction the current user made for the message.
-        Arguments:
+        Args:
             emoji (str): The emoji to delete the reaction for.
         """
         url = self.reactions_url / emoji / '@me'
@@ -69,7 +70,7 @@ class ReactionResource(ClientSubresources):
         user_id: LikeSnowflake | None = None,
     ) -> None:
         """Delete a reaction a user made for the message.
-        Arguments:
+        Args:
             emoji (str | None): The emoji to delete the reaction for.
             user_id (LikeSnowflake | None): The ID of the user to delete the reaction for.
         """

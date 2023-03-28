@@ -49,7 +49,7 @@ class AsyncGatewayClient:
     ):
         """Initialize the client.
 
-        Arguments:
+        Args:
             token (str): The token to use for authentication.
             session (aiohttp.ClientSession, None): The session to use for requests.
             ws_url (StrOrURL): The URL to connect to. Defaults to the Discord Gateway URL.
@@ -72,7 +72,7 @@ class AsyncGatewayClient:
     def add_handler(self, event_handler: EventHandlerType[_EVENT_T, ...]) -> None:
         """Add an event handler.
 
-        Arguments:
+        Args:
             event_handler (EventHandlerType[_EVENT_T]): The event handler to add.
         """
         self.dispatcher.add_handler(event_handler)
@@ -80,7 +80,7 @@ class AsyncGatewayClient:
     async def identify(self, command_data: IdentifyCommand) -> None:
         """Identify with the gateway.
 
-        Arguments:
+        Args:
             command_data (IdentifyCommand): The data to send to the gateway.
         """
         payload = command_data.dict(exclude_none=True)
@@ -93,7 +93,7 @@ class AsyncGatewayClient:
     async def resume(self, command_data: ResumeCommand) -> None:
         """Resume a previous session.
 
-        Arguments:
+        Args:
             command_data(ResumeCommand): The data to send to the gateway.
         """
         await self._send_command(GatewayCommandOpcode.RESUME, command_data.dict())
@@ -110,7 +110,7 @@ class AsyncGatewayClient:
             session = aiohttp.ClientSession()
 
         for _ in range(5, 0, -1):
-            try:  # noqa: WPS229  # Found too long ``try`` body length
+            try:  # noqa: WPS229 - Found too long ``try`` body length
                 await self._ws_loop(session)
                 break
 
@@ -165,7 +165,7 @@ class AsyncGatewayClient:
     async def _send_command(self, op: GatewayCommandOpcode, command: Any) -> None:
         """Send a command to the gateway.
 
-        Arguments:
+        Args:
             op(GatewayCommandOpcode): The opcode of the command.
             command(Any): The command data.
 
@@ -181,7 +181,7 @@ class AsyncGatewayClient:
 
         This method is responsible for dispatching events to the registered handlers.
 
-        Arguments:
+        Args:
             msg (GatewayMessage): The message to handle.
 
         Raises:
@@ -227,7 +227,7 @@ class AsyncGatewayClient:
     async def _hello(self, event: HelloEvent) -> None:
         """Handle a hello event.
 
-        Arguments:
+        Args:
             event (HelloEvent): The event to handle.
         """
         await self._reset_heartbeat(floor(event.heartbeat_interval / 1000))
@@ -252,7 +252,7 @@ class AsyncGatewayClient:
     async def _heartbeat_loop(self, heartbeat_period: float) -> None:
         """Start the heartbeat loop.
 
-        Arguments:
+        Args:
             heartbeat_period (float): The period of the heartbeat in seconds.
         """
         while True:
@@ -271,7 +271,7 @@ class AsyncGatewayClient:
     async def _wait_heartbeat_ack(self, wait_for: float) -> None:
         """Check if the last heartbeat was acknowledged.
 
-        Arguments:
+        Args:
             wait_for (float): The time to wait for the ack.
         """
         await asyncio.sleep(wait_for)
@@ -284,7 +284,7 @@ class AsyncGatewayClient:
     async def _reset_heartbeat(self, heartbeat_period: float) -> None:
         """Reset the heartbeat loop.
 
-        Arguments:
+        Args:
             heartbeat_period (float): The period of the heartbeat in seconds.
         """
         if self._check_heartbeat_ack_task:

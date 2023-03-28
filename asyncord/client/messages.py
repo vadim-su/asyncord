@@ -9,6 +9,13 @@ from asyncord.client.models.messages import Message, CreateMessageData, UpdateMe
 
 
 class MessageResource(ClientSubresources):
+    """Resource to perform actions on messages.
+
+    Attributes:
+        channel_id (LikeSnowflake): The ID of the channel.
+        messages_url (URL): The URL for the messages resource.
+    """
+
     channels_url = REST_API_URL / 'channels'
 
     def __init__(self, parent: ClientResource, channel_id: LikeSnowflake):
@@ -19,7 +26,7 @@ class MessageResource(ClientSubresources):
     def reactions(self, message_id: LikeSnowflake) -> ReactionResource:
         """Get the reactions resource for a message.
 
-        Arguments:
+        Args:
             channel_id (LikeSnowflake): The ID of the channel.
             message_id (LikeSnowflake): The ID of the message.
 
@@ -37,11 +44,11 @@ class MessageResource(ClientSubresources):
     ) -> list[Message]:
         """Get the messages for a channel.
 
-        Arguments:
-            around (LikeSnowflake, optional): Get messages around this message ID.
-            before (LikeSnowflake, optional): Get messages before this message ID.
-            after (LikeSnowflake, optional): Get messages after this message ID.
-            limit (int, optional): The maximum number of messages to return (1-100).
+        Args:
+            around (LikeSnowflake | None): Get messages around this message ID.
+            before (LikeSnowflake | None): Get messages before this message ID.
+            after (LikeSnowflake | None): Get messages after this message ID.
+            limit (int | None): The maximum number of messages to return (1-100).
 
         Returns:
             list[Channel]: A list of message objects.
@@ -67,12 +74,11 @@ class MessageResource(ClientSubresources):
     async def create(self, message_data: CreateMessageData) -> Message:
         """Create a new message object for the channel.
 
-        Arguments:
-            channel_id (LikeSnowflake): The ID of the channel.
-            content (str): The message content.
+        Args:
+            message_data (CreateMessageData): Data to create the message with.
 
         Returns:
-            Message: The created message object.
+            Message: Created message object.
         """
         url = self.messages_url
         payload = message_data.dict(exclude_unset=True)
@@ -82,13 +88,12 @@ class MessageResource(ClientSubresources):
     async def update(self, message_id: LikeSnowflake, message_data: UpdateMessageData) -> Message:
         """Update a message.
 
-        Arguments:
-            channel_id (LikeSnowflake): The ID of the channel.
-            message_id (LikeSnowflake): The ID of the message.
-            message_data (UpdateMessageData): The data to update the message with.
+        Args:
+            message_id (LikeSnowflake): Id of the message.
+            message_data (UpdateMessageData): Data to update the message with.
 
         Returns:
-            Message: The updated message object.
+            Message: Updated message object.
         """
         url = self.messages_url / str(message_id)
         payload = message_data.dict(exclude_unset=True)
@@ -98,10 +103,9 @@ class MessageResource(ClientSubresources):
     async def delete(self, message_id: LikeSnowflake, reason: str | None = None) -> None:
         """Delete a message.
 
-        Arguments:
-            channel_id (LikeSnowflake): The ID of the channel.
-            message_id (LikeSnowflake): The ID of the message.
-            reason (str, optional): The reason for deleting the message.
+        Args:
+            message_id (LikeSnowflake): Id of the message.
+            reason (str | None): Reason for deleting the message.
         """
         url = self.messages_url / str(message_id)
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from asyncord.snowflake import Snowflake
 from asyncord.client.users import UserResource
 from asyncord.client.guilds import GuildResource
 from asyncord.client.channels import ChannelResource

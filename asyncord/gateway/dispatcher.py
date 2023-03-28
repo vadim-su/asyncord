@@ -70,7 +70,7 @@ class EventDispatcher(Generic[_EVENT_T]):
         If the event type is not specified, the type will be inferred from
         the type hints of the event handler.
 
-        Arguments:
+        Args:
             event_type (type[_EVENT_T]):  The event type to handle.
             event_handler (EventHandlerType[_EVENT_T] | None):
                 The handler to call when the event is dispatched.
@@ -100,7 +100,7 @@ class EventDispatcher(Generic[_EVENT_T]):
     def add_argument(self, arg_name: str, arg_value: Any) -> None:
         """Add an argument to be passed to all event handlers.
 
-        Arguments:
+        Args:
             arg_name (str): The name of the argument.
             arg_value (Any): The value of the argument.
         """
@@ -112,7 +112,7 @@ class EventDispatcher(Generic[_EVENT_T]):
     async def dispatch(self, event: _EVENT_T) -> None:
         """Dispatch an event to all handlers.
 
-        Arguments:
+        Args:
             event (_EVENT_T): The event to dispatch.
         """
         event_type = type(event)
@@ -126,7 +126,7 @@ class EventDispatcher(Generic[_EVENT_T]):
     def _update_handler_args(self, event_handler: EventHandlerType[_EVENT_T, ...]) -> None:
         """Update the arguments to pass to an event handler.
 
-        Arguments:
+        Args:
             event_handler (EventHandlerType[_EVENT_T]): The event handler to update.
         """
         args = event_handler.__code__.co_varnames[1: event_handler.__code__.co_argcount]

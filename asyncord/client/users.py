@@ -5,8 +5,8 @@ from pydantic import BaseModel
 from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
 from asyncord.snowflake import Snowflake
+from asyncord.client.ports import Response
 from asyncord.client.resources import ClientSubresources
-from asyncord.client.http_proto import Response
 from asyncord.client.models.users import User
 from asyncord.client.models.members import Member
 from asyncord.client.models.channels import Channel
@@ -30,7 +30,7 @@ class UserResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/user#modify-current-user
 
-        Arguments:
+        Args:
             user_id (LikeSnowflake): The ID of the user to get.
         """
 
@@ -41,7 +41,7 @@ class UserResource(ClientSubresources):
     async def update_user(self, username: str) -> Response:
         """Update the current user.
 
-        Arguments:
+        Args:
             username (str): The new username.
 
         Reference: https://discord.com/developers/docs/resources/user#modify-current-user
@@ -63,7 +63,7 @@ class UserResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/user#get-current-user-guilds
 
-        Arguments:
+        Args:
             before (LikeSnowflake | None): Get guilds before this guild ID.
             after (LikeSnowflake | None): Get guilds after this guild ID.
             limit (int | None): The maximum number of guilds to get. Range: 1-200.
@@ -91,7 +91,7 @@ class UserResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
 
-        Arguments:
+        Args:
             guild_id (LikeSnowflake): The ID of the guild.
         """
         url = self.current_user_url / f'guilds/{guild_id}/member'
@@ -103,7 +103,7 @@ class UserResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/user#leave-guild
 
-        Arguments:
+        Args:
             guild_id (LikeSnowflake): The ID of the guild to leave.
         """
         url = self.current_user_url / f'guilds/{guild_id}'
@@ -114,7 +114,7 @@ class UserResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/user#create-dm
 
-        Arguments:
+        Args:
             user_id (LikeSnowflake): The ID of the user to create a DM with.
         """
         url = self.current_user_url / 'channels'
@@ -130,7 +130,7 @@ class UserResource(ClientSubresources):
 
         Reference: https://discord.com/developers/docs/resources/user#create-group-dm
 
-        Arguments:
+        Args:
             user_ids (list[LikeSnowflake]): The IDs of the users to create a group DM with.
                 The maximum number of users is 10.
 
