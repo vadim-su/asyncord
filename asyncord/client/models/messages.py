@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import io
 import enum
 import datetime
-from typing import Literal
+import mimetypes
+from typing import TYPE_CHECKING, Literal, BinaryIO
+from pathlib import Path
+from collections.abc import Mapping
 
-from pydantic import Field, BaseModel, root_validator
+from pydantic import Field, BaseModel, validator, root_validator
 
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.emoji import Emoji
@@ -12,6 +16,74 @@ from asyncord.client.models.users import User
 from asyncord.client.models.members import Member
 from asyncord.client.models.channels import Channel, ChannelMention
 from asyncord.client.models.stickers import Sticker
+
+MAX_EMBED_TEXT_LENGTH = 6000
+
+
+class AttachedFile(BaseModel):
+    """Attached file.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
+    """
+
+    filename: str
+    """Name of attached file."""
+
+    content_type: str
+    """Media type of the file."""
+
+    content: io.BufferedReader | io.BufferedRandom | BinaryIO | bytes
+    """File content."""
+
+    class Config():
+        arbitrary_types_allowed = True
+
+    def __init__(self, *, content: str | Path | BinaryIO | bytes, **data) -> None:
+        super().__init__(content=content, **data)
+
+    @root_validator(pre=True)
+    def fill_file_info(cls, values):
+        """Fill file info.
+
+        Args:
+            values (dict): The values to validate.
+
+        Returns:
+            dict: The validated values.
+        """
+        content = values.get('content')
+        if not content:
+            return values
+
+        if values.get('filename') and values.get('content_type'):
+            return values
+
+        if isinstance(content, str | Path):
+            content = open(content, 'rb')
+            values['content'] = content
+            if not values.get('filename'):
+                values['filename'] = Path(content.name).name
+
+        elif isinstance(content, (BinaryIO, io.BufferedReader, io.BufferedRandom)):
+            if not values.get('filename'):
+                values['filename'] = Path(content.name).name
+
+        elif isinstance(content, bytes):
+            if not values.get('filename'):
+                raise ValueError("'filename' is required for bytes file")
+
+        else:
+            raise ValueError(f"Unsupported file object type: {type(content).__name__}")
+
+        if not values.get('content_type'):
+            content_type = mimetypes.guess_type(values['filename'])[0]
+            if not content_type:
+                raise ValueError(f"Unable to guess content type for {values['filename']}")
+
+            values['content_type'] = content_type
+
+        return values
 
 
 @enum.unique
@@ -71,12 +143,12 @@ class _MessageData(BaseModel):
             values.get('content', False)
             or values.get('embeds', False)
             or values.get('sticker_ids', False)
-            or values.get('components', False),
-            # or values.get('files[n]', False), # FIXME: activate when attachments are implemented
+            or values.get('components', False)
+            or values.get('files', False),
         )
 
         if not has_any_content:
-            raise ValueError('Message must have content, embeds, stickers or components.')
+            raise ValueError('Message must have content, embeds, stickers, components or files.')
 
         return values
 
@@ -96,7 +168,7 @@ class _MessageData(BaseModel):
         Returns:
             dict: The validated values.
         """
-        embeds: list[Embed] = values.get('embeds', [])
+        embeds: list[Embed] = values.get('embeds') or []
 
         total_embed_text_length = 0
         for embed in embeds:
@@ -104,6 +176,48 @@ class _MessageData(BaseModel):
 
             if total_embed_text_length > MAX_EMBED_TEXT_LENGTH:
                 raise ValueError('Total embed text length must be less than 6000 characters.')
+
+        return values
+
+    @root_validator(pre=True)
+    def prepare_attached_files(cls, values):  # noqa: N805, WPS110
+        """Prepare attached files.
+
+        Args:
+            values (dict): The values to validate.
+
+        Returns:
+            dict: The validated values.
+        """
+
+        files = values.get('files')
+        if not files:
+            return values
+
+        if isinstance(files, Mapping):
+            attached_files = files.items()
+        else:
+            attached_files = files
+
+        prepared_files = []
+
+        for content in attached_files:
+            match content:
+                case AttachedFile():
+                    prepared_files.append(content)
+
+                # if list item - file_path or BinaryIO
+                case str() | Path() | io.BufferedReader() | io.BufferedRandom() | BinaryIO():
+                    prepared_files.append(AttachedFile(content=content))
+
+                # if mapping item - filename, file
+                case filename, content:
+                    prepared_files.append(AttachedFile(filename=filename, content=content))
+
+                case _:
+                    raise ValueError('Invalid file object type')
+
+        values['files'] = prepared_files
 
         return values
 
@@ -131,6 +245,49 @@ class _MessageData(BaseModel):
             embed_text_length += len(field.value or '')
 
         return embed_text_length
+
+
+class AttachmentData(BaseModel):
+    """Attachment object using for creating messages and editing messages.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#attachment-object
+    """
+
+    id: int | None = None
+    """Attachment id"""
+
+    filename: str | None = None
+    """Name of file attached"""
+
+    description: str | None = Field(None, max_length=1024)
+    """Description for the file (max 1024 characters)"""
+
+    content_type: str | None = None
+    """Media type of the file"""
+
+    size: int | None = None
+    """Size of file in bytes"""
+
+    url: str | None = None
+    """Source url of file"""
+
+    proxy_url: str | None = None
+    """Proxied url of file"""
+
+    height: int | None = None
+    """Height of file (if image)"""
+
+    width: int | None = None
+    """Width of file (if image)"""
+
+    ephemeral: bool | None = None
+    """Whether this attachment is ephemeral
+
+    Ephemeral attachments will automatically be removed after a set period of time.
+    Ephemeral attachments on messages are guaranteed to be available as long as
+    the message itself exists.
+    """
 
 
 class CreateMessageData(_MessageData):
@@ -166,13 +323,41 @@ class CreateMessageData(_MessageData):
     sticker_ids: list[Snowflake] | None = None
     """Sticker ids to include with the message."""
 
-    # FIXME: add attachments
+    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
+    """Contents of the file being sent.
+
+    See Uploading Files:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
+
+    attachments: list[AttachmentData] | None = None
+    """Attachment objects with filename and description.
+
+    See Uploading Files:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
 
     flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
     """The flags to use when sending the message.
 
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
+
+    @validator('attachments')
+    def validate_attachments(cls, attachments: list[AttachmentData]) -> list[AttachmentData]:  # noqa: WPS110
+        """Validate attachments."""
+        attachment_id_exit_list = [attach.id is not None for attach in attachments]
+
+        if all(attachment_id_exit_list):
+            return attachments
+
+        if any(attachment_id_exit_list):
+            raise ValueError('Attachments must have all ids or none of them.')
+
+        for index, attachment in enumerate(attachments):
+            attachment.id = index
+
+        return attachments
 
 
 class UpdateMessageData(_MessageData):
@@ -321,6 +506,9 @@ class Reaction(BaseModel):
 
 class Attachment(BaseModel):
     """Attachment object.
+
+    ATTENTION: This is not the same as the reAttachmentData' object.
+    If you want to send an attachment, use the 'AttachmentData' object.
 
     Read more info at:
     https://discord.com/developers/docs/resources/channel#attachment-object
@@ -877,3 +1065,4 @@ class InteractionType(enum.IntEnum):
 Message.update_forward_refs()
 Embed.update_forward_refs()
 MessageInteraction.update_forward_refs()
+CreateMessageData.update_forward_refs()

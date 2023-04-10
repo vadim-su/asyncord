@@ -89,7 +89,7 @@ class CreateChannelData(BaseModel):
 
 
 class UpdatGroupDMChannelData(BaseModel):
-    """https: // discord.com / developers / docs / resources / channel  # modify-channel-json-params-group-dm"""
+    """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-group-dm"""
     name: str | None = Field(None, min_length=1, max_length=100)
     """character channel name."""
 

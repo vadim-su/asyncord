@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from asyncord.client.headers import AUTHORIZATION
-from asyncord.client.http_proto import AsyncHttpClientPort
-from asyncord.client.http_client import AsyncHttpClient
+from asyncord.client.ports import AsyncHttpClientPort
+from asyncord.client.http.client import AsyncHttpClient
+from asyncord.client.http.headers import AUTHORIZATION
 
 
 class ClientResource:

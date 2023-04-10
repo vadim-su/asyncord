@@ -4,7 +4,7 @@ import pytest
 
 from asyncord.client.rest import RestClient
 from asyncord.client.members import MemberResource
-from asyncord.client.client_errors import ClientError
+from asyncord.client.http.errors import ClientError
 
 TEST_GUILD_ID = '763522265874694144'
 TEST_MEMBER_ID = '934564225769148436'

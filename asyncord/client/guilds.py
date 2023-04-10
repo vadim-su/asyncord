@@ -8,9 +8,9 @@ from pydantic import Field, BaseModel
 from asyncord.urls import REST_API_URL
 from asyncord.client.bans import BanResource
 from asyncord.client.roles import RoleResource
-from asyncord.client.headers import AUDIT_LOG_REASON
 from asyncord.client.members import MemberResource
 from asyncord.client.resources import ClientSubresources
+from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.models.guilds import (
     Guild,
     Prune,

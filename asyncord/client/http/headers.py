@@ -10,8 +10,11 @@ JSON_CONTENT_TYPE: Final[str] = 'application/json'
 
 
 @enum.unique
-class HttpMethod(enum.StrEnum):  # noqa: WPS600 Found subclassing a builtin: str
-    def _generate_next_value_(name, _start, _count, _last_values):  # noqa: WPS120 trailing underscore
+class HttpMethod(enum.StrEnum):
+    """HTTP method enum."""
+
+    # ignore argument of a method should be named 'self' and trailing underscore
+    def _generate_next_value_(name: str, _start, _count, _last_values) -> str:  # noqa: N805, WPS120
         return name
 
     GET = enum.auto()

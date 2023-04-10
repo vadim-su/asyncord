@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
-from asyncord.client.headers import AUDIT_LOG_REASON
 from asyncord.client.messages import MessageResource
 from asyncord.client.resources import ClientSubresources
+from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.models.channels import Channel
 from asyncord.client.models.channel_data import CreateChannelData, UpdateChannelDataType
 

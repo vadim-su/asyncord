@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
-from asyncord.client.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import ClientResource, ClientSubresources
 from asyncord.client.models.bans import Ban
+from asyncord.client.http.headers import AUDIT_LOG_REASON
 
 
 class BanResource(ClientSubresources):

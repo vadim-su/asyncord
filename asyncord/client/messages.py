@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import BinaryIO
+from pathlib import Path
+from collections.abc import Mapping
+
 from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
-from asyncord.client.headers import AUDIT_LOG_REASON
 from asyncord.client.reactions import ReactionResource
 from asyncord.client.resources import ClientResource, ClientSubresources
+from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.models.messages import Message, CreateMessageData, UpdateMessageData
 
 
@@ -82,7 +86,15 @@ class MessageResource(ClientSubresources):
         """
         url = self.messages_url
         payload = message_data.dict(exclude_unset=True)
-        resp = await self._http.post(url, payload)
+        resp = await self._http.post(
+            url=url,
+            payload=payload,
+            files=[
+                (file.filename, file.content_type, file.content)
+                for file in message_data.files
+            ],
+        )
+
         return Message(**resp.body)
 
     async def update(self, message_id: LikeSnowflake, message_data: UpdateMessageData) -> Message:

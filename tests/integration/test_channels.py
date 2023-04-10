@@ -4,7 +4,7 @@ import pytest
 
 from asyncord.client.rest import RestClient
 from asyncord.client.channels import ChannelResource
-from asyncord.client.client_errors import ClientError
+from asyncord.client.http.errors import ClientError
 from asyncord.client.models.channels import ChannelType
 from asyncord.client.models.channel_data import CreateChannelData, UpdateTextChannelData
 

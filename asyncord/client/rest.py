@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from asyncord.client.ports import AsyncHttpClientPort
 from asyncord.client.users import UserResource
 from asyncord.client.guilds import GuildResource
 from asyncord.client.channels import ChannelResource
 from asyncord.client.resources import ClientResource
-from asyncord.client.http_proto import AsyncHttpClientPort
 
 
 class RestClient(ClientResource):

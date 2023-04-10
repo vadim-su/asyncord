@@ -12,6 +12,7 @@ from asyncord.client.models.messages import Message, CreateMessageData, UpdateMe
 
 TEST_CHANNEL_ID = '920187645265608714'
 TEST_MESSAGE_ID = '923584607427899402'
+TEST_IMAGE_FILE = 'tests/data/test_image.jpg'
 
 
 class TestMessages:
