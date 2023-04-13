@@ -109,7 +109,14 @@ class MessageResource(ClientSubresources):
         """
         url = self.messages_url / str(message_id)
         payload = message_data.dict(exclude_unset=True)
-        resp = await self._http.patch(url, payload)
+        resp = await self._http.patch(
+            url=url,
+            payload=payload,
+            files=[
+                (file.filename, file.content_type, file.content)
+                for file in message_data.files
+            ],
+        )
         return Message(**resp.body)
 
     async def delete(self, message_id: LikeSnowflake, reason: str | None = None) -> None:
