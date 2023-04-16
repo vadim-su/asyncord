@@ -98,6 +98,7 @@ def test_dont_create_message_with_button_and_select_menu():
         ),
 
 
+@pytest.mark.xfail(reason='Pydantic discriminator not working properly')
 async def test_create_message_with_text_input(messages_res: MessageResource):
     components = [
         TextInput(

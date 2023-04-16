@@ -32,7 +32,9 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"GitHub.copilot-nightly",
-				"tamasfe.even-better-toml"
+				"tamasfe.even-better-toml",
+				"github.vscode-github-actions",
+				"redhat.vscode-yaml"
 			]
 		}
 	},

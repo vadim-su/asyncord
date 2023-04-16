@@ -6,7 +6,7 @@ PDM_VERSION="2.5"
 
 
 pip3 install --user "pdm~=$PDM_VERSION"
-pdm install
+pdm sync
 
 # Activate pdm completion
 

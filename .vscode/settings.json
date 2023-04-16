@@ -3,7 +3,7 @@
         "tests"
     ],
     "explorer.fileNesting.patterns": {
-        "pyproject.toml": "pdm.lock, .pdm-python"
+        "pyproject.toml": "pdm.lock, .pdm-python, pdm.toml"
     },
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
