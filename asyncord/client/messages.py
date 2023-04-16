@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from typing import BinaryIO
-from pathlib import Path
-from collections.abc import Mapping
-
 from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
 from asyncord.client.reactions import ReactionResource

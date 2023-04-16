@@ -12,6 +12,7 @@ from asyncord.gateway.events.base import GatewayEvent
 from asyncord.client.models.members import Member
 from asyncord.client.models.channels import Channel
 from asyncord.client.models.stickers import Sticker
+from asyncord.client.models.components import Component
 
 
 class MessageCreateEvent(GatewayEvent, messages.Message):
@@ -125,7 +126,7 @@ class MessageUpdateEvent(GatewayEvent):
     thread: Channel | None = None
     """The thread that was started from this message, includes thread member object."""
 
-    components: list[messages.MessageComponent] | None = None
+    components: list[Component] | None = None
     """Sent if the message is a response to an Interaction."""
 
     interaction: messages.MessageInteraction | None = None

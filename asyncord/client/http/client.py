@@ -341,22 +341,22 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
         elif payload:
             data = aiohttp.JsonPayload(payload)
 
-        async def on_request_chunk_sent(
-            session,
-            trace_config_ctx,
-            params,
-        ) -> None:
-            """Log request chunks."""
-            if len(params.chunk) > 500:
-                print(params.chunk)
-            else:
-                print(params.chunk.decode())
+        # async def on_request_chunk_sent(
+        #     session,
+        #     trace_config_ctx,
+        #     params,
+        # ) -> None:
+        #     """Log request chunks."""
+        #     if len(params.chunk) > 500:
+        #         print(params.chunk)
+        #     else:
+        #         print(params.chunk.decode())
 
-        trace = aiohttp.TraceConfig()
-        trace.on_request_chunk_sent.append(on_request_chunk_sent)
+        # trace = aiohttp.TraceConfig()
+        # trace.on_request_chunk_sent.append(on_request_chunk_sent)
 
-        self._session = aiohttp.ClientSession(trace_configs=[trace])
+        # self._session = aiohttp.ClientSession(trace_configs=[trace])
         if self._session:
             return self._session.request(method, url, data=data, headers=headers)
         else:
-            return aiohttp.request(method, url, data=payload, headers=headers)
+            return aiohttp.request(method, url, data=data, headers=headers)
