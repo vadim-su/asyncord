@@ -2,7 +2,9 @@
     "python.testing.pytestArgs": [
         "tests"
     ],
+    "explorer.fileNesting.patterns": {
+        "pyproject.toml": "pdm.lock, .pdm-python"
+    },
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "rpc.enabled": true,
 }

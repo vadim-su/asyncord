@@ -2,7 +2,7 @@
 
 # This script runs after the container is created.
 
-PDM_VERSION="2.3"
+PDM_VERSION="2.5"
 
 
 pip3 install --user "pdm~=$PDM_VERSION"
