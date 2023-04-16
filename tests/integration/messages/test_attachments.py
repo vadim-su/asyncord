@@ -124,25 +124,27 @@ async def test_replace_attachment(message: Message, messages_res: MessageResourc
         title='Test embed with attachments',
         image=EmbedImage(url=f'attachment://{test_filename}'),
     )
-    message = await messages_res.update(
-        message.id,
-        UpdateMessageData(
-            embeds=[embed],
-            Attachments=[
-                AttachmentData(filename=f'{test_filename}')
-            ],
-            files=[f'tests/data/{TEST_FILE_NAMES[0]}'],
-        ),
-    )
+    with open(f'tests/data/{TEST_FILE_NAMES[0]}', 'rb') as file:
+        message = await messages_res.update(
+            message.id,
+            UpdateMessageData(
+                embeds=[embed],
+                Attachments=[
+                    AttachmentData(filename=f'{test_filename}')
+                ],
+                files=[(f'{TEST_FILE_NAMES[0]}', file.read())],
+            ),
+        )
     assert len(message.attachments) == 1
 
-    updated_message = await messages_res.update(
-        message.id,
-        UpdateMessageData(
-            attachments=[AttachmentData(id=0)],
-            files=[f'tests/data/{TEST_FILE_NAMES[1]}'],
-        ),
-    )
+    with open(f'tests/data/{TEST_FILE_NAMES[1]}', 'rb') as file:
+        updated_message = await messages_res.update(
+            message.id,
+            UpdateMessageData(
+                attachments=[AttachmentData(id=0)],
+                files=[(f'{TEST_FILE_NAMES[1]}', file.read())],
+            ),
+        )
 
     assert len(updated_message.attachments) == 1
     assert updated_message.attachments[0].id != message.attachments[0].id
