@@ -177,7 +177,7 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
         Args:
             headers (Mapping[str, str]): Headers to send with requests.
         """
-        # FIXME: session can be used outside of the current client and we shouldn't be setting it here
+        # FIXME: #3 session can be used outside of the current client and we shouldn't be setting it here
         self._headers = headers
         if self._session:
             self._session.headers.clear()
@@ -341,21 +341,6 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
         elif payload:
             data = aiohttp.JsonPayload(payload)
 
-        # async def on_request_chunk_sent(
-        #     session,
-        #     trace_config_ctx,
-        #     params,
-        # ) -> None:
-        #     """Log request chunks."""
-        #     if len(params.chunk) > 500:
-        #         print(params.chunk)
-        #     else:
-        #         print(params.chunk.decode())
-
-        # trace = aiohttp.TraceConfig()
-        # trace.on_request_chunk_sent.append(on_request_chunk_sent)
-
-        # self._session = aiohttp.ClientSession(trace_configs=[trace])
         if self._session:
             return self._session.request(method, url, data=data, headers=headers)
         else:
