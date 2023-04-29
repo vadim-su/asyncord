@@ -1,6 +1,7 @@
 import typing
 
 from pydantic import BaseModel
+from asyncord.client.models.permissions import PermissionFlag
 
 from asyncord.snowflake import Snowflake
 
@@ -65,38 +66,46 @@ class RoleTags(BaseModel):
 
 
 class Role(BaseModel):
+    """Roles represent a set of permissions attached to a group of users.
+
+    The @everyone role has the same ID as the guild it belongs to.
+
+    More info at:
+    https://discord.com/developers/docs/topics/permissions#role-object
+    """
+
     id: Snowflake
-    """role id"""
+    """Role id."""
 
     name: str
-    """role name"""
+    """Role name."""
 
     color: int
-    """integer representation of hexadecimal color code"""
+    """Integer representation of hexadecimal color code."""
 
     hoist: bool
-    """if this role is pinned in the user listing"""
+    """Whether this role is pinned in the user listing."""
 
     icon: str | None = None
-    """role icon hash"""
+    """Role icon hash."""
 
     unicode_emoji: str | None = None
-    """role unicode emoji"""
+    """Role unicode emoji."""
 
     position: int
-    """position of this role"""
+    """Position of this role in."""
 
-    permissions: str
-    """permission bit set"""
+    permissions: PermissionFlag
+    """Permission bit set"""
 
     managed: bool
-    """whether this role is managed by an integration"""
+    """Whether this role is managed by an integration."""
 
     mentionable: bool
-    """whether this role is mentionable"""
+    """Whether this role is mentionable."""
 
     tags: RoleTags | None = None
-    """the tags this role has"""
+    """Role tags."""
 
 
 class RolePosition(BaseModel):
