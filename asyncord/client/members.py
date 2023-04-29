@@ -20,7 +20,7 @@ class MemberResource(ClientSubresources):
         resp = await self._http.get(url)
         return Member(**resp.body)
 
-    async def list(self, limit: int | None = 1, after: LikeSnowflake | None = None) -> list[Member]:
+    async def get_list(self, limit: int | None = 1, after: LikeSnowflake | None = None) -> list[Member]:
         """
         List members of guild.
 

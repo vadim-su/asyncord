@@ -24,7 +24,7 @@ class TestMembers:
     # FIXME: this test needs OAUTH GUILD_MEMBERS permission to access members list
     @pytest.mark.skip(reason='Need OAUTH GUILD_MEMBERS permission to access members list')
     async def test_list_members(self, members: MemberResource):
-        member_list = await members.list(limit=1)
+        member_list = await members.get_list(limit=1)
         assert len(member_list) == 1
         assert member_list[0].user
         assert member_list[0].user.id
