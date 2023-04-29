@@ -90,6 +90,7 @@ class CreateChannelData(BaseModel):
 
 class UpdatGroupDMChannelData(BaseModel):
     """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-group-dm"""
+
     name: str | None = Field(None, min_length=1, max_length=100)
     """character channel name."""
 
@@ -286,8 +287,7 @@ class VideoQualityMode(enum.IntEnum):
 
 
 class ForumTag(BaseModel):
-    """An object that represents a tag that is able to be applied to a thread in
-    a GUILD_FORUM channel.
+    """An object that represents a tag that is able to be applied to a GUILD_FORUM thread.
 
     https://discord.com/developers/docs/resources/channel#forum-tag-object
     """

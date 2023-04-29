@@ -227,7 +227,7 @@ class SelectMenu(BaseComponent):
     type: SelectComponentType = ComponentType.STRING_SELECT
     """Type of the component of select menu."""
 
-    custom_id: str | None = None
+    custom_id: str | None = Field(None, max_length=100)
     """Developer-defined identifier for the select menu.
 
     Max 100 characters.

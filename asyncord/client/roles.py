@@ -24,6 +24,7 @@ class RoleResource(ClientSubresources):
             list[Role]: The list of roles in the guild.
         """
         resp = await self._http.get(self.roles_url)
+        # FIXME: #4 replace by parse_obj_as
         return [Role(**role) for role in resp.body]
 
     async def create(self, role_data: CreateRoleData) -> Role:
