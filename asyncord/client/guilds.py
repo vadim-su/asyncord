@@ -345,7 +345,7 @@ class GuildResource(ClientSubresources):
             headers = {}
 
         payload = welcome_screen_data.dict(exclude_unset=True)
-        resp = await self._http.patch(url, payload, headers)
+        resp = await self._http.patch(url, payload, headers=headers)
         return WelcomeScreen(**resp.body)
 
     async def update_current_user_voice_state(
