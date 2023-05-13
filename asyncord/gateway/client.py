@@ -194,7 +194,7 @@ class AsyncGatewayClient:
             case GatewayEventOpcode.DISPATCH:
                 event_class = EVENT_MAP.get(cast(str, msg.event_name))
                 if event_class:
-                    event = event_class.parse_obj(msg.msg_data)
+                    event = event_class.model_validate(msg.msg_data)
                     if isinstance(event, ReadyEvent):
                         self.resume_url = event.resume_gateway_url
                         self._session_id = event.session_id
@@ -210,7 +210,7 @@ class AsyncGatewayClient:
                 raise errors.InvalidSessionError(session_id)
 
             case GatewayEventOpcode.HELLO:
-                event = HelloEvent.parse_obj(msg.msg_data)
+                event = HelloEvent.model_validate(msg.msg_data)
                 await self._hello(event)
 
             case GatewayEventOpcode.HEARTBEAT_ACK:
@@ -234,7 +234,7 @@ class AsyncGatewayClient:
         if self._session_id:
             await self.resume(ResumeCommand(
                 token=self.token,
-                session_id=cast(str, self._session_id),
+                session_id=self._session_id,
                 seq=self._last_seq_number,
             ))
         else:

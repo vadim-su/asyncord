@@ -122,4 +122,4 @@ class ReadyEventApplication(BaseModel):
     """the application's flags"""
 
 
-ReadyEvent.update_forward_refs()
+ReadyEvent.model_rebuild()

@@ -74,7 +74,7 @@ class ChannelResource(ClientSubresources):
         else:
             headers = {}
 
-        payload = channel_data.dict(exclude_unset=True)
+        payload = channel_data.model_dump(mode='json', exclude_unset=True)
 
         resp = await self._http.post(url, payload, headers=headers)
         return Channel(**resp.body)

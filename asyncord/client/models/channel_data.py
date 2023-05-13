@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import enum
-from typing import Union, Literal
+from typing import Any, Union, Literal
 
-from pydantic import Field, BaseModel, root_validator
+from pydantic import ConfigDict, Field, BaseModel, root_validator
 
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.channels import Overwrite, ChannelFlag, ChannelType
@@ -86,6 +86,9 @@ class CreateChannelData(BaseModel):
 
     default_sort_order: ThreadSortOrder | None = None
     """the default sort order type used to order posts in GUILD_FORUM channels"""
+
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
 
 
 class UpdatGroupDMChannelData(BaseModel):
@@ -201,6 +204,9 @@ class UpdateVoiceChannelData(_BaseGuildChannelUpdateData):
     video_quality_mode: VideoQualityMode | None = None
     """the camera video quality mode of the voice channel."""
 
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
+
 
 class UpdateStageChannelData(_BaseGuildChannelUpdateData):
     """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel"""
@@ -264,8 +270,11 @@ class UpdateForumChannelData(_BaseGuildChannelUpdateData):
     default_sort_order: ThreadSortOrder | None = None
     """the default sort order type used to order posts in GUILD_FORUM channels"""
 
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
 
-UpdateChannelDataType = Union[
+
+UpdateChannelDataType = Union[  # noqa: UP007
     UpdateTextChannelData,
     UpdateForumChannelData,
     UpdateStageChannelData,
@@ -314,8 +323,9 @@ class ForumTag(BaseModel):
     At most one of emoji_id and emoji_name may be set.
     """
 
-    @root_validator
-    def check_emoji_id_or_name(cls, values):
+    @root_validator(pre=True)
+    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate that only one of emoji_id and emoji_name is set."""
         if 'emoji_id' in values and 'emoji_name' in values:
             raise ValueError('At most one of emoji_id and emoji_name may be set.')
 
@@ -334,8 +344,9 @@ class DefaultReaction(BaseModel):
     emoji_name: str | None = None
     """the unicode character of the emoji"""
 
-    @root_validator
-    def check_emoji_id_or_emoji_name(cls, values):
+    @root_validator(pre=True)
+    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate that only one of emoji_id and emoji_name is set."""
         if 'emoji_id' in values and 'emoji_name' in values:
             raise ValueError('At most one of emoji_id and emoji_name may be set.')
 
@@ -350,3 +361,8 @@ class ThreadSortOrder(enum.IntEnum):
 
     CREATION_DATE = 1
     """Sort forum posts by creation time (from most recent to oldest)"""
+
+
+CreateChannelData.model_rebuild()
+UpdateVoiceChannelData.model_rebuild()
+UpdateForumChannelData.model_rebuild()

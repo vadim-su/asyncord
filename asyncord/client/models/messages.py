@@ -1,29 +1,35 @@
+"""This module contains message models."""
+
 from __future__ import annotations
 
-import io
 import enum
-import datetime
+import io
 import mimetypes
-from typing import TYPE_CHECKING, Literal, BinaryIO
-from pathlib import Path
 from collections.abc import Mapping
+from pathlib import Path
+from typing import TYPE_CHECKING, Annotated, Any, BinaryIO, Literal
 
-from pydantic import Field, BaseModel, validator, root_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, root_validator
 
+from asyncord.client.models.components import SELECT_COMPONENT_TYPE_LIST, ComponentType
 from asyncord.snowflake import Snowflake
-from asyncord.client.models.emoji import Emoji
-from asyncord.client.models.users import User
-from asyncord.client.models.members import Member
+
+import datetime
+
 from asyncord.client.models.channels import Channel, ChannelMention
+from asyncord.client.models.components import Component
+from asyncord.client.models.emoji import Emoji
+from asyncord.client.models.members import Member
 from asyncord.client.models.stickers import Sticker
-from asyncord.client.models.components import (
-    SELECT_COMPONENT_TYPE_LIST,
-    Component,
-    ComponentType,
-    SelectComponentType,
-)
+from asyncord.client.models.users import User
+
 
 MAX_EMBED_TEXT_LENGTH = 6000
+
+_OpennedFileType = io.BufferedReader | io.BufferedRandom
+
+AttachmentContentType = bytes | BinaryIO | _OpennedFileType
+FilePathType = str | Path
 
 
 class AttachedFile(BaseModel):
@@ -39,18 +45,20 @@ class AttachedFile(BaseModel):
     content_type: str
     """Media type of the file."""
 
-    content: io.BufferedReader | io.BufferedRandom | BinaryIO | bytes
+    content: AttachmentContentType
     """File content."""
 
-    class Config():
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    """Pydantic config."""
 
-    def __init__(self, *, content: str | Path | BinaryIO | bytes, **data) -> None:
-        super().__init__(content=content, **data)
+    def __init__(  # noqa: D107
+        self, *, content: FilePathType | AttachmentContentType, **kwargs: dict[str, Any],
+    ) -> None:
+        super().__init__(content=content, **kwargs)
 
     @root_validator(pre=True)
-    def fill_file_info(cls, values):
-        """Fill file info.
+    def validate_file_info(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Fill filename and content type if not provided.
 
         Args:
             values (dict): The values to validate.
@@ -62,16 +70,20 @@ class AttachedFile(BaseModel):
         if not content:
             return values
 
+        if isinstance(content, str):
+            content = Path(content)
+
+        # if file informaton is provided, skip
         if values.get('filename') and values.get('content_type'):
             return values
 
-        if isinstance(content, str | Path):
-            content = open(content, 'rb')
+        if isinstance(content, Path):
+            content = content.open('rb')
             values['content'] = content
             if not values.get('filename'):
                 values['filename'] = Path(content.name).name
 
-        elif isinstance(content, (BinaryIO, io.BufferedReader, io.BufferedRandom)):
+        elif isinstance(content, BinaryIO | io.BufferedReader | io.BufferedRandom):
             if not values.get('filename'):
                 values['filename'] = Path(content.name).name
 
@@ -80,7 +92,7 @@ class AttachedFile(BaseModel):
                 raise ValueError("'filename' is required for bytes file")
 
         else:
-            raise ValueError(f"Unsupported file object type: {type(content).__name__}")
+            raise ValueError(f'Unsupported file object type: {type(content).__name__}')
 
         if not values.get('content_type'):
             content_type = mimetypes.guess_type(values['filename'])[0]
@@ -90,6 +102,11 @@ class AttachedFile(BaseModel):
             values['content_type'] = content_type
 
         return values
+
+
+_FilesListType = list[AttachedFile | FilePathType | _OpennedFileType]
+_FileMapType = Mapping[str | Path, 'AttachmentContentType']
+FilesType = _FilesListType | _FileMapType
 
 
 @enum.unique
@@ -134,15 +151,15 @@ class _MessageData(BaseModel):
     Contains axillary validation methods and general fields.
     """
 
-    @root_validator
-    def has_content_or_embeds(cls, values):  # noqa: N805, WPS110
-        """Check if the message has content or embeds.
+    @root_validator(skip_on_failure=True)
+    def has_any_content(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate message content.
 
         Read more info at:
         https://discord.com/developers/docs/resources/channel#message-object-message-structure
 
         Args:
-            values (dict): The values to validate.
+            values (dict[str, Any]): The values to validate.
 
         Raises:
             ValueError: If the message has no content or embeds.
@@ -159,56 +176,56 @@ class _MessageData(BaseModel):
         )
 
         if not has_any_content:
-            raise ValueError('Message must have content, embeds, stickers, components or files.')
+            raise ValueError(
+                'Message must have content, embeds, stickers, components or files.',
+            )
 
         return values
 
-    @root_validator
-    def check_total_embed_text_length(cls, values):  # noqa: N805, WPS110
+    @field_validator('embeds', check_fields=False)
+    def validate_embeds(cls, embeds: list[Embed] | None) -> list[Embed] | None:
         """Check total embed text length.
 
         Read more info at:
         https://discord.com/developers/docs/resources/channel#message-object-message-structure
 
         Args:
-            values (dict): The values to validate.
+            embeds (list[Embed] | None): The values to validate.
 
         Raises:
             ValueError: If the total embed text length is more than 6000 characters.
 
         Returns:
-            dict: The validated values.
+            list[Embed] | None: The validated values.
         """
-        embeds: list[Embed] = values.get('embeds') or []
+        if not embeds:
+            return embeds
 
         total_embed_text_length = 0
         for embed in embeds:
             total_embed_text_length += cls._embed_text_length(embed)
 
             if total_embed_text_length > MAX_EMBED_TEXT_LENGTH:
-                raise ValueError('Total embed text length must be less than 6000 characters.')
+                raise ValueError(
+                    'Total embed text length must be less than 6000 characters.',
+                )
 
-        return values
+        return embeds
 
-    @root_validator(pre=True)
-    def prepare_attached_files(cls, values):  # noqa: N805, WPS110
+    @field_validator('files', mode='before', check_fields=False)
+    def validate_attached_files(cls, files: FilesType) -> list[AttachedFile]:
         """Prepare attached files.
 
         Args:
-            values (dict): The values to validate.
+            files (FilesType): Files to prepare.
 
         Returns:
-            dict: The validated values.
+            list[AttachedFile: Prepared files to attach.
         """
-
-        files = values.get('files')
         if not files:
-            return values
+            return []
 
-        if isinstance(files, Mapping):
-            attached_files = files.items()
-        else:
-            attached_files = files
+        attached_files = files.items() if isinstance(files, Mapping) else files
 
         prepared_files = []
 
@@ -222,35 +239,43 @@ class _MessageData(BaseModel):
                     prepared_files.append(AttachedFile(content=content))
 
                 # if mapping item - filename, file
-                case filename, content:
-                    prepared_files.append(AttachedFile(filename=filename, content=content))
+                case str() | Path() as filename, content if isinstance(content, AttachmentContentType):
+                    if isinstance(filename, Path):
+                        filename = filename.name
+                    prepared_files.append(
+                        AttachedFile(filename=filename, content=content),  # type: ignore
+                    )
 
                 case _:
                     raise ValueError('Invalid file object type')
 
-        values['files'] = prepared_files
+        return prepared_files
 
-        return values
+    @field_validator('attachments', check_fields=False)
+    def validate_attachments(cls, attachments: list[AttachmentData] | None) -> list[AttachmentData] | None:
+        """Validate attachments.
 
-    @root_validator
-    def validate_attachments(cls, values):  # noqa: WPS110
-        """Validate attachments."""
+        Args:
+            attachments (list[AttachmentData] | None): Attachments to validate.
 
-        # attachments has a default value of None
-        attachments: list[AttachmentData] = values.get('attachments') or []
+        Raises:
+            ValueError: If attachments have mixed ids.
+
+        Returns:
+            list[AttachmentData] | None: Validated attachments.
+        """
+        if not attachments:
+            return attachments
 
         attachment_id_exist_list = [attach.id is not None for attach in attachments]
 
         if all(attachment_id_exist_list):
-
             # Check is disabled because updated attachments already have id generated by Discord.
 
             # for attachment in attachments:
-            #     files = values.get('files', [])
             #     if attachment.id >= len(files):
-            #         raise ValueError('Attachment id must be less than files count.')
 
-            return values
+            return attachments
 
         if any(attachment_id_exist_list):
             raise ValueError('Attachments must have all ids or none of them')
@@ -258,13 +283,24 @@ class _MessageData(BaseModel):
         for index, attachment in enumerate(attachments):
             attachment.id = index
 
-        return values
+        return attachments
 
-    @root_validator
-    def validate_components(cls, values):  # noqa: WPS110
-        """Validate components."""
+    @field_validator('components', check_fields=False)
+    def validate_components(cls, components: list[Component] | None) -> list[Component] | None:
+        """Validate components.
 
-        components: list[Component] = values.get('components') or []
+        Args:
+            components (list[Component] | None): Components to validate.
+
+        Raises:
+            ValueError: If components have more than 5 action rows.
+
+        Returns:
+            list[Component] | None: Validated components.
+        """
+        if not components:
+            return components
+
         action_row_count = 0
 
         for component in components:
@@ -279,7 +315,7 @@ class _MessageData(BaseModel):
         if action_row_count > 5:
             raise ValueError('ActionRow components must be less than 5')
 
-        return values
+        return components
 
     @classmethod
     def _embed_text_length(cls, embed: Embed) -> int:
@@ -300,7 +336,7 @@ class _MessageData(BaseModel):
         if embed.author:
             embed_text_length += len(embed.author.name or '')
 
-        for field in (embed.fields or []):
+        for field in embed.fields or []:
             embed_text_length += len(field.name or '')
             embed_text_length += len(field.value or '')
 
@@ -314,7 +350,7 @@ class AttachmentData(BaseModel):
     https://discord.com/developers/docs/resources/channel#attachment-object
     """
 
-    id: int | None = None
+    id: Snowflake | int | None = None
     """Attachment id"""
 
     filename: str | None = None
@@ -357,10 +393,10 @@ class CreateMessageData(_MessageData):
     https://discord.com/developers/docs/resources/channel#create-message
     """
 
-    content: str | None = Field(None, max_length=2000)  # noqa: WPS110, WPS432
+    content: str | None = Field(None, max_length=2000)
     """The message content."""
 
-    nonce: str | int | None = Field(None, max_length=25)  # noqa: WPS432
+    nonce: Annotated[str, Field(max_length=25)] | int | None = None
     """Can be used to verify a message was sent.
 
     Value will appear in the Message Create event.
@@ -404,6 +440,9 @@ class CreateMessageData(_MessageData):
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
+
 
 class UpdateMessageData(_MessageData):
     """The data to update a message with.
@@ -412,7 +451,7 @@ class UpdateMessageData(_MessageData):
     https://discord.com/developers/docs/resources/channel#edit-message
     """
 
-    content: str | None = Field(None, max_length=2000)  # noqa: WPS110,WPS432
+    content: str | None = Field(None, max_length=2000)
     """The message content."""
 
     embeds: list[Embed] | None = None
@@ -444,6 +483,9 @@ class UpdateMessageData(_MessageData):
     https://discord.com/developers/docs/reference#uploading-files
     """
 
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
+
 
 class Message(BaseModel):
     """Message object.
@@ -461,7 +503,7 @@ class Message(BaseModel):
     author: User
     """author of the message"""
 
-    content: str  # noqa: WPS110
+    content: str
     """contents of the message"""
 
     timestamp: datetime.datetime
@@ -541,6 +583,9 @@ class Message(BaseModel):
     message: str | None = None
     """error message"""
 
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
+
 
 class Reaction(BaseModel):
     """Reaction object.
@@ -613,13 +658,13 @@ class Embed(BaseModel):
     https://discord.com/developers/docs/resources/channel#embed-object
     """
 
-    title: str | None = Field(None, max_length=256)  # noqa: WPS432
+    title: str | None = Field(None, max_length=256)
     """title of embed"""
 
     type: EmbedType | None = None
     """type of embed (always "rich" for webhook embeds)"""
 
-    description: str | None = Field(None, max_length=4096)  # noqa: WPS432
+    description: str | None = Field(None, max_length=4096)
     """description of embed"""
 
     url: str | None = None
@@ -653,6 +698,9 @@ class Embed(BaseModel):
     # the following field constraints are set but not enforced: max_items.
     fields: list[EmbedField] | None = None
     """fields information"""
+
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
 
 
 @enum.unique
@@ -695,7 +743,7 @@ class EmbedFooter(BaseModel):
     """
 
     # WPS432: Found magic number
-    text: str = Field(max_length=2048)  # noqa: WPS432
+    text: str = Field(max_length=2048)
     """footer text"""
 
     icon_url: str | None = None
@@ -806,12 +854,12 @@ class EmbedField(BaseModel):
     https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
     """
 
-    name: str = Field(max_length=256)  # noqa: WPS432 - Found magic number
+    name: str = Field(max_length=256)  # - Found magic number
     """name of the field"""
 
     # WPS110: Found wrong variable name
     # WPS432: Found magic number
-    value: str = Field(max_length=1024)  # noqa: WPS110, WPS432
+    value: str = Field(max_length=1024)
     """value of the field"""
 
     inline: bool | None = None
@@ -853,13 +901,13 @@ class MessageType(enum.IntEnum):
     GUILD_BOOST = 8
     """a user started boosting the guild"""
 
-    GUILD_BOOST_TIER_1 = 9  # noqa: WPS114
+    GUILD_BOOST_TIER_1 = 9
     """a user boosted the guild to tier 1"""
 
-    GUILD_BOOST_TIER_2 = 10  # noqa: WPS114
+    GUILD_BOOST_TIER_2 = 10
     """a user boosted the guild to tier 2"""
 
-    GUILD_BOOST_TIER_3 = 11  # noqa: WPS114
+    GUILD_BOOST_TIER_3 = 11
     """a user boosted the guild to tier 3"""
 
     CHANNEL_FOLLOW_ADD = 12
@@ -912,6 +960,9 @@ class MessageActivity(BaseModel):
     party_id: str | None = None
     """party_id from a Rich Presence event"""
 
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
+
 
 class MessageActivityType(enum.IntEnum):
     """Type of activity.
@@ -961,13 +1012,13 @@ class AllowedMentionType(enum.Enum):
     https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types
     """
 
-    ROLES = "roles"
+    ROLES = 'roles'
     """Controls role mentions."""
 
-    USERS = "users"
+    USERS = 'users'
     """Controls user mentions."""
 
-    EVERYONE = "everyone"
+    EVERYONE = 'everyone'
     """Controls @everyone and @here mentions"""
 
 
@@ -1050,38 +1101,6 @@ class ButtonStyle(enum.IntEnum):
     """
 
 
-class ComponentType(enum.IntEnum):
-    """Type of component.
-
-    Read more info at:
-    https://discord.com/developers/docs/interactions/message-components#component-object-component-types
-    """
-
-    ACTION_ROW = 1
-    """container for other components"""
-
-    BUTTON = 2
-    """button object"""
-
-    STRING_SELECT = 3
-    """select menu for picking from defined text options"""
-
-    TEXT_INPUT = 4
-    """text input object"""
-
-    USER_SELECT = 5
-    """select menu for users"""
-
-    ROLE_SELECT = 6
-    """select menu for roles"""
-
-    MENTIONABLE_SELECT = 7
-    """select menu for mentionables (users and roles)"""
-
-    CHANNEL_SELECT = 8
-    """select menu for channels"""
-
-
 class MessageInteraction(BaseModel):
     """Message interaction object.
 
@@ -1106,6 +1125,9 @@ class MessageInteraction(BaseModel):
 
     member: Member | None = None
     """Member who invoked the interaction"""
+
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
 
 
 @enum.unique
@@ -1132,8 +1154,10 @@ class InteractionType(enum.IntEnum):
     """modal submit"""
 
 
-Message.update_forward_refs()
-Embed.update_forward_refs()
-MessageInteraction.update_forward_refs()
-CreateMessageData.update_forward_refs()
-UpdateMessageData.update_forward_refs()
+MessageActivity.model_rebuild()
+MessageInteraction.model_rebuild()
+Message.model_rebuild()
+Embed.model_rebuild()
+MessageInteraction.model_rebuild()
+CreateMessageData.model_rebuild()
+UpdateMessageData.model_rebuild()

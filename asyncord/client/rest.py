@@ -1,10 +1,13 @@
+"""This module contains a root of the REST client for Asyncord."""
+
 from __future__ import annotations
 
-from asyncord.client.ports import AsyncHttpClientPort
-from asyncord.client.users import UserResource
-from asyncord.client.guilds import GuildResource
+from asyncord.client.applications import ApplicationResource
 from asyncord.client.channels import ChannelResource
+from asyncord.client.guilds import GuildResource
+from asyncord.client.ports import AsyncHttpClientPort
 from asyncord.client.resources import ClientResource
+from asyncord.client.users import UserResource
 
 
 class RestClient(ClientResource):
@@ -13,6 +16,7 @@ class RestClient(ClientResource):
         self.guilds = GuildResource(self)
         self.users = UserResource(self)
         self.channels = ChannelResource(self)
+        self.applications = ApplicationResource(self)
 
     @classmethod
     async def create(cls, token: str, *, http_client: AsyncHttpClientPort | None = None) -> RestClient:

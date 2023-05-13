@@ -133,4 +133,4 @@ class ClientStatus(BaseModel):
     """User's status set for an active web (browser, bot account) application session."""
 
 
-PresenceUpdateEvent.update_forward_refs()
+PresenceUpdateEvent.model_rebuild()

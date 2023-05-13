@@ -104,7 +104,7 @@ class MessageResource(ClientSubresources):
             Message: Updated message object.
         """
         url = self.messages_url / str(message_id)
-        payload = message_data.dict(exclude_unset=True)
+        payload = message_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http.patch(
             url=url,
             payload=payload,

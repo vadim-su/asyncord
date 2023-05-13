@@ -327,5 +327,5 @@ class MessageUser(BaseModel):
     """User's member properties in the guild."""
 
 
-MessageCreateEvent.update_forward_refs()
-MessageUpdateEvent.update_forward_refs()
+MessageCreateEvent.model_rebuild()
+MessageUpdateEvent.model_rebuild()

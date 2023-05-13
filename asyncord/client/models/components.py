@@ -1,10 +1,19 @@
 from __future__ import annotations
 
 import enum
-from typing import Literal, Annotated
+from typing import Any, Literal, Annotated
 from typing import get_args as get_typing_args
 
-from pydantic import Field, BaseModel, validator, root_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    BaseModel,
+    FieldValidationInfo,
+    field_validator,
+    validator,
+    root_validator,
+    TypeAdapter
+)
 
 
 @enum.unique
@@ -86,8 +95,10 @@ class ActionRow(BaseComponent):
     Text input components are not allowed in action rows.
     """
 
-    @validator('components')
-    def validate_components(cls, components):
+    model_config = ConfigDict(undefined_types_warning=False)
+
+    @field_validator('components')
+    def validate_components(cls, components: list[Button | SelectMenu]) -> list[Button | SelectMenu]:
         """Check ActionRow components."""
         component_types = [component.type for component in components]
         set_component_types = set(component_types)
@@ -95,13 +106,16 @@ class ActionRow(BaseComponent):
         if ComponentType.ACTION_ROW in set_component_types:
             raise ValueError('ActionRow cannot contain another ActionRow')
 
-        if ComponentType.BUTTON in set_component_types:
+        if ComponentType.BUTTON in set_component_types:  # noqa: SIM102
             # any select component in components
             if set_component_types & set(SELECT_COMPONENT_TYPE_LIST):
-                raise ValueError('ActionRow containing a select menu cannot also contain buttons')
+                raise ValueError(
+                    'ActionRow containing a select menu cannot also contain buttons',
+                )
 
         select_components = [
-            component_type for component_type in component_types
+            component_type
+            for component_type in component_types
             if component_type in SELECT_COMPONENT_TYPE_LIST
         ]
         if len(select_components) > 1:
@@ -170,14 +184,14 @@ class Button(BaseComponent):
     Only `ComponentType.BUTTON` is allowed.
     """
 
-    style: ButtonStyle = ButtonStyle.PRIMARY
-    """The style of the button."""
-
     label: str | None = Field(None, max_length=80)
     """The text to be displayed on the button.
 
     Max 80 characters.
     """
+
+    style: ButtonStyle = ButtonStyle.PRIMARY
+    """The style of the button."""
 
     emoji: ComponentEmoji | None = None
     """The emoji to be displayed on the button."""
@@ -194,13 +208,15 @@ class Button(BaseComponent):
     disabled: bool = False
     """Whether the button is disabled."""
 
-    @root_validator
-    def check_custom_id_or_url(cls, values):
-        """Check that `custom_id` or `url` is set."""
+    model_config = ConfigDict(undefined_types_warning=False)
 
-        custom_id = values.get('custom_id')
-        url = values.get('url')
-        if values.get('style') is ButtonStyle.LINK:
+    @root_validator(skip_on_failure=True)
+    def validate_style(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Check that `custom_id` or `url` are set."""
+        custom_id: str | None = values['custom_id']
+        url: str | None = values['url']
+
+        if values['style'] is ButtonStyle.LINK:
             if custom_id:
                 raise ValueError('`custom_id` is not allowed for link-style buttons')
             if not url:
@@ -210,6 +226,7 @@ class Button(BaseComponent):
                 raise ValueError('`url` is not allowed for non-link-style buttons')
             if not custom_id:
                 raise ValueError('`custom_id` is required for non-link-style buttons.')
+
         return values
 
 
@@ -240,11 +257,14 @@ class SelectMenu(BaseComponent):
     Max 25 options.
     """
 
-    @root_validator
-    def validate_options(cls, values):
+    model_config = ConfigDict(undefined_types_warning=False)
+
+    @field_validator('options')
+    def validate_options(
+        cls, options: list[SelectMenuOption], field_info: FieldValidationInfo,
+    ) -> list[SelectMenuOption]:
         """Check that `options` is set for `SelectComponentType.STRING_SELECT`."""
-        menu_type = values.get('type')
-        options = values.get('options')
+        menu_type = field_info.data.get('type')
 
         if menu_type is ComponentType.STRING_SELECT:
             if not options:
@@ -253,7 +273,7 @@ class SelectMenu(BaseComponent):
             if options:
                 raise ValueError('Options is allowed only for `SelectComponentType.STRING_SELECT`')
 
-        return values
+        return options
 
 
 class ComponentEmoji(BaseModel):
@@ -368,23 +388,24 @@ class TextInput(BaseComponent):
     Max 100 characters.
     """
 
-    # def __init__(self, **data) -> None:
-    #     super().__init__(**data)
-    #     self.__fields_set__.add('style')
+    def __init__(self, **data: dict[str, Any]) -> None:
+        super().__init__(**data)  # type: ignore
+        self.__fields_set__.add('style')
 
-    @root_validator
-    def check_length(cls, values):
-        min_length = values.get('min_length')
-        max_length = values.get('max_length')
+    @field_validator('max_length')
+    def validate_length(cls, max_length: int | None, field_info: FieldValidationInfo) -> int | None:
+        min_length: int | None = field_info.data['min_length']
 
-        if min_length is not None and max_length is not None:
+        if min_length is not None and max_length is not None:  # noqa: SIM102
             if min_length > max_length:
                 raise ValueError('`min_length` must be less than or equal to `max_length`')
 
-        return values
+        return max_length
 
 
 Component = Annotated[ActionRow | Button | SelectMenu | TextInput, Field(discriminator='type')]
 
-SelectMenu.update_forward_refs()
-ActionRow.update_forward_refs()
+
+SelectMenu.model_rebuild()
+Button.model_rebuild()
+ActionRow.model_rebuild()

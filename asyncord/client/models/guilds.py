@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import enum
 import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import Field, BaseModel
+from pydantic import ConfigDict, Field, BaseModel
 
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.emoji import Emoji
@@ -78,6 +78,8 @@ class CreateGuildData(BaseModel):
 
     system_channel_flags: int | None = None
     """System channel flags."""
+
+    model_config = ConfigDict(undefined_types_warning=False)
 
 
 class CreateGuildChannel(BaseModel):
@@ -234,6 +236,8 @@ class Guild(BaseModel):
     premium_progress_bar_enabled: bool
     """whether the guild has the boost progress bar enabled"""
 
+    model_config = ConfigDict(undefined_types_warning=False)
+
 
 class GuildPreview(BaseModel):
     """Guild preview object.
@@ -355,6 +359,8 @@ class Invite(BaseModel):
 
     target_user_type: str
     """user type the invite is for"""
+
+    model_config = ConfigDict(undefined_types_warning=False)
 
 
 class GuildCreateChannel(BaseModel):
@@ -498,12 +504,14 @@ class GeneralIntegration(BaseModel):
     scopes: list[str] | None = None
     """the scopes the application has been authorized for"""
 
+    model_config = ConfigDict(undefined_types_warning=False)
+
 
 class DiscordIntegration(BaseModel):
-    """
-    Integration object for Discord integrations.
+    """Integration object for Discord integrations.
 
-    Reference: https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
+    Reference:
+    https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
     """
 
     id: Snowflake
@@ -524,8 +532,10 @@ class DiscordIntegration(BaseModel):
     scopes: list[str] | None = None
     """the scopes the application has been authorized for"""
 
+    model_config = ConfigDict(undefined_types_warning=False)
 
-IntegrationVariants = GeneralIntegration | DiscordIntegration
+
+IntegrationVariants = Annotated[GeneralIntegration | DiscordIntegration, Field(discriminator='type')]
 
 
 @enum.unique
@@ -573,42 +583,27 @@ class IntegrationApplication(BaseModel):
 
 
 class UpdateWelcomeScreenData(BaseModel):
-    """
-    Welcome screen update data.
+    """Welcome screen update data.
 
     Reference: https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
     """
     enabled: bool | None = None
     """Whether the welcome screen is enabled"""
 
-    # FIXME: Field(max_items=5) is not working, pydantic bug
-    welcome_channels: list[WelcomeScreenChannel] | None = None
+    welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_items=5)
     """The channels shown in the welcome screen, max 5"""
 
     description: str | None = None
     """The server description shown in the welcome screen"""
 
-
-class WelcomeScreen(BaseModel):
-    """
-    Welcome screen object.
-
-    Reference: https://discord.com/developers/docs/resources/guild#welcome-screen-object
-    """
-
-    description: str | None
-    """The server description shown in the welcome screen"""
-
-    # FIXME: Field(max_items=5) is not working, pydantic bug
-    welcome_channels: list[WelcomeScreenChannel]
-    """The channels shown in the welcome screen, up to 5"""
+    model_config = ConfigDict(undefined_types_warning=False)
 
 
 class WelcomeScreenChannel(BaseModel):
-    """
-    Welcome screen channel object.
+    """Welcome screen channel object.
 
-    Reference: https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
+    Reference:
+    https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
     """
 
     channel_id: Snowflake
@@ -622,6 +617,22 @@ class WelcomeScreenChannel(BaseModel):
 
     emoji_name: str | None
     """the emoji name if custom, the unicode character if standard, or null if no emoji is set"""
+
+
+class WelcomeScreen(BaseModel):
+    """Welcome screen object.
+
+    Reference: https://discord.com/developers/docs/resources/guild#welcome-screen-object
+    """
+
+    description: str | None
+    """The server description shown in the welcome screen."""
+
+    welcome_channels: list[WelcomeScreenChannel] = Field(max_items=5)
+    """List of channels shown in the welcome screen.
+
+    Up to 5 channels.
+    """
 
 
 @enum.unique
@@ -662,7 +673,9 @@ class UnavailableGuild(BaseModel):
     """true if this guild is unavailable due to an outage"""
 
 
-Guild.update_forward_refs()
-GuildPreview.update_forward_refs()
-GeneralIntegration.update_forward_refs()
-DiscordIntegration.update_forward_refs()
+CreateGuildData.model_rebuild()
+Invite.model_rebuild()
+Guild.model_rebuild()
+GeneralIntegration.model_rebuild()
+DiscordIntegration.model_rebuild()
+UpdateWelcomeScreenData.model_rebuild()

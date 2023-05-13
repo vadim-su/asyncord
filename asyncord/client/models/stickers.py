@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
@@ -56,6 +56,8 @@ class Sticker(BaseModel):
     sort_value: int | None = None
     """the standard sticker's sort order within its pack"""
 
+    model_config = ConfigDict(undefined_types_warning=False)
+
 
 class StickerPack(BaseModel):
     """Represents a sticker pack.
@@ -84,6 +86,8 @@ class StickerPack(BaseModel):
     banner_asset_id: Snowflake | None = None
     """ID of the sticker asset for the pack's banner image"""
 
+    model_config = ConfigDict(undefined_types_warning=False)
+
 
 @enum.unique
 class StickerType(enum.IntEnum):
@@ -110,4 +114,5 @@ class StickerFormatType(enum.IntEnum):
     """LOTTIE sticker format"""
 
 
-Sticker.update_forward_refs()
+Sticker.model_rebuild()
+StickerPack.model_rebuild()

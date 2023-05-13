@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING
 
-from pydantic import Field, BaseModel
+from pydantic import TypeAdapter
 
 from asyncord.urls import REST_API_URL
 from asyncord.client.bans import BanResource
@@ -199,7 +199,6 @@ class GuildResource(ClientSubresources):
         Returns:
             Prune: The prune count.
         """
-
         payload = {}
         if days is not None:
             payload['days'] = days
@@ -275,10 +274,7 @@ class GuildResource(ClientSubresources):
         """
         url = self.guilds_url / str(guild_id) / 'integrations'
         resp = await self._http.get(url)
-        return [
-            _IntegrationParser.parse_obj(integration).__root__
-            for integration in resp.body
-        ]
+        return _IntegrationVariantListValidator.validate_python(resp.body)
 
     async def delete_integration(
         self,
@@ -297,10 +293,10 @@ class GuildResource(ClientSubresources):
         """
         url = self.guilds_url / str(guild_id) / 'integrations' / str(integration_id)
 
-        if reason is not None:
-            headers = {AUDIT_LOG_REASON: reason}
-        else:
+        if reason is None:
             headers = {}
+        else:
+            headers = {AUDIT_LOG_REASON: reason}
 
         await self._http.delete(url, headers=headers)
 
@@ -404,5 +400,4 @@ class GuildResource(ClientSubresources):
         await self._http.patch(url, payload)
 
 
-class _IntegrationParser(BaseModel):
-    __root__: Annotated[IntegrationVariants, Field(discriminator='type')]
+_IntegrationVariantListValidator = TypeAdapter(list[IntegrationVariants])

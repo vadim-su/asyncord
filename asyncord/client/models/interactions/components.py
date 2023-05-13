@@ -147,4 +147,4 @@ class ApplicationCommandOptionType(enum.IntEnum):
     """Attachment object."""
 
 
-Interaction.update_forward_refs()
+Interaction.model_rebuild()

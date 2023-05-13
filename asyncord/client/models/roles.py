@@ -11,13 +11,13 @@ class CreateRoleData(BaseModel):
     """Name of the role."""
 
     permissions: str | None = None
-    "bitwise value of the enabled/disabled permissions. Defaults to @everyone permissions in guild"
+    'bitwise value of the enabled/disabled permissions. Defaults to @everyone permissions in guild'
 
     color: int = 0
     """RGB color value of the role. Defaults to 0."""
 
     hoist: bool = False
-    "Whether the role should be displayed separately in the sidebar. Defaults to False."
+    'Whether the role should be displayed separately in the sidebar. Defaults to False.'
 
     icon: str | None = None
     """The role's icon image (if the guild has the ROLE_ICONS feature). Defaults to False."""
@@ -34,13 +34,13 @@ class UpdateRoleData(BaseModel):
     """Name of the role."""
 
     permissions: str | None = None
-    "bitwise value of the enabled/disabled permissions. Defaults to @everyone permissions in guild"
+    'bitwise value of the enabled/disabled permissions. Defaults to @everyone permissions in guild'
 
     color: int | None = None
     """RGB color value of the role."""
 
     hoist: bool | None = None
-    "Whether the role should be displayed separately in the sidebar. Defaults to False."
+    'Whether the role should be displayed separately in the sidebar. Defaults to False.'
 
     icon: str | None = None
     """The role's icon image (if the guild has the ROLE_ICONS feature). Defaults to False."""

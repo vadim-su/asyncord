@@ -9,7 +9,8 @@ from __future__ import annotations
 import enum
 from datetime import datetime
 
-from pydantic import Field, BaseModel, validator
+from pydantic import ConfigDict, Field, BaseModel, field_validator, validator
+from pydantic import FieldValidationInfo
 
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
@@ -42,7 +43,7 @@ class Channel(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=100)
     """Channel name (2-100 characters)"""
 
-    topic: str | None = Field(min_length=0, max_length=1024)
+    topic: str | None = None
     """Channel topic.
 
     Should be between 0 and 1024 characters.
@@ -129,11 +130,13 @@ class Channel(BaseModel):
     To automatically archive the thread after recent activity.
     Can be set to: 60, 1440, 4320, 10080.
     """
+
     permissions: str | None = None
     """Computed permissions for the invoking user in the channel, including overwrites.
 
     Only included when part of the resolved data received on a slash command interaction.
     """
+
     flags: ChannelFlag | None = None
     """Flags for the channel."""
 
@@ -143,6 +146,25 @@ class Channel(BaseModel):
     It's similar to message_count on message creation, but will not decrement
     the number when a message is deleted.
     """
+
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
+
+    @field_validator('topic')
+    def validate_topic(cls, topic: str | None, field_info: FieldValidationInfo) -> str | None:
+        """Validate topic field."""
+        if not topic:
+            return topic
+
+        channel_type = field_info.data.get('type')
+
+        if channel_type is ChannelType.GUILD_TEXT and len(topic) > 1024:
+            raise ValueError('Text channel topic must be between 0 and 1024 characters.')
+
+        if channel_type is ChannelType.GUILD_FORUM and len(topic) > 4096:
+            raise ValueError('Forum channel topic must be between 0 and 4096 characters.')
+
+        return topic
 
 
 class ChannelMention(BaseModel):
@@ -163,6 +185,9 @@ class ChannelMention(BaseModel):
 
     name: str
     """Channel name."""
+
+    model_config = ConfigDict(undefined_types_warning=False)
+    """Pydantic config."""
 
 
 @enum.unique
@@ -373,4 +398,5 @@ class ForumTag(BaseModel):
             raise ValueError('emoji_id and emoji_name cannot be set at the same time')
 
 
-Channel.update_forward_refs()
+Channel.model_rebuild()
+ChannelMention.model_rebuild()

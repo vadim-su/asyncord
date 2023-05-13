@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import BaseModel
+from pydantic import AnyHttpUrl, BaseModel, Field
 
 from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import UserFlags
+from asyncord.client.models.permissions import PermissionFlag
 
 
 class Application(BaseModel):
@@ -67,6 +68,21 @@ class Application(BaseModel):
 
     flags: ApplicationFlag | None = None
     """the application's public flags"""
+
+    tags = list[str] = Field(default_factory=list, max_items=5)
+    """Tags describing the content and functionality of the application.
+
+    Maximum of 5 tags.
+    """
+
+    install_params: InstallParams | None = None
+    """Settings for the application's default in-app authorization link."""
+
+    custom_install_url: AnyHttpUrl | None = None
+    """Application's default custom authorization link"""
+
+    role_connections_verification_url: AnyHttpUrl | None = None
+    """Application's default role connection verification url."""
 
 
 class ApplicationUser(BaseModel):
@@ -238,4 +254,22 @@ class ApplicationCommandPermissionType(enum.IntEnum):
     """Channel permission type"""
 
 
-Application.update_forward_refs()
+class InstallParams(BaseModel):
+    """Application install parameters.
+
+    Reference:
+    https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure
+    """
+
+    scopes: list[str]
+    """OAuth2 scopes.
+
+    Reference:
+    https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes
+    """
+
+    permissions: PermissionFlag
+    """Bitwise flags representing the permissions your application."""
+
+
+Application.model_rebuild()

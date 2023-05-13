@@ -268,4 +268,4 @@ class ActivityButton(BaseModel):
     """Url for the button. Should be between 1-512 characters."""
 
 
-Activity.update_forward_refs()
+Activity.model_rebuild()

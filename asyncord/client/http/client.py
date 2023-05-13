@@ -270,6 +270,7 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
                     )
 
                 case status if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
+                    # TODO: #8 Add more specific errors for 400 range
                     raise errors.ClientError(
                         message=message or 'Unknown error',
                         resp=resp,

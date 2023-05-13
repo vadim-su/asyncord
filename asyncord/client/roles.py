@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pydantic import TypeAdapter
+
 from asyncord.urls import REST_API_URL
 from asyncord.typedefs import LikeSnowflake
 from asyncord.client.resources import ClientResource, ClientSubresources
@@ -24,8 +26,7 @@ class RoleResource(ClientSubresources):
             list[Role]: The list of roles in the guild.
         """
         resp = await self._http.get(self.roles_url)
-        # FIXME: #4 replace by parse_obj_as
-        return [Role(**role) for role in resp.body]
+        return _RoleListValidator.validate_python(resp.body)
 
     async def create(self, role_data: CreateRoleData) -> Role:
         """Create a new role in a guild.
@@ -40,7 +41,7 @@ class RoleResource(ClientSubresources):
         """
         payload = role_data.dict(exclude_unset=True)
         resp = await self._http.post(self.roles_url, payload)
-        return Role(**resp.body)
+        return Role.model_validate(resp.body)
 
     async def change_role_positions(self, role_positions: list[RolePosition]) -> list[Role]:
         """Change the position of a role in a guild.
@@ -54,7 +55,7 @@ class RoleResource(ClientSubresources):
             list[Role]: The list of roles in the guild.
         """
         resp = await self._http.patch(self.roles_url, role_positions)
-        return [Role(**role) for role in resp.body]
+        return _RoleListValidator.validate_python(resp.body)
 
     async def update_role(self, role_id: LikeSnowflake, role_data: UpdateRoleData) -> Role:
         """Update a role in a guild.
@@ -71,7 +72,7 @@ class RoleResource(ClientSubresources):
         url = self.roles_url / str(role_id)
         payload = role_data.dict(exclude_unset=True)
         resp = await self._http.patch(url, payload)
-        return Role(**resp.body)
+        return Role.model_validate(resp.body)
 
     async def delete(self, role_id: LikeSnowflake, reason: str | None = None) -> None:
         """Delete a role in a guild.
@@ -89,3 +90,6 @@ class RoleResource(ClientSubresources):
             headers = {}
 
         await self._http.delete(url, headers=headers)
+
+
+_RoleListValidator = TypeAdapter(list[Role])

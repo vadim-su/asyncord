@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import Field, BaseModel
+from pydantic import ConfigDict, Field, BaseModel
 
 from asyncord.snowflake import Snowflake
 
@@ -33,7 +33,7 @@ class User(BaseModel):
     username: str
     """The user's username, not unique across the platform."""
 
-    discriminator: str = Field(min_len=4, max_len=4)
+    discriminator: str = Field(min_length=4, max_length=4)
     """The user's 4 - digit discord-tag."""
 
     avatar: str | None
@@ -72,6 +72,8 @@ class User(BaseModel):
 
     public_flags: UserFlags | None = None
     """The public flags on a user's account."""
+
+    model_config = ConfigDict(undefined_types_warning=False)
 
 
 @enum.unique
@@ -145,4 +147,4 @@ class PremiumType(enum.IntEnum):
     NITRO = 2
 
 
-User.update_forward_refs()
+User.model_rebuild()

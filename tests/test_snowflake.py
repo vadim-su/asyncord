@@ -1,5 +1,5 @@
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC as utc_timezone
 
 import pytest
 
@@ -12,7 +12,7 @@ class TestSnowflake:
         self.snowflake = Snowflake(self.raw_snowflake)
 
     def test_timestamp(self):
-        assert self.snowflake.timestamp == datetime(2016, 4, 30, 11, 18, 25, 796000)
+        assert self.snowflake.timestamp == datetime(2016, 4, 30, 11, 18, 25, 796000, tzinfo=utc_timezone)
 
     def test_internal_worker_id(self):
         assert self.snowflake.internal_worker_id == 1
@@ -36,7 +36,7 @@ class TestSnowflake:
         assert str(self.snowflake) == str(self.raw_snowflake)
 
     def test_build(self):
-        timestamp = datetime.now()
+        timestamp = datetime.now(tz=utc_timezone)
         snowflake = Snowflake.build(
             timestamp=timestamp,
             internal_worker_id=4,

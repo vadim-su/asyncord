@@ -1,8 +1,11 @@
 """A set of auxiliary entities for working with Snowflake."""
 from __future__ import annotations
 
-from typing import Any, Final
-from datetime import datetime
+from typing import Any, Callable, Final
+import datetime
+
+from pydantic import BaseModel
+from pydantic_core import CoreSchema, core_schema
 
 DISCORD_EPOCH: Final[int] = 1420070400000
 """The start of discord epoch.
@@ -33,7 +36,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
     @classmethod
     def build(
         cls,
-        timestamp: int | datetime,
+        timestamp: int | datetime.datetime,
         internal_worker_id: int,
         internal_process_id: int,
         increment: int,
@@ -49,7 +52,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         Returns:
             Snowflake: snowflake object.
         """
-        if isinstance(timestamp, datetime):
+        if isinstance(timestamp, datetime.datetime):
             timestamp = int(timestamp.timestamp() * 1000)
 
         raw_snowflake = (
@@ -61,7 +64,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         return Snowflake(raw_snowflake)
 
     @property
-    def timestamp(self) -> datetime:
+    def timestamp(self) -> datetime.datetime:
         """Extract timestamp.
 
         Milliseconds since Discord Epoch, the first second of 2015 or 1420070400000.
@@ -74,7 +77,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
             datetime: timestamp.
         """
         timestamp_secs: float = ((self._raw_value >> 22) + DISCORD_EPOCH) / 1000
-        return datetime.fromtimestamp(timestamp_secs)
+        return datetime.datetime.fromtimestamp(timestamp_secs, tz=datetime.UTC)
 
     @property
     def internal_worker_id(self) -> int:
@@ -133,7 +136,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         Returns:
             Snowflake: validated snowflake.
         """
-        if isinstance(value, (str, int)):
+        if isinstance(value, str | int):
             return cls(value)
 
         if isinstance(value, cls):
@@ -142,13 +145,29 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         raise ValueError('Invalid value type')
 
     @classmethod
-    def __get_validators__(cls):
-        """Get validators for pydantic.
+    def __get_pydantic_core_schema__(
+        cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
+    ) -> CoreSchema:
+        """Pydantic auxiliary method to get schema.
 
-        Yields:
-            callable: validator.
+        Args:
+            _source (type[BaseModel]): source of schema.
+            _handler (Callable[[Any], CoreSchema]): handler of schema.
+
+        Returns:
+            CoreSchema: schema.
         """
-        yield cls.validate
+        schema = core_schema.union_schema([
+            core_schema.int_schema(),
+            core_schema.str_schema(),
+            core_schema.is_instance_schema(cls),
+        ])
+
+        return core_schema.no_info_after_validator_function(
+            function=cls.validate,
+            schema=schema,
+            serialization=core_schema.to_string_ser_schema(),
+        )
 
     def __eq__(self, other: Any) -> bool:
         match other:
@@ -172,7 +191,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         return f'{class_name}({self._raw_value})'
 
     def __hash__(self) -> int:
-        """Hash snowflake.
+        """Get snowflake hash.
 
         Needed for searching with `in` operator. `str` representation used because
         it's most popular type to search for snowflake in lists.

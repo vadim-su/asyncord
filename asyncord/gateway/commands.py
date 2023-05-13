@@ -118,5 +118,5 @@ class PresenceUpdateData(BaseModel):
     """Whether or not the client is afk."""
 
 
-IdentifyCommand.update_forward_refs()
-PresenceUpdateData.update_forward_refs()
+IdentifyCommand.model_rebuild()
+PresenceUpdateData.model_rebuild()
