@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-import typing
 import datetime
+import typing
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
-from asyncord.snowflake import Snowflake
 from asyncord.client.models import messages
+from asyncord.client.models.channels import Channel
+from asyncord.client.models.components import Component
+from asyncord.client.models.members import Member
+from asyncord.client.models.stickers import Sticker
 from asyncord.client.models.users import User
 from asyncord.gateway.events.base import GatewayEvent
-from asyncord.client.models.members import Member
-from asyncord.client.models.channels import Channel
-from asyncord.client.models.stickers import Sticker
-from asyncord.client.models.components import Component
+from asyncord.snowflake import Snowflake
 
 
 class MessageCreateEvent(GatewayEvent, messages.Message):
@@ -34,6 +34,8 @@ class MessageCreateEvent(GatewayEvent, messages.Message):
 
     mentions: list[MessageUser]
     """Users specifically mentioned in the message."""
+
+    model_config = ConfigDict(undefined_types_warning=False)
 
 
 class MessageUpdateEvent(GatewayEvent):
@@ -143,6 +145,8 @@ class MessageUpdateEvent(GatewayEvent):
 
     mentions: list[MessageUser] | None = None
     """Users specifically mentioned in the message."""
+
+    model_config = ConfigDict(undefined_types_warning=False)
 
 
 class MessageDeleteEvent(GatewayEvent):
@@ -327,5 +331,5 @@ class MessageUser(BaseModel):
     """User's member properties in the guild."""
 
 
-MessageCreateEvent.model_rebuild()
 MessageUpdateEvent.model_rebuild()
+MessageCreateEvent.model_rebuild()

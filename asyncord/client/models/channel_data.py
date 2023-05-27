@@ -1,17 +1,94 @@
-from __future__ import annotations
 
 import enum
-from typing import Any, Union, Literal
+from typing import Any, Literal, Union
 
-from pydantic import ConfigDict, Field, BaseModel, root_validator
+from pydantic import BaseModel, Field, root_validator
 
+from asyncord.client.models.channels import ChannelFlag, ChannelType, Overwrite
 from asyncord.snowflake import Snowflake
-from asyncord.client.models.channels import Overwrite, ChannelFlag, ChannelType
 
 MIN_BITRATE = 8000
 MAX_BITRATE = 384000
-
 MAX_RATELIMIT = 21600
+
+
+class ThreadSortOrder(enum.IntEnum):
+    """https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types"""
+
+    LATEST_ACTIVITY = 0
+    """Sort forum posts by activity"""
+
+    CREATION_DATE = 1
+    """Sort forum posts by creation time (from most recent to oldest)"""
+
+
+@enum.unique
+class VideoQualityMode(enum.IntEnum):
+    """https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes"""
+
+    AUTO = 1
+    """Discord chooses the quality for optimal performance."""
+
+    FULL = 2
+    """720p"""
+
+
+class ForumTag(BaseModel):
+    """An object that represents a tag that is able to be applied to a GUILD_FORUM thread.
+
+    https://discord.com/developers/docs/resources/channel#forum-tag-object
+    """
+
+    id: Snowflake
+    """the id of the tag"""
+
+    name: str
+    """the name of the tag (0-20 characters)"""
+
+    moderated: bool
+    """Whether this tag can only be added to or removed from threads by a member
+    with the MANAGE_THREADS permission"""
+
+    emoji_id: Snowflake
+    """the id of a guild's custom emoji
+
+    At most one of emoji_id and emoji_name may be set.
+    """
+
+    emoji_name: str
+    """the unicode character of the emoji
+
+    At most one of emoji_id and emoji_name may be set.
+    """
+
+    @root_validator(pre=True)
+    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate that only one of emoji_id and emoji_name is set."""
+        if 'emoji_id' in values and 'emoji_name' in values:
+            raise ValueError('At most one of emoji_id and emoji_name may be set.')
+
+        return values
+
+
+class DefaultReaction(BaseModel):
+    """An object that specifies the emoji to use as the default way to react to a forum post.
+
+    More info:
+    https://discord.com/developers/docs/resources/channel#default-reaction-object"""
+
+    emoji_id: Snowflake | None = None
+    """the id of a guild's custom emoji"""
+
+    emoji_name: str | None = None
+    """the unicode character of the emoji"""
+
+    @root_validator(pre=True)
+    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate that only one of emoji_id and emoji_name is set."""
+        if 'emoji_id' in values and 'emoji_name' in values:
+            raise ValueError('At most one of emoji_id and emoji_name may be set.')
+
+        return values
 
 
 class CreateChannelData(BaseModel):
@@ -86,9 +163,6 @@ class CreateChannelData(BaseModel):
 
     default_sort_order: ThreadSortOrder | None = None
     """the default sort order type used to order posts in GUILD_FORUM channels"""
-
-    model_config = ConfigDict(undefined_types_warning=False)
-    """Pydantic config."""
 
 
 class UpdatGroupDMChannelData(BaseModel):
@@ -204,9 +278,6 @@ class UpdateVoiceChannelData(_BaseGuildChannelUpdateData):
     video_quality_mode: VideoQualityMode | None = None
     """the camera video quality mode of the voice channel."""
 
-    model_config = ConfigDict(undefined_types_warning=False)
-    """Pydantic config."""
-
 
 class UpdateStageChannelData(_BaseGuildChannelUpdateData):
     """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel"""
@@ -270,9 +341,6 @@ class UpdateForumChannelData(_BaseGuildChannelUpdateData):
     default_sort_order: ThreadSortOrder | None = None
     """the default sort order type used to order posts in GUILD_FORUM channels"""
 
-    model_config = ConfigDict(undefined_types_warning=False)
-    """Pydantic config."""
-
 
 UpdateChannelDataType = Union[  # noqa: UP007
     UpdateTextChannelData,
@@ -282,87 +350,3 @@ UpdateChannelDataType = Union[  # noqa: UP007
     UpdatGroupDMChannelData,
     UpdateAnnounceChannelData,
 ]
-
-
-@enum.unique
-class VideoQualityMode(enum.IntEnum):
-    """https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes"""
-
-    AUTO = 1
-    """Discord chooses the quality for optimal performance."""
-
-    FULL = 2
-    """720p"""
-
-
-class ForumTag(BaseModel):
-    """An object that represents a tag that is able to be applied to a GUILD_FORUM thread.
-
-    https://discord.com/developers/docs/resources/channel#forum-tag-object
-    """
-
-    id: Snowflake
-    """the id of the tag"""
-
-    name: str
-    """the name of the tag (0-20 characters)"""
-
-    moderated: bool
-    """Whether this tag can only be added to or removed from threads by a member
-    with the MANAGE_THREADS permission"""
-
-    emoji_id: Snowflake
-    """the id of a guild's custom emoji
-
-    At most one of emoji_id and emoji_name may be set.
-    """
-
-    emoji_name: str
-    """the unicode character of the emoji
-
-    At most one of emoji_id and emoji_name may be set.
-    """
-
-    @root_validator(pre=True)
-    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
-        """Validate that only one of emoji_id and emoji_name is set."""
-        if 'emoji_id' in values and 'emoji_name' in values:
-            raise ValueError('At most one of emoji_id and emoji_name may be set.')
-
-        return values
-
-
-class DefaultReaction(BaseModel):
-    """An object that specifies the emoji to use as the default way to react to a forum post.
-
-    More info:
-    https://discord.com/developers/docs/resources/channel#default-reaction-object"""
-
-    emoji_id: Snowflake | None = None
-    """the id of a guild's custom emoji"""
-
-    emoji_name: str | None = None
-    """the unicode character of the emoji"""
-
-    @root_validator(pre=True)
-    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
-        """Validate that only one of emoji_id and emoji_name is set."""
-        if 'emoji_id' in values and 'emoji_name' in values:
-            raise ValueError('At most one of emoji_id and emoji_name may be set.')
-
-        return values
-
-
-class ThreadSortOrder(enum.IntEnum):
-    """https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types"""
-
-    LATEST_ACTIVITY = 0
-    """Sort forum posts by activity"""
-
-    CREATION_DATE = 1
-    """Sort forum posts by creation time (from most recent to oldest)"""
-
-
-CreateChannelData.model_rebuild()
-UpdateVoiceChannelData.model_rebuild()
-UpdateForumChannelData.model_rebuild()

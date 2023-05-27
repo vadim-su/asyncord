@@ -3,12 +3,12 @@ from __future__ import annotations
 import re
 from typing import NamedTuple
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
-from asyncord.snowflake import Snowflake
-from asyncord.client.models.users import User
-from asyncord.client.models.guilds import UnavailableGuild
 from asyncord.client.models.applications import ApplicationFlag
+from asyncord.client.models.guilds import UnavailableGuild
+from asyncord.client.models.users import User
+from asyncord.snowflake import Snowflake
 
 
 class GatewayEvent(BaseModel):
@@ -71,6 +71,8 @@ class ReadyEvent(GatewayEvent):
 
     Contains the application's id and flags.
     """
+
+    model_config = ConfigDict(undefined_types_warning=False)
 
 
 class ResumedEvent(GatewayEvent):

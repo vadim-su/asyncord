@@ -2,25 +2,26 @@
 
 from __future__ import annotations
 
-import json
 import asyncio
+import json
 import logging
+from collections.abc import Mapping, Sequence
 from http import HTTPStatus
 from types import MappingProxyType
-from typing import TYPE_CHECKING, BinaryIO, NamedTuple
-from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, Any, BinaryIO, NamedTuple
 
 import aiohttp
-from pydantic import Field, BaseModel
-from rich.logging import RichHandler
 from aiohttp.client import ClientResponse
+from pydantic import BaseModel, Field
+from rich.logging import RichHandler
 
-from asyncord.typedefs import StrOrURL
 from asyncord.client.http import errors
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
+from asyncord.typedefs import Payload, StrOrURL
 
 if TYPE_CHECKING:
-    from typing import Any, Self, AsyncContextManager
+    from contextlib import AbstractAsyncContextManager
+    from typing import Self
 
 logging.basicConfig(
     handlers=[
@@ -38,6 +39,10 @@ AttachedFile = tuple[str, str, BinaryIO | bytes]
 
 The tuple contains the filename, the content type, and the file object.
 """
+
+
+MAX_NEXT_RETRY_SEC = 10
+"""Maximum number of seconds to wait before retrying a request."""
 
 
 class Response(NamedTuple):
@@ -61,7 +66,7 @@ class RateLimitBody(BaseModel):
     """Whether this is a global rate limit."""
 
 
-class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
+class AsyncHttpClient:
     """Asyncronous HTTP client."""
 
     def __init__(self) -> None:
@@ -90,7 +95,7 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
     async def post(
         self,
         url: StrOrURL,
-        payload: Any,
+        payload: Payload,
         files: list[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
@@ -99,9 +104,8 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
         Args:
             url (StrOrURL): URL to send the request to.
             payload (Any): Payload to send with the request.
-            headers (Mapping[str, str] | None): Headers to send with the request.
-                Defaults to None.
-            send_as_form (bool): Whether to send the payload as a form. Defaults to False.
+            files (list[AttachedFile] | None): Files to send with the request. Defaults to None.
+            headers (Mapping[str, str] | None): Headers to send with the request. Defaults to None.
 
         Returns:
             Response: response from the request.
@@ -111,7 +115,7 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
     async def put(
         self,
         url: StrOrURL,
-        payload: Any,
+        payload: Payload,
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
@@ -120,6 +124,7 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
         Args:
             url (StrOrURL): URL to send the request to.
             payload (Any): Payload to send with the request.
+            files (Sequence[AttachedFile] | None): Files to send with the request. Defaults to None.
             headers (Mapping[str, str] | None):
                 Headers to send with the request. Defaults to None.
 
@@ -131,19 +136,17 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
     async def patch(
         self,
         url: StrOrURL,
-        payload: Any,
+        payload: Payload,
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
         """Send a PATCH request.
 
         Args:
-            url (StrOrURL):
-                URL to send the request to.
-            payload (Any):
-                Payload to send with the request.
-            headers (Mapping[str, str] | None):
-                Headers to send with the request. Defaults to None.
+            url (StrOrURL): URL to send the request to.
+            payload (Any): Payload to send with the request.
+            files (Sequence[AttachedFile] | None): Files to send with the request. Defaults to None.
+            headers (Mapping[str, str] | None): Headers to send with the request. Defaults to None.
 
         Returns:
             Response: Response from the request.
@@ -153,18 +156,15 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
     async def delete(
         self,
         url: StrOrURL,
-        payload: Any | None = None,
+        payload: Payload | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
         """Send a DELETE request.
 
         Args:
-            url (StrOrURL):
-                Url to send the request to.
-            payload (Any | None):
-                Payload to send with the request. Defaults to None.
-            headers (Mapping[str, str] | None):
-                Headers to send with the request. Defaults to None.
+            url (StrOrURL): Url to send the request to.
+            payload (Any | None): Payload to send with the request. Defaults to None.
+            headers (Mapping[str, str] | None): Headers to send with the request. Defaults to None.
 
         Returns:
             Response: Response from the request.
@@ -203,15 +203,15 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
         self.start()
         return self
 
-    async def __aexit__(self, _exc_type, _exc, _tb):
+    async def __aexit__(self, _exc_type: Any, _exc: Any, _tb: Any) -> None:   # noqa: ANN401
         """Close the client when used as a context manager."""
         await self.close()
 
-    async def _request(
+    async def _request(  # noqa: PLR0913
         self,
         method: HttpMethod,
         url: StrOrURL,
-        payload: Any | None = None,
+        payload: Payload | None = None,
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
@@ -221,8 +221,8 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
             method (HttpMethod): HTTP method to use.
             url (StrOrURL): Url to request.
             payload (Any, optional): Payload to send. Defaults to None.
+            files (Sequence[AttachedFile], optional): Files to send. Defaults to None.
             headers (Mapping[str, str], optional): Headers to send. Defaults to None.
-            send_as_form (bool): Whether to send the payload as a form. Defaults to False.
 
         Returns:
             Response: Response from the request.
@@ -253,8 +253,8 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
                 case HTTPStatus.TOO_MANY_REQUESTS:
                     # FIXME: It's a simple hack for now. Potentially 'endless' recursion
                     ratelimit = RateLimitBody(**body)
-                    if ratelimit.retry_after > 10:
-                        raise errors.RateLimitError(  # noqa: WPS220 - Found too deep nesting
+                    if ratelimit.retry_after > MAX_NEXT_RETRY_SEC:
+                        raise errors.RateLimitError(
                             message=message or 'Unknown error',
                             resp=resp,
                             retry_after=ratelimit.retry_after or None,
@@ -305,14 +305,14 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
 
         return body, message
 
-    def _make_raw_request(
+    def _make_raw_request(  # noqa: PLR0913
         self,
         method: HttpMethod,
         url: StrOrURL,
         payload: Any | None = None,
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
-    ) -> AsyncContextManager[ClientResponse]:
+    ) -> AbstractAsyncContextManager[ClientResponse]:
         """Make a raw http request.
 
         When files are provided, the payload is sent as a form.
@@ -326,9 +326,8 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
             headers(Optional[Mapping[str, str]]): The headers to send. Defaults to None.
 
         Returns:
-            AsyncContextManager[ClientResponse]: The response context.
+            AbstractAsyncContextManager[ClientResponse]: The response context.
         """
-
         data = None
 
         if files:
@@ -344,5 +343,4 @@ class AsyncHttpClient:  # noqa: WPS214 - Found too many methods
 
         if self._session:
             return self._session.request(method, url, data=data, headers=headers)
-        else:
-            return aiohttp.request(method, url, data=data, headers=headers)
+        return aiohttp.request(method, url, data=data, headers=headers)

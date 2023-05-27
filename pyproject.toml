@@ -21,9 +21,11 @@ dependencies = [
 
 [tool.pdm]
 [tool.pdm.dev-dependencies]
+dev = ["pre-commit>=3.3.2"]
 linting = [
     "autopep8>=2.0.2", # confglct with wemake-python-styleguide
     "ruff>=0.0.269",
+    "isort>=5.12.0",
 ]
 testing = ["pytest>=7.3.1", "pytest-asyncio>=0.19.0", "pytest-pretty>=1.2.0"]
 
@@ -46,6 +48,15 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+
+extend-exclude = [
+    "tests",
+    ".git",
+    ".vscode",
+    ".devcontainer",
+    ".github",
+    ".venv",
+]
 
 select = [
     # Pyflakes
@@ -104,6 +115,8 @@ select = [
     "PTH",
     # eradicate
     "ERA",
+    # Pylint
+    "PL",
     # Ruff-specific rules
     "RUF",
 ]
@@ -117,10 +130,14 @@ ignore = [
     "N805",
     # It's not work properly for pydantic models
     # Move standard library import `datetime` into a type-checking block
+    "TCH001",
+    "TCH002",
     "TCH003",
     # Ternary operator make code less readable
     # Use ternary operator {} instead of `if`-`else`-
     "SIM108",
+    # Use a single `if` statement instead of nested `if` statementsRuff
+    "SIM102",
 ]
 
 [tool.ruff.flake8-quotes]

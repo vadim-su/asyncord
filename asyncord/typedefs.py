@@ -1,5 +1,6 @@
 from functools import lru_cache
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Any, NewType, TypeVar
+
 from pydantic import TypeAdapter
 from yarl import URL
 
@@ -7,6 +8,7 @@ from asyncord.snowflake import Snowflake
 
 StrOrURL = str | URL
 LikeSnowflake = int | str | Snowflake
+Payload = NewType('Payload', Any)
 
 
 _ListItemType = TypeVar('_ListItemType')

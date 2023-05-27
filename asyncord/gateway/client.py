@@ -1,28 +1,28 @@
 from __future__ import annotations
 
-import random
 import asyncio
 import logging
+import random
 from math import floor
 from typing import Any, TypeVar, cast
 
 import aiohttp
-from loguru import logger
 from aiohttp import WSMsgType
-from rich.pretty import pretty_repr
+from loguru import logger
 from rich.logging import RichHandler
+from rich.pretty import pretty_repr
 
-from asyncord.urls import GATEWAY_URL
-from asyncord.gateway import errors
-from asyncord.typedefs import StrOrURL
-from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
-from asyncord.gateway.message import GatewayMessage, GatewayEventOpcode, GatewayCommandOpcode
-from asyncord.gateway.commands import ResumeCommand, IdentifyCommand, PresenceUpdateData
-from asyncord.gateway.dispatcher import EventDispatcher, EventHandlerType
-from asyncord.gateway.events.base import HelloEvent, ReadyEvent, GatewayEvent
 from asyncord.client.models.activity import Activity, ActivityType
-from asyncord.gateway.events.messages import MessageCreateEvent
+from asyncord.gateway import errors
+from asyncord.gateway.commands import IdentifyCommand, PresenceUpdateData, ResumeCommand
+from asyncord.gateway.dispatcher import EventDispatcher, EventHandlerType
+from asyncord.gateway.events.base import GatewayEvent, HelloEvent, ReadyEvent
 from asyncord.gateway.events.event_map import EVENT_MAP
+from asyncord.gateway.events.messages import MessageCreateEvent
+from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
+from asyncord.gateway.message import GatewayCommandOpcode, GatewayEventOpcode, GatewayMessage
+from asyncord.typedefs import StrOrURL
+from asyncord.urls import GATEWAY_URL
 
 logger.configure(handlers=[{
     'sink': RichHandler(
@@ -30,7 +30,6 @@ logger.configure(handlers=[{
         rich_tracebacks=True,
     ),
     'format': '{message}',
-    # 'level': 'INFO',
 }])
 
 
@@ -47,12 +46,13 @@ class AsyncGatewayClient:
         intents: Intent = DEFAULT_INTENTS,
         ws_url: StrOrURL = GATEWAY_URL,
     ):
-        """Initialize the client.
+        """Initialize client.
 
         Args:
-            token (str): The token to use for authentication.
-            session (aiohttp.ClientSession, None): The session to use for requests.
-            ws_url (StrOrURL): The URL to connect to. Defaults to the Discord Gateway URL.
+            token (str): Token to use for authentication.
+            session (aiohttp.ClientSession, None): Session to use for requests.
+            intents (Intent): Intents to use for the client.
+            ws_url (StrOrURL): URL to connect to. Defaults to the Discord Gateway URL.
         """
         self.token = token
         self.intents = intents
@@ -94,13 +94,18 @@ class AsyncGatewayClient:
         """Resume a previous session.
 
         Args:
-            command_data(ResumeCommand): The data to send to the gateway.
+            command_data(ResumeCommand): Data to send to the gateway.
         """
         await self._send_command(GatewayCommandOpcode.RESUME, command_data.dict())
 
-    async def update_presence(self, command_data: PresenceUpdateData) -> None:
-        """Update the client's presence."""
-        await self._send_command(GatewayCommandOpcode.PRESENCE_UPDATE, command_data.dict())
+    async def update_presence(self, presence_data: PresenceUpdateData) -> None:
+        """Update the client's presence.
+
+        Args:
+            presence_data (PresenceUpdateData): Data to send to the gateway.
+        """
+        prepared_data = presence_data.model_dump(mode='json')
+        await self._send_command(GatewayCommandOpcode.PRESENCE_UPDATE, prepared_data)
 
     async def start(self) -> None:
         """Start the gateway client."""
@@ -110,7 +115,7 @@ class AsyncGatewayClient:
             session = aiohttp.ClientSession()
 
         for _ in range(5, 0, -1):
-            try:  # noqa: WPS229 - Found too long ``try`` body length
+            try:
                 await self._ws_loop(session)
                 break
 
@@ -162,19 +167,19 @@ class AsyncGatewayClient:
                 else:
                     logger.warning(f'Unhandled websocket message type: {msg.type}')
 
-    async def _send_command(self, op: GatewayCommandOpcode, command: Any) -> None:
+    async def _send_command(self, op: GatewayCommandOpcode, command_data: Any) -> None:  # noqa: ANN401
         """Send a command to the gateway.
 
         Args:
-            op(GatewayCommandOpcode): The opcode of the command.
-            command(Any): The command data.
+            op (GatewayCommandOpcode): Opcode of the command.
+            command_data (Any): Command data to send.
 
         Raises:
             RuntimeError: If the client is not connected.
         """
         if not self.ws:
             raise RuntimeError('Client is not connected')
-        await self.ws.send_json({'op': op, 'd': command})
+        await self.ws.send_json({'op': op, 'd': command_data})
 
     async def _handle_message(self, msg: GatewayMessage) -> None:
         """Handle a message from the gateway.

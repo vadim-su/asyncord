@@ -34,7 +34,9 @@
 				"GitHub.copilot-nightly",
 				"tamasfe.even-better-toml",
 				"github.vscode-github-actions",
-				"redhat.vscode-yaml"
+				"redhat.vscode-yaml",
+				"charliermarsh.ruff",
+				"ms-python.isort"
 			]
 		}
 	},

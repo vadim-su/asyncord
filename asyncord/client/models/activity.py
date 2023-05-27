@@ -2,76 +2,9 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
 from asyncord.snowflake import Snowflake
-
-
-class Activity(BaseModel):
-    """Represents a Discord activity.
-
-    Bots are only able to send name, type, and optionally url.
-
-    https://discord.com/developers/docs/topics/gateway-events#activity-object
-    """
-
-    name: str
-    """Activity's name."""
-
-    type: ActivityType
-    """Activity type."""
-
-    url: str | None = None
-    """Stream url.
-
-    Is validated when type is `ActivityType.STREAMING`.
-
-    Currently only supports Twitch and YouTube.
-    Only https://twitch.tv/ and https://youtube.com/ urls will work.
-    """
-
-    created_at: int | None = None
-    """Unix timestamp of when the activity was added to the user's session."""
-
-    timestamps: ActivityTimestamps | None = None
-    """Unix timestamps for start and/or end of the game."""
-
-    application_id: Snowflake | None = None
-    """Application id for the game."""
-
-    details: str | None = None
-    """What the player is currently doing."""
-
-    state: str | None = None
-    """User's current party status."""
-
-    emoji: ActivityEmoji | None = None
-    """Emoji data for custom statuses."""
-
-    party: ActivityParty | None = None
-    """Information for the current party of the player."""
-
-    assets: ActivityAssets | None = None
-    """Images for the presence and their hover texts."""
-
-    secrets: ActivitySecrets | None = None
-    """Secrets for Rich Presence joining and spectating."""
-
-    instance: bool | None = None
-    """Whether or not the activity is an instanced game session."""
-
-    flags: ActivityFlag | None = None
-    """Activity flags OR d together.
-
-    Describes what the payload includes."""
-
-    # FIXME: set max_items to 2 when pydantic fixes the issue
-    # https://github.com/pydantic/pydantic/issues/4547
-    buttons: list[ActivityButton] | None = None
-    """Custom buttons shown in the Rich Presence.
-
-    Maximum of 2 buttons.
-    """
 
 
 @enum.unique
@@ -268,4 +201,68 @@ class ActivityButton(BaseModel):
     """Url for the button. Should be between 1-512 characters."""
 
 
-Activity.model_rebuild()
+class Activity(BaseModel):
+    """Represents a Discord activity.
+
+    Bots are only able to send name, type, and optionally url.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object
+    """
+
+    name: str
+    """Activity's name."""
+
+    type: ActivityType
+    """Activity type."""
+
+    url: str | None = None
+    """Stream url.
+
+    Is validated when type is `ActivityType.STREAMING`.
+
+    Currently only supports Twitch and YouTube.
+    Only https://twitch.tv/ and https://youtube.com/ urls will work.
+    """
+
+    created_at: int | None = None
+    """Unix timestamp of when the activity was added to the user's session."""
+
+    timestamps: ActivityTimestamps | None = None
+    """Unix timestamps for start and/or end of the game."""
+
+    application_id: Snowflake | None = None
+    """Application id for the game."""
+
+    details: str | None = None
+    """What the player is currently doing."""
+
+    state: str | None = None
+    """User's current party status."""
+
+    emoji: ActivityEmoji | None = None
+    """Emoji data for custom statuses."""
+
+    party: ActivityParty | None = None
+    """Information for the current party of the player."""
+
+    assets: ActivityAssets | None = None
+    """Images for the presence and their hover texts."""
+
+    secrets: ActivitySecrets | None = None
+    """Secrets for Rich Presence joining and spectating."""
+
+    instance: bool | None = None
+    """Whether or not the activity is an instanced game session."""
+
+    flags: ActivityFlag | None = None
+    """Activity flags OR d together.
+
+    Describes what the payload includes."""
+
+    # FIXME: set max_items to 2 when pydantic fixes the issue
+    # https://github.com/pydantic/pydantic/issues/4547
+    buttons: list[ActivityButton] | None = None
+    """Custom buttons shown in the Rich Presence.
+
+    Maximum of 2 buttons.
+    """

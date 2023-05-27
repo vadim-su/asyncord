@@ -3,11 +3,11 @@ from __future__ import annotations
 import enum
 import platform
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from asyncord import __version__
-from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 from asyncord.client.models.activity import Activity
+from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 
 
 class IdentifyConnectionProperties(BaseModel):
@@ -74,6 +74,8 @@ class IdentifyCommand(BaseModel):
 
     properties: IdentifyConnectionProperties = IdentifyConnectionProperties()
     """Connection properties."""
+
+    model_config = ConfigDict(undefined_types_warning=False)
 
 
 @enum.unique
