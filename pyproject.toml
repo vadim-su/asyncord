@@ -1,6 +1,6 @@
 [project]
 name = "asyncord"
-version = "0.9.0"
+version = "0.10.0"
 description = "A smart and powerful base for creating discord bots and interaction with the API."
 authors = [{ name = "Vadim Suharnikov", email = "vsuharnikov@gmail.com" }]
 urls = { homepage = "https://github.com/suharnikov/asyncord", repository = "https://github.com/suharnikov/asyncord" }
