@@ -1,9 +1,9 @@
-from __future__ import annotations
+# from __future__ import annotations
 
 import enum
 import platform
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 from asyncord import __version__
 from asyncord.client.models.activity import Activity
@@ -24,6 +24,48 @@ class IdentifyConnectionProperties(BaseModel):
 
     device: str = f'asyncord-{__version__}'
     """Library name of the bot."""
+
+
+@enum.unique
+class StatusType(enum.StrEnum):
+    """Possible statuses for a user.
+
+    https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types
+    """
+
+    ONLINE = 'online'
+    """Online"""
+
+    DND = 'dnd'
+    """Do not disturb."""
+
+    IDLE = 'idle'
+    """AFK"""
+
+    INVISIBLE = 'invisible'
+    """Invisible and shown as offline."""
+
+    OFFLINE = 'offline'
+    """Offline"""
+
+
+class PresenceUpdateData(BaseModel):
+    """https://discord.com/developers/docs/topics/gateway-events#update-presence-gateway-presence-update-structure"""
+
+    since: int | None = None
+    """Unix time (in milliseconds) of when the client went idle.
+
+    None if the client is not idle.
+    """
+
+    activities: list[Activity] | None = None
+    """User's activities."""
+
+    status: StatusType = StatusType.ONLINE
+    """User's new status."""
+
+    afk: bool = False
+    """Whether or not the client is afk."""
 
 
 class ResumeCommand(BaseModel):
@@ -74,51 +116,3 @@ class IdentifyCommand(BaseModel):
 
     properties: IdentifyConnectionProperties = IdentifyConnectionProperties()
     """Connection properties."""
-
-    model_config = ConfigDict(undefined_types_warning=False)
-
-
-@enum.unique
-class StatusType(enum.StrEnum):
-    """Possible statuses for a user.
-
-    https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types
-    """
-
-    ONLINE = 'online'
-    """Online"""
-
-    DND = 'dnd'
-    """Do not disturb."""
-
-    IDLE = 'idle'
-    """AFK"""
-
-    INVISIBLE = 'invisible'
-    """Invisible and shown as offline."""
-
-    OFFLINE = 'offline'
-    """Offline"""
-
-
-class PresenceUpdateData(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway-events#update-presence-gateway-presence-update-structure"""
-
-    since: int | None = None
-    """Unix time (in milliseconds) of when the client went idle.
-
-    None if the client is not idle.
-    """
-
-    activities: list[Activity] | None = None
-    """User's activities."""
-
-    status: StatusType = StatusType.ONLINE
-    """User's new status."""
-
-    afk: bool = False
-    """Whether or not the client is afk."""
-
-
-IdentifyCommand.model_rebuild()
-PresenceUpdateData.model_rebuild()

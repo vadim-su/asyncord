@@ -1,12 +1,12 @@
-from typing import Any
 from datetime import datetime
+from typing import Any
 
-from asyncord.snowflake import Snowflake
-from asyncord.client.roles import Role
-from asyncord.client.models.users import User
-from asyncord.gateway.events.base import GatewayEvent
 from asyncord.client.models.guilds import Guild
 from asyncord.client.models.members import Member
+from asyncord.client.models.users import User
+from asyncord.client.roles import Role
+from asyncord.gateway.events.base import GatewayEvent
+from asyncord.snowflake import Snowflake
 
 
 class GuildCreateEvent(GatewayEvent, Guild):

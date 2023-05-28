@@ -295,6 +295,7 @@ class CreateApplicationCommandData(BaseModel):
         if field_info.data['type'] is not ApplicationCommandType.CHAT_INPUT:
             raise ValueError('Options are only allowed for CHAT_INPUT commands')
 
+        # Required options must be listed before optional options
         options.sort(key=lambda item: item.required, reverse=True)
         return options
 

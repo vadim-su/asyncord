@@ -1,5 +1,5 @@
-import operator
 import functools
+import operator
 from enum import IntFlag, unique
 
 

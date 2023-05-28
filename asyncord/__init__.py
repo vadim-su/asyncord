@@ -1,5 +1,4 @@
-"""
-A smart and powerful base for creating discord bots and interactin with the API.
+"""A smart and powerful base for creating discord bots and interactin with the API.
 
 Example:
 ::

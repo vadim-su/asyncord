@@ -1,8 +1,8 @@
 import typing
 
 from pydantic import BaseModel
-from asyncord.client.models.permissions import PermissionFlag
 
+from asyncord.client.models.permissions import PermissionFlag
 from asyncord.snowflake import Snowflake
 
 

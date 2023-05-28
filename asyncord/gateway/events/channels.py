@@ -1,10 +1,10 @@
-from typing import Any
 from datetime import datetime
+from typing import Any
 
-from asyncord.snowflake import Snowflake
-from asyncord.gateway.events.base import GatewayEvent
-from asyncord.client.models.members import Member
 from asyncord.client.models.channels import Channel, ChannelType, ThreadMember
+from asyncord.client.models.members import Member
+from asyncord.gateway.events.base import GatewayEvent
+from asyncord.snowflake import Snowflake
 
 
 class ChannelCreateEvent(GatewayEvent, Channel):

@@ -1,6 +1,6 @@
 
-from asyncord.gateway.events.base import GatewayEvent
 from asyncord.client.models.applications import GuildApplicationCommandPermissions
+from asyncord.gateway.events.base import GatewayEvent
 
 
 class GuildApplicationCommandPermissionsUpdateEvent(GatewayEvent, GuildApplicationCommandPermissions):

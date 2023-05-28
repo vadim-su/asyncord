@@ -1,17 +1,15 @@
-from typing import (  # noqa: WPS235  # Found too many imported names from a module
-    Any,
-    Generic,
-    TypeVar,
-    Callable,
-    Awaitable,
-    ParamSpec,
-    Concatenate,
-    MutableMapping,
-    cast,
-    overload,
-    get_type_hints,
-)
 from collections import defaultdict
+from collections.abc import Awaitable, Callable, MutableMapping
+from typing import (
+    Any,
+    Concatenate,
+    Generic,
+    ParamSpec,
+    TypeVar,
+    cast,
+    get_type_hints,
+    overload,
+)
 
 from loguru import logger
 from rich.logging import RichHandler

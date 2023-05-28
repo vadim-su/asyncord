@@ -2,78 +2,9 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import ConfigDict, Field, BaseModel
+from pydantic import BaseModel, Field
 
 from asyncord.snowflake import Snowflake
-
-
-class User(BaseModel):
-    """https://discord.com/developers/docs/resources/user#user-object
-
-    Example:
-    ::
-    {
-        "id": "80351110224678912",
-        "username": "Nelly",
-        "discriminator": "1337",
-        "avatar": "8342729096ea3675442027381ff50dfe",
-        "verified": true,
-        "email": "nelly@discord.com",
-        "flags": 64,
-        "banner": "06c16474723fe537c283b8efa61a30c8",
-        "accent_color": 16711680,
-        "premium_type": 1,
-        "public_flags": 64
-    }
-    """
-
-    id: Snowflake
-    """The user's id."""
-
-    username: str
-    """The user's username, not unique across the platform."""
-
-    discriminator: str = Field(min_length=4, max_length=4)
-    """The user's 4 - digit discord-tag."""
-
-    avatar: str | None
-    """The user's avatar hash."""
-
-    bot: bool | None = None
-    """Whether the user belongs to an OAuth2 application."""
-
-    system: bool | None = None
-    """Whether the user is an Official Discord System user (part of the urgent message system)"""
-
-    mfa_enabled: bool | None = None
-    """Whether the user has two factor enabled on their account."""
-
-    banner: str | None = None
-    """The user's banner hash."""
-
-    accent_color: int | None = None
-    """The user's banner color encoded as an integer representation of
-        hexadecimal color code."""
-
-    locale: str | None = None
-    """The user's chosen language option."""
-
-    verified: bool | None = None
-    """Whether the email on this account has been verified."""
-
-    email: str | None = None
-    "The user's email."
-
-    flags: UserFlags | None = None
-    """The flags on a user's account."""
-
-    premium_type: PremiumType | None = None
-    """The type of Nitro subscription on a user's account."""
-
-    public_flags: UserFlags | None = None
-    """The public flags on a user's account."""
-
-    model_config = ConfigDict(undefined_types_warning=False)
 
 
 @enum.unique
@@ -147,4 +78,68 @@ class PremiumType(enum.IntEnum):
     NITRO = 2
 
 
-User.model_rebuild()
+class User(BaseModel):
+    """https://discord.com/developers/docs/resources/user#user-object
+
+    Example:
+    ::
+    {
+        "id": "80351110224678912",
+        "username": "Nelly",
+        "discriminator": "1337",
+        "avatar": "8342729096ea3675442027381ff50dfe",
+        "verified": true,
+        "email": "nelly@discord.com",
+        "flags": 64,
+        "banner": "06c16474723fe537c283b8efa61a30c8",
+        "accent_color": 16711680,
+        "premium_type": 1,
+        "public_flags": 64
+    }
+    """
+
+    id: Snowflake
+    """The user's id."""
+
+    username: str
+    """The user's username, not unique across the platform."""
+
+    discriminator: str = Field(min_length=4, max_length=4)
+    """The user's 4 - digit discord-tag."""
+
+    avatar: str | None
+    """The user's avatar hash."""
+
+    bot: bool | None = None
+    """Whether the user belongs to an OAuth2 application."""
+
+    system: bool | None = None
+    """Whether the user is an Official Discord System user (part of the urgent message system)"""
+
+    mfa_enabled: bool | None = None
+    """Whether the user has two factor enabled on their account."""
+
+    banner: str | None = None
+    """The user's banner hash."""
+
+    accent_color: int | None = None
+    """The user's banner color encoded as an integer representation of
+        hexadecimal color code."""
+
+    locale: str | None = None
+    """The user's chosen language option."""
+
+    verified: bool | None = None
+    """Whether the email on this account has been verified."""
+
+    email: str | None = None
+    "The user's email."
+
+    flags: UserFlags | None = None
+    """The flags on a user's account."""
+
+    premium_type: PremiumType | None = None
+    """The type of Nitro subscription on a user's account."""
+
+    public_flags: UserFlags | None = None
+    """The public flags on a user's account."""

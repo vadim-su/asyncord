@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
+from asyncord.snowflake import Snowflake
 
 
 class Emoji(BaseModel):

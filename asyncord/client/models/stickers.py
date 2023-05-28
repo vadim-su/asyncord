@@ -2,10 +2,35 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
-from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
+from asyncord.snowflake import Snowflake
+
+
+@enum.unique
+class StickerType(enum.IntEnum):
+    """https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-types"""
+
+    STANDARD = 1
+    """an official sticker in a pack, part of Nitro or in a removed purchasable pack"""
+
+    GUILD = 2
+    """a sticker uploaded to a guild for the guild's members"""
+
+
+@enum.unique
+class StickerFormatType(enum.IntEnum):
+    """https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-format-types"""
+
+    PNG = 1
+    """PNG sticker format"""
+
+    APNG = 2
+    """APNG sticker format"""
+
+    LOTTIE = 3
+    """LOTTIE sticker format"""
 
 
 class Sticker(BaseModel):
@@ -56,8 +81,6 @@ class Sticker(BaseModel):
     sort_value: int | None = None
     """the standard sticker's sort order within its pack"""
 
-    model_config = ConfigDict(undefined_types_warning=False)
-
 
 class StickerPack(BaseModel):
     """Represents a sticker pack.
@@ -85,34 +108,3 @@ class StickerPack(BaseModel):
 
     banner_asset_id: Snowflake | None = None
     """ID of the sticker asset for the pack's banner image"""
-
-    model_config = ConfigDict(undefined_types_warning=False)
-
-
-@enum.unique
-class StickerType(enum.IntEnum):
-    """https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-types"""
-
-    STANDARD = 1
-    """an official sticker in a pack, part of Nitro or in a removed purchasable pack"""
-
-    GUILD = 2
-    """a sticker uploaded to a guild for the guild's members"""
-
-
-@enum.unique
-class StickerFormatType(enum.IntEnum):
-    """https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-format-types"""
-
-    PNG = 1
-    """PNG sticker format"""
-
-    APNG = 2
-    """APNG sticker format"""
-
-    LOTTIE = 3
-    """LOTTIE sticker format"""
-
-
-Sticker.model_rebuild()
-StickerPack.model_rebuild()

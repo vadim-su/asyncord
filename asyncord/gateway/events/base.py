@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import NamedTuple
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 from asyncord.client.models.applications import ApplicationFlag
 from asyncord.client.models.guilds import UnavailableGuild
@@ -33,6 +33,25 @@ class HelloEvent(GatewayEvent):
 
     heartbeat_interval: int
     """Interval (in milliseconds) the client should heartbeat with."""
+
+
+class Shard(NamedTuple):
+    """Shard information associated with this session."""
+    shard_id: int
+    num_shards: int
+
+
+class ReadyEventApplication(BaseModel):
+    """Application object.
+
+    https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields
+    """
+
+    id: Snowflake
+    """the id of the application"""
+
+    flags: ApplicationFlag
+    """the application's flags"""
 
 
 class ReadyEvent(GatewayEvent):
@@ -72,11 +91,9 @@ class ReadyEvent(GatewayEvent):
     Contains the application's id and flags.
     """
 
-    model_config = ConfigDict(undefined_types_warning=False)
-
 
 class ResumedEvent(GatewayEvent):
-    """Dispatched when a client has sent a resume payload to the gateway
+    """Dispatched when a client has sent a resume payload to the gateway.
 
     For resuming existing sessions.
 
@@ -99,29 +116,8 @@ class InvalidSessionEvent(GatewayEvent):
     - the gateway could not resume a session after receiving a Resume event
     - the gateway has invalidated an active session and is requesting client action
 
-    https://discord.com/developers/docs/topics/gateway-events#invalid-session"""
+    https://discord.com/developers/docs/topics/gateway-events#invalid-session
+    """
 
     is_resumable: bool
     """Whether or not the session can be resumed."""
-
-
-class Shard(NamedTuple):
-    """Shard information associated with this session."""
-    shard_id: int
-    num_shards: int
-
-
-class ReadyEventApplication(BaseModel):
-    """Application object.
-
-    https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields
-    """
-
-    id: Snowflake
-    """the id of the application"""
-
-    flags: ApplicationFlag
-    """the application's flags"""
-
-
-ReadyEvent.model_rebuild()

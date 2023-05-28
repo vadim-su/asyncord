@@ -1,8 +1,9 @@
 """A set of auxiliary entities for working with Snowflake."""
 from __future__ import annotations
 
-from typing import Any, Callable, Final
 import datetime
+from collections.abc import Callable
+from typing import Any, Final, Self
 
 from pydantic import BaseModel
 from pydantic_core import CoreSchema, core_schema
@@ -14,7 +15,7 @@ The first second of 01.01.2015.
 """
 
 
-class Snowflake:  # noqa: WPS214 Found too many methods
+class Snowflake:
     """Discord ID.
 
     It's variant of twitter's snowflake format of IDs.
@@ -40,7 +41,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         internal_worker_id: int,
         internal_process_id: int,
         increment: int,
-    ) -> Snowflake:
+    ) -> Self:
         """Build snowflake from separate parameters.
 
         Args:
@@ -93,7 +94,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         """
         # ampersand operation removes left first 22 bits of snowflake and takes the rest
         # shift operation removes right 17 zero bits
-        return (self._raw_value & 0x3E0000) >> 17  # noqa: WPS432
+        return (self._raw_value & 0x3E0000) >> 17
 
     @property
     def internal_process_id(self) -> int:
@@ -107,7 +108,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         Returns:
             int: internal process id.
         """
-        return (self._raw_value & 0x1F000) >> 12  # noqa: WPS432
+        return (self._raw_value & 0x1F000) >> 12
 
     @property
     def increment(self) -> int:
@@ -121,10 +122,10 @@ class Snowflake:  # noqa: WPS214 Found too many methods
         Returns:
             int: increment.
         """
-        return self._raw_value & 0xFFF  # noqa: WPS432
+        return self._raw_value & 0xFFF
 
     @classmethod
-    def validate(cls, value: Any) -> Snowflake:
+    def validate(cls, value: str | int | Self) -> Self:
         """Pydantic auxiliary validation method.
 
         Args:
@@ -172,7 +173,7 @@ class Snowflake:  # noqa: WPS214 Found too many methods
     def __eq__(self, other: Any) -> bool:
         match other:
             case Snowflake():
-                return self._raw_value == other._raw_value
+                return self._raw_value == other._raw_value  # noqa: SLF001
             case int():
                 return self._raw_value == other
             case str():

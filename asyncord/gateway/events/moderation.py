@@ -1,9 +1,9 @@
 """All auto moderation related events are currently only sent to bot users
 which have the MANAGE_GUILD permission.
-."""
-from asyncord.snowflake import Snowflake
+"""
+from asyncord.client.models.automoderation import AutoModerationRule, RuleAction, TriggerType
 from asyncord.gateway.events.base import GatewayEvent
-from asyncord.client.models.automoderation import RuleAction, TriggerType, AutoModerationRule
+from asyncord.snowflake import Snowflake
 
 
 class AutoModerationRuleCreateEvent(GatewayEvent, AutoModerationRule):

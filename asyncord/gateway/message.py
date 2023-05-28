@@ -1,7 +1,7 @@
 import enum
 from typing import Any
 
-from pydantic import Field, BaseModel, validator
+from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
 
 
 @enum.unique
@@ -50,13 +50,16 @@ class GatewayMessage(BaseModel):
     event_name: str | None = Field(alias='t')
     trace: Any = Field(default=None, alias='_trace')
 
-    @validator('event_name', 'sequence_number')
-    def check_values_are_not_none(cls, value, values):  # noqa: N805,WPS110
-        if values['opcode'] == GatewayEventOpcode.DISPATCH:
-            if value is None:
+    @field_validator('event_name', 'sequence_number')
+    def validate_values_are_not_none(
+        cls, validating_value: str | int | None, field_info: FieldValidationInfo,
+    ) -> str | int | None:
+        """Ensure that event name and sequence number are set correctly."""
+        if field_info.data['opcode'] == GatewayEventOpcode.DISPATCH:
+            if validating_value is None:
                 raise ValueError('Event name and sequence number must be set')
 
-        elif value is not None:
+        elif validating_value is not None:
             raise ValueError('Event name and sequence number must be None')
 
-        return value
+        return validating_value

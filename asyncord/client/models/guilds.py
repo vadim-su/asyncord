@@ -1,17 +1,32 @@
 from __future__ import annotations
 
-import enum
 import datetime
+import enum
 from typing import Annotated, Literal
 
-from pydantic import ConfigDict, Field, BaseModel
+from pydantic import BaseModel, Field
 
-from asyncord.snowflake import Snowflake
+from asyncord.client.models.channels import ChannelType, Overwrite
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.roles import Role
-from asyncord.client.models.users import User
-from asyncord.client.models.channels import Overwrite, ChannelType
 from asyncord.client.models.stickers import Sticker
+from asyncord.client.models.users import User
+from asyncord.snowflake import Snowflake
+
+
+class CreateGuildChannel(BaseModel):
+    """Data for creating a guild channel.
+
+    https://discord.com/developers/docs/resources/guild#create-guild-channel
+    """
+
+    id: Snowflake
+    """channel id"""
+
+    name: str = Field(min_length=1, max_length=100)
+
+    type: ChannelType
+    """the type of channel"""
 
 
 class CreateGuildData(BaseModel):
@@ -79,22 +94,56 @@ class CreateGuildData(BaseModel):
     system_channel_flags: int | None = None
     """System channel flags."""
 
-    model_config = ConfigDict(undefined_types_warning=False)
 
+class WelcomeScreenChannel(BaseModel):
+    """Welcome screen channel object.
 
-class CreateGuildChannel(BaseModel):
-    """Data for creating a guild channel.
-
-    https://discord.com/developers/docs/resources/guild#create-guild-channel
+    Reference:
+    https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
     """
 
-    id: Snowflake
-    """channel id"""
+    channel_id: Snowflake
+    """The channel's id"""
 
-    name: str = Field(min_length=1, max_length=100)
+    description: str
+    """The channel's description"""
 
-    type: ChannelType
-    """the type of channel"""
+    emoji_id: Snowflake | None
+    """The emoji id, if the emoji is custom"""
+
+    emoji_name: str | None
+    """the emoji name if custom, the unicode character if standard, or null if no emoji is set"""
+
+
+class UpdateWelcomeScreenData(BaseModel):
+    """Welcome screen update data.
+
+    Reference: https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
+    """
+    enabled: bool | None = None
+    """Whether the welcome screen is enabled"""
+
+    welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_items=5)
+    """The channels shown in the welcome screen, max 5"""
+
+    description: str | None = None
+    """The server description shown in the welcome screen"""
+
+
+class WelcomeScreen(BaseModel):
+    """Welcome screen object.
+
+    Reference: https://discord.com/developers/docs/resources/guild#welcome-screen-object
+    """
+
+    description: str | None
+    """The server description shown in the welcome screen."""
+
+    welcome_channels: list[WelcomeScreenChannel] = Field(max_items=5)
+    """List of channels shown in the welcome screen.
+
+    Up to 5 channels.
+    """
 
 
 class Guild(BaseModel):
@@ -236,8 +285,6 @@ class Guild(BaseModel):
     premium_progress_bar_enabled: bool
     """whether the guild has the boost progress bar enabled"""
 
-    model_config = ConfigDict(undefined_types_warning=False)
-
 
 class GuildPreview(BaseModel):
     """Guild preview object.
@@ -299,8 +346,7 @@ class BeginPruneData(BaseModel):
 
 
 class Prune(BaseModel):
-    """
-    Object returned by the prune endpoints.
+    """Object returned by the prune endpoints.
 
     Reference: https://discord.com/developers/docs/resources/guild#prune-object
     """
@@ -309,8 +355,7 @@ class Prune(BaseModel):
 
 
 class VoiceRegion(BaseModel):
-    """
-    Object returned by the voice region endpoints.
+    """Object returned by the voice region endpoints.
 
     Reference: https://discord.com/developers/docs/resources/voice#voice-region-object-voice-region-structure
     """
@@ -330,9 +375,37 @@ class VoiceRegion(BaseModel):
     """whether the voice region is custom"""
 
 
+class InviteChannel(BaseModel):
+    """https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object"""
+
+    id: Snowflake
+    """channel id"""
+
+    name: str
+    """channel name"""
+
+    type: ChannelType
+    """the type of channel"""
+
+
+@enum.unique
+class IntegrationType(enum.StrEnum):
+    """Type of integration."""
+    TWITCH = 'twitch'
+    YOUTUBE = 'youtube'
+    DISCORD = 'discord'
+
+
+@enum.unique
+class InviteTargetType(enum.IntEnum):
+    """The target type of an invite."""
+
+    STREAM = 1
+    """The invite is for a stream."""
+
+
 class Invite(BaseModel):
-    """
-    Object returned by the invite endpoints.
+    """Object returned by the invite endpoints.
 
     Reference: https://discord.com/developers/docs/resources/invite#invite-object-invite-structure
     """
@@ -360,12 +433,9 @@ class Invite(BaseModel):
     target_user_type: str
     """user type the invite is for"""
 
-    model_config = ConfigDict(undefined_types_warning=False)
-
 
 class GuildCreateChannel(BaseModel):
-    """
-    Object returned by the guild create channel endpoints.
+    """Object returned by the guild create channel endpoints.
 
     Reference: https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params
     """
@@ -427,32 +497,48 @@ class GuildCreateChannel(BaseModel):
     """
 
 
-class InviteChannel(BaseModel):
-    """Reference: https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object"""
+@enum.unique
+class ExpireBehavior(enum.IntEnum):
+    """The behavior of expiring subscribers."""
+    REMOVE_ROLE = 0
+    KICK = 1
 
-    id: Snowflake
-    """channel id"""
+
+class IntegrationAccount(BaseModel):
+    """Integration Account Structure.
+
+    Reference: https://discord.com/developers/docs/resources/guild#integration-account-object
+    """
+    id: str
+    """id of the account"""
 
     name: str
-    """channel name"""
-
-    type: ChannelType
-    """the type of channel"""
+    """name of the account"""
 
 
-@enum.unique
-class IntegrationType(enum.StrEnum):
+class IntegrationApplication(BaseModel):
+    """Integration Application Structure.
+
+    Reference: https://discord.com/developers/docs/resources/guild#integration-application-object
     """
-    Type of integration.
-    """
-    TWITCH = 'twitch'
-    YOUTUBE = 'youtube'
-    DISCORD = 'discord'
+    id: Snowflake
+    """id of the app"""
+
+    name: str
+    """name of the app"""
+
+    icon: str | None = None
+    """icon hash of the app"""
+
+    description: str
+    """description of the app"""
+
+    bot: User | None = None
+    """bot associated with this application"""
 
 
 class GeneralIntegration(BaseModel):
-    """
-    Inntegration object for all types of integrations except Dicscord.
+    """Inntegration object for all types of integrations except Dicscord.
 
     Reference: https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
     """
@@ -504,8 +590,6 @@ class GeneralIntegration(BaseModel):
     scopes: list[str] | None = None
     """the scopes the application has been authorized for"""
 
-    model_config = ConfigDict(undefined_types_warning=False)
-
 
 class DiscordIntegration(BaseModel):
     """Integration object for Discord integrations.
@@ -532,107 +616,8 @@ class DiscordIntegration(BaseModel):
     scopes: list[str] | None = None
     """the scopes the application has been authorized for"""
 
-    model_config = ConfigDict(undefined_types_warning=False)
-
 
 IntegrationVariants = Annotated[GeneralIntegration | DiscordIntegration, Field(discriminator='type')]
-
-
-@enum.unique
-class ExpireBehavior(enum.IntEnum):
-    """
-    The behavior of expiring subscribers.
-    """
-    REMOVE_ROLE = 0
-    KICK = 1
-
-
-class IntegrationAccount(BaseModel):
-    """
-    Integration Account Structure.
-
-    Reference: https://discord.com/developers/docs/resources/guild#integration-account-object
-    """
-    id: str
-    """id of the account"""
-
-    name: str
-    """name of the account"""
-
-
-class IntegrationApplication(BaseModel):
-    """
-    Integration Application Structure.
-
-    Reference: https://discord.com/developers/docs/resources/guild#integration-application-object
-    """
-    id: Snowflake
-    """id of the app"""
-
-    name: str
-    """name of the app"""
-
-    icon: str | None = None
-    """icon hash of the app"""
-
-    description: str
-    """description of the app"""
-
-    bot: User | None = None
-    """bot associated with this application"""
-
-
-class UpdateWelcomeScreenData(BaseModel):
-    """Welcome screen update data.
-
-    Reference: https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
-    """
-    enabled: bool | None = None
-    """Whether the welcome screen is enabled"""
-
-    welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_items=5)
-    """The channels shown in the welcome screen, max 5"""
-
-    description: str | None = None
-    """The server description shown in the welcome screen"""
-
-    model_config = ConfigDict(undefined_types_warning=False)
-
-
-class WelcomeScreenChannel(BaseModel):
-    """Welcome screen channel object.
-
-    Reference:
-    https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
-    """
-
-    channel_id: Snowflake
-    """The channel's id"""
-
-    description: str
-    """The channel's description"""
-
-    emoji_id: Snowflake | None
-    """The emoji id, if the emoji is custom"""
-
-    emoji_name: str | None
-    """the emoji name if custom, the unicode character if standard, or null if no emoji is set"""
-
-
-class WelcomeScreen(BaseModel):
-    """Welcome screen object.
-
-    Reference: https://discord.com/developers/docs/resources/guild#welcome-screen-object
-    """
-
-    description: str | None
-    """The server description shown in the welcome screen."""
-
-    welcome_channels: list[WelcomeScreenChannel] = Field(max_items=5)
-    """List of channels shown in the welcome screen.
-
-    Up to 5 channels.
-    """
 
 
 @enum.unique
@@ -646,21 +631,13 @@ class DefaultMessageNotificationLevel(enum.IntEnum):
 
 @enum.unique
 class MFALevel(enum.IntEnum):
-    """Level of Multi Factor Authentication"""
+    """Level of Multi Factor Authentication."""
 
     NONE = 0
     """guild has no MFA/2FA requirement for moderation actions"""
 
     ELEVATED = 1
     """guild has a 2FA requirement for moderation actions"""
-
-
-@enum.unique
-class InviteTargetType(enum.IntEnum):
-    """The target type of an invite."""
-
-    STREAM = 1
-    """The invite is for a stream."""
 
 
 class UnavailableGuild(BaseModel):
@@ -671,11 +648,3 @@ class UnavailableGuild(BaseModel):
 
     unavailable: bool
     """true if this guild is unavailable due to an outage"""
-
-
-CreateGuildData.model_rebuild()
-Invite.model_rebuild()
-Guild.model_rebuild()
-GeneralIntegration.model_rebuild()
-DiscordIntegration.model_rebuild()
-UpdateWelcomeScreenData.model_rebuild()

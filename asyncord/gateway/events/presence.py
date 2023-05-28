@@ -2,39 +2,29 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from asyncord.snowflake import Snowflake
+from asyncord.client.models.activity import Activity
+from asyncord.client.models.members import Member
 from asyncord.client.models.users import User
 from asyncord.gateway.events.base import GatewayEvent
-from asyncord.client.models.members import Member
-from asyncord.client.models.activity import Activity
+from asyncord.snowflake import Snowflake
 
 
-class PresenceUpdateEvent(GatewayEvent):
-    """Sent when a user's presence or info, such as name or avatar, is updated.
+class ClientStatus(BaseModel):
+    """Active sessions are indicated with an 'online', 'idle', or 'dnd' string per platform.
 
-    https://discord.com/developers/docs/topics/gateway-events#presence-update
+    If a user is offline or invisible, the corresponding field is not present.
+
+    https://discord.com/developers/docs/topics/gateway-events#client-status-object
     """
 
-    user: PresenceUpdateUser
-    """the user presence is being updated for
+    desktop: str | None = None
+    """User's status set for an active desktop (Windows, Linux, Mac) application session."""
 
-    The user object within this event can be partial, the only field which
-    must be sent is the id field, everything else is optional. Along with this
-    limitation, no fields are required, and the types of the fields are not validated.
-    Your client should expect any combination of fields and types within this event.
-    """
+    mobile: str | None = None
+    """User's status set for an active mobile (iOS, Android) application session."""
 
-    guild_id: Snowflake
-    """Guild id."""
-
-    status: str
-    """Presence status."""
-
-    activities: list[Activity]
-    """User's current activities."""
-
-    client_status: ClientStatus
-    """User's platform-dependent status."""
+    web: str | None = None
+    """User's status set for an active web (browser, bot account) application session."""
 
 
 class PresenceUpdateUser(BaseModel):
@@ -86,6 +76,34 @@ class PresenceUpdateUser(BaseModel):
     """Public flags on a user's account."""
 
 
+class PresenceUpdateEvent(GatewayEvent):
+    """Sent when a user's presence or info, such as name or avatar, is updated.
+
+    https://discord.com/developers/docs/topics/gateway-events#presence-update
+    """
+
+    user: PresenceUpdateUser
+    """the user presence is being updated for
+
+    The user object within this event can be partial, the only field which
+    must be sent is the id field, everything else is optional. Along with this
+    limitation, no fields are required, and the types of the fields are not validated.
+    Your client should expect any combination of fields and types within this event.
+    """
+
+    guild_id: Snowflake
+    """Guild id."""
+
+    status: str
+    """Presence status."""
+
+    activities: list[Activity]
+    """User's current activities."""
+
+    client_status: ClientStatus
+    """User's platform-dependent status."""
+
+
 class TypingStartEvent(GatewayEvent):
     """Sent when a user starts typing in a channel.
 
@@ -113,24 +131,3 @@ class UserUpdateEvent(GatewayEvent, User):
 
     https://discord.com/developers/docs/topics/gateway-events#user-update
     """
-
-
-class ClientStatus(BaseModel):
-    """Active sessions are indicated with an 'online', 'idle', or 'dnd' string per platform.
-
-    If a user is offline or invisible, the corresponding field is not present.
-
-    https://discord.com/developers/docs/topics/gateway-events#client-status-object
-    """
-
-    desktop: str | None = None
-    """User's status set for an active desktop (Windows, Linux, Mac) application session."""
-
-    mobile: str | None = None
-    """User's status set for an active mobile (iOS, Android) application session."""
-
-    web: str | None = None
-    """User's status set for an active web (browser, bot account) application session."""
-
-
-PresenceUpdateEvent.model_rebuild()

@@ -1,19 +1,19 @@
 import inspect
+from collections.abc import Generator, Mapping
 from types import MappingProxyType
-from typing import Mapping, Generator
 
 from loguru import logger
 from rich.pretty import pretty_repr
 
 from asyncord.gateway.events import (
+    application,
     base,
-    guilds,
     channels,
+    guilds,
     messages,
+    moderation,
     presence,
     schedule,
-    moderation,
-    application,
 )
 
 

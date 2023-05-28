@@ -2,64 +2,11 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import Field, BaseModel, validator
+from pydantic import BaseModel, Field, validator
 
 from asyncord.snowflake import Snowflake
 
 FOUR_WEEKS = 2419200
-
-
-class AutoModerationRule(BaseModel):
-    """Represents a rule for the AutoModeration system."""
-
-    id: Snowflake
-    """The rule's id."""
-
-    guild_id: Snowflake
-    """the id of the guild which this rule belongs to"""
-
-    name: str
-    """the name of the rule"""
-
-    creator_id: Snowflake
-    """the id of the user who created this rule"""
-
-    event_type: AutoModerationRuleEventType
-    """the rule event type"""
-
-    trigger_type: TriggerType
-    """the rule trigger type"""
-
-    trigger_metadata: TriggerMetadata
-    """the rule trigger metadata"""
-
-    actions: list[RuleAction]
-    """the actions which will execute when the rule is triggered"""
-
-    enabled: bool
-    """whether the rule is enabled"""
-
-    exempt_roles: list[Snowflake] = Field(max_items=20)
-    """the role ids that should not be affected by the rule (Maximum of 20)"""
-
-    exempt_channels: list[Snowflake] = Field(max_items=50)
-    """the channel ids that should not be affected by the rule (Maximum of 50)"""
-
-    @validator('actions', each_item=True)
-    def check_actions(cls, value: RuleAction, values):  # noqa: N805,WPS110
-        trigger_type: TriggerType = values['trigger_type']
-
-        keyword_or_mention_spam = trigger_type in {
-            TriggerType.KEYWORD,
-            TriggerType.MENTION_SPAM,
-        }
-        if value.type is RuleActionType.TIMEOUT and not keyword_or_mention_spam:
-            raise ValueError(
-                'Timeout actions can only be used with `TriggerType.KEYWORD`'
-                + ' and `TriggerType.MENTION_SPAM` triggers.',
-            )
-
-        return value
 
 
 @enum.unique
@@ -136,6 +83,41 @@ class TriggerMetadata(BaseModel):
     """
 
 
+@enum.unique
+class RuleActionType(enum.IntEnum):
+    """Indicates what action to take when a rule is triggered.
+
+    https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types
+    """
+
+    BLOCK_MESSAGE = 1
+    """blocks the content of a message according to the rule"""
+
+    SEND_ALERT_MESSAGE = 2
+    """logs user content to a specified channel"""
+
+    TIMEOUT = 3
+    """timeout user for a specified duration
+
+    The MODERATE_MEMBERS permission is required to use the TIMEOUT action type.
+    """
+
+
+class RuleActionMetadata(BaseModel):
+    """Additional data used when an action is executed.
+
+    Different fields are relevant based on the value of `RuleActionType`.
+
+    https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-metadata
+    """
+
+    channel_id: Snowflake | None = None
+    """channel to which user content should be logged"""
+
+    duration_seconds: int | None = Field(None, le=FOUR_WEEKS)
+    """timeout duration in seconds (Maximum of 2419200 seconds or 4 weeks)"""
+
+
 class RuleAction(BaseModel):
     """Represents an action which will execute when a rule is triggered.
 
@@ -169,35 +151,54 @@ class RuleAction(BaseModel):
         return value
 
 
-@enum.unique
-class RuleActionType(enum.IntEnum):
-    """Indicates what action to take when a rule is triggered.
+class AutoModerationRule(BaseModel):
+    """Represents a rule for the AutoModeration system."""
 
-    https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types
-    """
+    id: Snowflake
+    """The rule's id."""
 
-    BLOCK_MESSAGE = 1
-    """blocks the content of a message according to the rule"""
+    guild_id: Snowflake
+    """the id of the guild which this rule belongs to"""
 
-    SEND_ALERT_MESSAGE = 2
-    """logs user content to a specified channel"""
+    name: str
+    """the name of the rule"""
 
-    TIMEOUT = 3
-    """timeout user for a specified duration
+    creator_id: Snowflake
+    """the id of the user who created this rule"""
 
-    The MODERATE_MEMBERS permission is required to use the TIMEOUT action type.
-    """
+    event_type: AutoModerationRuleEventType
+    """the rule event type"""
 
+    trigger_type: TriggerType
+    """the rule trigger type"""
 
-class RuleActionMetadata(BaseModel):
-    """Additional data used when an action is executed.
-    Different fields are relevant based on the value of `RuleActionType`.
+    trigger_metadata: TriggerMetadata
+    """the rule trigger metadata"""
 
-    https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-metadata
-    """
+    actions: list[RuleAction]
+    """the actions which will execute when the rule is triggered"""
 
-    channel_id: Snowflake | None = None
-    """channel to which user content should be logged"""
+    enabled: bool
+    """whether the rule is enabled"""
 
-    duration_seconds: int | None = Field(None, le=FOUR_WEEKS)
-    """timeout duration in seconds (Maximum of 2419200 seconds or 4 weeks)"""
+    exempt_roles: list[Snowflake] = Field(max_items=20)
+    """the role ids that should not be affected by the rule (Maximum of 20)"""
+
+    exempt_channels: list[Snowflake] = Field(max_items=50)
+    """the channel ids that should not be affected by the rule (Maximum of 50)"""
+
+    @validator('actions', each_item=True)
+    def check_actions(cls, value: RuleAction, values):  # noqa: N805,WPS110
+        trigger_type: TriggerType = values['trigger_type']
+
+        keyword_or_mention_spam = trigger_type in {
+            TriggerType.KEYWORD,
+            TriggerType.MENTION_SPAM,
+        }
+        if value.type is RuleActionType.TIMEOUT and not keyword_or_mention_spam:
+            raise ValueError(
+                'Timeout actions can only be used with `TriggerType.KEYWORD`'
+                + ' and `TriggerType.MENTION_SPAM` triggers.',
+            )
+
+        return value

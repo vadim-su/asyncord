@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import datetime
-import typing
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 from asyncord.client.models import messages
 from asyncord.client.models.channels import Channel
@@ -13,6 +12,58 @@ from asyncord.client.models.stickers import Sticker
 from asyncord.client.models.users import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
+
+
+class MessageMember(BaseModel):
+    nick: str | None = None
+    """User's guild nickname."""
+
+    avatar: str | None = None
+    """Member's guild avatar hash."""
+
+    roles: list[Snowflake]
+    """Array of snowflakes."""
+
+    joined_at: datetime.datetime
+    """When the user joined the guild."""
+
+    premium_since: datetime.datetime | None = None
+    """When the user started boosting the guild."""
+
+    deaf: bool
+    """Whether the user is deafened in voice channels."""
+
+    mute: bool
+    """Whether the user is muted in voice channels."""
+
+    pending: bool | None = None
+    """Whether the user has not yet passed the guild's Membership Screening requirements."""
+
+    communication_disabled_until: datetime.datetime | None = None
+    """When the user's timeout will expire and the user will be able to communicate in the guild again.
+
+    None or a time in the past if the user is not timed out.
+    """
+
+
+class MessageUser(BaseModel):
+    id: Snowflake
+    """The user's id."""
+
+    username: str
+    """User's username, not unique across the platform."""
+
+    discriminator: str = Field(min_len=4, max_len=4)
+    """User's 4 - digit discord-tag."""
+
+    avatar: str | None
+    """User's avatar hash."""
+
+    avatar_decoration: str | None = None
+    """User's avatar decoration hash."""
+
+    member: MessageMember
+    """User's member properties in the guild."""
 
 
 class MessageCreateEvent(GatewayEvent, messages.Message):
@@ -35,8 +86,6 @@ class MessageCreateEvent(GatewayEvent, messages.Message):
     mentions: list[MessageUser]
     """Users specifically mentioned in the message."""
 
-    model_config = ConfigDict(undefined_types_warning=False)
-
 
 class MessageUpdateEvent(GatewayEvent):
     """Sent when a message is updated.
@@ -53,7 +102,7 @@ class MessageUpdateEvent(GatewayEvent):
     author: User | None = None
     """Author of the message."""
 
-    content: str | None = None  # noqa WPS110 # Found wrong variable name
+    content: str | None = None
     """Contents of the message."""
 
     timestamp: datetime.datetime | None = None
@@ -145,8 +194,6 @@ class MessageUpdateEvent(GatewayEvent):
 
     mentions: list[MessageUser] | None = None
     """Users specifically mentioned in the message."""
-
-    model_config = ConfigDict(undefined_types_warning=False)
 
 
 class MessageDeleteEvent(GatewayEvent):
@@ -277,59 +324,3 @@ class MessageReactionRemoveEmojiEvent(GatewayEvent):
 
     emoji: MessageReactionEmoji
     """Emoji that was removed."""
-
-
-class MessageMember(BaseModel):
-    nick: str | None = None
-    """User's guild nickname."""
-
-    avatar: str | None = None
-    """Member's guild avatar hash."""
-
-    roles: list[Snowflake]
-    """Array of snowflakes."""
-
-    joined_at: datetime.datetime
-    """When the user joined the guild."""
-
-    premium_since: datetime.datetime | None = None
-    """When the user started boosting the guild."""
-
-    deaf: bool
-    """Whether the user is deafened in voice channels."""
-
-    mute: bool
-    """Whether the user is muted in voice channels."""
-
-    pending: bool | None = None
-    """Whether the user has not yet passed the guild's Membership Screening requirements."""
-
-    communication_disabled_until: datetime.datetime | None = None
-    """When the user's timeout will expire and the user will be able to communicate in the guild again.
-
-    None or a time in the past if the user is not timed out.
-    """
-
-
-class MessageUser(BaseModel):
-    id: Snowflake
-    """The user's id."""
-
-    username: str
-    """User's username, not unique across the platform."""
-
-    discriminator: typing.Annotated[str, Field(min_len=4, max_len=4)]
-    """User's 4 - digit discord-tag."""
-
-    avatar: str | None
-    """User's avatar hash."""
-
-    avatar_decoration: str | None = None
-    """User's avatar decoration hash."""
-
-    member: MessageMember
-    """User's member properties in the guild."""
-
-
-MessageUpdateEvent.model_rebuild()
-MessageCreateEvent.model_rebuild()

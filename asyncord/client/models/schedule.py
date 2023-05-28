@@ -1,12 +1,73 @@
 from __future__ import annotations
 
-import enum
 import datetime
+import enum
 
-from pydantic import Field, BaseModel, validator
+from pydantic import BaseModel, Field, validator
 
-from asyncord.snowflake import Snowflake
 from asyncord.client.models.users import User
+from asyncord.snowflake import Snowflake
+
+
+@enum.unique
+class EventPrivacyLevel(enum.IntEnum):
+    """Represents a scheduled event's privacy level.
+
+    https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level
+    """
+
+    PUBLIC = 1
+    """the scheduled event is public, the guild_id is exposed"""
+
+    GUILD_ONLY = 2
+    """the scheduled event is private, only available to guild members"""
+
+
+@enum.unique
+class EventStatus(enum.IntEnum):
+    """Represents a scheduled event's status.
+
+    https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status
+    """
+
+    SCHEDULED = 1
+    """the scheduled event is scheduled"""
+
+    ACTIVE = 2
+    """the scheduled event is currently active"""
+
+    COMPLETED = 3
+    """the scheduled event has concluded"""
+
+    CANCELED = 4
+    """the scheduled event was canceled"""
+
+
+@enum.unique
+class EventEntityType(enum.IntEnum):
+    """Represents a scheduled event's entity type.
+
+    https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types
+    """
+
+    STAGE_INSTANCE = 1
+    """the scheduled event is associated with a stage instance"""
+
+    VOICE = 2
+    """the scheduled event is associated with a voice channel"""
+
+    EXTERNAL = 3
+    """the scheduled event is not associated with a guild channel"""
+
+
+class EventEntityMetadata(BaseModel):
+    """Represents a scheduled event's entity metadata.
+
+    https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata
+    """
+
+    location: str | None = Field(None, min_length=1, max_length=100)
+    """location of the event (1-100 characters)"""
 
 
 class GuildScheduleEvent(BaseModel):
@@ -119,64 +180,3 @@ class GuildScheduleEvent(BaseModel):
                 )
 
         return value
-
-
-@enum.unique
-class EventPrivacyLevel(enum.IntEnum):
-    """Represents a scheduled event's privacy level.
-
-    https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level
-    """
-
-    PUBLIC = 1
-    """the scheduled event is public, the guild_id is exposed"""
-
-    GUILD_ONLY = 2
-    """the scheduled event is private, only available to guild members"""
-
-
-@enum.unique
-class EventStatus(enum.IntEnum):
-    """Represents a scheduled event's status.
-
-    https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status
-    """
-
-    SCHEDULED = 1
-    """the scheduled event is scheduled"""
-
-    ACTIVE = 2
-    """the scheduled event is currently active"""
-
-    COMPLETED = 3
-    """the scheduled event has concluded"""
-
-    CANCELED = 4
-    """the scheduled event was canceled"""
-
-
-@enum.unique
-class EventEntityType(enum.IntEnum):
-    """Represents a scheduled event's entity type.
-
-    https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types
-    """
-
-    STAGE_INSTANCE = 1
-    """the scheduled event is associated with a stage instance"""
-
-    VOICE = 2
-    """the scheduled event is associated with a voice channel"""
-
-    EXTERNAL = 3
-    """the scheduled event is not associated with a guild channel"""
-
-
-class EventEntityMetadata(BaseModel):
-    """Represents a scheduled event's entity metadata.
-
-    https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata
-    """
-
-    location: str | None = Field(None, min_length=1, max_length=100)
-    """location of the event (1-100 characters)"""
