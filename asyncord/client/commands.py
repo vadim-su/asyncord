@@ -1,8 +1,9 @@
+from pydantic import TypeAdapter
+
 from asyncord.client.models.commands import ApplicationCommand, CreateApplicationCommandData
 from asyncord.client.resources import ClientResource, ClientSubresources
 from asyncord.typedefs import LikeSnowflake
 from asyncord.urls import REST_API_URL
-from pydantic import TypeAdapter
 
 
 class BaseCommandResource(ClientSubresources):

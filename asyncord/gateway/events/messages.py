@@ -15,6 +15,8 @@ from asyncord.snowflake import Snowflake
 
 
 class MessageMember(BaseModel):
+    """Mentioned user object."""
+
     nick: str | None = None
     """User's guild nickname."""
 
@@ -46,7 +48,7 @@ class MessageMember(BaseModel):
     """
 
 
-class MessageUser(BaseModel):
+class MentionUser(BaseModel):
     id: Snowflake
     """The user's id."""
 
@@ -62,7 +64,7 @@ class MessageUser(BaseModel):
     avatar_decoration: str | None = None
     """User's avatar decoration hash."""
 
-    member: MessageMember
+    member: MessageMember | None = None
     """User's member properties in the guild."""
 
 
@@ -83,7 +85,7 @@ class MessageCreateEvent(GatewayEvent, messages.Message):
 
     Only included when the message is in a guild."""
 
-    mentions: list[MessageUser]
+    mentions: list[MentionUser]
     """Users specifically mentioned in the message."""
 
 
@@ -192,7 +194,7 @@ class MessageUpdateEvent(GatewayEvent):
     member: MessageMember | None = None
     """Member properties for this message's author - only included when the message is in a guild."""
 
-    mentions: list[MessageUser] | None = None
+    mentions: list[MentionUser] | None = None
     """Users specifically mentioned in the message."""
 
 

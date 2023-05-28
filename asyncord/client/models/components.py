@@ -233,7 +233,11 @@ class Button(BaseComponent):
 
 
 class SelectMenuOption(BaseModel):
-    """Select menu option."""
+    """Select menu option.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
+    """
 
     label: str = Field(..., max_length=100)
     """User - facing name of the option.

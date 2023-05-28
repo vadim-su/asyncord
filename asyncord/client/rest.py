@@ -5,6 +5,7 @@ from __future__ import annotations
 from asyncord.client.applications import ApplicationResource
 from asyncord.client.channels import ChannelResource
 from asyncord.client.guilds import GuildResource
+from asyncord.client.interactions import InteractionResource
 from asyncord.client.ports import AsyncHttpClientPort
 from asyncord.client.resources import ClientResource
 from asyncord.client.users import UserResource
@@ -17,6 +18,7 @@ class RestClient(ClientResource):
         self.users = UserResource(self)
         self.channels = ChannelResource(self)
         self.applications = ApplicationResource(self)
+        self.interactions = InteractionResource(self)
 
     @classmethod
     async def create(cls, token: str, *, http_client: AsyncHttpClientPort | None = None) -> RestClient:
