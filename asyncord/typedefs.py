@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     def list_model(type_: type[_ListItemType]) -> TypeAdapter[list[_ListItemType]]:
         return TypeAdapter(list[type_])
 else:
-    @lru_cache()
+    @lru_cache
     def list_model(type_: type[_ListItemType]) -> TypeAdapter[list[_ListItemType]]:
         return TypeAdapter(list[type_])
 
