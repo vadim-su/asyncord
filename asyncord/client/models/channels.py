@@ -11,6 +11,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
 
+from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.models.users import User
 from asyncord.snowflake import Snowflake
 
@@ -107,23 +108,20 @@ class Overwrite(BaseModel):
     """
 
     id: Snowflake
-    """Role or user id"""
+    """Role or user id.
+
+    Set corresponding type field.
+    """
 
     type: OverwriteType
-    """Either 0 (role) or 1 (member)"""
+    """Type of overwrite."""
 
+    # TODO: #10 Every channel type has different permissions so we need to validate this
     allow: str
-    """Permission bit set.
+    """Permission flags to allow."""
 
-    Example:
-        66321471
-    """
-    deny: str
-    """Permission bit set
-
-    Example:
-        16241572
-    """
+    deny: PermissionFlag
+    """Permission flags to deny."""
 
 
 class ThreadMetadata(BaseModel):
@@ -203,6 +201,7 @@ class Channel(BaseModel):
     """Channel id."""
 
     type: ChannelType
+    """Type of channel."""
 
     guild_id: Snowflake | None = None
     """Guild id.
@@ -217,7 +216,7 @@ class Channel(BaseModel):
     """Explicit permission overwrites for members and roles."""
 
     name: str | None = Field(None, min_length=1, max_length=100)
-    """Channel name (2-100 characters)"""
+    """Channel name (1-100 characters)"""
 
     topic: str | None = None
     """Channel topic.
@@ -305,12 +304,6 @@ class Channel(BaseModel):
 
     To automatically archive the thread after recent activity.
     Can be set to: 60, 1440, 4320, 10080.
-    """
-
-    permissions: str | None = None
-    """Computed permissions for the invoking user in the channel, including overwrites.
-
-    Only included when part of the resolved data received on a slash command interaction.
     """
 
     flags: ChannelFlag | None = None
