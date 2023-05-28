@@ -1,5 +1,9 @@
 import enum
-from typing import Self
+from collections.abc import Callable
+from typing import Any, Self
+
+from pydantic import BaseModel
+from pydantic_core import CoreSchema, core_schema
 
 
 @enum.unique
@@ -159,21 +163,45 @@ class PermissionFlag(enum.IntFlag):
         """Pydantic auxiliary validation method.
 
         Args:
-            value (str | int | Self): value to validate.
+            value (str | int | Self): Value to validate.
+
+        Raises:
+            ValueError: If value is not valid snowflake.
 
         Returns:
-            Self: validated snowflake.
+            PermissionFlags: Validated permission flags.
         """
-        if isinstance(value, str | int):
-            return cls(int(value))
+        match value:
+            case str():
+                return cls(int(value))
+            case int():
+                return cls(value)
+            case Self():
+                return value
 
-        return value
+        raise ValueError('Invalid value type for PermissionFlags')
 
     @classmethod
-    def __get_validators__(cls):
-        """Get validators for pydantic.
+    def __get_pydantic_core_schema__(
+        cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
+    ) -> CoreSchema:
+        """Pydantic auxiliary method to get schema.
 
-        Yields:
-            callable: validator.
+        Args:
+            _source (type[BaseModel]): Source of schema.
+            _handler (Callable[[Any], CoreSchema]): Handler of schema.
+
+        Returns:
+            CoreSchema: Resulted schema.
         """
-        yield cls.validate
+        schema = core_schema.union_schema([
+            core_schema.int_schema(),
+            core_schema.str_schema(),
+            core_schema.is_instance_schema(cls),
+        ])
+
+        return core_schema.no_info_after_validator_function(
+            function=cls.validate,
+            schema=schema,
+            serialization=core_schema.to_string_ser_schema(),
+        )

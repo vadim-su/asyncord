@@ -170,7 +170,8 @@ class Snowflake:
             serialization=core_schema.to_string_ser_schema(),
         )
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> bool:  # noqa: ANN401
+        """Compare snowflakes."""
         match other:
             case Snowflake():
                 return self._raw_value == other._raw_value  # noqa: SLF001
@@ -182,12 +183,15 @@ class Snowflake:
         return super().__eq__(other)
 
     def __int__(self) -> int:
+        """Get int value of snowflake."""
         return self._raw_value
 
     def __str__(self) -> str:
+        """Get str value of snowflake."""
         return str(self._raw_value)
 
     def __repr__(self) -> str:
+        """Get representation of snowflake."""
         class_name = self.__class__.__name__
         return f'{class_name}({self._raw_value})'
 
