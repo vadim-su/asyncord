@@ -1,3 +1,7 @@
+"""This module contains the guilds resource endpoints.
+
+Reference: https://discord.com/developers/docs/resources/guild
+"""
 from __future__ import annotations
 
 import datetime
@@ -5,31 +9,37 @@ from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
 
-from asyncord.urls import REST_API_URL
 from asyncord.client.bans import BanResource
-from asyncord.client.roles import RoleResource
-from asyncord.client.members import MemberResource
-from asyncord.client.resources import ClientSubresources
 from asyncord.client.http.headers import AUDIT_LOG_REASON
+from asyncord.client.members import MemberResource
+from asyncord.client.models.channels import Channel
 from asyncord.client.models.guilds import (
+    CreateGuildData,
     Guild,
-    Prune,
+    GuildPreview,
+    IntegrationVariants,
     Invite,
     MFALevel,
-    VoiceRegion,
-    GuildPreview,
-    WelcomeScreen,
-    CreateGuildData,
-    IntegrationVariants,
+    Prune,
     UpdateWelcomeScreenData,
+    VoiceRegion,
+    WelcomeScreen,
 )
-from asyncord.client.models.channels import Channel
+from asyncord.client.resources import ClientSubresources
+from asyncord.client.roles import RoleResource
+from asyncord.urls import REST_API_URL
 
 if TYPE_CHECKING:
     from asyncord.typedefs import LikeSnowflake
 
 
 class GuildResource(ClientSubresources):
+    """Representaion of the guilds resource.
+
+    Attributes:
+        guilds_url (URL): Guilds resource URL.
+    """
+
     guilds_url = REST_API_URL / 'guilds'
 
     def members(self, guild_id: LikeSnowflake) -> MemberResource:
@@ -83,6 +93,17 @@ class GuildResource(ClientSubresources):
         return Guild(**resp.body)
 
     async def get_preview(self, guild_id: LikeSnowflake) -> GuildPreview:
+        """Get a guild preview.
+
+        Preview guilds are a special type of guilds object that contain only
+        the most vital information about a guild.
+
+        Args:
+            guild_id(LikeSnowflake): ID of the guild to get the preview for.
+
+        Returns:
+            GuildPreview: Preview of the guild with the specified ID.
+        """
         url = self.guilds_url / str(guild_id) / 'preview'
         resp = await self._http.get(url)
         return GuildPreview(**resp.body)
@@ -167,7 +188,8 @@ class GuildResource(ClientSubresources):
         resp = await self._http.get(url, headers)
         return Prune(**resp.body)
 
-    async def begin_prune(
+    # TODO: #15 Replace args with a dataclass
+    async def begin_prune(  # noqa: PLR0913
         self,
         guild_id: LikeSnowflake,
         days: int | None = None,

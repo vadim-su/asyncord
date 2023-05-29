@@ -1,8 +1,8 @@
+"""This module contains models for interaction events."""
 from __future__ import annotations
 
-import enum
 from datetime import datetime
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 from pydantic import __version__ as pydantic_version
@@ -55,7 +55,10 @@ class BaseInteraction(BaseModel):
     """Continuation token for responding to the interaction."""
 
     version: Literal[1] = 1
-    """Read-only property, always 1."""
+    """Read-only property.
+
+    Always 1.
+    """
 
     message: dict | None = None
     """For components, the message they were attached to."""
@@ -71,7 +74,7 @@ class BaseInteraction(BaseModel):
 
 
 class PingInteraction(BaseInteraction):
-    """Represents a ping interaction.
+    """Represent a ping interaction.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
@@ -81,7 +84,7 @@ class PingInteraction(BaseInteraction):
 
 
 class ApplicationCommandInteractionOption(BaseModel):
-    """Represents an option of an application command interaction."""
+    """Represent an option of an application command interaction."""
 
     name: str
     """Name of the parameter."""
@@ -141,7 +144,7 @@ class ApplicationCommandInteractionMember(BaseModel):
 
 
 class ApplicationCommandInteractionMessage(BaseModel):
-    """Represents a message of an application command interaction."""
+    """Represent a message of an application command interaction."""
 
     id: Snowflake
     """ID of the message."""
@@ -192,7 +195,7 @@ class ApplicationCommandInteractionMessage(BaseModel):
 class ApplicationCommandInterationChannel(BaseModel):
     """Partial Channel objects only have id, name, type and permissions fields.
 
-    Read more info at:
+    Reference:
     https://discord.com/developers/docs/resources/channel#channel-object-channel-structure
     """
 
@@ -227,7 +230,8 @@ ApplicationCommandInteractionChannelType = ApplicationCommandInterationChannel |
 
 
 class ApplicationCommandResolvedData(BaseModel):
-    """Represents the resolved data payload of an application command interaction."""
+    """Represent the resolved data payload of an application command interaction."""
+
     users: dict[Snowflake, User] | None = None
     """Map of Snowflakes to user objects.
 
@@ -251,7 +255,7 @@ class ApplicationCommandResolvedData(BaseModel):
 
 
 class ApplicationCommandInteractionData(BaseModel):
-    """Represents data payload of an application command interaction.
+    """Represent data payload of an application command interaction.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-data-structure
@@ -280,7 +284,7 @@ class ApplicationCommandInteractionData(BaseModel):
 
 
 class ApplicationCommandInteraction(BaseInteraction):
-    """Represents an application command interaction.
+    """Represent an application command interaction.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
@@ -293,8 +297,8 @@ class ApplicationCommandInteraction(BaseInteraction):
     """Command data payload."""
 
 
-class ApplicationCommandAutocompleteInteraction(BaseModel):
-    """Represents an autocomplete interaction.
+class ApplicationCommandAutocompleteInteraction(BaseInteraction):
+    """Represent an autocomplete interaction.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
@@ -311,7 +315,7 @@ class ApplicationCommandAutocompleteInteraction(BaseModel):
 
 
 class MessageComponentInteractionData(BaseModel):
-    """Represents data payload of a message component interaction.
+    """Represent data payload of a message component interaction.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-message-component-data-structure
@@ -328,7 +332,7 @@ class MessageComponentInteractionData(BaseModel):
 
 
 class MessageComponentInteraction(BaseInteraction):
-    """Represents a message component interaction.
+    """Represent a message component interaction.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
@@ -342,7 +346,7 @@ class MessageComponentInteraction(BaseInteraction):
 
 
 class ModalSubmitInteractionData(BaseModel):
-    """Represents data payload of a modal submit interaction.
+    """Represent data payload of a modal submit interaction.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-modal-submit-data-structure
@@ -356,7 +360,7 @@ class ModalSubmitInteractionData(BaseModel):
 
 
 class ModalSubmitInteraction(BaseInteraction):
-    """Represents a modal submit interaction.
+    """Represent a modal submit interaction.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object

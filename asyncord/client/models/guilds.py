@@ -46,7 +46,7 @@ class CreateGuildData(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     """Name of the guild (2-100 characters)."""
 
-    # TODO: Implement icon uploading and base64 encoding
+    # TODO: #14 Implement icon uploading and base64 encoding
     icon: str | None = None
     """Base64 128x128 image for the guild icon.
 
