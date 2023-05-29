@@ -38,6 +38,7 @@ class TestGuilds:
     async def test_get_invites(self, guilds: GuildResource):
         invites = await guilds.get_invites(TEST_GUILD_ID)
         assert isinstance(invites, list)
+        assert invites
 
     async def test_get_channels(self, guilds: GuildResource):
         assert await guilds.get_channels(TEST_GUILD_ID)
