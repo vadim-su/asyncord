@@ -35,8 +35,7 @@
 				"tamasfe.even-better-toml",
 				"github.vscode-github-actions",
 				"redhat.vscode-yaml",
-				"charliermarsh.ruff",
-				"ms-python.isort"
+				"charliermarsh.ruff"
 			]
 		}
 	},
