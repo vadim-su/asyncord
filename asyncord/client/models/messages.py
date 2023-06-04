@@ -314,7 +314,7 @@ class Embed(BaseModel):
     author: EmbedAuthor | None = None
     """Author information."""
 
-    fields: list[EmbedField] | None = Field(None, max_length=25)
+    fields: list[EmbedField] = Field(default_factory=list, max_length=25)
     """List of fields.
 
     Maximum of 25 items.
@@ -403,7 +403,7 @@ class AttachmentData(BaseModel):
 class _MessageData(BaseModel):
     """Base message data class used for message creation and editing.
 
-    Contains axillary validation methods and general fields.
+    Contains axillary validation methods.
     """
 
     @root_validator(skip_on_failure=True)
@@ -587,14 +587,14 @@ class _MessageData(BaseModel):
         embed_text_length += len(embed.description or '')
 
         if embed.footer:
-            embed_text_length += len(embed.footer.text or '')
+            embed_text_length += len(embed.footer.text)
 
         if embed.author:
-            embed_text_length += len(embed.author.name or '')
+            embed_text_length += len(embed.author.name)
 
-        for field in embed.fields or []:
-            embed_text_length += len(field.name or '')
-            embed_text_length += len(field.value or '')
+        for field in embed.fields:
+            embed_text_length += len(field.name)
+            embed_text_length += len(field.value)
 
         return embed_text_length
 
