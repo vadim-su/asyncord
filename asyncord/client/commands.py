@@ -1,3 +1,9 @@
+"""This module containing the command resources.
+
+Reference:
+https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
+"""
+
 from pydantic import TypeAdapter
 
 from asyncord.client.models.commands import ApplicationCommand, CreateApplicationCommandData
@@ -7,10 +13,12 @@ from asyncord.urls import REST_API_URL
 
 
 class BaseCommandResource(ClientSubresources):
+    """Base class for command resources."""
 
     applications_url = REST_API_URL / 'applications'
 
     def __init__(self, parent: ClientResource, app_id: LikeSnowflake) -> None:
+        """Initialize the command resource."""
         super().__init__(parent)
         self.app_id = app_id
         self.commands_url = self.applications_url / str(app_id) / 'commands'
@@ -39,6 +47,8 @@ class BaseCommandResource(ClientSubresources):
 
     async def create(self, command_data: CreateApplicationCommandData) -> ApplicationCommand:
         """Create a command.
+
+        If a command with the same name already exists, it will be overwritten.
 
         Args:
             command_data (CreateApplicationCommandData): Command to create.

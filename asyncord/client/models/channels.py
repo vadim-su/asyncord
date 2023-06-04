@@ -366,7 +366,7 @@ class ForumTag(BaseModel):
     id: Snowflake
     """Tag id."""
 
-    name: str = Field(..., min_length=0, max_length=20)
+    name: str = Field(min_length=0, max_length=20)
     """Tag name.
 
     Should be between 0 and 20 characters.

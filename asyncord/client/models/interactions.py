@@ -1,3 +1,10 @@
+"""This module contains models for interactions and their responses.
+
+Reference:
+https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
+"""
+
+
 import enum
 from typing import Literal
 
@@ -84,7 +91,7 @@ class AutocompleteResponseData(BaseModel):
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
     """
 
-    choices: list[ApplicationCommandOptionChoice] = Field(min_items=1, max_items=25)
+    choices: list[ApplicationCommandOptionChoice] = Field(min_length=1, max_length=25)
     """List of autocomplete choices."""
 
 
@@ -107,7 +114,7 @@ class ModalSubmitResponseData(BaseModel):
     Max 45 characters.
     """
 
-    components: list[Component] = Field(..., min_items=1, max_items=5)
+    components: list[Component] = Field(min_items=1, max_items=5)
     """Components that make up the modal.
 
     Should be etween 1 and 5 (inclusive)

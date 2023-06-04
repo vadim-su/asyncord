@@ -1,4 +1,9 @@
-"""This module contains message models."""
+"""This module contains message models.
+
+Reference:
+https://discord.com/developers/docs/resources/channel#message-object
+"""
+
 from __future__ import annotations
 
 import datetime
@@ -274,7 +279,10 @@ class Embed(BaseModel):
     """Title of the embed."""
 
     type: EmbedType | None = None
-    """Type of the embed (always "rich" for webhook embeds)."""
+    """Type of the embed.
+
+    Always "rich" for webhook embeds.
+    """
 
     description: str | None = Field(None, max_length=4096)
     """Description of the embed."""
@@ -306,10 +314,11 @@ class Embed(BaseModel):
     author: EmbedAuthor | None = None
     """Author information."""
 
-    # FIXME: Field(None, max_items=25) doesn't work On field "fields"
-    # the following field constraints are set but not enforced: max_items.
-    fields: list[EmbedField] | None = None
-    """Fields information."""
+    fields: list[EmbedField] | None = Field(None, max_length=25)
+    """List of fields.
+
+    Maximum of 25 items.
+    """
 
 
 @enum.unique
@@ -662,6 +671,8 @@ class InteractionType(enum.IntEnum):
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
     """
+
+    # TODO: #16 move to interactions module (Now it is here because of circular imports)
 
     PING = 1
     """Ping interaction."""

@@ -1,3 +1,9 @@
+"""This module contains models for the message components.
+
+Reference:
+https://discord.com/developers/docs/interactions/message-components#message-components
+"""
+
 from __future__ import annotations
 
 import enum
@@ -56,7 +62,8 @@ class BaseComponent(BaseModel):
     type: ComponentType
     """The type of the component."""
 
-    def __init__(self, **data):
+    def __init__(self, **data: Any) -> None:  # noqa: ANN401
+        """Initialize the component."""
         super().__init__(**data)
         # Add `type` to `__fields_set__` to make `dict(exclude_unset)` work properly.
         # We don't need to set 'type' field because it's already set in a component class,
@@ -239,13 +246,13 @@ class SelectMenuOption(BaseModel):
     https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
     """
 
-    label: str = Field(..., max_length=100)
+    label: str = Field(max_length=100)
     """User - facing name of the option.
 
     Max 100 characters.
     """
 
-    value: str = Field(..., max_length=100)
+    value: str = Field(max_length=100)
     """Value of the option that will be sent to the client.
 
     Max 100 characters.
@@ -379,6 +386,7 @@ class TextInput(BaseComponent):
     """
 
     def __init__(self, **data: dict[str, Any]) -> None:
+        """Create a new text input component."""
         super().__init__(**data)  # type: ignore
         self.__fields_set__.add('style')
 

@@ -1,7 +1,13 @@
+"""This module contains models for the application commands.
+
+Reference:
+https://discord.com/developers/docs/interactions/application-commands
+"""
+
 from __future__ import annotations
 
 import enum
-from typing import Annotated, Final
+from typing import Annotated, Final, Self
 
 from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
 
@@ -12,6 +18,7 @@ from asyncord.snowflake import Snowflake
 
 _APP_COMMAND_NAME_PATTERN: Final[str] = r'^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$'
 _NameAnnotation = Annotated[str, Field(min_length=1, max_length=32, pattern=_APP_COMMAND_NAME_PATTERN)]
+_DescriptionAnnotation = Annotated[str, Field(min_length=1, max_length=100)]
 
 
 @enum.unique
@@ -56,7 +63,7 @@ class AppCommandOptionType(enum.IntEnum):
 class ApplicationCommandType(enum.IntEnum):
     """Type of the command.
 
-    More info:
+    Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types
     """
 
@@ -76,7 +83,7 @@ class ApplicationCommandType(enum.IntEnum):
 class ApplicationCommandOptionChoice(BaseModel):
     """Represents a choice for a Discord application command option."""
 
-    name: str = Field(..., min_length=1, max_length=100)
+    name: str = Field(min_length=1, max_length=100)
     """Name of the choice.
 
     Must be 1-100 characters long.
@@ -107,10 +114,12 @@ class ApplicationCommandOption(BaseModel):
         https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
+    # TODO: #18 Possibly add a separate class for creating options
+
     type: AppCommandOptionType
     """Type of option."""
 
-    name: str = Field(..., min_length=1, max_length=32)
+    name: str = Field(min_length=1, max_length=32)
     """Name of the option.
 
     Must be 1-32 characters long.
@@ -119,7 +128,7 @@ class ApplicationCommandOption(BaseModel):
     name_localizations: dict[Locale, str] | None
     """Dictionary of language codes to localized names."""
 
-    description: str = Field(..., min_length=1, max_length=100)
+    description: str = Field(min_length=1, max_length=100)
     """Description of the option.
 
     Must be 1-100 characters long.
@@ -236,7 +245,7 @@ class ApplicationCommandOption(BaseModel):
 class CreateApplicationCommandData(BaseModel):
     """Data to create a Discord application command.
 
-    More info:
+    Reference:
     https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params
     """
 
@@ -252,13 +261,13 @@ class CreateApplicationCommandData(BaseModel):
     name_localizations: dict[Locale, _NameAnnotation] | None = None
     """Dictionary of language codes to localized names. Defaults to None."""
 
-    description: str = Field(..., min_length=1, max_length=100)
+    description: _DescriptionAnnotation
     """Description of the command.
 
     Must be 1-100 characters long.
     """
 
-    description_localizations: dict[Locale, str] | None = None
+    description_localizations: dict[Locale, _DescriptionAnnotation] | None = None
     """Dictionary of language codes to localized descriptions. Defaults to None."""
 
     options: list[ApplicationCommandOption] | None = Field(None, max_length=25)
@@ -284,6 +293,18 @@ class CreateApplicationCommandData(BaseModel):
     Defaults to true.
     """
 
+    @classmethod
+    def from_command(cls, command: ApplicationCommand) -> Self:
+        """Create data from an existing command.
+
+        Args:
+            command (ApplicationCommand): Command to create data from.
+
+        Returns:
+            Data to create a new command.
+        """
+        return cls.model_validate(command.model_dump())
+
     @field_validator('options')
     def validate_options(
         cls, options: list[ApplicationCommandOption] | None, field_info: FieldValidationInfo,
@@ -303,7 +324,7 @@ class CreateApplicationCommandData(BaseModel):
 class ApplicationCommand(BaseModel):
     """Represents a Discord application command.
 
-    More info:
+    Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object
     """
 
@@ -322,7 +343,7 @@ class ApplicationCommand(BaseModel):
     Set to None if the command is global.
     """
 
-    name: str = Field(..., min_length=1, max_length=32)
+    name: str = Field(min_length=1, max_length=32)
     """Name of the command.
 
     Must be 1-32 characters long.
