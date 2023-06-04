@@ -4,7 +4,6 @@ Reference:
 https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 """
 
-
 import enum
 from typing import Literal
 
@@ -12,8 +11,14 @@ from pydantic import BaseModel, Field
 
 from asyncord.client.models.commands import ApplicationCommandOptionChoice
 from asyncord.client.models.components import Component
-from asyncord.client.models.messages import AllowedMentions, AttachmentData, BaseMessageData, Embed, MessageFlags
-from asyncord.client.ports import AttachedFile
+from asyncord.client.models.messages import (
+    AllowedMentions,
+    AttachedFile,
+    AttachmentData,
+    BaseMessageData,
+    Embed,
+    MessageFlags,
+)
 
 
 @enum.unique
@@ -143,6 +148,5 @@ class InteractionResponseData(BaseModel):
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object
     """
 
-    # TODO: #11 Add support for files
     type: InteractionResponseType
     data: MessageResponseData | AutocompleteResponseData | ModalSubmitResponseData | None = None
