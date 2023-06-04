@@ -41,3 +41,8 @@ async def test_ban_managment(ban_managment: BanResource):
     # test unban
     await ban_managment.unban(verum_user_id)
     assert not await ban_managment.get_list()
+
+
+async def test_get_ban_list(ban_managment: BanResource):
+    bans = await ban_managment.get_list()
+    assert isinstance(bans, list)
