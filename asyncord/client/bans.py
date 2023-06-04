@@ -1,24 +1,34 @@
+"""This module contains the ban resource classes."""
+
 from __future__ import annotations
 
-from asyncord.urls import REST_API_URL
-from asyncord.typedefs import LikeSnowflake
-from asyncord.client.resources import ClientResource, ClientSubresources
-from asyncord.client.models.bans import Ban
 from asyncord.client.http.headers import AUDIT_LOG_REASON
+from asyncord.client.models.bans import Ban
+from asyncord.client.resources import ClientResource, ClientSubresources
+from asyncord.typedefs import LikeSnowflake, list_model
+from asyncord.urls import REST_API_URL
 
 
 class BanResource(ClientSubresources):
+    """Base class for ban resources.
+
+    Attributes:
+        guilds_url (URL): Base guilds url.
+    """
+
     guilds_url = REST_API_URL / 'guilds'
 
     def __init__(self, parent: ClientResource, guild_id: LikeSnowflake):
+        """Initialize the ban resource."""
         super().__init__(parent)
         self.guild_id = guild_id
         self.bans_url = self.guilds_url / str(self.guild_id) / 'bans'
 
     async def get(self, user_id: LikeSnowflake) -> Ban:
+        """Get a ban object for a user."""
         url = self.bans_url / str(user_id)
         resp = await self._http.get(url)
-        return Ban(**resp.body)
+        return Ban.model_validate(**resp.body)
 
     async def get_list(
         self,
@@ -26,7 +36,16 @@ class BanResource(ClientSubresources):
         before: LikeSnowflake | None = None,
         after: LikeSnowflake | None = None,
     ) -> list[Ban]:
-        """List bans of a guild."""
+        """List bans of a guild.
+
+        Args:
+            limit (int | None): Number of bans to return. Defaults to None.
+            before (LikeSnowflake | None): ID of the ban to get bans before. Defaults to None.
+            after (LikeSnowflake | None): ID of the ban to get bans after. Defaults to None.
+
+        Returns:
+            list[Ban]: list of user bans.
+        """
         url_params = {}
         if limit is not None:
             url_params['limit'] = limit
@@ -37,7 +56,7 @@ class BanResource(ClientSubresources):
 
         url = self.bans_url % url_params
         resp = await self._http.get(url)
-        return [Ban(**ban) for ban in resp.body]
+        return list_model(Ban).validate_python(resp.body)
 
     async def ban(
         self,
@@ -67,7 +86,7 @@ class BanResource(ClientSubresources):
 
         await self._http.put(url, payload, headers)
 
-    async def unban(self, user_id: LikeSnowflake, reason: str | None = None,) -> None:
+    async def unban(self, user_id: LikeSnowflake, reason: str | None = None) -> None:
         """Unban a user from a guild.
 
         Args:

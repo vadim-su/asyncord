@@ -2,12 +2,11 @@
 
 Reference: https://discord.com/developers/docs/resources/guild
 """
+
 from __future__ import annotations
 
 import datetime
 from typing import TYPE_CHECKING
-
-from pydantic import TypeAdapter
 
 from asyncord.client.bans import BanResource
 from asyncord.client.http.headers import AUDIT_LOG_REASON
@@ -27,6 +26,7 @@ from asyncord.client.models.guilds import (
 )
 from asyncord.client.resources import ClientSubresources
 from asyncord.client.roles import RoleResource
+from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 if TYPE_CHECKING:
@@ -251,7 +251,7 @@ class GuildResource(ClientSubresources):
         """
         url = self.guilds_url / str(guild_id) / 'regions'
         resp = await self._http.get(url)
-        return [VoiceRegion(**voice_region) for voice_region in resp.body]
+        return list_model(VoiceRegion).validate_python(resp.body)
 
     async def get_invites(self, guild_id: LikeSnowflake) -> list[Invite]:
         """Get the invites for a guild.
@@ -266,7 +266,7 @@ class GuildResource(ClientSubresources):
         """
         url = self.guilds_url / str(guild_id) / 'invites'
         resp = await self._http.get(url)
-        return [Invite(**invite) for invite in resp.body]
+        return list_model(Invite).validate_python(resp.body)
 
     async def get_channels(self, guild_id: LikeSnowflake) -> list[Channel]:
         """Get the channels for a guild.
@@ -281,7 +281,7 @@ class GuildResource(ClientSubresources):
         """
         url = self.guilds_url / str(guild_id) / 'channels'
         resp = await self._http.get(url)
-        return [Channel(**channel) for channel in resp.body]
+        return list_model(Channel).validate_python(resp.body)
 
     async def get_integrations(self, guild_id: LikeSnowflake) -> list[IntegrationVariants]:
         """Get the integrations for a guild.
@@ -296,7 +296,7 @@ class GuildResource(ClientSubresources):
         """
         url = self.guilds_url / str(guild_id) / 'integrations'
         resp = await self._http.get(url)
-        return _IntegrationVariantListValidator.validate_python(resp.body)
+        return list_model(IntegrationVariants).validate_python(resp.body)
 
     async def delete_integration(
         self,
@@ -420,6 +420,3 @@ class GuildResource(ClientSubresources):
         if suppress is not None:
             payload['suppress'] = suppress
         await self._http.patch(url, payload)
-
-
-_IntegrationVariantListValidator = TypeAdapter(list[IntegrationVariants])

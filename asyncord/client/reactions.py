@@ -1,17 +1,25 @@
+"""This module contains the ReactionResource class."""
+
 from __future__ import annotations
 
-from asyncord.urls import REST_API_URL
-from asyncord.typedefs import LikeSnowflake
-from asyncord.client.resources import ClientResource, ClientSubresources
 from asyncord.client.models.users import User
+from asyncord.client.resources import ClientResource, ClientSubresources
+from asyncord.typedefs import LikeSnowflake, list_model
+from asyncord.urls import REST_API_URL
 
 
 class ReactionResource(ClientSubresources):
+    """Reaction resource for a message.
+
+    Attributes:
+        channels_url (URL): Base channels url.
+    """
     channels_url = REST_API_URL / 'channels'
 
     def __init__(
         self, parent: ClientResource, channel_id: LikeSnowflake, message_id: LikeSnowflake,
     ):
+        """Initialize the reaction resource."""
         super().__init__(parent)
         self.channel_id = channel_id
         messages_url = self.channels_url / str(self.channel_id) / 'messages'
@@ -31,6 +39,7 @@ class ReactionResource(ClientSubresources):
                 Defaults to None.
             limit (int | None): The maximum number of users to return (1-100).
                 Defaults to None.
+
         Returns:
             list[User]: List of user which reacted with this emoji.
         """
@@ -42,13 +51,14 @@ class ReactionResource(ClientSubresources):
 
         url = self.reactions_url / emoji % url_params
         resp = await self._http.get(url)
-        return [User(**user) for user in resp.body]
+        return list_model(User).validate_python(resp.body)
 
     async def add(
         self,
         emoji: str,
     ) -> None:
         """Create a reaction for the message.
+
         Args:
             emoji (str): The emoji to react with.
             user_id (LikeSnowflake): The ID of the user to react as.
@@ -58,6 +68,7 @@ class ReactionResource(ClientSubresources):
 
     async def delete_own_reaction(self, emoji: str) -> None:
         """Delete a reaction the current user made for the message.
+
         Args:
             emoji (str): The emoji to delete the reaction for.
         """
@@ -70,6 +81,7 @@ class ReactionResource(ClientSubresources):
         user_id: LikeSnowflake | None = None,
     ) -> None:
         """Delete a reaction a user made for the message.
+
         Args:
             emoji (str | None): The emoji to delete the reaction for.
             user_id (LikeSnowflake | None): The ID of the user to delete the reaction for.

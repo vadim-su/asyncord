@@ -4,16 +4,18 @@ Reference:
 https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
 """
 
-from pydantic import TypeAdapter
-
 from asyncord.client.models.commands import ApplicationCommand, CreateApplicationCommandData
 from asyncord.client.resources import ClientResource, ClientSubresources
-from asyncord.typedefs import LikeSnowflake
+from asyncord.typedefs import LikeSnowflake, list_model
 from asyncord.urls import REST_API_URL
 
 
 class BaseCommandResource(ClientSubresources):
-    """Base class for command resources."""
+    """Base class for command resources.
+
+    Attributes:
+        applications_url (URL): Base applications url.
+    """
 
     applications_url = REST_API_URL / 'applications'
 
@@ -43,7 +45,7 @@ class BaseCommandResource(ClientSubresources):
             list[ApplicationCommand]: List of commands.
         """
         resp = await self._http.get(self.commands_url)
-        return _ApplicationCommandListValidator.validate_python(resp.body)
+        return list_model(ApplicationCommand).validate_python(resp.body)
 
     async def create(self, command_data: CreateApplicationCommandData) -> ApplicationCommand:
         """Create a command.
@@ -68,6 +70,3 @@ class BaseCommandResource(ClientSubresources):
         """
         url = self.commands_url / str(command_id)
         await self._http.delete(url)
-
-
-_ApplicationCommandListValidator = TypeAdapter(list[ApplicationCommand])

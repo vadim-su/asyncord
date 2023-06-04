@@ -1,24 +1,26 @@
+"""This module contains resource classes for interacting with messages."""
+
 from __future__ import annotations
 
-from asyncord.urls import REST_API_URL
-from asyncord.typedefs import LikeSnowflake
+from asyncord.client.http.headers import AUDIT_LOG_REASON
+from asyncord.client.models.messages import CreateMessageData, Message, UpdateMessageData
 from asyncord.client.reactions import ReactionResource
 from asyncord.client.resources import ClientResource, ClientSubresources
-from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.models.messages import Message, CreateMessageData, UpdateMessageData
+from asyncord.typedefs import LikeSnowflake, list_model
+from asyncord.urls import REST_API_URL
 
 
 class MessageResource(ClientSubresources):
     """Resource to perform actions on messages.
 
     Attributes:
-        channel_id (LikeSnowflake): The ID of the channel.
-        messages_url (URL): The URL for the messages resource.
+        channels_url (URL): URL for the messages resource.
     """
 
     channels_url = REST_API_URL / 'channels'
 
     def __init__(self, parent: ClientResource, channel_id: LikeSnowflake):
+        """Initialize the message resource."""
         super().__init__(parent)
         self.channel_id = channel_id
         self.messages_url = self.channels_url / str(channel_id) / 'messages'
@@ -69,7 +71,7 @@ class MessageResource(ClientSubresources):
         url = self.messages_url % url_params
 
         resp = await self._http.get(url)
-        return [Message(**message) for message in resp.body]
+        return list_model(Message).validate_python(resp.body)
 
     async def create(self, message_data: CreateMessageData) -> Message:
         """Create a new message object for the channel.

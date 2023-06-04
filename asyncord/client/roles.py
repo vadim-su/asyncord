@@ -1,18 +1,24 @@
-from __future__ import annotations
+"""This module contains role resource classes."""
 
-from pydantic import TypeAdapter
+from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.models.roles import CreateRoleData, Role, RolePosition, UpdateRoleData
 from asyncord.client.resources import ClientResource, ClientSubresources
-from asyncord.typedefs import LikeSnowflake
+from asyncord.typedefs import LikeSnowflake, list_model
 from asyncord.urls import REST_API_URL
 
 
 class RoleResource(ClientSubresources):
+    """Resource to perform actions on roles.
+
+    Attributes:
+        guild_id (LikeSnowflake): ID of the guild.
+    """
     guilds_url = REST_API_URL / 'guilds'
 
     def __init__(self, parent: ClientResource, guild_id: LikeSnowflake):
+        """Initialize the role resource."""
         super().__init__(parent)
         self.guild_id = guild_id
         self.roles_url = self.guilds_url / str(self.guild_id) / 'roles'
@@ -26,7 +32,7 @@ class RoleResource(ClientSubresources):
             list[Role]: The list of roles in the guild.
         """
         resp = await self._http.get(self.roles_url)
-        return _RoleListValidator.validate_python(resp.body)
+        return list_model(Role).validate_python(resp.body)
 
     async def create(self, role_data: CreateRoleData) -> Role:
         """Create a new role in a guild.
@@ -55,7 +61,7 @@ class RoleResource(ClientSubresources):
             list[Role]: The list of roles in the guild.
         """
         resp = await self._http.patch(self.roles_url, role_positions)
-        return _RoleListValidator.validate_python(resp.body)
+        return list_model(Role).validate_python(resp.body)
 
     async def update_role(self, role_id: LikeSnowflake, role_data: UpdateRoleData) -> Role:
         """Update a role in a guild.
@@ -90,6 +96,3 @@ class RoleResource(ClientSubresources):
             headers = {}
 
         await self._http.delete(url, headers=headers)
-
-
-_RoleListValidator = TypeAdapter(list[Role])

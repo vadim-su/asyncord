@@ -1,35 +1,52 @@
+"""Members resource for the client."""
+
 from __future__ import annotations
 
-from asyncord.urls import REST_API_URL
-from asyncord.typedefs import LikeSnowflake
-from asyncord.client.resources import ClientResource, ClientSubresources
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.models.members import Member, UpdateMemberData
+from asyncord.client.resources import ClientResource, ClientSubresources
+from asyncord.typedefs import LikeSnowflake, list_model
+from asyncord.urls import REST_API_URL
 
 
 class MemberResource(ClientSubresources):
+    """Resource to perform actions on members.
+
+    Attributes:
+        guilds_url (URL): URL for the guilds resource.
+    """
     guilds_url = REST_API_URL / 'guilds'
 
     def __init__(self, parent: ClientResource, guild_id: LikeSnowflake):
+        """Create a new member resource."""
         super().__init__(parent)
         self.guild_id = guild_id
         self.members_url = self.guilds_url / str(self.guild_id) / 'members'
 
     async def get(self, user_id: LikeSnowflake) -> Member:
+        """Get a member of a guild.
+
+        This endpoint is restricted according to whether the GUILD_MEMBERS Privileged.
+
+        Args:
+            user_id (LikeSnowflake): ID of the member to get.
+
+        Returns:
+            Member: Member object for the ID provided.
+        """
         url = self.members_url / str(user_id)
         resp = await self._http.get(url)
         return Member(**resp.body)
 
     async def get_list(self, limit: int | None = 1, after: LikeSnowflake | None = None) -> list[Member]:
-        """
-        List members of guild.
+        """List members of guild.
 
         This endpoint is restricted according to whether the GUILD_MEMBERS Privileged
         Intent is enabled for your application.
 
         Args:
             limit (int): The maximum number of members to return.
-                Should be between 1 and 1000.Defaults to 1.
+                Should be between 1 and 1000. Defaults to 1.
             after (LikeSnowflake): The ID of the member to start at.
 
         Returns:
@@ -43,7 +60,7 @@ class MemberResource(ClientSubresources):
 
         url = self.members_url % url_params
         resp = await self._http.get(url)
-        return [Member(**member) for member in resp.body]
+        return list_model(Member).validate_python(resp.body)
 
     async def search(self, nick_or_name: str, limit: int | None = 1) -> list[Member]:
         """Search members of a guild by username or nickname.
@@ -64,7 +81,7 @@ class MemberResource(ClientSubresources):
 
         url = self.members_url % url_params
         resp = await self._http.get(url)
-        return [Member(**member) for member in resp.body]
+        return list_model(Member).validate_python(resp.body)
 
     async def update(
         self, user_id: LikeSnowflake, member_data: UpdateMemberData, reason: str | None = None,

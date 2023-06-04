@@ -1,18 +1,27 @@
+"""This module contains the UserResource class, which is used to interact with."""
+
 from __future__ import annotations
 
 from pydantic import BaseModel
 
-from asyncord.urls import REST_API_URL
-from asyncord.typedefs import LikeSnowflake
-from asyncord.snowflake import Snowflake
+from asyncord.client.models.channels import Channel
+from asyncord.client.models.members import Member
+from asyncord.client.models.users import User
 from asyncord.client.ports import Response
 from asyncord.client.resources import ClientSubresources
-from asyncord.client.models.users import User
-from asyncord.client.models.members import Member
-from asyncord.client.models.channels import Channel
+from asyncord.snowflake import Snowflake
+from asyncord.typedefs import LikeSnowflake, list_model
+from asyncord.urls import REST_API_URL
 
 
 class UserResource(ClientSubresources):
+    """User resource.
+
+    Attributes:
+        users_url (URL): Base users url.
+        current_user_url (URL): Current user url.
+    """
+
     users_url = REST_API_URL / 'users'
     current_user_url = users_url / '@me'
 
@@ -33,7 +42,6 @@ class UserResource(ClientSubresources):
         Args:
             user_id (LikeSnowflake): The ID of the user to get.
         """
-
         url = self.users_url / str(user_id)
         resp = await self._http.get(url)
         return User(**resp.body)
@@ -82,7 +90,7 @@ class UserResource(ClientSubresources):
 
         url = self.current_user_url / 'guilds' % url_params
         resp = await self._http.get(url)
-        return [UserGuild(**guild) for guild in resp.body]
+        return list_model(UserGuild).validate_python(resp.body)
 
     async def get_current_user_guild_member(self, guild_id: LikeSnowflake) -> Member:
         """Get the current user's guild member.
@@ -98,7 +106,7 @@ class UserResource(ClientSubresources):
         resp = await self._http.get(url)
         return Member(**resp.body)
 
-    async def leave_guild(self, guild_id: LikeSnowflake):
+    async def leave_guild(self, guild_id: LikeSnowflake) -> None:
         """Leave a guild.
 
         Reference: https://discord.com/developers/docs/resources/user#leave-guild
@@ -137,7 +145,7 @@ class UserResource(ClientSubresources):
         Raises:
             ValueError: If the number of users is greater than 10.
         """
-        if len(user_ids) > 10:
+        if len(user_ids) > 10:  # noqa: PLR2004
             # limited by discord to 10 users per group DM
             raise ValueError('Cannot create a group DM with more than 10 users.')
         url = self.current_user_url / 'channels'
