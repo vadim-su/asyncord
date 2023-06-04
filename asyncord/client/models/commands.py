@@ -102,7 +102,7 @@ class ApplicationCommandOptionChoice(BaseModel):
     def validate_value(cls, field_value: str | int | float) -> str | int | float:
         """Validates the value field."""
         if isinstance(field_value, str):
-            if not (1 >= len(field_value) <= 100):  # noqa: PLR2004
+            if not (1 <= len(field_value) <= 100):  # noqa: PLR2004
                 raise ValueError('Value field must be 1-100 characters long')
         return field_value
 
@@ -111,7 +111,7 @@ class ApplicationCommandOption(BaseModel):
     """Represents an option for a Discord application command.
 
     Reference:
-        https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
     # TODO: #18 Possibly add a separate class for creating options
@@ -125,7 +125,8 @@ class ApplicationCommandOption(BaseModel):
     Must be 1-32 characters long.
     """
 
-    name_localizations: dict[Locale, str] | None
+    # TODO: Remove the default value for description_localizations once the option cration data will be separated
+    name_localizations: dict[Locale, str] | None = None
     """Dictionary of language codes to localized names."""
 
     description: str = Field(min_length=1, max_length=100)
