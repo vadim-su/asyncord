@@ -12,7 +12,8 @@ from pydantic import BaseModel, Field
 
 from asyncord.client.models.commands import ApplicationCommandOptionChoice
 from asyncord.client.models.components import Component
-from asyncord.client.models.messages import AllowedMentions, Embed, MessageFlags
+from asyncord.client.models.messages import AllowedMentions, AttachmentData, BaseMessageData, Embed, MessageFlags
+from asyncord.client.ports import AttachedFile
 
 
 @enum.unique
@@ -55,7 +56,7 @@ class InteractionResponseType(enum.IntEnum):
     """Respond to an interaction with a popup modal."""
 
 
-class MessageResponseData(BaseModel):
+class MessageResponseData(BaseMessageData):
     """Message response data.
 
     References:
@@ -82,6 +83,20 @@ class MessageResponseData(BaseModel):
 
     components: list[Component] | None = None
     """List of components."""
+
+    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
+    """Contents of the file being sent.
+
+    See Uploading Files:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
+
+    attachments: list[AttachmentData] | None = None
+    """Attachment objects with filename and description.
+
+    See Uploading Files:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
 
 
 class AutocompleteResponseData(BaseModel):
