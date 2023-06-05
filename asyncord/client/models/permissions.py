@@ -1,3 +1,5 @@
+"""This module contains the permission flags used by many Discord models."""
+
 import enum
 from collections.abc import Callable
 from typing import Any, Self
@@ -200,6 +202,7 @@ class PermissionFlag(enum.IntFlag):
             core_schema.is_instance_schema(cls),
         ])
 
+        # TODO: #21 Move serialization from string to int
         return core_schema.no_info_after_validator_function(
             function=cls.validate,
             schema=schema,

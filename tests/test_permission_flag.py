@@ -39,6 +39,7 @@ def test_permission_flag_convertation():
     assert str(flag) == str(2**0 + 2**1)
 
 
+@pytest.mark.xfail(raises=AssertionError, reason='Pydantic 2.0b2 was broken')
 @pytest.mark.parametrize('permission_type', [PermissionFlag, int, str])
 def test_permission_flag_as_part_of_model(permission_type: type):
     class TestModel(BaseModel):

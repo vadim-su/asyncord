@@ -4,8 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
-from pydantic import __version__ as pydantic_version
+from pydantic import BaseModel, Field, RootModel
 
 from asyncord.client.models.channels import ChannelType
 from asyncord.client.models.commands import AppCommandOptionType, ApplicationCommandType
@@ -382,19 +381,5 @@ Interaction = Annotated[
 ]
 
 
-if pydantic_version != '2.0a4':
-    from pydantic import RootModel
-
-    class InteractionCreateEvent(GatewayEvent, RootModel[Interaction]):
-        """Represents an INTERACTION_CREATE event."""
-else:
-    InteractionDataType = (
-        ApplicationCommandInteractionData
-        | MessageComponentInteractionData
-        | ModalSubmitInteractionData
-    )
-
-    class InteractionCreateEvent(GatewayEvent, BaseInteraction):
-        """Represents an INTERACTION_CREATE event."""
-
-        data: InteractionDataType | None = None
+class InteractionCreateEvent(GatewayEvent, RootModel[Interaction]):
+    """Represents an INTERACTION_CREATE event."""
