@@ -10,7 +10,7 @@ import enum
 from typing import Annotated, Any, Literal
 from typing import get_args as get_typing_args
 
-from pydantic import BaseModel, ConfigDict, Field, FieldValidationInfo, field_validator, root_validator
+from pydantic import BaseModel, Field, FieldValidationInfo, field_validator, root_validator
 
 
 @enum.unique
@@ -69,60 +69,6 @@ class BaseComponent(BaseModel):
         # We don't need to set 'type' field because it's already set in a component class,
         # but we need to send it to Discord excluding another unset fields.
         self.__fields_set__.add('type')
-
-
-class ActionRow(BaseComponent):
-    """ActionRow is a non-interactive container component for other types of components.
-
-    * You can have up to 5 Action Rows per message
-    * ActionRow cannot contain another ActionRow
-    * ActionRow can contain only one select menu
-    * ActionRow containing a select menu cannot also contain buttons
-    * ActionRow can contain up to 5 buttons
-
-    Read more at:
-    https://discord.com/developers/docs/interactions/message-components#action-rows
-    """
-
-    type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
-    """The type of the component."""
-
-    components: list[Button | SelectMenu]
-    """The components in the action row.
-
-    Text input components are not allowed in action rows.
-    """
-
-    model_config = ConfigDict(undefined_types_warning=False)
-
-    @field_validator('components')
-    def validate_components(cls, components: list[Button | SelectMenu]) -> list[Button | SelectMenu]:
-        """Check ActionRow components."""
-        component_types = [component.type for component in components]
-        set_component_types = set(component_types)
-
-        if ComponentType.ACTION_ROW in set_component_types:
-            raise ValueError('ActionRow cannot contain another ActionRow')
-
-        if ComponentType.BUTTON in set_component_types:
-            # any select component in components
-            if set_component_types & set(SELECT_COMPONENT_TYPE_LIST):
-                raise ValueError(
-                    'ActionRow containing a select menu cannot also contain buttons',
-                )
-
-        select_components = [
-            component_type
-            for component_type in component_types
-            if component_type in SELECT_COMPONENT_TYPE_LIST
-        ]
-        if len(select_components) > 1:
-            raise ValueError('ActionRow can contain only one select menu')
-
-        if component_types.count(ComponentType.BUTTON) > 5:  # noqa: PLR2004
-            raise ValueError('ActionRow can contain up to 5 buttons')
-
-        return components
 
 
 class ComponentEmoji(BaseModel):
@@ -402,6 +348,56 @@ class TextInput(BaseComponent):
         return max_length
 
 
-Component = Annotated[ActionRow | Button | SelectMenu | TextInput, Field(discriminator='type')]
+class ActionRow(BaseComponent):
+    """ActionRow is a non-interactive container component for other types of components.
 
-ActionRow.model_rebuild()
+    * You can have up to 5 Action Rows per message
+    * ActionRow cannot contain another ActionRow
+    * ActionRow can contain only one select menu
+    * ActionRow containing a select menu cannot also contain buttons
+    * ActionRow can contain up to 5 buttons
+
+    Read more at:
+    https://discord.com/developers/docs/interactions/message-components#action-rows
+    """
+
+    type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
+    """The type of the component."""
+
+    components: list[Button | SelectMenu]
+    """The components in the action row.
+
+    Text input components are not allowed in action rows.
+    """
+
+    @field_validator('components')
+    def validate_components(cls, components: list[Button | SelectMenu]) -> list[Button | SelectMenu]:
+        """Check ActionRow components."""
+        component_types = [component.type for component in components]
+        set_component_types = set(component_types)
+
+        if ComponentType.ACTION_ROW in set_component_types:
+            raise ValueError('ActionRow cannot contain another ActionRow')
+
+        if ComponentType.BUTTON in set_component_types:
+            # any select component in components
+            if set_component_types & set(SELECT_COMPONENT_TYPE_LIST):
+                raise ValueError(
+                    'ActionRow containing a select menu cannot also contain buttons',
+                )
+
+        select_components = [
+            component_type
+            for component_type in component_types
+            if component_type in SELECT_COMPONENT_TYPE_LIST
+        ]
+        if len(select_components) > 1:
+            raise ValueError('ActionRow can contain only one select menu')
+
+        if component_types.count(ComponentType.BUTTON) > 5:  # noqa: PLR2004
+            raise ValueError('ActionRow can contain up to 5 buttons')
+
+        return components
+
+
+Component = Annotated[ActionRow | Button | SelectMenu | TextInput, Field(discriminator='type')]
