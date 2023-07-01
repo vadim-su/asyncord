@@ -80,8 +80,13 @@ class PremiumType(enum.IntEnum):
     """
 
     NONE = 0
+    """No premium."""
+
     NITRO_CLASSIC = 1
+    """Nitro Classic."""
+
     NITRO = 2
+    """Nitro."""
 
 
 class User(BaseModel):
@@ -89,32 +94,22 @@ class User(BaseModel):
 
     Reference:
     https://discord.com/developers/docs/resources/user#user-object
-
-    For example: ::
-
-        {
-            "id": "80351110224678912",
-            "username": "Nelly",
-            "discriminator": "1337",
-            "avatar": "8342729096ea3675442027381ff50dfe",
-            "verified": true,
-            "email": "nelly@discord.com",
-            "flags": 64,
-            "banner": "06c16474723fe537c283b8efa61a30c8",
-            "accent_color": 16711680,
-            "premium_type": 1,
-            "public_flags": 64
-        }
     """
 
     id: Snowflake
-    """The user's id."""
+    """User's id."""
 
     username: str
-    """The user's username, not unique across the platform."""
+    """User's username, not unique across the platform."""
 
     discriminator: str
-    """The user's 4 - digit discord-tag or 0 if the user has no tag."""
+    """User's 4 - digit discord-tag or 0 if the user has no tag."""
+
+    global_name: str | None
+    """User's global name.
+
+    For bots, this is the application name.
+    """
 
     avatar: str | None
     """The user's avatar hash."""
@@ -129,26 +124,26 @@ class User(BaseModel):
     """Whether the user has two factor enabled on their account."""
 
     banner: str | None = None
-    """The user's banner hash."""
+    """User's banner hash."""
 
     accent_color: int | None = None
-    """The user's banner color encoded as an integer representation of
+    """User's banner color encoded as an integer representation of
         hexadecimal color code."""
 
     locale: str | None = None
-    """The user's chosen language option."""
+    """User's chosen language option."""
 
     verified: bool | None = None
     """Whether the email on this account has been verified."""
 
     email: str | None = None
-    "The user's email."
+    """User's email."""
 
     flags: UserFlags | None = None
-    """The flags on a user's account."""
+    """Flags on a user's account."""
 
     premium_type: PremiumType | None = None
-    """The type of Nitro subscription on a user's account."""
+    """Type of Nitro subscription on a user's account."""
 
     public_flags: UserFlags | None = None
-    """The public flags on a user's account."""
+    """Public flags on a user's account."""
