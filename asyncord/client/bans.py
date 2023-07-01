@@ -28,7 +28,7 @@ class BanResource(ClientSubresources):
         """Get a ban object for a user."""
         url = self.bans_url / str(user_id)
         resp = await self._http.get(url)
-        return Ban.model_validate(**resp.body)
+        return Ban.model_validate(resp.body)
 
     async def get_list(
         self,
@@ -84,7 +84,7 @@ class BanResource(ClientSubresources):
         else:
             payload = None
 
-        await self._http.put(url, payload, headers)
+        await self._http.put(url, payload, headers=headers)
 
     async def unban(self, user_id: LikeSnowflake, reason: str | None = None) -> None:
         """Unban a user from a guild.
