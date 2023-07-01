@@ -30,12 +30,16 @@ class CreateGuildChannel(BaseModel):
     """
 
     id: Snowflake
-    """channel id"""
+    """Channel ID."""
 
     name: str = Field(min_length=1, max_length=100)
+    """channel name.
+
+    1-100 characters.
+    """
 
     type: ChannelType
-    """the type of channel"""
+    """Type of the channel."""
 
 
 class CreateGuildData(BaseModel):
@@ -113,16 +117,16 @@ class WelcomeScreenChannel(BaseModel):
     """
 
     channel_id: Snowflake
-    """The channel's id"""
+    """ID of the channel."""
 
     description: str
-    """The channel's description"""
+    """Description of the channel."""
 
     emoji_id: Snowflake | None
-    """The emoji id, if the emoji is custom"""
+    """Emoji ID, if the emoji is custom."""
 
     emoji_name: str | None
-    """the emoji name if custom, the unicode character if standard, or null if no emoji is set"""
+    """Emoji name if custom, the unicode character if standard, or null if no emoji is set."""
 
 
 class UpdateWelcomeScreenData(BaseModel):
@@ -130,14 +134,15 @@ class UpdateWelcomeScreenData(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
     """
+
     enabled: bool | None = None
-    """Whether the welcome screen is enabled"""
+    """Whether the welcome screen is enabled."""
 
     welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_items=5)
-    """The channels shown in the welcome screen, max 5"""
+    """Channels shown in the welcome screen, max 5."""
 
     description: str | None = None
-    """The server description shown in the welcome screen"""
+    """Server description shown in the welcome screen."""
 
 
 class WelcomeScreen(BaseModel):
@@ -147,7 +152,7 @@ class WelcomeScreen(BaseModel):
     """
 
     description: str | None
-    """The server description shown in the welcome screen."""
+    """Server description shown in the welcome screen."""
 
     welcome_channels: list[WelcomeScreenChannel] = Field(max_items=5)
     """List of channels shown in the welcome screen.
@@ -205,7 +210,7 @@ class Guild(BaseModel):
     """True if the server widget is enabled."""
 
     widget_channel_id: Snowflake | None = None
-    """The channel ID that the widget will generate an invite to, or null if set to no invite."""
+    """Channel ID that the widget will generate an invite to, or null if set to no invite."""
 
     verification_level: int
     """Verification level required for the guild."""
@@ -232,22 +237,22 @@ class Guild(BaseModel):
     """Application ID of the guild creator if it is bot-created."""
 
     system_channel_id: Snowflake | None
-    """The ID of the channel where guild notices such as welcome messages and boost events are posted."""
+    """ID of the channel where guild notices such as welcome messages and boost events are posted."""
 
     system_channel_flags: int
     """System channel flags."""
 
     rules_channel_id: Snowflake | None
-    """The ID of the channel where Community guilds can display rules and/or guidelines."""
+    """ID of the channel where Community guilds can display rules and/or guidelines."""
 
     max_presences: int | None = None
-    """The maximum number of presences for the guild (null is always returned, apart from the largest of guilds)."""
+    """Maximum number of presences for the guild (null is always returned, apart from the largest of guilds)."""
 
     max_members: int
-    """The maximum number of members for the guild."""
+    """Maximum number of members for the guild."""
 
     vanity_url_code: str | None
-    """The vanity URL code for the guild."""
+    """Vanity URL code for the guild."""
 
     description: str | None
     """Guild description (0-1000 characters)."""
@@ -259,22 +264,43 @@ class Guild(BaseModel):
     """Premium tier (Server Boost level)."""
 
     premium_subscription_count: int
-    """The number of boosts this guild currently has."""
+    """Number of boosts this guild currently has."""
 
     preferred_locale: str
-    """The preferred locale of a Community guild used in server discovery and notices
+    """Preferred locale of a Community guild used in server discovery and notices
 
     Sent in interactions. Defaults to "en-US".
     """
 
     public_updates_channel_id: Snowflake | None
-    """The ID of the channel where admins and moderators of Community guilds receive notices from Discord."""
+    """ID of the channel where admins and moderators of Community guilds receive notices from Discord."""
 
-    max_video_channel_users: int
-    """The maximum amount of users in a video channel."""
+    max_video_channel_users: int | None = None
+    """Maximum amount of users in a video channel."""
+
+    max_stage_video_channel_users: int | None = None
+    """Maximum amount of users in a stage video channel."""
+
+    approximate_member_count: int | None = None
+    """Approximate number of members in this guild.
+
+    Returned from the GET /guilds/<id> endpoint when with_counts is true.
+    """
+
+    welcome_screen: WelcomeScreen | None = None
+    """Welcome screen of a Community guild.
+
+    Shown to new members, returned in an Invite's guild object.
+    """
 
     nsfw_level: int
     """Guild NSFW level."""
+
+    premium_progress_bar_enabled: bool
+    """Whether the guild has the boost progress bar enabled."""
+
+    safety_alerts_channel_id: Snowflake | None
+    """ID of the channel where admins and moderators of Community guilds receive safety alerts from Discord."""
 
 
 class GuildPreview(BaseModel):
@@ -284,16 +310,19 @@ class GuildPreview(BaseModel):
     """
 
     id: Snowflake
-    """guild id"""
+    """Guild ID."""
 
     name: str
-    """guild name(2 - 100 characters, excluding trailing and leading whitespace)"""
+    """Guild name.
+
+    2 - 100 characters, excluding trailing and leading whitespace.
+    """
 
     icon: str | None
-    """icon hash"""
+    """Icon hash."""
 
     splash: str | None
-    """splash hash"""
+    """Splash hash."""
 
     discovery_splash: str | None
     """Discovery splash hash.
@@ -302,22 +331,22 @@ class GuildPreview(BaseModel):
     """
 
     emojis: list[Emoji] | None = None
-    """custom guild emojis"""
+    """Custom guild emojis."""
 
     features: list[str]
-    """enabled guild features
+    """Enabled guild features.
 
     Replaced by str because too often changes without any notifications.
     """
 
     approximate_member_count: int | None = None
-    """approximate number of members in this guild"""
+    """Approximate number of members in this guild."""
 
     approximate_presence_count: int | None = None
-    """approximate number of non - offline members in this guild"""
+    """Approximate number of non - offline members in this guild."""
 
     description: str | None = None
-    """the description for the guild, if the guild is discoverable"""
+    """Description for the guild, if the guild is discoverable."""
 
 
 class BeginPruneData(BaseModel):
@@ -327,13 +356,13 @@ class BeginPruneData(BaseModel):
     """
 
     days: int | None = None
-    """number of days to count prune for(1 or more)"""
+    """Number of days to count prune for(1 or more)."""
 
     compute_prune_count: bool | None = None
-    """whether 'pruned' is returned, discouraged for large guilds"""
+    """Whether 'pruned' is returned, discouraged for large guilds."""
 
     include_roles: list[Snowflake] | None = None
-    """roles to include"""
+    """Roles to include."""
 
 
 class Prune(BaseModel):
@@ -341,8 +370,9 @@ class Prune(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/guild#prune-object
     """
+
     pruned: int
-    """number of members pruned"""
+    """Number of members pruned."""
 
 
 class VoiceRegion(BaseModel):
@@ -350,20 +380,21 @@ class VoiceRegion(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/voice#voice-region-object-voice-region-structure
     """
+
     id: str
-    """voice region id"""
+    """Voice region id."""
 
     name: str
-    """voice region name"""
+    """Voice region name."""
 
     optimal: bool
-    """whether the voice region is optimal for voice communication"""
+    """Whether the voice region is optimal for voice communication."""
 
     deprecated: bool
-    """whether the voice region is deprecated"""
+    """Whether the voice region is deprecated."""
 
     custom: bool
-    """whether the voice region is custom"""
+    """Whether the voice region is custom."""
 
 
 class InviteChannel(BaseModel):
@@ -388,6 +419,7 @@ class InviteGuild(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/guild#guild-object
     """
+
     id: str
     """Guild ID."""
 
@@ -434,9 +466,15 @@ class InviteGuild(BaseModel):
 @enum.unique
 class IntegrationType(enum.StrEnum):
     """Type of integration."""
+
     TWITCH = 'twitch'
+    """Twitch integration."""
+
     YOUTUBE = 'youtube'
+    """YouTube integration."""
+
     DISCORD = 'discord'
+    """Discord integration."""
 
 
 @enum.unique
@@ -452,6 +490,7 @@ class Invite(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/invite#invite-object-invite-structure
     """
+
     code: str
     """Unique identifier for the invite."""
 
@@ -507,22 +546,22 @@ class GuildCreateChannel(BaseModel):
     """
 
     id: int | None = None
-    """channel id"""
+    """Channel id."""
 
     type: ChannelType
-    """the type of channel"""
+    """Type of channel."""
 
     name: str | None = Field(None, min_length=1, max_length=100)
-    """channel name (1 - 100 characters)"""
+    """Channel name (1 - 100 characters)."""
 
     topic: str | None = Field(None, min_length=0, max_length=1024)
-    """The channel topic(0 - 1024 characters)."""
+    """Channel topic(0 - 1024 characters)."""
 
     bitrate: int | None = None
-    """The bitrate ( in bits) of the voice channel."""
+    """Bitrate (in bits) of the voice channel."""
 
     user_limit: int | None = None
-    """The user limit of the voice channel."""
+    """User limit of the voice channel."""
 
     rate_limit_per_user: int | None = Field(None, min=0, max=21600)
     """Amount of seconds a user has to wait before sending another message(0 - 21600).
@@ -534,7 +573,7 @@ class GuildCreateChannel(BaseModel):
     """
 
     permission_overwrites: list[Overwrite] | None = None
-    """explicit permission overwrites for members and roles."""
+    """Explicit permission overwrites for members and roles."""
 
     parent_id: Snowflake | None = None
     """Parent category or channel id.
@@ -552,11 +591,10 @@ class GuildCreateChannel(BaseModel):
     """Voice region id for the voice channel, automatic when set to null."""
 
     video_quality_mode: int | None = None
-    """The camera video quality mode of the voice channel, 1 when not present."""
+    """Camera video quality mode of the voice channel, 1 when not present."""
 
     default_auto_archive_duration: Literal[60, 1440, 4320, 10080] | None = None
-    """Default duration ( in minutes) that the clients (not the API) will use
-    for newly created threads.
+    """Default duration (in minutes) that the clients (not the API) will use for newly created threads.
 
     To automatically archive the thread after recent activity.
     Can be set to: 60, 1440, 4320, 10080.
@@ -566,8 +604,12 @@ class GuildCreateChannel(BaseModel):
 @enum.unique
 class ExpireBehavior(enum.IntEnum):
     """The behavior of expiring subscribers."""
+
     REMOVE_ROLE = 0
+    """Remove the role."""
+
     KICK = 1
+    """Kick the user."""
 
 
 class IntegrationAccount(BaseModel):
@@ -576,10 +618,10 @@ class IntegrationAccount(BaseModel):
     Reference: https://discord.com/developers/docs/resources/guild#integration-account-object
     """
     id: str
-    """id of the account"""
+    """ID of the account."""
 
     name: str
-    """name of the account"""
+    """Name of the account."""
 
 
 class IntegrationApplication(BaseModel):
@@ -587,20 +629,21 @@ class IntegrationApplication(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/guild#integration-application-object
     """
+
     id: Snowflake
-    """id of the app"""
+    """ID of the app."""
 
     name: str
-    """name of the app"""
+    """Name of the app."""
 
     icon: str | None = None
-    """icon hash of the app"""
+    """Icon hash of the app"""
 
     description: str
-    """description of the app"""
+    """Description of the app."""
 
     bot: User | None = None
-    """bot associated with this application"""
+    """Bot associated with this application."""
 
 
 class GeneralIntegration(BaseModel):
@@ -608,53 +651,54 @@ class GeneralIntegration(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
     """
+
     id: Snowflake
-    """integration id"""
+    """Integration id."""
 
     name: str
-    """integration name"""
+    """Integration name."""
 
     type: Literal[IntegrationType.TWITCH, IntegrationType.YOUTUBE]
-    """integration type (twitch, youtube, or discord)"""
+    """Integration type (twitch, youtube, or discord)."""
 
     enabled: bool
-    """is this integration enabled"""
+    """Is this integration enabled."""
 
     syncing: bool
-    """is this integration being synced"""
+    """Is this integration being synced."""
 
     role_id: Snowflake
-    """id that this integration uses for "subscribers"""
+    """ID that this integration uses for "subscribers."""
 
     enable_emoticons: bool
-    """whether emoticons should be synced for this integration (twitch only currently)"""
+    """Whether emoticons should be synced for this integration (twitch only currently)."""
 
     expire_behavior: ExpireBehavior
-    """the behavior of expiring subscribers"""
+    """Behavior of expiring subscribers."""
 
     expire_grace_period: int
-    """the grace period (in days) before expiring subscribers"""
+    """Grace period (in days) before expiring subscribers."""
 
     user: User
-    """user for this integration"""
+    """User for this integration."""
 
     account: IntegrationAccount
-    """integration account information"""
+    """Integration account information."""
 
     synced_at: datetime.datetime
-    """when this integration was last synced"""
+    """When this integration was last synced."""
 
     subscriber_count: int
-    """how many subscribers this integration has"""
+    """How many subscribers this integration has."""
 
     revoked: bool
-    """has this integration been revoked"""
+    """Has this integration been revoked."""
 
     application: IntegrationApplication | None = None
-    """the bot/OAuth2 application for discord integrations"""
+    """Bot or OAuth2 application for discord integrations."""
 
     scopes: list[str] | None = None
-    """the scopes the application has been authorized for"""
+    """Scopes the application has been authorized for."""
 
 
 class DiscordIntegration(BaseModel):
@@ -665,22 +709,22 @@ class DiscordIntegration(BaseModel):
     """
 
     id: Snowflake
-    """integration id"""
+    """Integration id."""
 
     name: str
-    """integration name"""
+    """Integration name."""
 
     type: Literal[IntegrationType.DISCORD]
-    """integration type (twitch, youtube, or discord)"""
+    """Integration type (twitch, youtube, or discord)."""
 
     account: IntegrationAccount
-    """integration account information"""
+    """Integration account information."""
 
     application: IntegrationApplication | None = None
-    """the bot/OAuth2 application for discord integrations"""
+    """Bot OAuth2 application for discord integrations."""
 
     scopes: list[str] | None = None
-    """the scopes the application has been authorized for"""
+    """Scopes the application has been authorized for."""
 
 
 IntegrationVariants = Annotated[GeneralIntegration | DiscordIntegration, Field(discriminator='type')]
@@ -693,6 +737,7 @@ class DefaultMessageNotificationLevel(enum.IntEnum):
     Reference:
     https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level
     """
+
     ALL_MESSAGES = 0
     """Members will receive notifications for all messages by default."""
 
@@ -712,10 +757,10 @@ class MFALevel(enum.IntEnum):
 
 
 class UnavailableGuild(BaseModel):
-    """An unavailable guild object."""
+    """Unavailable guild object."""
 
     id: Snowflake
-    """guild id"""
+    """Guild ID"""
 
     unavailable: bool
-    """true if this guild is unavailable due to an outage"""
+    """True if this guild is unavailable due to an outage."""
