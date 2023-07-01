@@ -45,7 +45,7 @@ class RoleResource(ClientSubresources):
         Returns:
             Role: The created role.
         """
-        payload = role_data.dict(exclude_unset=True)
+        payload = role_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http.post(self.roles_url, payload)
         return Role.model_validate(resp.body)
 
@@ -76,7 +76,7 @@ class RoleResource(ClientSubresources):
             Role: The updated role.
         """
         url = self.roles_url / str(role_id)
-        payload = role_data.dict(exclude_unset=True)
+        payload = role_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http.patch(url, payload)
         return Role.model_validate(resp.body)
 

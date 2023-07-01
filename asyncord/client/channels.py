@@ -5,13 +5,13 @@ endpoints like message creation.
 """
 from __future__ import annotations
 
-from asyncord.urls import REST_API_URL
-from asyncord.typedefs import LikeSnowflake
-from asyncord.client.messages import MessageResource
-from asyncord.client.resources import ClientSubresources
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.models.channels import Channel
+from asyncord.client.messages import MessageResource
 from asyncord.client.models.channel_data import CreateChannelData, UpdateChannelDataType
+from asyncord.client.models.channels import Channel
+from asyncord.client.resources import ClientSubresources
+from asyncord.typedefs import LikeSnowflake
+from asyncord.urls import REST_API_URL
 
 
 class ChannelResource(ClientSubresources):
@@ -102,10 +102,10 @@ class ChannelResource(ClientSubresources):
         else:
             headers = {}
 
-        payload = channel_data.dict(exclude_unset=True)
+        payload = channel_data.model_dump(mode='json', exclude_unset=True)
 
         resp = await self._http.patch(url, payload, headers=headers)
-        return Channel(**resp.body)
+        return Channel.model_validate(resp.body)
 
     async def delete(self, channel_id: LikeSnowflake, reason: str | None = None) -> None:
         """Delete a channel, or close a private message.

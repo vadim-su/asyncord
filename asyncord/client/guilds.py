@@ -121,9 +121,9 @@ class GuildResource(ClientSubresources):
         Returns:
             Guild: The created guild.
         """
-        payload = guild_data.dict(exclude_unset=True)
+        payload = guild_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http.post(self.guilds_url, payload)
-        return Guild(**resp.body)
+        return Guild.model_validate(resp.body)
 
     async def delete(self, guild_id: LikeSnowflake) -> None:
         """Delete a guild.
@@ -362,9 +362,9 @@ class GuildResource(ClientSubresources):
         else:
             headers = {}
 
-        payload = welcome_screen_data.dict(exclude_unset=True)
+        payload = welcome_screen_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http.patch(url, payload, headers=headers)
-        return WelcomeScreen(**resp.body)
+        return WelcomeScreen.model_validate(resp.body)
 
     async def update_current_user_voice_state(
         self,
