@@ -1,15 +1,21 @@
+"""User models for the asyncord client."""
+
 from __future__ import annotations
 
 import enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from asyncord.snowflake import Snowflake
 
 
 @enum.unique
 class UserFlags(enum.IntFlag):
-    """https://discord.com/developers/docs/resources/user#user-object-user-flags"""
+    """User flags.
+
+    Reference:
+    https://discord.com/developers/docs/resources/user#user-object-user-flags
+    """
 
     NONE = 0
     """No flags set."""
@@ -79,23 +85,26 @@ class PremiumType(enum.IntEnum):
 
 
 class User(BaseModel):
-    """https://discord.com/developers/docs/resources/user#user-object
+    """User model representing a Discord user entity.
 
-    Example:
-    ::
-    {
-        "id": "80351110224678912",
-        "username": "Nelly",
-        "discriminator": "1337",
-        "avatar": "8342729096ea3675442027381ff50dfe",
-        "verified": true,
-        "email": "nelly@discord.com",
-        "flags": 64,
-        "banner": "06c16474723fe537c283b8efa61a30c8",
-        "accent_color": 16711680,
-        "premium_type": 1,
-        "public_flags": 64
-    }
+    Reference:
+    https://discord.com/developers/docs/resources/user#user-object
+
+    For example: ::
+
+        {
+            "id": "80351110224678912",
+            "username": "Nelly",
+            "discriminator": "1337",
+            "avatar": "8342729096ea3675442027381ff50dfe",
+            "verified": true,
+            "email": "nelly@discord.com",
+            "flags": 64,
+            "banner": "06c16474723fe537c283b8efa61a30c8",
+            "accent_color": 16711680,
+            "premium_type": 1,
+            "public_flags": 64
+        }
     """
 
     id: Snowflake
@@ -104,8 +113,8 @@ class User(BaseModel):
     username: str
     """The user's username, not unique across the platform."""
 
-    discriminator: str = Field(min_length=4, max_length=4)
-    """The user's 4 - digit discord-tag."""
+    discriminator: str
+    """The user's 4 - digit discord-tag or 0 if the user has no tag."""
 
     avatar: str | None
     """The user's avatar hash."""
