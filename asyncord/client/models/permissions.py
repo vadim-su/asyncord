@@ -161,7 +161,32 @@ class PermissionFlag(enum.IntFlag):
     """Allows sending voice messages."""
 
     @classmethod
-    def validate(cls, value: str | int | Self) -> Self:
+    def __get_pydantic_core_schema__(
+        cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
+    ) -> CoreSchema:
+        """Pydantic auxiliary method to get schema.
+
+        Args:
+            _source (type[BaseModel]): Source of schema.
+            _handler (Callable[[Any], CoreSchema]): Handler of schema.
+
+        Returns:
+            CoreSchema: Resulted schema.
+        """
+        schema = core_schema.union_schema([
+            core_schema.int_schema(),
+            core_schema.str_schema(),
+            core_schema.is_instance_schema(cls),
+        ])
+
+        return core_schema.no_info_after_validator_function(
+            function=cls._validate,
+            schema=schema,
+            serialization=core_schema.to_string_ser_schema(),
+        )
+
+    @classmethod
+    def _validate(cls, value: str | int | Self) -> Self:
         """Pydantic auxiliary validation method.
 
         Args:
@@ -182,28 +207,3 @@ class PermissionFlag(enum.IntFlag):
                 return value
 
         raise ValueError('Invalid value type for PermissionFlags')
-
-    @classmethod
-    def __get_pydantic_core_schema__(
-        cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
-    ) -> CoreSchema:
-        """Pydantic auxiliary method to get schema.
-
-        Args:
-            _source (type[BaseModel]): Source of schema.
-            _handler (Callable[[Any], CoreSchema]): Handler of schema.
-
-        Returns:
-            CoreSchema: Resulted schema.
-        """
-        schema = core_schema.union_schema([
-            core_schema.int_schema(),
-            core_schema.str_schema(),
-            core_schema.is_instance_schema(cls),
-        ])
-
-        return core_schema.no_info_after_validator_function(
-            function=cls.validate,
-            schema=schema,
-            serialization=core_schema.to_string_ser_schema(),
-        )

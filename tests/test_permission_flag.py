@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 import pytest
+from pydantic import BaseModel
 
 from asyncord.client.models.permissions import PermissionFlag
 
@@ -48,4 +48,4 @@ def test_permission_flag_as_part_of_model(permission_type: type):
 
     assert model.flag == flag
     assert model.model_dump() == {'flag': flag}
-    assert model.model_dump(mode='json') == {'flag': str(flag)}
+    assert model.model_dump(mode='json') == {'flag': str(flag.value)}
