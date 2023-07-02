@@ -134,7 +134,7 @@ class ModalSubmitResponseData(BaseModel):
     Max 45 characters.
     """
 
-    components: list[Component] = Field(min_items=1, max_items=5)
+    components: list[Component] = Field(min_length=1, max_length=5)
     """Components that make up the modal.
 
     Should be etween 1 and 5 (inclusive)

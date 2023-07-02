@@ -1,3 +1,9 @@
+"""This module contains the `Activity` model and related enums and models.
+
+Reference:
+https://discord.com/developers/docs/game-sdk/activities#activities
+"""
+
 from __future__ import annotations
 
 import enum
@@ -259,8 +265,6 @@ class Activity(BaseModel):
 
     Describes what the payload includes."""
 
-    # FIXME: set max_items to 2 when pydantic fixes the issue
-    # https://github.com/pydantic/pydantic/issues/4547
     buttons: list[ActivityButton] | None = None
     """Custom buttons shown in the Rich Presence.
 

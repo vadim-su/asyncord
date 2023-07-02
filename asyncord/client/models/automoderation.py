@@ -1,6 +1,9 @@
+"""Represents the AutoModeration system models."""
+
 from __future__ import annotations
 
 import enum
+from typing import Any
 
 from pydantic import BaseModel, Field, validator
 
@@ -130,7 +133,8 @@ class RuleAction(BaseModel):
     """the action metadata"""
 
     @validator('type')
-    def check_actions(cls, value: RuleActionType, values):  # noqa: N805,WPS110
+    def check_actions(cls, value: RuleActionType, values: dict[str, Any]) -> RuleActionType:
+        """Check that the metadata is valid for the action type."""
         metadata: RuleActionMetadata = values['metadata']
 
         match value:
@@ -181,14 +185,15 @@ class AutoModerationRule(BaseModel):
     enabled: bool
     """whether the rule is enabled"""
 
-    exempt_roles: list[Snowflake] = Field(max_items=20)
+    exempt_roles: list[Snowflake] = Field(max_length=20)
     """the role ids that should not be affected by the rule (Maximum of 20)"""
 
-    exempt_channels: list[Snowflake] = Field(max_items=50)
+    exempt_channels: list[Snowflake] = Field(max_length=50)
     """the channel ids that should not be affected by the rule (Maximum of 50)"""
 
     @validator('actions', each_item=True)
-    def check_actions(cls, value: RuleAction, values):  # noqa: N805,WPS110
+    def check_actions(cls, value: RuleAction, values: dict[str, Any]) -> RuleAction:
+        """Validate the actions for the rule."""
         trigger_type: TriggerType = values['trigger_type']
 
         keyword_or_mention_spam = trigger_type in {
@@ -197,8 +202,8 @@ class AutoModerationRule(BaseModel):
         }
         if value.type is RuleActionType.TIMEOUT and not keyword_or_mention_spam:
             raise ValueError(
-                'Timeout actions can only be used with `TriggerType.KEYWORD`'
-                + ' and `TriggerType.MENTION_SPAM` triggers.',
+                'Timeout actions can only be used with `TriggerType.KEYWORD` '
+                + 'and `TriggerType.MENTION_SPAM` triggers.',
             )
 
         return value

@@ -1,3 +1,9 @@
+"""This module contains models related to Discord applications.
+
+Reference:
+https://discord.com/developers/docs/resources/application
+"""
+
 from __future__ import annotations
 
 import enum
@@ -11,7 +17,11 @@ from asyncord.snowflake import Snowflake
 
 @enum.unique
 class ApplicationCommandPermissionType(enum.IntEnum):
-    """https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type"""
+    """Discord application command permission type.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type
+    """
 
     ROLE = 1
     """Role permission type"""
@@ -215,7 +225,7 @@ class Application(BaseModel):
     flags: ApplicationFlag | None = None
     """the application's public flags"""
 
-    tags: list[str] = Field(default_factory=list, max_items=5)
+    tags: list[str] = Field(default_factory=list, max_length=5)
     """Tags describing the content and functionality of the application.
 
     Maximum of 5 tags.
@@ -232,7 +242,11 @@ class Application(BaseModel):
 
 
 class ApplicationCommandPermissions(BaseModel):
-    """https://discord.com/developers/docs/interactions/slash-commands#applicationcommandpermissions"""
+    """Returned when fetching the permissions for a command in a guild.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/slash-commands#applicationcommandpermissions
+    """
 
     id: Snowflake  # TODO: add permission constants support
     """ID of the command or the application ID.

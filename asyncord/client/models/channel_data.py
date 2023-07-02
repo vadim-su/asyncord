@@ -1,37 +1,53 @@
+"""This module contains the models for channel data.
+
+Reference: https://discord.com/developers/docs/resources/channel
+"""
+
 from __future__ import annotations
 
 import enum
 from typing import Any, Literal, Union
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 
 from asyncord.client.models.channels import ChannelFlag, ChannelType, Overwrite
 from asyncord.snowflake import Snowflake
 
 MIN_BITRATE = 8000
+"""Minimum bitrate for voice channels."""
 MAX_BITRATE = 384000
+"""Maximum bitrate for voice channels."""
 MAX_RATELIMIT = 21600
+"""Maximum ratelimit for channels."""
 
 
 class ThreadSortOrder(enum.IntEnum):
-    """https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types"""
+    """Thread sort order.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types
+    """
 
     LATEST_ACTIVITY = 0
-    """Sort forum posts by activity"""
+    """Sort forum posts by activity."""
 
     CREATION_DATE = 1
-    """Sort forum posts by creation time (from most recent to oldest)"""
+    """Sort forum posts by creation time (from most recent to oldest)."""
 
 
 @enum.unique
 class VideoQualityMode(enum.IntEnum):
-    """https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes"""
+    """Camera video quality modes.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes
+    """
 
     AUTO = 1
     """Discord chooses the quality for optimal performance."""
 
     FULL = 2
-    """720p"""
+    """720p."""
 
 
 class ForumTag(BaseModel):
@@ -41,28 +57,30 @@ class ForumTag(BaseModel):
     """
 
     id: Snowflake
-    """the id of the tag"""
+    """ID of the tag."""
 
     name: str
-    """the name of the tag (0-20 characters)"""
+    """Name of the tag (0-20 characters)."""
 
     moderated: bool
-    """Whether this tag can only be added to or removed from threads by a member
-    with the MANAGE_THREADS permission"""
+    """Tag can only be added to or removed from threads.
+
+    It allowed only for members with the MANAGE_THREADS permission.
+    """
 
     emoji_id: Snowflake
-    """the id of a guild's custom emoji
+    """ID of a guild's custom emoji.
 
     At most one of emoji_id and emoji_name may be set.
     """
 
     emoji_name: str
-    """the unicode character of the emoji
+    """Unicode character of the emoji.
 
     At most one of emoji_id and emoji_name may be set.
     """
 
-    @root_validator(pre=True)
+    @model_validator(mode='before')
     def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
         """Validate that only one of emoji_id and emoji_name is set."""
         if 'emoji_id' in values and 'emoji_name' in values:
@@ -72,18 +90,19 @@ class ForumTag(BaseModel):
 
 
 class DefaultReaction(BaseModel):
-    """An object that specifies the emoji to use as the default way to react to a forum post.
+    """Model specifies the emoji to use as the default way to react to a forum post.
 
     More info:
-    https://discord.com/developers/docs/resources/channel#default-reaction-object"""
+    https://discord.com/developers/docs/resources/channel#default-reaction-object
+    """
 
     emoji_id: Snowflake | None = None
-    """the id of a guild's custom emoji"""
+    """ID of a guild's custom emoji."""
 
     emoji_name: str | None = None
-    """the unicode character of the emoji"""
+    """Unicode character of the emoji."""
 
-    @root_validator(pre=True)
+    @model_validator(mode='before')
     def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
         """Validate that only one of emoji_id and emoji_name is set."""
         if 'emoji_id' in values and 'emoji_name' in values:
@@ -92,8 +111,9 @@ class DefaultReaction(BaseModel):
         return values
 
 
+# TODO: #22 Separate into different models
 class CreateChannelData(BaseModel):
-    """Create Channel Data.
+    """Data to create a channel with.
 
     This is the data to create a channel with.
 
@@ -101,16 +121,16 @@ class CreateChannelData(BaseModel):
     """
 
     name: str
-    """channel name."""
+    """Channel name."""
 
     type: ChannelType
-    """the type of channel."""
+    """Type of channel."""
 
     topic: str | None = Field(None, max_length=1024)
-    """channel topic."""
+    """Channel topic."""
 
     bitrate: int | None = Field(None, ge=MIN_BITRATE, le=MAX_BITRATE)
-    """The bitrate (in bits) of the voice channel.
+    """Bitrate (in bits) of the voice channel.
 
     For voice channels, normal servers can set bitrate up to 96000.
     Servers with Boost level 1 can set up to 128000, servers with Boost level 2
@@ -120,7 +140,7 @@ class CreateChannelData(BaseModel):
     """
 
     user_limit: int | None = Field(None, ge=0, le=99)
-    """The user limit of the voice channel.
+    """User limit of the voice channel.
 
     0 refers to no limit, 1 to 99 refers to a user limit.
     """
@@ -133,62 +153,82 @@ class CreateChannelData(BaseModel):
     """
 
     position: int | None = None
-    """the position of the channel in the left-hand listing"""
+    """Position of the channel in the left-hand listing"""
 
     permission_overwrites: list[Overwrite] | None = None
-    """channel or category-specific permissions."""
+    """Channel or category-specific permissions."""
 
     parent_id: Snowflake | None = None
-    """id of the new parent category for a channel"""
+    """ID of the new parent category for a channel."""
 
     nsfw: bool | None = None
-    """whether the channel is nsfw"""
+    """Whether the channel is nsfw."""
 
     rtc_region: str | None = None
-    """channel voice region id of the voice or stage channel, automatic when set to null."""
+    """Channel voice region id of the voice or stage channel.
+
+    Automatic when set to null.
+    """
 
     video_quality_mode: VideoQualityMode | None = None
-    """the camera video quality mode of the voice channel."""
+    """Camera video quality mode of the voice channel."""
 
     default_auto_archive_duration: Literal[60, 14400, 86400] | None = None
-    """the default duration that the clients use (not the API) for
-    newly created threads in the channel, in minutes, to automatically archive
-    the thread after recent activity.
+    """This field represents the default duration in minutes.
+
+    That clients use to automatically archive newly created threads in the channel
+    after recent activity.
+    """
+
+    default_thread_rate_limit_per_user: int | None = None
+    """Initial rate_limit_per_user to set on newly created threads in a channel.
+
+    This field is copied to the thread at creation time and does not live update.
     """
 
     default_reaction_emoji: DefaultReaction | None = None
-    """the emoji to show in the add reaction button on a thread in a GUILD_FORUM channel"""
+    """Emoji to show in the add reaction button on a thread in a GUILD_FORUM channel."""
 
     available_tags: list[ForumTag] | None = None
-    """the set of tags that can be used in a GUILD_FORUM channel"""
+    """Set of tags that can be used in a GUILD_FORUM channel."""
 
     default_sort_order: ThreadSortOrder | None = None
-    """the default sort order type used to order posts in GUILD_FORUM channels"""
+    """Default sort order type used to order posts in GUILD_FORUM channels."""
 
 
 class UpdatGroupDMChannelData(BaseModel):
-    """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-group-dm"""
+    """Model for updating a Group DM Channel.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#modify-channel-json-params-group-dm
+    """
 
     name: str | None = Field(None, min_length=1, max_length=100)
-    """character channel name."""
+    """Character channel name."""
 
     icon: str | None = None
-    """base64 encoded icon"""
+    """Base64 encoded icon"""
 
 
 class _BaseGuildChannelUpdateData(BaseModel):
+    """Base model for updating a Guild Channel."""
+
     name: str | None = Field(None, min_length=1, max_length=100)
-    """channel name."""
+    """Channel name."""
 
     position: int | None = None
-    """the position of the channel in the left-hand listing"""
+    """position of the channel in the left-hand listing."""
 
     permission_overwrites: list[Overwrite] | None = None
-    """channel or category-specific permissions."""
+    """Channel or category-specific permissions."""
 
 
 class UpdateTextChannelData(_BaseGuildChannelUpdateData):
-    """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel"""
+    """Model for updating a Text Channel.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
+    """
 
     type: Literal[ChannelType.GUILD_TEXT] | None = None
     """Type of channel.
@@ -198,10 +238,10 @@ class UpdateTextChannelData(_BaseGuildChannelUpdateData):
     """
 
     topic: str | None = Field(None, max_length=1024)
-    """character channel topic"""
+    """Character channel topic."""
 
     nsfw: bool | None = None
-    """whether the channel is nsfw"""
+    """Whether the channel is nsfw."""
 
     rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
     """Amount of seconds a user has to wait before sending another message.
@@ -211,22 +251,28 @@ class UpdateTextChannelData(_BaseGuildChannelUpdateData):
     """
 
     parent_id: Snowflake | None = None
-    """id of the new parent category for a channel"""
+    """ID of the new parent category for a channel."""
 
     default_auto_archive_duration: Literal[60, 14400, 86400] | None = None
-    """the default duration that the clients use (not the API) for
-    newly created threads in the channel, in minutes, to automatically archive
-    the thread after recent activity"""
+    """This field represents the default duration in minutes.
+
+    That clients use to automatically archive newly created threads in the channel
+    after recent activity.
+    """
 
     default_thread_rate_limit_per_user: int | None = None
-    """the initial rate_limit_per_user to set on newly created threads in a channel.
+    """Initial rate_limit_per_user to set on newly created threads in a channel.
 
     This field is copied to the thread at creation time and does not live update.
     """
 
 
-class UpdateAnnounceChannelData(UpdateTextChannelData):
-    """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel"""
+class UpdateAnnounceChannelData(_BaseGuildChannelUpdateData):
+    """Model for updating an Announcement Channel.
+
+    Re
+    https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
+    """
 
     type: Literal[ChannelType.ANNOUNCEMENT_THREAD] | None = None
     """Type of channel.
@@ -236,26 +282,31 @@ class UpdateAnnounceChannelData(UpdateTextChannelData):
     """
 
     topic: str | None = Field(None, max_length=1024)
-    """character channel topic"""
+    """Character channel topic."""
 
     nsfw: bool | None = None
-    """whether the channel is nsfw"""
+    """Whether the channel is nsfw/"""
 
     parent_id: Snowflake | None = None
-    """id of the new parent category for a channel"""
+    """ID of the new parent category for a channel."""
 
     default_auto_archive_duration: Literal[60, 14400, 86400] | None = None
-    """the default duration that the clients use (not the API) for
-    newly created threads in the channel, in minutes, to automatically archive
-    the thread after recent activity.
+    """This field represents the default duration in minutes.
+
+    That clients use to automatically archive newly created threads in the channel
+    after recent activity.
     """
 
 
 class UpdateVoiceChannelData(_BaseGuildChannelUpdateData):
-    """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel"""
+    """Model for updating a Voice Channel.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
+    """
 
     bitrate: int | None = Field(None, ge=MIN_BITRATE, le=MAX_BITRATE)
-    """The bitrate (in bits) of the voice channel.
+    """Bitrate (in bits) of the voice channel.
 
     For voice channels, normal servers can set bitrate up to 96000.
     Servers with Boost level 1 can set up to 128000, servers with Boost level 2
@@ -265,26 +316,33 @@ class UpdateVoiceChannelData(_BaseGuildChannelUpdateData):
     """
 
     user_limit: int | None = Field(None, ge=0, le=99)
-    """The user limit of the voice channel.
+    """User limit of the voice channel.
 
     0 refers to no limit, 1 to 99 refers to a user limit.
     """
 
     parent_id: Snowflake | None = None
-    """id of the new parent category for a channel"""
+    """ID of the new parent category for a channel."""
 
     rtc_region: Snowflake | None = None
-    """channel voice region id of the voice or stage channel, automatic when set to null."""
+    """Channel voice region id of the voice or stage channel.
+
+    Automatic when set to null.
+    """
 
     video_quality_mode: VideoQualityMode | None = None
-    """the camera video quality mode of the voice channel."""
+    """Camera video quality mode of the voice channel."""
 
 
 class UpdateStageChannelData(_BaseGuildChannelUpdateData):
-    """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel"""
+    """Model for updating a Stage Channel.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
+    """
 
     bitrate: int | None = Field(None, ge=MIN_BITRATE, le=MAX_BITRATE)
-    """The bitrate (in bits) of the voice channel.
+    """Bitrate (in bits) of the voice channel.
 
     For voice channels, normal servers can set bitrate up to 96000.
     Servers with Boost level 1 can set up to 128000, servers with Boost level 2
@@ -295,20 +353,24 @@ class UpdateStageChannelData(_BaseGuildChannelUpdateData):
 
     # it possible to be removed because it's not documented
     parent_id: Snowflake | None = None
-    """id of the new parent category for a channel"""
+    """ID of the new parent category for a channel."""
 
     rtc_region: Snowflake | None = None
-    """channel voice region id of the voice or stage channel, automatic when set to null."""
+    """Channel voice region id of the voice or stage channel, automatic when set to null."""
 
 
 class UpdateForumChannelData(_BaseGuildChannelUpdateData):
-    """https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel"""
+    """Model for updating a Forum Channel.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
+    """
 
     topic: str | None = Field(None, max_length=4096)
-    """character channel topic (0-4096 characters)"""
+    """Character channel topic (0-4096 characters)."""
 
     nsfw: bool | None = None
-    """whether the channel is nsfw"""
+    """Whether the channel is nsfw."""
 
     rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
     """Amount of seconds a user has to wait before sending another message.
@@ -318,29 +380,31 @@ class UpdateForumChannelData(_BaseGuildChannelUpdateData):
     """
 
     parent_id: Snowflake | None = None
-    """id of the new parent category for a channel"""
+    """ID of the new parent category for a channel."""
 
     default_auto_archive_duration: int | None = None
-    """the default duration that the clients use (not the API) for
-    newly created threads in the channel, in minutes, to automatically archive
-    the thread after recent activity"""
+    """This field represents the default duration in minutes.
+
+    That clients use to automatically archive newly created threads in the channel
+    after recent activity."""
 
     flags: Literal[ChannelFlag.NONE, ChannelFlag.REQUIRE_TAG] | None = None
+    """Flags of the channel."""
 
     available_tags: list[ForumTag] | None = None
-    """the set of tags that can be used in a GUILD_FORUM channel"""
+    """Set of tags that can be used in a GUILD_FORUM channel."""
 
     default_reaction_emoji: DefaultReaction | None = None
-    """the emoji to show in the add reaction button on a thread in a GUILD_FORUM channel"""
+    """Emoji to show in the add reaction button on a thread in a GUILD_FORUM channel."""
 
     default_thread_rate_limit_per_user: int | None = None
-    """the initial rate_limit_per_user to set on newly created threads in a channel.
+    """Initial rate_limit_per_user to set on newly created threads in a channel.
 
     This field is copied to the thread at creation time and does not live update.
     """
 
     default_sort_order: ThreadSortOrder | None = None
-    """the default sort order type used to order posts in GUILD_FORUM channels"""
+    """Default sort order type used to order posts in GUILD_FORUM channels."""
 
 
 UpdateChannelDataType = Union[  # noqa: UP007
@@ -351,3 +415,4 @@ UpdateChannelDataType = Union[  # noqa: UP007
     UpdatGroupDMChannelData,
     UpdateAnnounceChannelData,
 ]
+"""Type of data to update a channel."""

@@ -138,7 +138,7 @@ class UpdateWelcomeScreenData(BaseModel):
     enabled: bool | None = None
     """Whether the welcome screen is enabled."""
 
-    welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_items=5)
+    welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_length=5)
     """Channels shown in the welcome screen, max 5."""
 
     description: str | None = None
@@ -154,7 +154,7 @@ class WelcomeScreen(BaseModel):
     description: str | None
     """Server description shown in the welcome screen."""
 
-    welcome_channels: list[WelcomeScreenChannel] = Field(max_items=5)
+    welcome_channels: list[WelcomeScreenChannel] = Field(max_length=5)
     """List of channels shown in the welcome screen.
 
     Up to 5 channels.

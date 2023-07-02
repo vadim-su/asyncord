@@ -1,3 +1,9 @@
+"""Websocket gateway client for the Discord API.
+
+References:
+https://discord.com/developers/docs/topics/gateway
+"""
+
 from __future__ import annotations
 
 import asyncio
@@ -83,7 +89,7 @@ class AsyncGatewayClient:
         Args:
             command_data (IdentifyCommand): The data to send to the gateway.
         """
-        payload = command_data.dict(exclude_none=True)
+        payload = command_data.model_dump(mode='json', exclude_none=True)
         await self._send_command(GatewayCommandOpcode.IDENTIFY, payload)
 
     async def heartbeat(self) -> None:
@@ -96,7 +102,7 @@ class AsyncGatewayClient:
         Args:
             command_data(ResumeCommand): Data to send to the gateway.
         """
-        await self._send_command(GatewayCommandOpcode.RESUME, command_data.dict())
+        await self._send_command(GatewayCommandOpcode.RESUME, command_data.model_dump(mode='json'))
 
     async def update_presence(self, presence_data: PresenceUpdateData) -> None:
         """Update the client's presence.
@@ -304,10 +310,11 @@ class AsyncGatewayClient:
         )
 
 
-async def main():
+async def main() -> None:
+    """Main function for fast gateway testing."""
     c = AsyncGatewayClient('OTM0NTY0MjI1NzY5MTQ4NDM2.Yex6wg.AAkUaqRS0ACw8__ERfQ6d8gOdkE')
 
-    async def test_ready_handler(_: ReadyEvent, gateway: AsyncGatewayClient) -> None:
+    async def test_ready_handler(_: ReadyEvent, gateway: AsyncGatewayClient) -> None:  # noqa: PT019
         await gateway.update_presence(PresenceUpdateData(
             activities=[
                 Activity(
@@ -334,5 +341,4 @@ async def main():
 
 
 if __name__ == '__main__':
-    import asyncio
     asyncio.run(main())

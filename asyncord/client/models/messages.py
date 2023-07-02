@@ -14,7 +14,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Annotated, Any, BinaryIO, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, root_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from asyncord.client.models.channels import Channel, ChannelMention
 from asyncord.client.models.components import SELECT_COMPONENT_TYPE_LIST, Component, ComponentType
@@ -56,7 +56,7 @@ class AttachedFile(BaseModel):
     ) -> None:
         super().__init__(content=content, **kwargs)
 
-    @root_validator(pre=True)
+    @model_validator(mode='before')
     def validate_file_info(cls, values: dict[str, Any]) -> dict[str, Any]:
         """Fill filename and content type if not provided.
 
@@ -406,7 +406,7 @@ class BaseMessageData(BaseModel):
     Contains axillary validation methods.
     """
 
-    @root_validator(skip_on_failure=True)
+    @model_validator(mode='before')
     def has_any_content(cls, values: dict[str, Any]) -> dict[str, Any]:
         """Validate message content.
 
@@ -628,10 +628,10 @@ class AllowedMentions(BaseModel):
     parse: list[AllowedMentionType] | None = None
     """Array of allowed mention types to parse from the content."""
 
-    roles: list[Snowflake] | None = Field(None, max_items=100)
+    roles: list[Snowflake] | None = Field(None, max_length=100)
     """Array of role IDs to mention."""
 
-    users: list[Snowflake] | None = Field(None, max_items=100)
+    users: list[Snowflake] | None = Field(None, max_length=100)
     """Array of user IDs to mention."""
 
     replied_user: bool | None = None
@@ -725,7 +725,7 @@ class CreateMessageData(BaseMessageData):
     """
 
     content: str | None = Field(None, max_length=2000)
-    """The message content."""
+    """Message content."""
 
     nonce: Annotated[str, Field(max_length=25)] | int | None = None
     """Can be used to verify a message was sent.
@@ -780,13 +780,13 @@ class UpdateMessageData(BaseMessageData):
     """
 
     content: str | None = Field(None, max_length=2000)
-    """The message content."""
+    """Message content."""
 
     embeds: list[Embed] | None = None
     """Embedded rich content."""
 
     flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
-    """The flags to use when sending the message.
+    """Flags to use when sending the message.
 
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
@@ -1076,8 +1076,9 @@ class Message(BaseModel):
     """Sent with Rich Presence-related chat embeds."""
 
     application_id: Snowflake | None = None
-    """If the message is an Interaction or application-owned webhook,
-    this is the id of the application.
+    """If the message is an Interaction or application-owned webhook.
+
+    This is the id of the application.
     """
 
     message_reference: MessageReference | None = None

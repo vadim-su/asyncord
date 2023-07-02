@@ -7,10 +7,10 @@ https://discord.com/developers/docs/interactions/message-components#message-comp
 from __future__ import annotations
 
 import enum
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Self
 from typing import get_args as get_typing_args
 
-from pydantic import BaseModel, Field, FieldValidationInfo, field_validator, root_validator
+from pydantic import BaseModel, Field, FieldValidationInfo, field_validator, model_validator
 
 
 @enum.unique
@@ -60,15 +60,15 @@ class BaseComponent(BaseModel):
     """Base component class."""
 
     type: ComponentType
-    """The type of the component."""
+    """Type of the component."""
 
     def __init__(self, **data: Any) -> None:  # noqa: ANN401
         """Initialize the component."""
         super().__init__(**data)
-        # Add `type` to `__fields_set__` to make `dict(exclude_unset)` work properly.
+        # Add `type` to `model_fields_set` to make `dict(exclude_unset)` work properly.
         # We don't need to set 'type' field because it's already set in a component class,
         # but we need to send it to Discord excluding another unset fields.
-        self.__fields_set__.add('type')
+        self.model_fields_set.add('type')
 
 
 class ComponentEmoji(BaseModel):
@@ -165,13 +165,13 @@ class Button(BaseComponent):
     disabled: bool = False
     """Whether the button is disabled."""
 
-    @root_validator(skip_on_failure=True)
-    def validate_style(cls, values: dict[str, Any]) -> dict[str, Any]:
+    @model_validator(mode='after')
+    def validate_style(self) -> Self:
         """Check that `custom_id` or `url` are set."""
-        custom_id: str | None = values['custom_id']
-        url: str | None = values['url']
+        custom_id: str | None = self.custom_id
+        url: str | None = self.url
 
-        if values['style'] is ButtonStyle.LINK:
+        if self.style is ButtonStyle.LINK:
             if custom_id:
                 raise ValueError('`custom_id` is not allowed for link-style buttons')
             if not url:
@@ -182,7 +182,7 @@ class Button(BaseComponent):
             if not custom_id:
                 raise ValueError('`custom_id` is required for non-link-style buttons.')
 
-        return values
+        return self
 
 
 class SelectMenuOption(BaseModel):
@@ -218,7 +218,7 @@ class SelectMenuOption(BaseModel):
 
 
 class SelectMenu(BaseComponent):
-    """Select menu is interactive components that allow users to select options  in messages.
+    """Select menu is interactive components that allow users to select options in messages.
 
     * Select menus must be sent inside an Action Row
     * An ActionRow can contain up to 1 select menu
@@ -334,7 +334,7 @@ class TextInput(BaseComponent):
     def __init__(self, **data: dict[str, Any]) -> None:
         """Create a new text input component."""
         super().__init__(**data)  # type: ignore
-        self.__fields_set__.add('style')
+        self.model_fields_set.add('style')
 
     @field_validator('max_length')
     def validate_length(cls, max_length: int | None, field_info: FieldValidationInfo) -> int | None:
