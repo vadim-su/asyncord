@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, FieldValidationInfo, field_validator, mod
 class ComponentType(enum.IntEnum):
     """Component types.
 
-    Read more at:
+    Reference:
     https://discord.com/developers/docs/interactions/message-components#component-object-component-types
     """
 
@@ -75,10 +75,10 @@ class ComponentEmoji(BaseModel):
     """Emoji to be displayed on the button."""
 
     name: str
-    """The name of the emoji."""
+    """Name of the emoji."""
 
     id: int
-    """The id of the emoji."""
+    """ID of the emoji."""
 
     animated: bool
     """Whether the emoji is animated."""
@@ -87,7 +87,7 @@ class ComponentEmoji(BaseModel):
 class ButtonStyle(enum.IntEnum):
     """Button styles.
 
-    Read more at:
+    Reference:
     https://discord.com/developers/docs/interactions/message-components#button-object-button-styles
     """
 
@@ -131,27 +131,27 @@ class Button(BaseComponent):
     * An Action Row can contain up to 5 buttons
     * An Action Row containing buttons cannot also contain any select menu components
 
-    Read more at:
+    Reference:
     https://discord.com/developers/docs/interactions/message-components#buttons
     """
 
     type: Literal[ComponentType.BUTTON] = ComponentType.BUTTON
-    """The type of the component.
+    """Type of the component.
 
     Only `ComponentType.BUTTON` is allowed.
     """
 
     label: str | None = Field(None, max_length=80)
-    """The text to be displayed on the button.
+    """Text to be displayed on the button.
 
     Max 80 characters.
     """
 
     style: ButtonStyle = ButtonStyle.PRIMARY
-    """The style of the button."""
+    """Style of the button."""
 
     emoji: ComponentEmoji | None = None
-    """The emoji to be displayed on the button."""
+    """Emoji to be displayed on the button."""
 
     custom_id: str | None = Field(None, max_length=100)
     """Developer-defined identifier for the button.
@@ -160,7 +160,7 @@ class Button(BaseComponent):
     """
 
     url: str | None = None
-    """A URL for link-style buttons."""
+    """URL for link-style buttons."""
 
     disabled: bool = False
     """Whether the button is disabled."""
@@ -224,7 +224,7 @@ class SelectMenu(BaseComponent):
     * An ActionRow can contain up to 1 select menu
     * An ActionRow containing a select menu cannot also contain any buttons
 
-    Read more at:
+    Reference:
     https://discord.com/developers/docs/interactions/message-components#select-menus
     """
 
@@ -238,7 +238,7 @@ class SelectMenu(BaseComponent):
     """
 
     options: list[SelectMenuOption] = Field(default_factory=list)
-    """The choices in the select menu.
+    """Choices in the select menu.
 
     Only required and allowed for `SelectComponentType.STRING_SELECT`.
     Max 25 options.
@@ -263,7 +263,7 @@ class SelectMenu(BaseComponent):
 class TextInputStyle(enum.IntEnum):
     """Text input styles.
 
-    Read more at:
+    Reference:
     https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles
     """
 
@@ -278,13 +278,14 @@ class TextInput(BaseComponent):
     """Text inputs are an interactive component that render on modals.
 
     They can be used to collect short-form or long-form text.
+    Can be used in modal interactions only.
 
-    Read more at:
+    Reference:
     https://discord.com/developers/docs/interactions/message-components#text-inputs
     """
 
     type: Literal[ComponentType.TEXT_INPUT] = ComponentType.TEXT_INPUT
-    """The type of the component.
+    """Type of the component.
 
     Only `ComponentType.TEXT_INPUT` is allowed.
     """
@@ -296,7 +297,7 @@ class TextInput(BaseComponent):
     """
 
     style: TextInputStyle = TextInputStyle.SHORT
-    """The style of the text input."""
+    """Style of the text input."""
 
     label: str
     """Label of the component.
@@ -357,15 +358,15 @@ class ActionRow(BaseComponent):
     * ActionRow containing a select menu cannot also contain buttons
     * ActionRow can contain up to 5 buttons
 
-    Read more at:
+    Reference:
     https://discord.com/developers/docs/interactions/message-components#action-rows
     """
 
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
-    """The type of the component."""
+    """Type of the component."""
 
-    components: list[Button | SelectMenu]
-    """The components in the action row.
+    components: list[Button | SelectMenu | TextInput]
+    """Components in the action row.
 
     Text input components are not allowed in action rows.
     """
@@ -400,4 +401,4 @@ class ActionRow(BaseComponent):
         return components
 
 
-Component = Annotated[ActionRow | Button | SelectMenu | TextInput, Field(discriminator='type')]
+Component = Annotated[ActionRow | Button | SelectMenu, Field(discriminator='type')]

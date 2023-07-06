@@ -718,7 +718,7 @@ class MessageInteraction(BaseModel):
 
 
 class CreateMessageData(BaseMessageData):
-    """The data to create a message with.
+    """Data to create a message with.
 
     Reference:
     https://discord.com/developers/docs/resources/channel#create-message
