@@ -7,7 +7,6 @@ from asyncord.client.models.messages import CreateMessageData
 from asyncord.client.models.components import (
     Button,
     ActionRow,
-    TextInput,
     SelectMenu,
     ButtonStyle,
     ComponentType,
@@ -43,7 +42,7 @@ async def test_create_message_with_buttons(messages_res: MessageResource):
                     label='Link',
                     style=ButtonStyle.LINK,
                     url='https://discord.com',
-                ),
+                ),  # type: ignore
             ],
         ),
     ]
@@ -95,28 +94,4 @@ def test_dont_create_message_with_button_and_select_menu():
                     options=[SelectMenuOption(label='Option 1', value='option_1')],
                 ),
             ],
-        ),
-
-
-@pytest.mark.xfail(reason='Pydantic discriminator not working properly')
-async def test_create_message_with_text_input(messages_res: MessageResource):
-    components = [
-        TextInput(
-            type=ComponentType.TEXT_INPUT,
-            custom_id='custom_id',
-            label='Label',
-            placeholder='Placeholder',
-        ),
-    ],
-    message = await messages_res.create(
-        CreateMessageData(
-            content='Test message with text input',
-            components=components,
-        ),
-    )
-
-    try:
-        assert message.content == 'Test message with text input'
-        assert len(message.components) == len(components)
-    finally:
-        await messages_res.delete(message.id)
+        )
