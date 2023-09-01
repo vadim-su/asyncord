@@ -287,6 +287,12 @@ class Guild(BaseModel):
     Returned from the GET /guilds/<id> endpoint when with_counts is true.
     """
 
+    approximate_presence_count: int | None = None
+    """Approximate number of non-offline members in this guild.
+
+    Returned when with_counts is true.
+    """
+
     welcome_screen: WelcomeScreen | None = None
     """Welcome screen of a Community guild.
 

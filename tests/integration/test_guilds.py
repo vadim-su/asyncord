@@ -13,6 +13,14 @@ class TestGuilds:
     async def guilds(self, client: RestClient):
         yield client.guilds
 
+    @pytest.mark.parametrize('with_counts', [True, False])
+    async def test_get_guild(self, guilds: GuildResource, with_counts: bool):
+        guild = await guilds.get(TEST_GUILD_ID, with_counts=True)
+        if with_counts:
+            assert guild.approximate_member_count is not None
+            assert guild.approximate_presence_count is not None
+        assert await guilds.get(TEST_GUILD_ID)
+
     async def test_get_preview(self, guilds: GuildResource):
         assert await guilds.get_preview(TEST_GUILD_ID)
 

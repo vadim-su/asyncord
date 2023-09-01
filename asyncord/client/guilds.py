@@ -75,7 +75,7 @@ class GuildResource(ClientSubresources):
         """
         return RoleResource(self, guild_id)
 
-    async def get(self, guild_id: LikeSnowflake, with_counts: bool | None = None) -> Guild:
+    async def get(self, guild_id: LikeSnowflake, with_counts: bool = False) -> Guild:
         """Get a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#et-guild
@@ -87,8 +87,7 @@ class GuildResource(ClientSubresources):
         Returns:
             Guild: The guild with the specified ID.
         """
-        # FIXME: with_counts is not implemented
-        url = self.guilds_url / str(guild_id)
+        url = self.guilds_url / str(guild_id) % {'with_counts': str(with_counts)}
         resp = await self._http.get(url)
         return Guild(**resp.body)
 
