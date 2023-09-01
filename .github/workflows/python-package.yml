@@ -18,7 +18,7 @@ jobs:
         python-version: ["3.11"]
 
     env:
-      PDM_VERSION: "2.5.*"
+      PDM_VERSION: "2.*"
 
     steps:
       - uses: actions/checkout@v3
