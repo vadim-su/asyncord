@@ -101,7 +101,7 @@ class MemberResource(ClientSubresources):
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
-        resp = await self._http.patch(url, member_data, headers)
+        resp = await self._http.patch(url, member_data, headers=headers)
         return Member(**resp.body)
 
     async def update_current_member(self, nickname: str | None, reason: str | None = None) -> Member:
@@ -121,7 +121,7 @@ class MemberResource(ClientSubresources):
         else:
             headers = {}
         payload = {'nick': nickname}
-        resp = await self._http.patch(url, payload, headers)
+        resp = await self._http.patch(url, payload, headers=headers)
         return Member(**resp.body)
 
     async def add_role(
