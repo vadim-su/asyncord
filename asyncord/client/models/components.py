@@ -367,16 +367,14 @@ class ActionRow(BaseComponent):
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
     """Type of the component."""
 
-    components: list[Button | SelectMenu | TextInput]
+    components: list[Component | TextInput]
     """Components in the action row.
 
     Text input components are not allowed in action rows.
     """
 
     @field_validator('components')
-    def validate_components(
-        cls, components: list[Button | SelectMenu | TextInput],
-    ) -> list[Button | SelectMenu | TextInput]:
+    def validate_components(cls, components: list[Component | TextInput]) -> list[Component | TextInput]:
         """Check ActionRow components."""
         component_types = [component.type for component in components]
         set_component_types = set(component_types)

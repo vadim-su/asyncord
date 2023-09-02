@@ -237,13 +237,18 @@ class InteractionModalData(BaseModel):
     """
 
     @field_validator('components')
-    def validate_components(cls, components: list[ActionRow] | list[TextInput]) -> list[ActionRow]:
+    def validate_components(
+        cls, components: list[ActionRow] | list[TextInput],
+    ) -> list[ActionRow] | list[TextInput]:
         """Validate the components.
 
         Components should be wrapped in an ActionRow. If it is not, wrap it in one.
         """
-        if isinstance(components, list) and not isinstance(components[0], ActionRow):
-            components = [ActionRow(components=components)]
+        if isinstance(components[0], TextInput):
+            # If the first component is a TextInput
+            # (pydantic garuntees that all components are the same type), wrap it in an ActionRow.
+            text_inputs = cast(list[Component | TextInput], components)
+            components = [ActionRow(components=text_inputs)]
 
         components = cast(list[ActionRow], components)
         for action_row in components:
