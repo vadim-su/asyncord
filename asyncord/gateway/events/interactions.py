@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, RootModel
 
 from asyncord.client.models.channels import ChannelType
 from asyncord.client.models.commands import AppCommandOptionType, ApplicationCommandType
-from asyncord.client.models.components import Component, ComponentType, SelectMenuOption
+from asyncord.client.models.components import ActionRow, ComponentType, SelectMenuOption
 from asyncord.client.models.members import Member
 from asyncord.client.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType
 from asyncord.client.models.permissions import PermissionFlag
@@ -354,7 +354,7 @@ class ModalSubmitInteractionData(BaseModel):
     custom_id: str
     """Custom id value of the modal."""
 
-    components: list[Component] | None = None
+    components: list[ActionRow] | None = None
     """Values submitted by the user."""
 
 
@@ -376,7 +376,8 @@ Interaction = Annotated[
     PingInteraction
     | ApplicationCommandInteraction
     | MessageComponentInteraction
-    | ApplicationCommandAutocompleteInteraction,
+    | ApplicationCommandAutocompleteInteraction
+    | ModalSubmitInteraction,
     Field(discriminator='type'),
 ]
 

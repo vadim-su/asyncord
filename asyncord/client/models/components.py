@@ -299,7 +299,9 @@ class TextInput(BaseComponent):
     style: TextInputStyle = TextInputStyle.SHORT
     """Style of the text input."""
 
-    label: str
+    # FIXME: #25 label should be required for TextInput
+    # But for response TextInput it is not required (it uses in interaction response)
+    label: str = ''
     """Label of the component.
 
     Max 45 characters.
@@ -332,7 +334,7 @@ class TextInput(BaseComponent):
     Max 100 characters.
     """
 
-    def __init__(self, **data: dict[str, Any]) -> None:
+    def __init__(self, **data: Any) -> None:  # noqa: ANN401
         """Create a new text input component."""
         super().__init__(**data)  # type: ignore
         self.model_fields_set.add('style')
@@ -372,13 +374,12 @@ class ActionRow(BaseComponent):
     """
 
     @field_validator('components')
-    def validate_components(cls, components: list[Button | SelectMenu]) -> list[Button | SelectMenu]:
+    def validate_components(
+        cls, components: list[Button | SelectMenu | TextInput],
+    ) -> list[Button | SelectMenu | TextInput]:
         """Check ActionRow components."""
         component_types = [component.type for component in components]
         set_component_types = set(component_types)
-
-        if ComponentType.ACTION_ROW in set_component_types:
-            raise ValueError('ActionRow cannot contain another ActionRow')
 
         if ComponentType.BUTTON in set_component_types:
             # any select component in components
@@ -397,6 +398,9 @@ class ActionRow(BaseComponent):
 
         if component_types.count(ComponentType.BUTTON) > 5:  # noqa: PLR2004
             raise ValueError('ActionRow can contain up to 5 buttons')
+
+        if TextInput in set_component_types and component_types.count(TextInput) != len(component_types):
+            raise ValueError('Text input components cannot be mixed with other components')
 
         return components
 

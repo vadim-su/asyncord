@@ -5,12 +5,12 @@ https://discord.com/developers/docs/interactions/receiving-and-responding#intera
 """
 
 import enum
-from typing import Literal
+from typing import Literal, cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from asyncord.client.models.commands import ApplicationCommandOptionChoice
-from asyncord.client.models.components import Component
+from asyncord.client.models.components import ActionRow, Component, TextInput
 from asyncord.client.models.messages import (
     AllowedMentions,
     AttachedFile,
@@ -61,7 +61,13 @@ class InteractionResponseType(enum.IntEnum):
     """Respond to an interaction with a popup modal."""
 
 
-class MessageResponseData(BaseMessageData):
+class InteractionPongResponseData(BaseModel):
+    """Interaction response data for PONG."""
+
+    type: Literal[InteractionResponseType.PONG] = InteractionResponseType.PONG
+
+
+class IteractionCreateMessageData(BaseMessageData):
     """Message response data.
 
     References:
@@ -104,7 +110,87 @@ class MessageResponseData(BaseMessageData):
     """
 
 
-class AutocompleteResponseData(BaseModel):
+class IteractionChannelMessageResponseData(BaseModel):
+    """Interaction response data for CHANNEL_MESSAGE_WITH_SOURCE."""
+
+    type: Literal[InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE] = (
+        InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+    )
+
+    data: IteractionCreateMessageData
+
+
+class IteractionDeferredChannelMessageResponseData(BaseModel):
+    """Interaction response data for DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE."""
+
+    type: Literal[InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE] = (
+        InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+    )
+
+    data: IteractionCreateMessageData
+
+
+class InteractionUpdateMessageData(BaseModel):
+    """Interaction response data for UPDATE_MESSAGE.
+
+    References:
+    https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
+    """
+
+    content: str | None = Field(None, max_length=2000)
+    """Message content."""
+
+    embeds: list[Embed] | None = None
+    """List of embeds."""
+
+    allowed_mentions: AllowedMentions | None = None
+    """Allowed mentions object."""
+
+    flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
+    """Flags to use when sending the message.
+
+    Only MessageFlags.SUPPRESS_EMBEDS can be set.
+    """
+
+    components: list[Component] | None = None
+    """List of components."""
+
+    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
+    """Contents of the file being sent.
+
+    See Uploading Files:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
+
+    attachments: list[AttachmentData] | None = None
+    """Attachment objects with filename and description.
+
+    See Uploading Files:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
+
+
+class InteractionDeferredUpdateMessageResponseData(BaseModel):
+    """Interaction response data for DEFERRED_UPDATE_MESSAGE."""
+
+    type: Literal[InteractionResponseType.DEFERRED_UPDATE_MESSAGE] = (
+        InteractionResponseType.DEFERRED_UPDATE_MESSAGE
+    )
+
+    data: InteractionUpdateMessageData
+
+
+class InteractionUpdateMessageResponseData(BaseModel):
+    """Interaction response data for UPDATE_MESSAGE."""
+
+    type: Literal[InteractionResponseType.UPDATE_MESSAGE] = (
+        InteractionResponseType.UPDATE_MESSAGE
+    )
+
+    data: InteractionUpdateMessageData
+
+
+class InteractionAutocompleteResultData(BaseModel):
     """Autocomplete response data.
 
     References:
@@ -115,8 +201,18 @@ class AutocompleteResponseData(BaseModel):
     """List of autocomplete choices."""
 
 
-class ModalSubmitResponseData(BaseModel):
-    """Modal submit response data.
+class InteractionAutocompleteResponseData(BaseModel):
+    """Interaction response data for AUTOCOMPLETE."""
+
+    type: Literal[InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT] = (
+        InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
+    )
+
+    data: InteractionAutocompleteResultData
+
+
+class InteractionModalData(BaseModel):
+    """Modal response data.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal
@@ -134,19 +230,44 @@ class ModalSubmitResponseData(BaseModel):
     Max 45 characters.
     """
 
-    components: list[Component] = Field(min_length=1, max_length=5)
+    components: list[ActionRow] | list[TextInput] = Field(min_length=1, max_length=5)
     """Components that make up the modal.
 
-    Should be etween 1 and 5 (inclusive)
+    Should be between 1 and 5 (inclusive). Only TextInput components are allowed.
     """
 
+    @field_validator('components')
+    def validate_components(cls, components: list[ActionRow] | list[TextInput]) -> list[ActionRow]:
+        """Validate the components.
 
-class InteractionResponseData(BaseModel):
-    """Interaction response data object.
+        Components should be wrapped in an ActionRow. If it is not, wrap it in one.
+        """
+        if isinstance(components, list) and not isinstance(components[0], ActionRow):
+            components = [ActionRow(components=components)]
 
-    References:
-    https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object
-    """
+        components = cast(list[ActionRow], components)
+        for action_row in components:
+            for component in action_row.components:
+                if not isinstance(component, TextInput):
+                    raise ValueError('Only TextInput components are allowed.')
 
-    type: InteractionResponseType
-    data: MessageResponseData | AutocompleteResponseData | ModalSubmitResponseData | None = None
+        return components
+
+
+class InteractionModalResponseData(BaseModel):
+    """Interaction response data for MODAL."""
+
+    type: Literal[InteractionResponseType.MODAL] = InteractionResponseType.MODAL
+    data: InteractionModalData
+
+
+InteractionResponse = (
+    InteractionPongResponseData
+    | IteractionChannelMessageResponseData
+    | IteractionDeferredChannelMessageResponseData
+    | InteractionDeferredUpdateMessageResponseData
+    | InteractionUpdateMessageResponseData
+    | InteractionAutocompleteResponseData
+    | InteractionModalResponseData
+)
+"""Collection of all interaction response data models."""
