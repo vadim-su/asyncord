@@ -61,10 +61,10 @@ class AttachedFile(BaseModel):
         """Fill filename and content type if not provided.
 
         Args:
-            values (dict): The values to validate.
+            values: Values to validate.
 
         Returns:
-            dict: The validated values.
+            Validated values.
         """
         content = values.get('content')
         if not content:
@@ -414,13 +414,13 @@ class BaseMessageData(BaseModel):
         https://discord.com/developers/docs/resources/channel#message-object-message-structure
 
         Args:
-            values (dict[str, Any]): The values to validate.
+            values: Values to validate.
+
+        Returns:
+            Validated values.
 
         Raises:
             ValueError: If the message has no content or embeds.
-
-        Returns:
-            dict: The validated values.
         """
         has_any_content = bool(
             values.get('content', False)
@@ -445,13 +445,13 @@ class BaseMessageData(BaseModel):
         https://discord.com/developers/docs/resources/channel#message-object-message-structure
 
         Args:
-            embeds (list[Embed] | None): The values to validate.
+            embeds: Values to validate.
 
         Raises:
             ValueError: If the total embed text length is more than 6000 characters.
 
         Returns:
-            list[Embed] | None: The validated values.
+            Validated values.
         """
         if not embeds:
             return embeds
@@ -472,10 +472,10 @@ class BaseMessageData(BaseModel):
         """Prepare attached files.
 
         Args:
-            files (FilesType): Files to prepare.
+            files: Files to prepare.
 
         Returns:
-            list[AttachedFile: Prepared files to attach.
+            Prepared files to attach.
         """
         if not files:
             return []
@@ -511,13 +511,13 @@ class BaseMessageData(BaseModel):
         """Validate attachments.
 
         Args:
-            attachments (list[AttachmentData] | None): Attachments to validate.
+            attachments: Attachments to validate.
 
         Raises:
             ValueError: If attachments have mixed ids.
 
         Returns:
-            list[AttachmentData] | None: Validated attachments.
+            Validated attachments.
         """
         if not attachments:
             return attachments
@@ -546,13 +546,13 @@ class BaseMessageData(BaseModel):
         """Validate components.
 
         Args:
-            components (list[Component] | None): Components to validate.
+            components: Components to validate.
 
         Raises:
             ValueError: If components have more than 5 action rows.
 
         Returns:
-            list[Component] | None: Validated components.
+            Validated components.
         """
         if not components:
             return components
@@ -579,10 +579,10 @@ class BaseMessageData(BaseModel):
         """Get the length of the embed text.
 
         Args:
-            embed (Embed): Embed to get the length of.
+            embed: Embed to get the length of.
 
         Returns:
-            int: length of the embed text.
+            Length of the embed text.
         """
         embed_text_length = len(embed.title or '')
         embed_text_length += len(embed.description or '')

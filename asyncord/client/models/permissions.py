@@ -167,11 +167,11 @@ class PermissionFlag(enum.IntFlag):
         """Pydantic auxiliary method to get schema.
 
         Args:
-            _source (type[BaseModel]): Source of schema.
-            _handler (Callable[[Any], CoreSchema]): Handler of schema.
+            _source: Source of schema.
+            _handler: Handler of schema.
 
         Returns:
-            CoreSchema: Resulted schema.
+            Resulted schema.
         """
         schema = core_schema.union_schema([
             core_schema.int_schema(),
@@ -190,13 +190,13 @@ class PermissionFlag(enum.IntFlag):
         """Pydantic auxiliary validation method.
 
         Args:
-            value (str | int | Self): Value to validate.
+            value: Value to validate.
 
         Raises:
             ValueError: If value is not valid snowflake.
 
         Returns:
-            PermissionFlags: Validated permission flags.
+            Validated permission flags.
         """
         match value:
             case str():

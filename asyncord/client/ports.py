@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, BinaryIO, Protocol, AsyncContextManager
 from collections.abc import Sequence
+from contextlib import AbstractAsyncContextManager
+from typing import TYPE_CHECKING, BinaryIO, Protocol
 
 from asyncord.typedefs import StrOrURL
 
 if TYPE_CHECKING:
-    from typing import Any
     from collections.abc import Mapping
+    from typing import Any
 
 AttachedFile = tuple[str, str, BinaryIO | bytes]
 """Type alias for a file to be attached to a message.
@@ -32,44 +33,44 @@ class Response(Protocol):
     body: Any
 
 
-class AsyncHttpClientPort(AsyncContextManager, Protocol):  # noqa: WPS214 - Found too many methods
+class AsyncHttpClientPort(AbstractAsyncContextManager, Protocol):
     """Interface for the async HTTP client."""
 
-    async def get(
+    async def get(  # noqa: D102
         self,
         url: StrOrURL,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
         ...
 
-    async def post(
+    async def post(  # noqa: D102
         self,
         url: StrOrURL,
-        payload: Any,
+        payload: Any,  # noqa: ANN401
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
         ...
 
-    async def put(
+    async def put(  # noqa: D102
         self,
         url: StrOrURL,
-        payload: Any,
+        payload: Any,  # noqa: ANN401
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
         ...
 
-    async def patch(
+    async def patch(  # noqa: D102
         self,
         url: StrOrURL,
-        payload: Any,
+        payload: Any,  # noqa: ANN401
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
         ...
 
-    async def delete(
+    async def delete(  # noqa: D102
         self,
         url: StrOrURL,
         payload: Any | None = None,
@@ -77,11 +78,11 @@ class AsyncHttpClientPort(AsyncContextManager, Protocol):  # noqa: WPS214 - Foun
     ) -> Response:
         ...
 
-    def set_headers(self, headers: Mapping[str, str]) -> None:
+    def set_headers(self, headers: Mapping[str, str]) -> None:  # noqa: D102
         ...
 
-    def start(self) -> None:
+    def start(self) -> None:  # noqa: D102
         ...
 
-    async def close(self) -> None:
+    async def close(self) -> None:  # noqa: D102
         ...

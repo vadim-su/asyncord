@@ -18,8 +18,8 @@ class UserResource(ClientSubresources):
     """User resource.
 
     Attributes:
-        users_url (URL): Base users url.
-        current_user_url (URL): Current user url.
+        users_url: Base users url.
+        current_user_url: Current user url.
     """
 
     users_url = REST_API_URL / 'users'
@@ -40,7 +40,7 @@ class UserResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/user#modify-current-user
 
         Args:
-            user_id (LikeSnowflake): The ID of the user to get.
+            user_id: ID of the user to get.
         """
         url = self.users_url / str(user_id)
         resp = await self._http.get(url)
@@ -50,7 +50,7 @@ class UserResource(ClientSubresources):
         """Update the current user.
 
         Args:
-            username (str): The new username.
+            username: New username.
 
         Reference: https://discord.com/developers/docs/resources/user#modify-current-user
         """
@@ -72,13 +72,12 @@ class UserResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/user#get-current-user-guilds
 
         Args:
-            before (LikeSnowflake | None): Get guilds before this guild ID.
-            after (LikeSnowflake | None): Get guilds after this guild ID.
-            limit (int | None): The maximum number of guilds to get. Range: 1-200.
-                 Defaults to 200.
+            before: Get guilds before this guild ID.
+            after: Get guilds after this guild ID.
+            limit: Maximum number of guilds to get. Range: 1-200. Defaults to 200.
 
         Returns:
-            list[Guild]: The current user's guilds.
+            Current user's guilds.
         """
         url_params = {}
         if before is not None:
@@ -100,7 +99,7 @@ class UserResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
 
         Args:
-            guild_id (LikeSnowflake): The ID of the guild.
+            guild_id: ID of the guild.
         """
         url = self.current_user_url / f'guilds/{guild_id}/member'
         resp = await self._http.get(url)
@@ -112,7 +111,7 @@ class UserResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/user#leave-guild
 
         Args:
-            guild_id (LikeSnowflake): The ID of the guild to leave.
+            guild_id: ID of the guild to leave.
         """
         url = self.current_user_url / f'guilds/{guild_id}'
         await self._http.delete(url)
@@ -123,7 +122,7 @@ class UserResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/user#create-dm
 
         Args:
-            user_id (LikeSnowflake): The ID of the user to create a DM with.
+            user_id: ID of the user to create a DM with.
         """
         url = self.current_user_url / 'channels'
         payload = {'recipient_id': user_id}
@@ -139,7 +138,7 @@ class UserResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/user#create-group-dm
 
         Args:
-            user_ids (list[LikeSnowflake]): The IDs of the users to create a group DM with.
+            user_ids: IDs of the users to create a group DM with.
                 The maximum number of users is 10.
 
         Raises:
@@ -157,19 +156,22 @@ class UserGuild(BaseModel):
     """A partial user guild object."""
 
     id: Snowflake
-    """guild id"""
+    """Guild id."""
 
     name: str
-    """guild name(2 - 100 characters, excluding trailing and leading whitespace)"""
+    """Guild name
+
+    2 - 100 characters, excluding trailing and leading whitespace.
+    """
 
     icon: str | None = None
-    """icon hash"""
+    """Icon hash."""
 
     owner: bool | None = None
-    """true if the user is the owner of the guild"""
+    """True if the user is the owner of the guild."""
 
     permissions: str | None = None
-    """total permissions for the user in the guild(excludes overwrites)"""
+    """Total permissions for the user in the guild (excludes overwrites)."""
 
     feature: dict | None = None
-    """strings	enabled guild features"""
+    """Strings enabled guild features/"""

@@ -12,7 +12,7 @@ class ReactionResource(ClientSubresources):
     """Reaction resource for a message.
 
     Attributes:
-        channels_url (URL): Base channels url.
+        channels_url: Base channels url.
     """
     channels_url = REST_API_URL / 'channels'
 
@@ -34,14 +34,12 @@ class ReactionResource(ClientSubresources):
         """Get a list of users that reacted with this emoji.
 
         Args:
-            emoji (str): The emoji to get the reactions for.
-            after (LikeSnowflake | None): Get users after this user ID.
-                Defaults to None.
-            limit (int | None): The maximum number of users to return (1-100).
-                Defaults to None.
+            emoji: Emoji to get the reactions for.
+            after: Get users after this user ID. Defaults to None.
+            limit: Maximum number of users to return (1-100). Defaults to None.
 
         Returns:
-            list[User]: List of user which reacted with this emoji.
+            List of user which reacted with this emoji.
         """
         url_params = {}
         if after is not None:
@@ -60,8 +58,8 @@ class ReactionResource(ClientSubresources):
         """Create a reaction for the message.
 
         Args:
-            emoji (str): The emoji to react with.
-            user_id (LikeSnowflake): The ID of the user to react as.
+            emoji: Emoji to react with.
+            user_id: ID of the user to react as.
         """
         url = self.reactions_url / emoji / '@me'
         await self._http.put(url, None)
@@ -70,7 +68,7 @@ class ReactionResource(ClientSubresources):
         """Delete a reaction the current user made for the message.
 
         Args:
-            emoji (str): The emoji to delete the reaction for.
+            emoji: Emoji to delete the reaction for.
         """
         url = self.reactions_url / emoji / '@me'
         await self._http.delete(url)
@@ -83,8 +81,8 @@ class ReactionResource(ClientSubresources):
         """Delete a reaction a user made for the message.
 
         Args:
-            emoji (str | None): The emoji to delete the reaction for.
-            user_id (LikeSnowflake | None): The ID of the user to delete the reaction for.
+            emoji: Emoji to delete the reaction for.
+            user_id: ID of the user to delete the reaction for.
         """
         if user_id and not emoji:
             raise ValueError('If user_id is specified, emoji must be specified too.')

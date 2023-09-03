@@ -1,3 +1,5 @@
+"""Gateway message models."""
+
 import enum
 from typing import Any
 
@@ -6,6 +8,8 @@ from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
 
 @enum.unique
 class GatewayCommandOpcode(enum.IntEnum):
+    """Gateway command opcodes."""
+
     HEARTBEAT = 1
     """Fired periodically by the client to keep the connection alive."""
 
@@ -27,6 +31,8 @@ class GatewayCommandOpcode(enum.IntEnum):
 
 @enum.unique
 class GatewayEventOpcode(enum.IntEnum):
+    """Gateway event opcodes."""
+
     DISPATCH = 0
     """An event was dispatched."""
 
@@ -44,6 +50,8 @@ class GatewayEventOpcode(enum.IntEnum):
 
 
 class GatewayMessage(BaseModel):
+    """General gateway message."""
+
     opcode: GatewayEventOpcode = Field(alias='op')
     msg_data: Any = Field(alias='d')
     sequence_number: int | None = Field(alias='s')

@@ -1,3 +1,10 @@
+"""This module defines the base classes for all gateway events in Asyncord.
+
+The gateway is Discord's real-time API for sending and receiving events. These events
+are used to notify clients of changes in state, such as when a user sends a message or
+when a guild is updated.
+"""
+
 from __future__ import annotations
 
 import re
@@ -17,6 +24,10 @@ class GatewayEvent(BaseModel):
     @classmethod
     @property
     def __event_name__(cls) -> str:
+        """Name of the event.
+
+        Used for identifying the event.
+        """
         class_name_without_suffix = cls.__name__[:-5]
         # make camel case into snake case
         event_name = re.sub('(?<!^)(?=[A-Z])', '_', class_name_without_suffix)

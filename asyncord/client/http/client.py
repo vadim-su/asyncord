@@ -7,7 +7,7 @@ import json
 import logging
 from collections.abc import Mapping, Sequence
 from http import HTTPStatus
-from types import MappingProxyType
+from types import MappingProxyType, TracebackType
 from typing import TYPE_CHECKING, Any, BinaryIO, NamedTuple
 
 import aiohttp
@@ -83,12 +83,11 @@ class AsyncHttpClient:
         """Send a GET request.
 
         Args:
-            url (StrOrURL): URL to send the request to.
-            headers (Mapping[str, str] | None): Headers to send with the request.
-                Defaults to None.
+            url: URL to send the request to.
+            headers: Headers to send with the request. Defaults to None.
 
         Returns:
-            Response: response from the request.
+            Response response from the request.
         """
         return await self._request(HttpMethod.GET, url, headers=headers)
 
@@ -102,13 +101,13 @@ class AsyncHttpClient:
         """Send a POST request.
 
         Args:
-            url (StrOrURL): URL to send the request to.
-            payload (Any): Payload to send with the request.
-            files (list[AttachedFile] | None): Files to send with the request. Defaults to None.
-            headers (Mapping[str, str] | None): Headers to send with the request. Defaults to None.
+            url: URL to send the request to.
+            payload: Payload to send with the request.
+            files: Files to send with the request. Defaults to None.
+            headers: Headers to send with the request. Defaults to None.
 
         Returns:
-            Response: response from the request.
+            Response from the request.
         """
         return await self._request(HttpMethod.POST, url, payload, files, headers)
 
@@ -122,14 +121,13 @@ class AsyncHttpClient:
         """Send a PUT request.
 
         Args:
-            url (StrOrURL): URL to send the request to.
-            payload (Any): Payload to send with the request.
-            files (Sequence[AttachedFile] | None): Files to send with the request. Defaults to None.
-            headers (Mapping[str, str] | None):
-                Headers to send with the request. Defaults to None.
+            url: URL to send the request to.
+            payload: Payload to send with the request.
+            files: Files to send with the request. Defaults to None.
+            headers: Headers to send with the request. Defaults to None.
 
         Returns:
-            Response: response from the request.
+            Response from the request.
         """
         return await self._request(HttpMethod.PUT, url, payload, files, headers)
 
@@ -143,13 +141,13 @@ class AsyncHttpClient:
         """Send a PATCH request.
 
         Args:
-            url (StrOrURL): URL to send the request to.
-            payload (Any): Payload to send with the request.
-            files (Sequence[AttachedFile] | None): Files to send with the request. Defaults to None.
-            headers (Mapping[str, str] | None): Headers to send with the request. Defaults to None.
+            url: URL to send the request to.
+            payload: Payload to send with the request.
+            files: Files to send with the request. Defaults to None.
+            headers: Headers to send with the request. Defaults to None.
 
         Returns:
-            Response: Response from the request.
+            Response from the request.
         """
         return await self._request(HttpMethod.PATCH, url, payload, files, headers)
 
@@ -162,12 +160,12 @@ class AsyncHttpClient:
         """Send a DELETE request.
 
         Args:
-            url (StrOrURL): Url to send the request to.
-            payload (Any | None): Payload to send with the request. Defaults to None.
-            headers (Mapping[str, str] | None): Headers to send with the request. Defaults to None.
+            url: Url to send the request to.
+            payload: Payload to send with the request. Defaults to None.
+            headers: Headers to send with the request. Defaults to None.
 
-        Returns:
-            Response: Response from the request.
+        Response:
+            Response from the request.
         """
         return await self._request(HttpMethod.DELETE, url, payload, headers=headers)
 
@@ -175,7 +173,7 @@ class AsyncHttpClient:
         """Set the headers to send with requests.
 
         Args:
-            headers (Mapping[str, str]): Headers to send with requests.
+            headers: Headers to send with requests.
         """
         # FIXME: #3 session can be used outside of the current client and we shouldn't be setting it here
         self._headers = headers
@@ -198,12 +196,14 @@ class AsyncHttpClient:
         """Initialize the client when used as a context manager.
 
         Returns:
-            Self: Initialized client.
+            Initialized client.
         """
         self.start()
         return self
 
-    async def __aexit__(self, _exc_type: Any, _exc: Any, _tb: Any) -> None:   # noqa: ANN401
+    async def __aexit__(
+        self, _exc_type: type[BaseException] | None, _exc: BaseException | None, _tb: TracebackType | None,
+    ) -> None:
         """Close the client when used as a context manager."""
         await self.close()
 
@@ -218,20 +218,19 @@ class AsyncHttpClient:
         """Make a request to the Discord API.
 
         Args:
-            method (HttpMethod): HTTP method to use.
-            url (StrOrURL): Url to request.
-            payload (Any, optional): Payload to send. Defaults to None.
-            files (Sequence[AttachedFile], optional): Files to send. Defaults to None.
-            headers (Mapping[str, str], optional): Headers to send. Defaults to None.
+            method: HTTP method to use.
+            url: URL to send the request to.
+            payload: Payload to send. Defaults to None.
+            files: Files to send. Defaults to None.
+            headers: Headers to send. Defaults to None.
 
         Returns:
-            Response: Response from the request.
+            Response from the request.
 
         Raises:
             ClientError: If the response status code is in the 400 range.
             ServerError: If the response status code is in the 500 range.
-            RateLimitError: If the response status code is 429 and
-                the retry_after is greater than 10.
+            RateLimitError: If the response status code is 429 and the retry_after is greater than 10.
         """
         if headers is None:
             headers = self._headers
@@ -288,10 +287,10 @@ class AsyncHttpClient:
         """Extract the body and message from the response.
 
         Args:
-            resp (ClientResponse): request response.
+            resp: Request response.
 
         Returns:
-            tuple[Any, str | None]: body and message from the response.
+            Body and message from the response.
         """
         if resp.status == HTTPStatus.NO_CONTENT:
             body = {}
@@ -319,14 +318,14 @@ class AsyncHttpClient:
         Read more here: https://discord.com/developers/docs/resources/channel#create-message.
 
         Args:
-            method(HttpMethod): The HTTP method to use.
-            url(StrOrURL): The URL to request.
-            payload(Optional[Any]): The payload to send. Defaults to None.
-            files(Optional[Sequence[AttachedFile]]): The files to send. Defaults to None.
-            headers(Optional[Mapping[str, str]]): The headers to send. Defaults to None.
+            method: HTTP method to use.
+            url: URL to request.
+            payload: Payload to send. Defaults to None.
+            files: Files to send. Defaults to None.
+            headers: Headers to send. Defaults to None.
 
         Returns:
-            AbstractAsyncContextManager[ClientResponse]: The response context.
+            Response context.
         """
         data = None
 

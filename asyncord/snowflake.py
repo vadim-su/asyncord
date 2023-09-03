@@ -20,7 +20,7 @@ class Snowflake:
 
     It's variant of twitter's snowflake format of IDs.
 
-    See details at:
+    Reference:
     https://discord.com/developers/docs/reference#snowflakes
     """
 
@@ -30,7 +30,7 @@ class Snowflake:
         """Create new snowflake object from raw int.
 
         Args:
-            raw_snowflake (int | str): raw value of snowflake.
+            raw_snowflake: Raw value of snowflake.
         """
         self._raw_value = int(raw_snowflake)
 
@@ -45,13 +45,13 @@ class Snowflake:
         """Build snowflake from separate parameters.
 
         Args:
-            timestamp (int | datetime): timestamp of snowflake.
-            internal_worker_id (int): internal worker id.
-            internal_process_id (int): internal process id.
-            increment (int): increment of snowflake.
+            timestamp: Timestamp of snowflake.
+            internal_worker_id: Internal worker id.
+            internal_process_id: Internal process id.
+            increment: Increment of snowflake.
 
         Returns:
-            Snowflake: snowflake object.
+            Snowflake object.
         """
         if isinstance(timestamp, datetime.datetime):
             timestamp = int(timestamp.timestamp() * 1000)
@@ -71,11 +71,11 @@ class Snowflake:
         Milliseconds since Discord Epoch, the first second of 2015 or 1420070400000.
         The first 22 bits of snowflake.
 
-        See details at:
+        Reference:
         https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right
 
         Returns:
-            datetime: timestamp.
+            Extracted timestamp.
         """
         timestamp_secs: float = ((self._raw_value >> 22) + DISCORD_EPOCH) / 1000
         return datetime.datetime.fromtimestamp(timestamp_secs, tz=datetime.UTC)
@@ -86,11 +86,11 @@ class Snowflake:
 
         The next 5 bits after timestamp.
 
-        See details at:
+        Reference:
         https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right
 
         Returns:
-            int: internal worker id.
+            Internal worker id.
         """
         # ampersand operation removes left first 22 bits of snowflake and takes the rest
         # shift operation removes right 17 zero bits
@@ -102,11 +102,11 @@ class Snowflake:
 
         The next 5 bits after internal worker id.
 
-        See details at:
+        Reference:
         https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right
 
         Returns:
-            int: internal process id.
+            Internal process id.
         """
         return (self._raw_value & 0x1F000) >> 12
 
@@ -116,11 +116,11 @@ class Snowflake:
 
         Last 12 bits of snowflake.
 
-        See details at:
+        Reference:
         https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right
 
         Returns:
-            int: increment.
+            Increment part of snowflake.
         """
         return self._raw_value & 0xFFF
 
@@ -129,13 +129,13 @@ class Snowflake:
         """Pydantic auxiliary validation method.
 
         Args:
-            value (Any): value to validate.
-
-        Raises:
-            ValueError: if value is not valid snowflake.
+            value: Value to validate.
 
         Returns:
-            Snowflake: validated snowflake.
+            Validated snowflake.
+
+        Raises:
+            ValueError: If value is not valid snowflake.
         """
         if isinstance(value, str | int):
             return cls(value)
@@ -152,11 +152,11 @@ class Snowflake:
         """Pydantic auxiliary method to get schema.
 
         Args:
-            _source (type[BaseModel]): source of schema.
-            _handler (Callable[[Any], CoreSchema]): handler of schema.
+            _source: Source of schema.
+            _handler: Handler of schema.
 
         Returns:
-            CoreSchema: schema.
+            Pydantic core schema.
         """
         schema = core_schema.union_schema([
             core_schema.int_schema(),
@@ -170,11 +170,11 @@ class Snowflake:
             serialization=core_schema.to_string_ser_schema(),
         )
 
-    def __eq__(self, other: Any) -> bool:  # noqa: ANN401
+    def __eq__(self, other: object) -> bool:
         """Compare snowflakes."""
         match other:
             case Snowflake():
-                return self._raw_value == other._raw_value  # noqa: SLF001
+                return self._raw_value == other._raw_value
             case int():
                 return self._raw_value == other
             case str():
@@ -202,6 +202,6 @@ class Snowflake:
         it's most popular type to search for snowflake in lists.
 
         Returns:
-            int: hash of snowflake.
+            Hash of snowflake.
         """
         return hash(str(self._raw_value))

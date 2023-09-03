@@ -4,12 +4,12 @@
 class GatewayError(Exception):
     """Base exception class for all gateway errors."""
 
-    def __init__(self, message: str, code: int | None = None):
+    def __init__(self, message: str, code: int | None = None) -> None:
         """Initialize base gateway error.
 
         Args:
-            message (str): message of error.
-            code (int | None): code of error.
+            message: Message of error.
+            code: Code of error.
         """
         self.message = message
         self.code = code
@@ -28,7 +28,7 @@ class InvalidSessionError(Exception):
         """Initialize invalid session error.
 
         Args:
-            session_id (str): Session ID that is invalid.
+            session_id: Session ID that is invalid.
         """
         super().__init__(f"Session '{session_id}' is invalid")
 

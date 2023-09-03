@@ -19,9 +19,9 @@ class Heartbeat:
     """A class for handling the heartbeat loop.
 
     Attributes:
-        heartbeat_command (Callable[..., Awaitable[None]]): Command to send a heartbeat.
-        timeout_callback (Callable[..., Awaitable[None]]): Callback to call when a heartbeat ack is not received.
-        is_started (bool): Whether the heartbeat loop is started.
+        heartbeat_command: Command to send a heartbeat.
+        timeout_callback: Callback to call when a heartbeat ack is not received.
+        is_started: Whether the heartbeat loop is started.
     """
 
     def __init__(
@@ -32,8 +32,8 @@ class Heartbeat:
         """Initialize the heartbeat processor.
 
         Args:
-            heartbeat_command (Callable[..., Awaitable[None]]): Command to send a heartbeat.
-            timeout_callback (Callable[..., Awaitable[None]]): Callback to call when a heartbeat ack is not received.
+            heartbeat_command: Command to send a heartbeat.
+            timeout_callback: Callback to call when a heartbeat ack is not received.
         """
         self.heartbeat_command = heartbeat_command
         self.timeout_callback = timeout_callback
@@ -45,7 +45,7 @@ class Heartbeat:
         """Start the heartbeat loop.
 
         Args:
-            heartbeat_period (float): Period of the heartbeat in seconds.
+            heartbeat_period: Period of the heartbeat in seconds.
         """
         logger.debug('Starting heartbeat loop')
         if self.is_started:
@@ -67,7 +67,7 @@ class Heartbeat:
         """Reset the heartbeat loop.
 
         Args:
-            heartbeat_period (float): The period of the heartbeat in seconds.
+            heartbeat_period: Period of the heartbeat in seconds.
         """
         if self.is_started:
             await self.stop()
@@ -83,7 +83,7 @@ class Heartbeat:
         """Heartbeat loop.
 
         Args:
-            heartbeat_period (float): Period of the heartbeat in seconds.
+            heartbeat_period: Period of the heartbeat in seconds.
         """
         timeout = 0
         while self.is_started:
@@ -108,7 +108,7 @@ class Heartbeat:
         """Heartbeat loop iteration.
 
         Args:
-            heartbeat_period (float): Period of the heartbeat in seconds.
+            heartbeat_period: Period of the heartbeat in seconds.
         """
         self._event.clear()
         await self.heartbeat_command()

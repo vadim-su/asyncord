@@ -29,10 +29,10 @@ class ChannelResource(ClientSubresources):
         """Get the message resource for the channel.
 
         Args:
-            channel_id (LikeSnowflake): Channel id.
+            channel_id: Channel id.
 
         Returns:
-            MessageResource: Resource for managing messages.
+            Resource for managing messages.
         """
         return MessageResource(self, channel_id)
 
@@ -40,10 +40,10 @@ class ChannelResource(ClientSubresources):
         """Get a channel by id.
 
         Args:
-            channel_id (LikeSnowflake): Channel id.
+            channel_id: Channel id.
 
         Returns:
-            Channel: Channel object.
+            Channel object.
         """
         url = self.channels_url / str(channel_id)
         resp = await self._http.get(url)
@@ -60,12 +60,12 @@ class ChannelResource(ClientSubresources):
         This endpoint can only be used on guilds.
 
         Args:
-            guild_id (LikeSnowflake): Guild id.
-            channel_data (CreateChannelData): Data to create the channel with.
-            reason (str | optional): Reason for creating the channel.
+            guild_id: Guild id.
+            channel_data: Data to create the channel with.
+            reason: Reason for creating the channel.
 
         Returns:
-            Channel: Created channel object.
+            Created channel object.
         """
         url = REST_API_URL / 'guilds' / str(guild_id) / 'channels'
 
@@ -88,12 +88,12 @@ class ChannelResource(ClientSubresources):
         """Update a channel's settings.
 
         Args:
-            channel_id (LikeSnowflake): Channel id.
-            channel_data (UpdateChannelDataType): The data to update the channel with.
-            reason (str | optional): The reason for updating the channel.
+            channel_id: Channel id.
+            channel_data: The data to update the channel with.
+            reason: The reason for updating the channel.
 
         Returns:
-            Channel: Updated channel object.
+            Updated channel object.
         """
         url = self.channels_url / str(channel_id)
 
@@ -119,8 +119,8 @@ class ChannelResource(ClientSubresources):
         the Community Updates channel cannot be deleted.
 
         Args:
-            channel_id (LikeSnowflake): Channel id.
-            reason (str | optional): Reason for deleting the channel.
+            channel_id: Channel id.
+            reason: Reason for deleting the channel.
         """
         url = self.channels_url / str(channel_id)
 

@@ -1,3 +1,5 @@
+"""This module defines the EventDispatcher class, which dispatches events to registered handlers."""
+
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, MutableMapping
 from typing import (
@@ -27,14 +29,13 @@ logger.configure(handlers=[{
         rich_tracebacks=True,
     ),
     'format': '{message}',
-    # 'level': 'INFO',
 }])
 
 
 class EventDispatcher(Generic[_EVENT_T]):
     """Dispatches events to registered handlers."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the event dispatcher."""
         self._handlers: MutableMapping[
             type[_EVENT_T], list[EventHandlerType[_EVENT_T, ...]],
@@ -69,9 +70,8 @@ class EventDispatcher(Generic[_EVENT_T]):
         the type hints of the event handler.
 
         Args:
-            event_type (type[_EVENT_T]):  The event type to handle.
-            event_handler (EventHandlerType[_EVENT_T] | None):
-                The handler to call when the event is dispatched.
+            event_type: Event type to handle.
+            event_handler: Handler to call when the event is dispatched.
 
         Raises:
             ValueError: If the event type is not specified and cannot be inferred.
@@ -95,12 +95,12 @@ class EventDispatcher(Generic[_EVENT_T]):
         self._update_handler_args(event_handler)
         self._handlers[event_type].append(event_handler)
 
-    def add_argument(self, arg_name: str, arg_value: Any) -> None:
+    def add_argument(self, arg_name: str, arg_value: Any) -> None:  # noqa: ANN401
         """Add an argument to be passed to all event handlers.
 
         Args:
-            arg_name (str): The name of the argument.
-            arg_value (Any): The value of the argument.
+            arg_name: Name of the argument.
+            arg_value: Value of the argument.
         """
         self._args[arg_name] = arg_value
         for event_handlers in self._handlers.values():
@@ -111,7 +111,7 @@ class EventDispatcher(Generic[_EVENT_T]):
         """Dispatch an event to all handlers.
 
         Args:
-            event (_EVENT_T): The event to dispatch.
+            event: Event to dispatch.
         """
         event_type = type(event)
         for event_handler in self._handlers.get(event_type, []):
@@ -125,7 +125,7 @@ class EventDispatcher(Generic[_EVENT_T]):
         """Update the arguments to pass to an event handler.
 
         Args:
-            event_handler (EventHandlerType[_EVENT_T]): The event handler to update.
+            event_handler: Event handler to update.
         """
         args = event_handler.__code__.co_varnames[1: event_handler.__code__.co_argcount]
         self._arg_map[event_handler] = {

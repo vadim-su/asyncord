@@ -127,6 +127,8 @@ ignore = [
     "ANN102",
     # Checks for string literals that are explicitly concatenated (using the + operator).
     'ISC003',
+    # Private member accessed
+    'SLF001',
     # First argument of a method should be named `self`
     "N805",
     # It's not work properly for pydantic models

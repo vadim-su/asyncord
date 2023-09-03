@@ -38,9 +38,9 @@ class InteractionResource(ClientSubresources):
         """Send a response to an interaction.
 
         Args:
-            interaction_id (int): interaction ID.
-            interaction_token (str): Interaction token.
-            interaction_response (InteractionResponse): Response to send to the interaction.
+            interaction_id: Interaction ID.
+            interaction_token: Interaction token.
+            interaction_response: Response to send to the interaction.
         """
         url = self.interactions_url / str(interaction_id) / interaction_token / 'callback'
         payload = interaction_response.model_dump(mode='json')
@@ -59,8 +59,8 @@ class InteractionResource(ClientSubresources):
         """Send a pong response to an interaction.
 
         Args:
-            interaction_id (int): interaction ID.
-            interaction_token (str): Interaction token.
+            interaction_id: Interaction ID.
+            interaction_token: Interaction token.
         """
         await self.send_response(
             interaction_id=interaction_id,

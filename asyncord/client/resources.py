@@ -1,8 +1,10 @@
+"""This module contains the base classes for client resources."""
+
 from __future__ import annotations
 
-from asyncord.client.ports import AsyncHttpClientPort
 from asyncord.client.http.client import AsyncHttpClient
 from asyncord.client.http.headers import AUTHORIZATION
+from asyncord.client.ports import AsyncHttpClientPort
 
 
 class ClientResource:
@@ -12,8 +14,8 @@ class ClientResource:
         """Initialize the resource.
 
         Args:
-            token (str): Bot token.
-            http_client (AsyncHttpClientPort | None): HTTP client. Defaults to None.
+            token: Bot token.
+            http_client: HTTP client. Defaults to None.
         """
         self.token = token
 
@@ -37,6 +39,6 @@ class ClientSubresources(ClientResource):
         """Initialize the subresource.
 
         Args:
-            parent (ClientResource): The parent resource.
+            parent: Parent resource.
         """
-        super().__init__(parent.token, http_client=parent._http)  # noqa: WPS437 - Found protected attribute
+        super().__init__(parent.token, http_client=parent._http)

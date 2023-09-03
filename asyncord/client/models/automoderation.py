@@ -9,48 +9,64 @@ from pydantic import BaseModel, Field, FieldValidationInfo, field_validator, mod
 
 from asyncord.snowflake import Snowflake
 
-FOUR_WEEKS = 2419200
+FOUR_WEEKS_SECS = 2419200
+"""4 weeks in seconds."""
 
 
 @enum.unique
 class AutoModerationRuleEventType(enum.IntEnum):
     """Indicates in what event context a rule should be checked.
 
+    Reference:
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-event-types
     """
 
     MESSAGE_SEND = 1
-    """when a member sends or edits a message in the guild"""
+    """When a member sends or edits a message in the guild."""
 
 
 @enum.unique
 class TriggerType(enum.IntEnum):
     """Indicates what triggers a rule.
 
+    Reference:
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types
     """
 
     KEYWORD = 1
-    """check if content contains words from a user defined list of keywords. Max 3."""
+    """Check if content contains words from a user defined list of keywords.
+
+    Maxiumum of 10.
+    """
 
     SPAM = 3
-    """check if content represents generic spam. Max 1."""
+    """Check if content represents generic spam.
+
+    Maximum of 1.
+    """
 
     KEYWORD_PRESET = 4
-    """check if content contains words from internal pre - defined wordsets. Max 1."""
+    """Check if content contains words from internal pre-defined wordsets.
+
+    Maximum of 1.
+    """
 
     MENTION_SPAM = 5
-    """check if content contains more mentions than allowed. Max 1."""
+    """Check if content contains more mentions than allowed.
+
+    Maximum of 1.
+    """
 
 
 class TriggerMetadata(BaseModel):
     """Represents the metadata for a rule's trigger.
 
+    Reference:
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
     """
 
     keyword_filter: list[str]
-    """substrings which will be searched for in content.
+    """Substrings which will be searched for in content.
 
     Associated with `TriggerType.KEYWORD`.
 
@@ -58,17 +74,18 @@ class TriggerMetadata(BaseModel):
     (not available to allow lists) can be used to customize how each keyword
     will be matched.
 
-    See keyword matching [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
+    See keyword matching
+    [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
     """
 
     presets: int
-    """the internally pre - defined wordsets which will be searched for in content.
+    """Internally pre-defined wordsets which will be searched for in content.
 
     Associated with `TriggerType.KEYWORD_PRESET`.
     """
 
     allow_list: list[str]
-    """substrings which will be exempt from triggering the preset trigger type.
+    """Substrings which will be exempt from triggering the preset trigger type.
 
     Associated with `TriggerType.KEYWORD_PRESET`.
 
@@ -76,12 +93,14 @@ class TriggerMetadata(BaseModel):
     (not available to allow lists) can be used to customize how each keyword
     will be matched.
 
-    See keyword matching [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
+    See keyword matching
+    [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
     """
 
     mention_total_limit: int = Field(le=50)
-    """total number of mentions(role & user) allowed per message (Maximum of 50).
+    """Total number of mentions(role & user) allowed per message.
 
+    Maximum of 50.
     Associated with `TriggerType.MENTION_SPAM`.
     """
 
@@ -90,17 +109,18 @@ class TriggerMetadata(BaseModel):
 class RuleActionType(enum.IntEnum):
     """Indicates what action to take when a rule is triggered.
 
+    Reference:
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types
     """
 
     BLOCK_MESSAGE = 1
-    """blocks the content of a message according to the rule"""
+    """Blocks the content of a message according to the rule."""
 
     SEND_ALERT_MESSAGE = 2
-    """logs user content to a specified channel"""
+    """Logs user content to a specified channel."""
 
     TIMEOUT = 3
-    """timeout user for a specified duration
+    """Timeout user for a specified duration.
 
     The MODERATE_MEMBERS permission is required to use the TIMEOUT action type.
     """
@@ -111,26 +131,31 @@ class RuleActionMetadata(BaseModel):
 
     Different fields are relevant based on the value of `RuleActionType`.
 
+    Reference:
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-metadata
     """
 
     channel_id: Snowflake | None = None
-    """channel to which user content should be logged"""
+    """Channel to which user content should be logged."""
 
-    duration_seconds: int | None = Field(None, le=FOUR_WEEKS)
-    """timeout duration in seconds (Maximum of 2419200 seconds or 4 weeks)"""
+    duration_seconds: int | None = Field(None, le=FOUR_WEEKS_SECS)
+    """Timeout duration in seconds.
+
+    Maximum of 2419200 seconds or 4 weeks.
+    """
 
 
 class RuleAction(BaseModel):
     """Represents an action which will execute when a rule is triggered.
 
+    Reference:
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-auto-moderation-action-structure
     """
     type: RuleActionType
-    """the type of action"""
+    """Type of action."""
 
     metadata: RuleActionMetadata | None = None
-    """the action metadata"""
+    """Action metadata."""
 
     @model_validator(mode='after')
     def validate_metadata(self) -> Self:
@@ -154,40 +179,46 @@ class RuleAction(BaseModel):
 
 
 class AutoModerationRule(BaseModel):
-    """Represents a rule for the AutoModeration system."""
+    """Represents a rule for AutoModeration system."""
 
     id: Snowflake
-    """The rule's id."""
+    """Rule's id."""
 
     guild_id: Snowflake
-    """the id of the guild which this rule belongs to"""
+    """ID of guild which this rule belongs to."""
 
     name: str
-    """the name of the rule"""
+    """Name of the rule."""
 
     creator_id: Snowflake
-    """the id of the user who created this rule"""
+    """ID of the user who created this rule."""
 
     event_type: AutoModerationRuleEventType
-    """the rule event type"""
+    """Rule event type."""
 
     trigger_type: TriggerType
-    """the rule trigger type"""
+    """Rule trigger type."""
 
     trigger_metadata: TriggerMetadata
-    """the rule trigger metadata"""
+    """Rule trigger metadata."""
 
     actions: list[RuleAction]
-    """the actions which will execute when the rule is triggered"""
+    """Actions which will execute when the rule is triggered."""
 
     enabled: bool
-    """whether the rule is enabled"""
+    """Whether the rule is enabled."""
 
     exempt_roles: list[Snowflake] = Field(max_length=20)
-    """the role ids that should not be affected by the rule (Maximum of 20)"""
+    """Role ids that should not be affected by the rule.
+
+    Maximum of 20.
+    """
 
     exempt_channels: list[Snowflake] = Field(max_length=50)
-    """the channel ids that should not be affected by the rule (Maximum of 50)"""
+    """Channel ids that should not be affected by the rule.
+
+    Maximum of 50.
+    """
 
     @field_validator('actions')
     def check_actions(cls, actions: list[RuleAction], field_info: FieldValidationInfo) -> list[RuleAction]:

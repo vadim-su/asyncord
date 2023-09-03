@@ -14,7 +14,7 @@ class MessageResource(ClientSubresources):
     """Resource to perform actions on messages.
 
     Attributes:
-        channels_url (URL): URL for the messages resource.
+        channels_url: URL for the messages resource.
     """
 
     channels_url = REST_API_URL / 'channels'
@@ -29,11 +29,11 @@ class MessageResource(ClientSubresources):
         """Get the reactions resource for a message.
 
         Args:
-            channel_id (LikeSnowflake): The ID of the channel.
-            message_id (LikeSnowflake): The ID of the message.
+            channel_id: ID of the channel.
+            message_id: ID of the message.
 
         Returns:
-            ReactionsResource: The reactions resource for the message.
+            Reactions resource for the message.
         """
         return ReactionResource(self, self.channel_id, message_id)
 
@@ -47,13 +47,13 @@ class MessageResource(ClientSubresources):
         """Get the messages for a channel.
 
         Args:
-            around (LikeSnowflake | None): Get messages around this message ID.
-            before (LikeSnowflake | None): Get messages before this message ID.
-            after (LikeSnowflake | None): Get messages after this message ID.
-            limit (int | None): The maximum number of messages to return (1-100).
+            around: Get messages around this message ID.
+            before: Get messages before this message ID.
+            after: Get messages after this message ID.
+            limit: Maximum number of messages to return (1-100).
 
         Returns:
-            list[Channel]: A list of message objects.
+            List of message objects.
         """
         if bool(around) + bool(before) + bool(after) > 1:
             raise ValueError('Only one of around, before, after can be specified.')
@@ -77,10 +77,10 @@ class MessageResource(ClientSubresources):
         """Create a new message object for the channel.
 
         Args:
-            message_data (CreateMessageData): Data to create the message with.
+            message_data: Data to create the message with.
 
         Returns:
-            Message: Created message object.
+            Created message object.
         """
         url = self.messages_url
         payload = message_data.model_dump(mode='json', exclude_unset=True)
@@ -99,11 +99,11 @@ class MessageResource(ClientSubresources):
         """Update a message.
 
         Args:
-            message_id (LikeSnowflake): Id of the message.
-            message_data (UpdateMessageData): Data to update the message with.
+            message_id: Id of the message.
+            message_data: Data to update the message with.
 
         Returns:
-            Message: Updated message object.
+            Updated message object.
         """
         url = self.messages_url / str(message_id)
         payload = message_data.model_dump(mode='json', exclude_unset=True)
@@ -121,8 +121,8 @@ class MessageResource(ClientSubresources):
         """Delete a message.
 
         Args:
-            message_id (LikeSnowflake): Id of the message.
-            reason (str | None): Reason for deleting the message.
+            message_id: Id of the message.
+            reason: Reason for deleting the message.
         """
         url = self.messages_url / str(message_id)
 

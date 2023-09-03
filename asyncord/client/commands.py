@@ -14,7 +14,7 @@ class BaseCommandResource(ClientSubresources):
     """Base class for command resources.
 
     Attributes:
-        applications_url (URL): Base applications url.
+        applications_url: Base applications url.
     """
 
     applications_url = REST_API_URL / 'applications'
@@ -29,10 +29,10 @@ class BaseCommandResource(ClientSubresources):
         """Get a command by id.
 
         Args:
-            command_id (LikeSnowflake): Id of the command to get.
+            command_id: ID of the command to get.
 
         Returns:
-            ApplicationCommand: The command object.
+            Object of the command.
         """
         url = self.commands_url / str(command_id)
         resp = await self._http.get(url)
@@ -42,7 +42,7 @@ class BaseCommandResource(ClientSubresources):
         """Get a list of commands.
 
         Returns:
-            list[ApplicationCommand]: List of commands.
+            List of commands.
         """
         resp = await self._http.get(self.commands_url)
         return list_model(ApplicationCommand).validate_python(resp.body)
@@ -53,10 +53,10 @@ class BaseCommandResource(ClientSubresources):
         If a command with the same name already exists, it will be overwritten.
 
         Args:
-            command_data (CreateApplicationCommandData): Command to create.
+            command_data: Command to create.
 
         Returns:
-            ApplicationCommand: The created command.
+            Created command.
         """
         payload = command_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http.post(self.commands_url, payload)
@@ -66,7 +66,7 @@ class BaseCommandResource(ClientSubresources):
         """Delete a command.
 
         Args:
-            command_id (LikeSnowflake): Id of the command to delete.
+            command_id: ID of the command to delete.
         """
         url = self.commands_url / str(command_id)
         await self._http.delete(url)

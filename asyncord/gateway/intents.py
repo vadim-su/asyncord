@@ -1,3 +1,5 @@
+"""Gateway intents."""
+
 import functools
 import operator
 from enum import IntFlag, unique
@@ -5,12 +7,12 @@ from enum import IntFlag, unique
 
 @unique
 class Intent(IntFlag):
-    """Gateway intents
+    """Gateway intents.
 
     You can get more information about intent values and related events by the link:
     https://discord.com/developers/docs/topics/gateway#gateway-intents
     """
-    GUILDS = 1 << 0  # noqa: WPS345
+    GUILDS = 1 << 0
     GUILD_MEMBERS = 1 << 1
     GUILD_BANS = 1 << 2
     GUILD_EMOJIS_AND_STICKERS = 1 << 3

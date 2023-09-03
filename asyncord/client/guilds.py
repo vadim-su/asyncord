@@ -37,7 +37,7 @@ class GuildResource(ClientSubresources):
     """Representaion of the guilds resource.
 
     Attributes:
-        guilds_url (URL): Guilds resource URL.
+        guilds_url: Guilds resource URL.
     """
 
     guilds_url = REST_API_URL / 'guilds'
@@ -46,10 +46,10 @@ class GuildResource(ClientSubresources):
         """Get the member subresource for a guild.
 
         Args:
-            guild_id (LikeSnowflake): The ID of the guild to get the member subresource for.
+            guild_id: ID of guild to get the member subresource for.
 
         Returns:
-            MemberResource: The member subresource for the guild.
+            Member subresource for the guild.
         """
         return MemberResource(self, guild_id)
 
@@ -57,10 +57,10 @@ class GuildResource(ClientSubresources):
         """Get the ban subresource for a guild.
 
         Args:
-            guild_id (LikeSnowflake): The ID of the guild to get the ban subresource for.
+            guild_id: ID of the guild to get the ban subresource for.
 
         Returns:
-            BanResource: The ban subresource for the guild.
+            Ban subresource for the guild.
         """
         return BanResource(self, guild_id)
 
@@ -68,10 +68,10 @@ class GuildResource(ClientSubresources):
         """Get the role subresource for a guild.
 
         Args:
-            guild_id (LikeSnowflake): The ID of the guild to get the role subresource for.
+            guild_id: ID of the guild to get the role subresource for.
 
         Returns:
-            RoleResource: The role subresource for the guild.
+            Role subresource for the guild.
         """
         return RoleResource(self, guild_id)
 
@@ -81,11 +81,11 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#et-guild
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to get.
-            with_counts(bool | None): Whether to include approximate members.
+            guild_id: ID of the guild to get.
+            with_counts: Whether to include approximate members.
 
         Returns:
-            Guild: The guild with the specified ID.
+            Guild with the specified ID.
         """
         url = self.guilds_url / str(guild_id) % {'with_counts': str(with_counts)}
         resp = await self._http.get(url)
@@ -98,10 +98,10 @@ class GuildResource(ClientSubresources):
         the most vital information about a guild.
 
         Args:
-            guild_id(LikeSnowflake): ID of the guild to get the preview for.
+            guild_id: ID of the guild to get the preview for.
 
         Returns:
-            GuildPreview: Preview of the guild with the specified ID.
+            Preview of the guild with the specified ID.
         """
         url = self.guilds_url / str(guild_id) / 'preview'
         resp = await self._http.get(url)
@@ -118,7 +118,7 @@ class GuildResource(ClientSubresources):
             guild_data(CreateGuildData): The data for the guild to create.
 
         Returns:
-            Guild: The created guild.
+            The created guild.
         """
         payload = guild_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http.post(self.guilds_url, payload)
@@ -128,7 +128,7 @@ class GuildResource(ClientSubresources):
         """Delete a guild.
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to delete.
+            guild_id: ID of the guild to delete.
         """
         url = self.guilds_url / str(guild_id)
         await self._http.delete(url)
@@ -139,11 +139,11 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to update.
-            level(MFALevel): The MFA level to set.
+            guild_id: ID of the guild to update.
+            level: MFA level to set.
 
         Returns:
-            MFALevel: The updated MFA level.
+            Updated MFA level.
         """
         url = self.guilds_url / str(guild_id) / 'mfa'
         payload = {'level': level}
@@ -162,15 +162,13 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to get the prune count for.
-            days(int | None): The number of days to count prune for. Should be between 1 and 30.
-                Defaults to 7 if not specified.
-            include_roles(list[LikeSnowflake] | None): A list of role IDs to include in
-                the prune count.
-            reason(str | None): The reason for the prune.
+            guild_id: ID of the guild to get the prune count for.
+            days: Number of days to count prune for. Should be between 1 and 30. Defaults to 7.
+            include_roles: List of role IDs to include in the prune count.
+            reason: Reason for the prune.
 
         Returns:
-            Prune: The prune count.
+            Count of members that would be removed from the guild if pruned.
         """
         url_params = {}
         if days is not None:
@@ -209,16 +207,14 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#begin-guild-prune
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to prune.
-            days(int | None): The number of days to count prune for. Should be between 1 and 30.
-                Defaults to 7 if not specified.
-            compute_prune_count(bool | None): Whether to compute the prune count.
-                Defaults to True if not specified.
-            include_roles(list[LikeSnowflake] | None): A list of role IDs to include in the prune count.
-            reason(str | None): The reason for the prune.
+            guild_id: ID of the guild to prune.
+            days: Number of days to count prune for. Should be between 1 and 30. Defaults to 7.
+            compute_prune_count: Whether to compute the prune count. Defaults to True.
+            include_roles: List of role IDs to include in the prune count.
+            reason: Reason for the prune.
 
         Returns:
-            Prune: The prune count.
+            Prune object.
         """
         payload = {}
         if days is not None:
@@ -243,10 +239,10 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to get the voice regions for.
+            guild_id: ID of the guild to get the voice regions for.
 
         Returns:
-            list[VoiceRegion]: The voice regions for the guild.
+            Voice regions for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'regions'
         resp = await self._http.get(url)
@@ -258,10 +254,10 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-invites
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to get the invites for.
+            guild_id: ID of the guild to get the invites for.
 
         Returns:
-            list[Invite]: The invites for the guild.
+            Invites for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'invites'
         resp = await self._http.get(url)
@@ -273,10 +269,10 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-channels
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to get the channels for.
+            guild_id: ID of the guild to get the channels for.
 
         Returns:
-            list[Channel]: The channels for the guild.
+            Channels for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'channels'
         resp = await self._http.get(url)
@@ -288,10 +284,10 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-integrations
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to get the integrations for.
+            guild_id: ID of the guild to get the integrations for.
 
         Returns:
-            list[Integration]: The integrations for the guild.
+            Integrations for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'integrations'
         resp = await self._http.get(url)
@@ -308,9 +304,9 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to delete the integration for.
-            integration_id(LikeSnowflake): The ID of the integration to delete.
-            reason(str | None): The reason for deleting the integration.
+            guild_id: ID of the guild to delete the integration for.
+            integration_id: ID of the integration to delete.
+            reason: Reason for deleting the integration.
         """
         url = self.guilds_url / str(guild_id) / 'integrations' / str(integration_id)
 
@@ -327,10 +323,10 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to get the welcome screen for.
+            guild_id: ID of the guild to get the welcome screen for.
 
         Returns:
-            WelcomeScreen: The welcome screen for the guild.
+            Welcome screen for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'welcome-screen'
         resp = await self._http.get(url)
@@ -347,12 +343,12 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#update-guild-welcome-screen
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to update the welcome screen for.
-            welcome_screen_data(UpdateWelcomeScreenData): The welcome screen data to update.
-            reason(str | None): The reason for updating the welcome screen.
+            guild_id: ID of the guild to update the welcome screen for.
+            welcome_screen_data: Welcome screen data to update.
+            reason: Reason for updating the welcome screen.
 
         Returns:
-            WelcomeScreen: The updated welcome screen.
+            Updated welcome screen.
         """
         url = self.guilds_url / str(guild_id) / 'welcome-screen'
 
@@ -377,11 +373,10 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to update the current user's voice state for.
-            channel_id(LikeSnowflake | None): The ID of the channel to move the current user to.
-            suppress(bool | None): Whether the current user should be suppressed.
-            request_to_speak_timestamp(datetime.datetime | None): The time at which the current user
-                requested to speak.
+            guild_id: ID of the guild to update the current user's voice state for.
+            channel_id: ID of the channel to move the current user to.
+            suppress: Whether the current user should be suppressed.
+            request_to_speak_timestamp: Time at which the current user requested to speak.
         """
         url = self.guilds_url / str(guild_id) / 'voice-states' / '@me'
 
@@ -406,10 +401,10 @@ class GuildResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#modify-user-voice-state
 
         Args:
-            guild_id(LikeSnowflake): The ID of the guild to update the user's voice state for.
-            user_id(LikeSnowflake): The ID of the user to update the voice state for.
-            channel_id(LikeSnowflake | None): The ID of the channel to move the user to.
-            suppress(bool | None): Whether the user should be suppressed.
+            guild_id: ID of the guild to update the user's voice state for.
+            user_id: ID of the user to update the voice state for.
+            channel_id: ID of the channel to move the user to.
+            suppress: Whether the user should be suppressed.
         """
         url = self.guilds_url / str(guild_id) / 'voice-states' / str(user_id)
 

@@ -16,122 +16,127 @@ from asyncord.snowflake import Snowflake
 class EventPrivacyLevel(enum.IntEnum):
     """Represents a scheduled event's privacy level.
 
+    Reference:
     https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level
     """
 
     PUBLIC = 1
-    """the scheduled event is public, the guild_id is exposed"""
+    """Scheduled event is public, guild_id is exposed."""
 
     GUILD_ONLY = 2
-    """the scheduled event is private, only available to guild members"""
+    """Scheduled event is private, only available to guild members."""
 
 
 @enum.unique
 class EventStatus(enum.IntEnum):
     """Represents a scheduled event's status.
 
+    Reference:
     https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status
     """
 
     SCHEDULED = 1
-    """the scheduled event is scheduled"""
+    """Scheduled event is scheduled."""
 
     ACTIVE = 2
-    """the scheduled event is currently active"""
+    """Scheduled event is currently active."""
 
     COMPLETED = 3
-    """the scheduled event has concluded"""
+    """Scheduled event has concluded."""
 
     CANCELED = 4
-    """the scheduled event was canceled"""
+    """Scheduled event was canceled."""
 
 
 @enum.unique
 class EventEntityType(enum.IntEnum):
     """Represents a scheduled event's entity type.
 
+    Reference:
     https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types
     """
 
     STAGE_INSTANCE = 1
-    """the scheduled event is associated with a stage instance"""
+    """Scheduled event is associated with a stage instance."""
 
     VOICE = 2
-    """the scheduled event is associated with a voice channel"""
+    """Scheduled event is associated with a voice channel."""
 
     EXTERNAL = 3
-    """the scheduled event is not associated with a guild channel"""
+    """Scheduled event is not associated with a guild channel."""
 
 
 class EventEntityMetadata(BaseModel):
     """Represents a scheduled event's entity metadata.
 
+    Reference:
     https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata
     """
 
     location: str | None = Field(None, min_length=1, max_length=100)
-    """location of the event (1-100 characters)"""
+    """Location of the event."""
 
 
 class GuildScheduleEvent(BaseModel):
     """Represents a scheduled event in a guild.
 
+    Reference:
     https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-structure
     """
 
     id: Snowflake
-    """the id of the scheduled event"""
+    """ID of scheduled event."""
 
     guild_id: Snowflake
-    """the guild id which the scheduled event belongs to"""
+    """Guild id which scheduled event belongs to."""
 
     channel_id: Snowflake | None
-    """the channel id in which the scheduled event will be hosted,
-    or `None` if entity type is `EXTERNAL`
+    """Channel id in which scheduled event will be hosted.
+
+    Should be `None` if entity type is `EXTERNAL`.
     """
 
     creator_id: Snowflake
-    """the id of the user that created the scheduled event"""
+    """Id of user that created scheduled event."""
 
     name: str = Field(min_length=1, max_length=100)
-    """the name of the scheduled event (1-100 characters)"""
+    """Name of scheduled event."""
 
     description: str | None = Field(min_length=1, max_length=1000)
-    """the description of the scheduled event (1-1000 characters)"""
+    """Description of scheduled event"""
 
     scheduled_start_time: datetime.datetime
-    """the time the scheduled event will start"""
+    """Time scheduled event will start."""
 
     scheduled_end_time: datetime.datetime | None
-    """the time the scheduled event will end
+    """Time scheduled event will end.
 
-    `None` if the event does not have a scheduled time to end.
+    `None` if event does not have a scheduled time to end.
     """
 
     privacy_level: EventPrivacyLevel
-    """the privacy level of the scheduled event"""
+    """Privacy level of scheduled event."""
 
     status: EventStatus
-    """the status of the scheduled event"""
+    """Status of scheduled event."""
 
     entity_type: EventEntityType
-    """the entity type of the scheduled event"""
+    """Entity type of scheduled event."""
 
     entity_id: Snowflake | None
-    """the id of an entity associated with a guild scheduled event"""
+    """Id of an entity associated with a guild scheduled event."""
 
     entity_metadata: EventEntityMetadata | None
-    """the metadata for the guild scheduled event"""
+    """Metadata for the guild scheduled event."""
 
     creator: User
-    """the user that created the scheduled event"""
+    """User that created scheduled event."""
 
     user_count: int | None = None
-    """the user that created the scheduled event"""
+    """User that created scheduled event."""
 
     image: str | None = None
-    """the cover image hash of the scheduled event"""
-
+    """Cover image hash of scheduled event."""
 
     # FIXME: #26 This is a temporary solution. Need to replace with multiple models.
     @model_validator(mode='after')

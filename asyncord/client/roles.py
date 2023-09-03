@@ -13,7 +13,7 @@ class RoleResource(ClientSubresources):
     """Resource to perform actions on roles.
 
     Attributes:
-        guild_id (LikeSnowflake): ID of the guild.
+        guild_id: ID of the guild.
     """
     guilds_url = REST_API_URL / 'guilds'
 
@@ -29,7 +29,7 @@ class RoleResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-roles
 
         Returns:
-            list[Role]: The list of roles in the guild.
+            List of roles in the guild.
         """
         resp = await self._http.get(self.roles_url)
         return list_model(Role).validate_python(resp.body)
@@ -40,10 +40,10 @@ class RoleResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#create-guild-role
 
         Args:
-            role_data (CreateRoleData): The data for the role to create.
+            role_data: Data for the role to create.
 
         Returns:
-            Role: The created role.
+            Created role.
         """
         payload = role_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http.post(self.roles_url, payload)
@@ -55,10 +55,10 @@ class RoleResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
 
         Args:
-            role_positions (list[RolePosition]): The list of role positions to change.
+            role_positions: List of role positions to change.
 
         Returns:
-            list[Role]: The list of roles in the guild.
+            List of roles in the guild.
         """
         resp = await self._http.patch(self.roles_url, role_positions)
         return list_model(Role).validate_python(resp.body)
@@ -69,11 +69,11 @@ class RoleResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#modify-guild-role
 
         Args:
-            role_id (LikeSnowflake): The ID of the role to update.
-            role_data (UpdateRoleData): The data for the role to update.
+            role_id: ID of the role to update.
+            role_data: Data for the role to update.
 
         Returns:
-            Role: The updated role.
+            Updated role.
         """
         url = self.roles_url / str(role_id)
         payload = role_data.model_dump(mode='json', exclude_unset=True)
@@ -86,8 +86,8 @@ class RoleResource(ClientSubresources):
         Reference: https://discord.com/developers/docs/resources/guild#delete-guild-role
 
         Args:
-            role_id (LikeSnowflake): The ID of the role to delete.
-            reason (str | None): The reason for deleting the role.
+            role_id: ID of the role to delete.
+            reason: Reason for deleting the role.
         """
         url = self.roles_url / str(role_id)
         if reason is not None:

@@ -99,7 +99,7 @@ class ApplicationCommandOptionChoice(BaseModel):
     """
 
     @field_validator('value')
-    def validate_value(cls, field_value: str | int | float) -> str | int | float:
+    def validate_value(cls, field_value: str | float) -> str | int | float:
         """Validates the value field."""
         if isinstance(field_value, str):
             if not (1 <= len(field_value) <= 100):  # noqa: PLR2004
@@ -299,7 +299,7 @@ class CreateApplicationCommandData(BaseModel):
         """Create data from an existing command.
 
         Args:
-            command (ApplicationCommand): Command to create data from.
+            command: Command to create data from.
 
         Returns:
             Data to create a new command.

@@ -13,7 +13,7 @@ class MemberResource(ClientSubresources):
     """Resource to perform actions on members.
 
     Attributes:
-        guilds_url (URL): URL for the guilds resource.
+        guilds_url: URL for the guilds resource.
     """
     guilds_url = REST_API_URL / 'guilds'
 
@@ -29,10 +29,10 @@ class MemberResource(ClientSubresources):
         This endpoint is restricted according to whether the GUILD_MEMBERS Privileged.
 
         Args:
-            user_id (LikeSnowflake): ID of the member to get.
+            user_id: ID of the member to get.
 
         Returns:
-            Member: Member object for the ID provided.
+            Member object for the ID provided.
         """
         url = self.members_url / str(user_id)
         resp = await self._http.get(url)
@@ -45,12 +45,12 @@ class MemberResource(ClientSubresources):
         Intent is enabled for your application.
 
         Args:
-            limit (int): The maximum number of members to return.
+            limit: Maximum number of members to return.
                 Should be between 1 and 1000. Defaults to 1.
-            after (LikeSnowflake): The ID of the member to start at.
+            after: ID of the member to start at.
 
         Returns:
-            list[Member]: List of members.
+            List of members.
         """
         url_params = {}
         if limit is not None:
@@ -66,12 +66,12 @@ class MemberResource(ClientSubresources):
         """Search members of a guild by username or nickname.
 
         Args:
-            nick_or_name (str): The name or nickname of the member to search for.
-            limit (int): The maximum number of members to return.
+            nick_or_name: Name or nickname of the member to search for.
+            limit: Maximum number of members to return.
                 Should be between 1 and 1000. Defaults to 1.
 
         Returns:
-            list[Member]: List of members.
+            List of members.
         """
         url_params = {}
         if nick_or_name is not None:
@@ -89,12 +89,12 @@ class MemberResource(ClientSubresources):
         """Update a member.
 
         Args:
-            user_id (LikeSnowflake): The ID of the member to update.
-            member_data (UpdateMemberData): The data to update.
-            reason (str | None): The reason for the update. Defaults to None.
+            user_id: ID of the member to update.
+            member_data: Data to update.
+            reason: Reason for the update. Defaults to None.
 
         Returns:
-            Member: The updated member.
+            The updated member.
         """
         url = self.members_url / str(user_id)
         if reason is not None:
@@ -108,12 +108,12 @@ class MemberResource(ClientSubresources):
         """Update the current member.
 
         Args:
-            nickname (str | None): The nickname to update to.
+            nickname: Nickname to update to.
                 None to reset to user's default nickname.
-            reason (str | None): The reason for the update. Defaults to None.
+            reason: Reason for the update. Defaults to None.
 
         Returns:
-            Member: The updated member.
+            The updated member.
         """
         url = self.members_url / '@me'
         if reason is not None:
@@ -130,10 +130,9 @@ class MemberResource(ClientSubresources):
         """Add a role to a member.
 
         Args:
-            user_id (LikeSnowflake): The ID of the member to add a role to.
-            role_id (LikeSnowflake): The ID of the role to add.
-            reason (str | None): The reason for adding the role to the member.
-                Defaults to None.
+            user_id: ID of the member to add a role to.
+            role_id: ID of the role to add.
+            reason: Reason for adding the role to the member. Defaults to None.
         """
         url = self.members_url / str(user_id) / 'roles' / str(role_id)
         if reason is not None:
@@ -148,10 +147,9 @@ class MemberResource(ClientSubresources):
         """Remove a role from a member.
 
         Args:
-            user_id (LikeSnowflake): The ID of the member to remove a role from.
-            role_id (LikeSnowflake): The ID of the role to remove.
-            reason (str | None): The reason for removing the role from the member.
-                Defaults to None.
+            user_id: ID of the member to remove a role from.
+            role_id: ID of the role to remove.
+            reason: Reason for removing the role from the member. Defaults to None.
         """
         url = self.members_url / str(user_id) / 'roles' / str(role_id)
         if reason is not None:
@@ -164,8 +162,8 @@ class MemberResource(ClientSubresources):
         """Kick a member from the guild.
 
         Args:
-            user_id (LikeSnowflake): The ID of the member to kick.
-            reason (str | None): The reason for kicking the member. Defaults to None.
+            user_id: ID of the member to kick.
+            reason: Reason for kicking the member. Defaults to None.
         """
         url = self.members_url / str(user_id)
         if reason is not None:

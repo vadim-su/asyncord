@@ -13,7 +13,7 @@ class BanResource(ClientSubresources):
     """Base class for ban resources.
 
     Attributes:
-        guilds_url (URL): Base guilds url.
+        guilds_url: Base guilds url.
     """
 
     guilds_url = REST_API_URL / 'guilds'
@@ -39,12 +39,12 @@ class BanResource(ClientSubresources):
         """List bans of a guild.
 
         Args:
-            limit (int | None): Number of bans to return. Defaults to None.
-            before (LikeSnowflake | None): ID of the ban to get bans before. Defaults to None.
-            after (LikeSnowflake | None): ID of the ban to get bans after. Defaults to None.
+            limit: Number of bans to return. Defaults to None.
+            before: ID of the ban to get bans before. Defaults to None.
+            after: ID of the ban to get bans after. Defaults to None.
 
         Returns:
-            list[Ban]: list of user bans.
+            List of user bans.
         """
         url_params = {}
         if limit is not None:
@@ -67,10 +67,10 @@ class BanResource(ClientSubresources):
         """Ban a user from a guild.
 
         Args:
-            user_id (LikeSnowflake): The ID of the user to ban.
-            delete_message_days (int | None): The number of days to delete messages for.
+            user_id: ID of a user to ban.
+            delete_message_days: Number of days to delete messages for.
                 Should be between 0 and 7. Defaults to 0.
-            reason (str | None): The reason for banning the user. Defaults to None.
+            reason: Reason for banning the user. Defaults to None.
         """
         url = self.bans_url / str(user_id)
 
@@ -90,8 +90,8 @@ class BanResource(ClientSubresources):
         """Unban a user from a guild.
 
         Args:
-            user_id (LikeSnowflake): The ID of the user to unban.
-            reason (str | None): The reason for unbanning the user. Defaults to None.
+            user_id: ID of the user to unban.
+            reason: Reason for unbanning the user. Defaults to None.
         """
         if reason is not None:
             headers = {AUDIT_LOG_REASON: reason}

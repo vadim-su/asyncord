@@ -46,10 +46,10 @@ class GatewayClient:
     """Class for the gateway client.
 
     Attributes:
-        token (str): Token to use for authentication.
-        intents (Intent): Intents to use for the client.
-        dispatcher (EventDispatcher): Event dispatcher.
-        is_started (bool): Whether the client is started.
+        token: Token to use for authentication.
+        intents: Intents to use for the client.
+        dispatcher: Event dispatcher.
+        is_started: Whether the client is started.
     """
 
     def __init__(
@@ -62,10 +62,10 @@ class GatewayClient:
         """Initialize client.
 
         Args:
-            token (str): Token to use for authentication.
-            session (aiohttp.ClientSession, None): Session to use for requests.
-            intents (Intent): Intents to use for the client.
-            ws_url (StrOrURL): URL to connect to. Defaults to the Discord Gateway URL.
+            token: Token to use for authentication.
+            session: Session to use for requests.
+            intents: Intents to use for the client.
+            ws_url: URL to connect to. Defaults to the Discord Gateway URL.
         """
         self.token = token
         self.intents = intents
@@ -119,7 +119,7 @@ class GatewayClient:
         """Add an event handler.
 
         Args:
-            event_handler (EventHandlerType[_EVENT_T]): The event handler to add.
+            event_handler: Event handler to add.
         """
         self.dispatcher.add_handler(event_handler)
 
@@ -127,7 +127,7 @@ class GatewayClient:
         """Identify with the gateway.
 
         Args:
-            command_data (IdentifyCommand): The data to send to the gateway.
+            command_data: Data to send to the gateway.
         """
         payload = command_data.model_dump(mode='json', exclude_none=True)
         await self._send_command(GatewayCommandOpcode.IDENTIFY, payload)
@@ -148,7 +148,7 @@ class GatewayClient:
         """Update the client's presence.
 
         Args:
-            presence_data (PresenceUpdateData): Data to send to the gateway.
+            presence_data: Data to send to the gateway.
         """
         prepared_data = presence_data.model_dump(mode='json')
         await self._send_command(GatewayCommandOpcode.PRESENCE_UPDATE, prepared_data)
@@ -158,7 +158,7 @@ class GatewayClient:
         """Return the URL of the websocket connection.
 
         Returns:
-            StrOrURL: The URL of the websocket connection.
+            URL of the websocket connection.
         """
         return self._resume_url or self._ws_url
 
@@ -180,8 +180,8 @@ class GatewayClient:
         """Send a command to the gateway.
 
         Args:
-            op (GatewayCommandOpcode): Opcode of the command.
-            command_data (Any): Command data to send.
+            op: Opcode of the command.
+            command_data: Command data to send.
 
         Raises:
             RuntimeError: If the client is not connected.
@@ -196,7 +196,7 @@ class GatewayClient:
         This method is responsible for dispatching events to the registered handlers.
 
         Args:
-            msg (GatewayMessage): The message to handle.
+            msg: Message to handle.
 
         Raises:
             InvalidSessionError: If the session is invalid.
@@ -242,7 +242,7 @@ class GatewayClient:
         """Handle a hello event.
 
         Args:
-            event (HelloEvent): The event to handle.
+            event: Event to handle.
         """
         heartbeat_period = floor(event.heartbeat_interval / 1000)
         await self._heartbeat.reset_heartbeat(heartbeat_period)
