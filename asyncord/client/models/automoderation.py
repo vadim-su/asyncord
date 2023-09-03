@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import enum
-from typing import Any
+from typing import Self
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, FieldValidationInfo, field_validator, model_validator
 
 from asyncord.snowflake import Snowflake
 
@@ -132,27 +132,25 @@ class RuleAction(BaseModel):
     metadata: RuleActionMetadata | None = None
     """the action metadata"""
 
-    @validator('type')
-    def check_actions(cls, value: RuleActionType, values: dict[str, Any]) -> RuleActionType:
-        """Check that the metadata is valid for the action type."""
-        metadata: RuleActionMetadata = values['metadata']
-
-        match value:
+    @model_validator(mode='after')
+    def validate_metadata(self) -> Self:
+        """Validate the metadata for the action."""
+        match self.type:
             case RuleActionType.BLOCK_MESSAGE:
-                if metadata:
+                if self.metadata:
                     raise ValueError('Metadata is not allowed for `RuleActionType.BLOCK_MESSAGE`')
 
             case RuleActionType.SEND_ALERT_MESSAGE:
-                if not metadata or metadata.channel_id is None:
+                if not self.metadata or self.metadata.channel_id is None:
                     raise ValueError(
                         '`Metadata.channel_id` is required for `RuleActionType.SEND_ALERT_MESSAGE`',
                     )
 
             case RuleActionType.TIMEOUT:
-                if not metadata or metadata.duration_seconds is None:
+                if not self.metadata or self.metadata.duration_seconds is None:
                     raise ValueError('`Metadata.duration_seconds` is required for `RuleActionType.TIMEOUT`')
 
-        return value
+        return self
 
 
 class AutoModerationRule(BaseModel):
@@ -191,19 +189,20 @@ class AutoModerationRule(BaseModel):
     exempt_channels: list[Snowflake] = Field(max_length=50)
     """the channel ids that should not be affected by the rule (Maximum of 50)"""
 
-    @validator('actions', each_item=True)
-    def check_actions(cls, value: RuleAction, values: dict[str, Any]) -> RuleAction:
-        """Validate the actions for the rule."""
-        trigger_type: TriggerType = values['trigger_type']
+    @field_validator('actions')
+    def check_actions(cls, actions: list[RuleAction], field_info: FieldValidationInfo) -> list[RuleAction]:
+        """Validate actions for the rule."""
+        trigger_type: TriggerType = field_info.data['trigger_type']
 
         keyword_or_mention_spam = trigger_type in {
             TriggerType.KEYWORD,
             TriggerType.MENTION_SPAM,
         }
-        if value.type is RuleActionType.TIMEOUT and not keyword_or_mention_spam:
-            raise ValueError(
-                'Timeout actions can only be used with `TriggerType.KEYWORD` '
-                + 'and `TriggerType.MENTION_SPAM` triggers.',
-            )
+        for action in actions:
+            if action.type is RuleActionType.TIMEOUT and not keyword_or_mention_spam:
+                raise ValueError(
+                    'Timeout actions can only be used with `TriggerType.KEYWORD` '
+                    + 'and `TriggerType.MENTION_SPAM` triggers.',
+                )
 
-        return value
+        return actions

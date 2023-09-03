@@ -1,9 +1,12 @@
+"""This module contains models related to scheduled events in a guild."""
+
 from __future__ import annotations
 
 import datetime
 import enum
+from typing import Self
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, model_validator
 
 from asyncord.client.models.users import User
 from asyncord.snowflake import Snowflake
@@ -129,54 +132,33 @@ class GuildScheduleEvent(BaseModel):
     image: str | None = None
     """the cover image hash of the scheduled event"""
 
-    @validator('channel_id')
-    def check_channel_id(cls, value: Snowflake | None, values) -> Snowflake | None:
-        entity_type: EventEntityType = values.get('entity_type')
 
-        if entity_type is EventEntityType.EXTERNAL:
-            if value is not None:
-                raise ValueError('`channel_id` must be None if `entity_type` is EXTERNAL')
-
-        elif entity_type in {EventEntityType.STAGE_INSTANCE, EventEntityType.VOICE}:
-            if value is None:
-                raise ValueError(
-                    '`channel_id` must not be None if `entity_type` is STAGE_INSTANCE or VOICE',
-                )
-
-        return value
-
-    @validator('entity_metadata')
-    def check_entity_metadata(cls, value: EventEntityMetadata | None, values) -> EventEntityMetadata | None:
-        entity_type: EventEntityType = values.get('entity_type')
-
-        match entity_type:
+    # FIXME: #26 This is a temporary solution. Need to replace with multiple models.
+    @model_validator(mode='after')
+    def validate_entity_type(self) -> Self:
+        """Validates the entity type of the scheduled event."""
+        match self.entity_type:
             case EventEntityType.EXTERNAL:
-                if value is None:
-                    raise ValueError(
-                        '`entity_metadata` must not be None if `entity_type` is EXTERNAL',
-                    )
+                if self.channel_id:
+                    raise ValueError('`channel_id` must be None if `entity_type` is EXTERNAL')
 
-                if value.location is None:
-                    raise ValueError(
-                        '`entity_metadata.location` must not be None if `entity_type` is EXTERNAL',
-                    )
+                if not self.scheduled_end_time:
+                    raise ValueError('`scheduled_end_time` must be set if `entity_type` is EXTERNAL')
+
+                if not self.entity_metadata:
+                    raise ValueError('`entity_metadata` must be set if `entity_type` is EXTERNAL')
+
+                if not self.entity_metadata.location:
+                    raise ValueError('`entity_metadata.location` must be set if `entity_type` is EXTERNAL')
 
             case EventEntityType.STAGE_INSTANCE | EventEntityType.VOICE:
-                if value is not None:
+                if not self.channel_id:
+                    raise ValueError(
+                        '`channel_id` must be set if `entity_type` is STAGE_INSTANCE or VOICE',
+                    )
+                if self.entity_metadata:
                     raise ValueError(
                         '`entity_metadata` must be None if `entity_type` is STAGE_INSTANCE or VOICE',
                     )
 
-        return value
-
-    @validator('scheduled_end_time')
-    def check_scheduled_end_time(cls, value: datetime.datetime | None, values) -> datetime.datetime | None:
-        entity_type: EventEntityType = values.get('entity_type')
-
-        if entity_type is EventEntityType.EXTERNAL:
-            if not value:
-                raise ValueError(
-                    '`scheduled_end_time` must not be None if `entity_type` is EXTERNAL',
-                )
-
-        return value
+        return self
