@@ -9,11 +9,13 @@ https://discord.com/developers/docs/resources/guild
 
 from __future__ import annotations
 
+import base64
 import datetime
 import enum
+import imghdr
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from asyncord.client.models.channels import ChannelType, Overwrite
 from asyncord.client.models.emoji import Emoji
@@ -50,8 +52,7 @@ class CreateGuildData(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     """Name of the guild (2-100 characters)."""
 
-    # TODO: #14 Implement icon uploading and base64 encoding
-    icon: str | None = None
+    icon: str | bytes | None = None
     """Base64 128x128 image for the guild icon.
 
     Exmaple:
@@ -107,6 +108,23 @@ class CreateGuildData(BaseModel):
 
     system_channel_flags: int | None = None
     """System channel flags."""
+
+    @field_validator('icon')
+    def validate_icon(cls, image_data: str | bytes | None) -> str | None:
+        """Validate the icon."""
+        if not image_data:
+            return None
+
+        if isinstance(image_data, str):
+            if not image_data.startswith('data:image/'):
+                raise ValueError('Icon must be a base64 encoded image.')
+            return image_data
+
+        encoded_string = base64.b64encode(image_data).decode('utf-8')
+        img_type = imghdr.what(None, image_data)
+        if not img_type:
+            raise ValueError('Icon must be a valid image.')
+        return f'data:image/{img_type};base64,{encoded_string}'
 
 
 class WelcomeScreenChannel(BaseModel):
