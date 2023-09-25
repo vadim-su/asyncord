@@ -69,11 +69,15 @@ class RateLimitBody(BaseModel):
 class AsyncHttpClient:
     """Asyncronous HTTP client."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        session: aiohttp.ClientSession | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> None:
         """Initialize the client."""
         asyncio.get_running_loop()
-        self._session: aiohttp.ClientSession | None = None
-        self._headers = {}
+        self._session = session
+        self._headers = headers or {}
 
     async def get(
         self,
@@ -175,17 +179,12 @@ class AsyncHttpClient:
         Args:
             headers: Headers to send with requests.
         """
-        # FIXME: #3 session can be used outside of the current client and we shouldn't be setting it here
         self._headers = headers
-        if self._session:
-            self._session.headers.clear()
-            self._session.headers.update(headers)
 
     def start(self) -> None:
         """Initialize the client."""
         asyncio.get_running_loop()
         self._session = aiohttp.ClientSession()
-        self.set_headers(self._headers)
 
     async def close(self) -> None:
         """Close the client."""
