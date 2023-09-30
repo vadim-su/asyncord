@@ -1,3 +1,4 @@
+from yarl import URL
 from asyncord.client.messages import MessageResource
 from asyncord.client.models.messages import (
     Embed,
@@ -65,8 +66,8 @@ async def test_cteate_message_with_attachment_in_embed(messages_res: MessageReso
 
     assert len(message.embeds) == 1
     assert message.embeds[0].title == embed.title
-    assert message.embeds[0].image.url.endswith(TEST_FILE_NAMES[0])
-    assert message.embeds[0].thumbnail.url.endswith(TEST_FILE_NAMES[1])
+    assert URL(message.embeds[0].image.url).path.endswith(TEST_FILE_NAMES[0])
+    assert URL(message.embeds[0].thumbnail.url).path.endswith(TEST_FILE_NAMES[1])
 
     await messages_res.delete(message.id)
 
