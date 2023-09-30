@@ -1,3 +1,5 @@
+"""Mapping of event names to event classes."""
+
 import inspect
 from collections.abc import Generator, Mapping
 from types import MappingProxyType
@@ -14,7 +16,7 @@ from asyncord.gateway.events import (
     messages,
     moderation,
     presence,
-    schedule,
+    scheduled_events,
 )
 
 
@@ -41,7 +43,7 @@ EVENT_MAP: Mapping[str, type[base.GatewayEvent]] = MappingProxyType({
         messages,
         moderation,
         presence,
-        schedule,
+        scheduled_events,
     ])
 })
 """Mapping of event names to event classes.

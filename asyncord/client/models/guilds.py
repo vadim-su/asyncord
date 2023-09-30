@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field, field_validator
 from asyncord.client.models.channels import ChannelType, Overwrite
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.roles import Role
-from asyncord.client.models.schedule import GuildScheduleEvent
+from asyncord.client.models.scheduled_events import ScheduledEvent
 from asyncord.client.models.users import User
 from asyncord.snowflake import Snowflake
 
@@ -555,7 +555,7 @@ class Invite(BaseModel):
     Return from get_invite endpoint only when `with_expiration` is True.
     """
 
-    guild_scheduled_event: GuildScheduleEvent | None = None
+    guild_scheduled_event: ScheduledEvent | None = None
     """Guild scheduled event.
 
     Return from get_invite endpoint only when `guild_scheduled_event_id` is not None

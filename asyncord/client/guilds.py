@@ -26,6 +26,7 @@ from asyncord.client.models.guilds import (
 )
 from asyncord.client.resources import ClientSubresources
 from asyncord.client.roles import RoleResource
+from asyncord.client.scheduled_events import ScheduledEventsResource
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
@@ -74,6 +75,17 @@ class GuildResource(ClientSubresources):
             Role subresource for the guild.
         """
         return RoleResource(self, guild_id)
+
+    def events(self, guild_id: LikeSnowflake) -> ScheduledEventsResource:
+        """Get the events subresource for a guild.
+
+        Args:
+            guild_id: ID of the guild to get the events subresource for.
+
+        Returns:
+            Events subresource for the guild.
+        """
+        return ScheduledEventsResource(self, guild_id)
 
     async def get(self, guild_id: LikeSnowflake, with_counts: bool = False) -> Guild:
         """Get a guild.
