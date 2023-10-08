@@ -8,35 +8,19 @@ urls = { homepage = "https://github.com/suharnikov/asyncord", repository = "http
 readme = "README.md"
 license = { text = "MIT" }
 
-requires-python = ">=3.11.0"
+requires-python = ">=3.12.0"
 dependencies = [
-    "aiohttp>=3.8.1",
     "yarl>=1.8.1",
     "sentinel>=1.0.0",
-    "loguru>=0.6.0",
     "rich>=12.5.1",
-    "pydantic @ git+https://github.com/pydantic/pydantic.git",
+    "pydantic>=2.4.2",
+    "aiohttp<4",
 ]
 
-
-[tool.pdm]
-[tool.pdm.dev-dependencies]
-dev = ["pre-commit>=3.3.2"]
-linting = [
-    "autopep8>=2.0.2", # confglct with wemake-python-styleguide
-    "ruff>=0.0.269",
-]
-testing = ["pytest>=7.3.1", "pytest-asyncio>=0.19.0", "pytest-pretty>=1.2.0"]
 
 [build-system]
 requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
-
-[tool.isort]
-line_length = 110
-multi_line_output = 3
-include_trailing_comma = true
-length_sort = true
 
 [tool.pytest.ini_options]
 minversion = "6.2"
@@ -47,6 +31,15 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+
+[tool.autopep8]
+max_line_length = 120
+
+[tool.isort]
+line_length = 110
+multi_line_output = 3
+include_trailing_comma = true
+length_sort = true
 
 extend-exclude = [
     "tests",
@@ -158,3 +151,27 @@ convention = "google"
 
 [tool.ruff.flake8-annotations]
 mypy-init-return = true
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
+
+# for strict mypy: (this is the tricky one :-))
+disallow_untyped_defs = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = ["pre-commit>=3.3.2"]
+linting = ["autopep8>=2.0.2", "ruff>=0.0.269"]
+testing = ["pytest>=7.3.1", "pytest-asyncio>=0.19.0", "pytest-pretty>=1.2.0"]

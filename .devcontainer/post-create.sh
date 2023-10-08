@@ -2,7 +2,6 @@
 
 # This script runs after the container is created.
 
-pip3 install --user "pdm<3.0.0"
 pdm sync
 pre-commit install
 
