@@ -27,10 +27,8 @@
 			"extensions": [
 				"ms-python.python",
 				"ms-python.vscode-pylance",
-				"GitHub.copilot-nightly",
 				"tamasfe.even-better-toml",
 				"github.vscode-github-actions",
-				"redhat.vscode-yaml",
 				"charliermarsh.ruff",
 				"ms-python.autopep8"
 			]
