@@ -1,5 +1,6 @@
 """This module defines the EventDispatcher class, which dispatches events to registered handlers."""
 
+import logging
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, MutableMapping
 from typing import (
@@ -13,9 +14,6 @@ from typing import (
     overload,
 )
 
-from loguru import logger
-from rich.logging import RichHandler
-
 from asyncord.gateway.events.base import GatewayEvent
 
 _EVENT_T = TypeVar('_EVENT_T', bound=GatewayEvent)
@@ -23,13 +21,7 @@ _EVENT_HANDLERS_P = ParamSpec('_EVENT_HANDLERS_P')
 
 EventHandlerType = Callable[Concatenate[_EVENT_T, _EVENT_HANDLERS_P], Awaitable[None]]
 
-logger.configure(handlers=[{
-    'sink': RichHandler(
-        omit_repeated_times=False,
-        rich_tracebacks=True,
-    ),
-    'format': '{message}',
-}])
+logger = logging.getLogger(__name__)
 
 
 class EventDispatcher(Generic[_EVENT_T]):

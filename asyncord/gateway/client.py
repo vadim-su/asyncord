@@ -13,8 +13,6 @@ from typing import Any, TypeVar, cast
 
 import aiohttp
 from aiohttp import ClientWebSocketResponse, WSMsgType
-from loguru import logger
-from rich.logging import RichHandler
 from rich.pretty import pretty_repr
 
 from asyncord.client.models.activity import Activity, ActivityType
@@ -30,16 +28,9 @@ from asyncord.gateway.message import GatewayCommandOpcode, GatewayEventOpcode, G
 from asyncord.typedefs import StrOrURL
 from asyncord.urls import GATEWAY_URL
 
-logger.configure(handlers=[{
-    'sink': RichHandler(
-        omit_repeated_times=False,
-        rich_tracebacks=True,
-    ),
-    'format': '{message}',
-}])
-
 
 _EVENT_T = TypeVar('_EVENT_T', bound=GatewayEvent)
+logger = logging.getLogger(__name__)
 
 
 class GatewayClient:
@@ -201,7 +192,7 @@ class GatewayClient:
         Raises:
             InvalidSessionError: If the session is invalid.
         """
-        logger.debug('Got message:\n{0}', pretty_repr(msg))
+        logger.debug('Got message:\n%s', pretty_repr(msg))
         self._last_seq_number = max(self._last_seq_number, msg.sequence_number or 0)
 
         match msg.opcode:
@@ -215,7 +206,7 @@ class GatewayClient:
 
                     await self.dispatcher.dispatch(event)
                 else:
-                    logger.warning("Event '{0}' unhandled", msg.event_name)
+                    logger.warning("Event '%s' unhandled", msg.event_name)
 
             case GatewayEventOpcode.INVALID_SESSION:
                 session_id = cast(str, self._session_id)
@@ -236,7 +227,7 @@ class GatewayClient:
                 raise errors.NecessaryReconnectError
 
             case _:
-                logger.warning('Unhandled message:\n{0}', pretty_repr(msg))
+                logger.debug('Unhandled message:\n%s', pretty_repr(msg))
 
     async def _hello(self, event: HelloEvent) -> None:
         """Handle a hello event.

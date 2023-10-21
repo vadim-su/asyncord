@@ -1,10 +1,10 @@
 """Mapping of event names to event classes."""
 
 import inspect
+import logging
 from collections.abc import Generator, Mapping
 from types import MappingProxyType
 
-from loguru import logger
 from rich.pretty import pretty_repr
 
 from asyncord.gateway.events import (
@@ -18,6 +18,8 @@ from asyncord.gateway.events import (
     presence,
     scheduled_events,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _get_all_event_classes(modules: list[object]) -> Generator[type[base.GatewayEvent], None, None]:
@@ -51,4 +53,4 @@ EVENT_MAP: Mapping[str, type[base.GatewayEvent]] = MappingProxyType({
 https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events
 """
 
-logger.debug(pretty_repr(EVENT_MAP))
+logger.debug("The EVENT_MAP contains %d events:\n%s", len(EVENT_MAP), pretty_repr(EVENT_MAP))

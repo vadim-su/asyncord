@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncord.logger  # noqa: F401 # initial logger for every resource
 from asyncord.client.http.client import AsyncHttpClient
 from asyncord.client.http.headers import AUTHORIZATION
 from asyncord.client.ports import AsyncHttpClientPort

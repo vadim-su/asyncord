@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import logging
 from collections.abc import Mapping, Sequence
 from http import HTTPStatus
 from types import MappingProxyType, TracebackType
@@ -13,7 +12,6 @@ from typing import TYPE_CHECKING, Any, BinaryIO, NamedTuple
 import aiohttp
 from aiohttp.client import ClientResponse
 from pydantic import BaseModel, Field
-from rich.logging import RichHandler
 
 from asyncord.client.http import errors
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
@@ -22,16 +20,6 @@ from asyncord.typedefs import Payload, StrOrURL
 if TYPE_CHECKING:
     from contextlib import AbstractAsyncContextManager
     from typing import Self
-
-logging.basicConfig(
-    handlers=[
-        RichHandler(
-            omit_repeated_times=False,
-            rich_tracebacks=True,
-        ),
-    ],
-    level=logging.DEBUG,
-)
 
 
 AttachedFile = tuple[str, str, BinaryIO | bytes]
@@ -235,7 +223,6 @@ class AsyncHttpClient:
             headers = self._headers
         else:
             headers = {**self._headers, **headers}
-        logging.basicConfig(level=logging.DEBUG)
 
         async with self._make_raw_request(method, url, payload, files, headers) as resp:
             body, message = await self._extract_body_and_message(resp)

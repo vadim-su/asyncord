@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import datetime
+import logging
 import random
 from collections.abc import Awaitable, Callable
 
-from loguru import logger
-
 from asyncord.gateway import errors
+
+logger = logging.getLogger(__name__)
 
 MAX_TIMEOUT_IN_ROW = 3
 """Maximum number of timeouts in a row before failing."""
@@ -117,13 +118,13 @@ class Heartbeat:
         next_run = round(next_run, 3)
         next_run_time = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(seconds=next_run)
 
-        logger.debug('Heartbeat sent. Next run in {0} seconds', next_run)
+        logger.debug('Heartbeat sent. Next run in %s seconds', next_run)
 
         try:
             # wait for heartbeat ack or timeout in next_run seconds
             await asyncio.wait_for(self._event.wait(), next_run)
         except asyncio.TimeoutError:
-            logger.debug('Heartbeat ack timeout for {0} seconds', next_run)
+            logger.debug('Heartbeat ack timeout for %s seconds', next_run)
             raise
 
         logger.debug('Heartbeat ack event received')

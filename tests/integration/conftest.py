@@ -1,10 +1,10 @@
 from typing import Any, AsyncGenerator
+
 import aiohttp
 import pytest
 
 from asyncord.client.rest import RestClient
 from asyncord.gateway.client import GatewayClient
-
 
 TEST_CHANNEL_ID = '920187645265608714'
 TEST_VOICE_CHANNEL_ID = '1157605385826476062'
