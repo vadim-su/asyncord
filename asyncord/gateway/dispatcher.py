@@ -7,7 +7,6 @@ from typing import (
     Any,
     Concatenate,
     Generic,
-    ParamSpec,
     TypeVar,
     cast,
     get_type_hints,
@@ -17,9 +16,9 @@ from typing import (
 from asyncord.gateway.events.base import GatewayEvent
 
 _EVENT_T = TypeVar('_EVENT_T', bound=GatewayEvent)
-_EVENT_HANDLERS_P = ParamSpec('_EVENT_HANDLERS_P')
+EventHandlerType = Callable[Concatenate[_EVENT_T, ...], Awaitable[None]]
+"""Type alias for an event handler."""
 
-EventHandlerType = Callable[Concatenate[_EVENT_T, _EVENT_HANDLERS_P], Awaitable[None]]
 
 logger = logging.getLogger(__name__)
 
@@ -30,31 +29,31 @@ class EventDispatcher(Generic[_EVENT_T]):
     def __init__(self) -> None:
         """Initialize the event dispatcher."""
         self._handlers: MutableMapping[
-            type[_EVENT_T], list[EventHandlerType[_EVENT_T, ...]],
+            type[_EVENT_T], list[EventHandlerType[_EVENT_T]],
         ] = defaultdict(list)
 
         self._args: dict[str, Any] = {}
 
         self._arg_map: dict[
-            EventHandlerType[_EVENT_T, ...], dict[str, Any],
+            EventHandlerType[_EVENT_T], dict[str, Any],
         ] = {}
 
     @overload
     def add_handler(
         self,
         event_type: type[_EVENT_T],
-        event_handler: EventHandlerType[_EVENT_T, ...],
+        event_handler: EventHandlerType[_EVENT_T],
     ) -> None:
         ...
 
     @overload
-    def add_handler(self, event_type: EventHandlerType[_EVENT_T, ...]) -> None:
+    def add_handler(self, event_type: EventHandlerType[_EVENT_T]) -> None:
         ...
 
     def add_handler(
         self,
-        event_type: type[_EVENT_T] | EventHandlerType[_EVENT_T, ...],
-        event_handler: EventHandlerType[_EVENT_T, ...] | None = None,
+        event_type: type[_EVENT_T] | EventHandlerType[_EVENT_T],
+        event_handler: EventHandlerType[_EVENT_T] | None = None,
     ) -> None:
         """Add a handler for a specific event type.
 
@@ -69,7 +68,7 @@ class EventDispatcher(Generic[_EVENT_T]):
             ValueError: If the event type is not specified and cannot be inferred.
         """
         if event_handler is None:
-            event_handler = cast(EventHandlerType[_EVENT_T, ...], event_type)
+            event_handler = cast(EventHandlerType[_EVENT_T], event_type)
             handler_arg_types = list(get_type_hints(event_handler).values())
 
             if not handler_arg_types:
@@ -113,7 +112,7 @@ class EventDispatcher(Generic[_EVENT_T]):
             except Exception as exc:
                 logger.exception(exc)
 
-    def _update_handler_args(self, event_handler: EventHandlerType[_EVENT_T, ...]) -> None:
+    def _update_handler_args(self, event_handler: EventHandlerType[_EVENT_T]) -> None:
         """Update the arguments to pass to an event handler.
 
         Args:

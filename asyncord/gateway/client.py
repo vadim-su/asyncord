@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from math import floor
-from typing import Any, TypeVar, cast
+from typing import Any, cast
 
 import aiohttp
 from aiohttp import ClientWebSocketResponse, WSMsgType
@@ -29,8 +29,6 @@ from asyncord.gateway.message import GatewayCommandOpcode, GatewayEventOpcode, G
 from asyncord.typedefs import StrOrURL
 from asyncord.urls import GATEWAY_URL
 
-
-_EVENT_T = TypeVar('_EVENT_T', bound=GatewayEvent)
 logger = logging.getLogger(__name__)
 
 
@@ -107,7 +105,7 @@ class GatewayClient:
         if self.ws:
             await self.ws.close()
 
-    def add_handler(self, event_handler: EventHandlerType[_EVENT_T, ...]) -> None:
+    def add_handler[EVENT_T: GatewayEvent](self, event_handler: EventHandlerType[EVENT_T]) -> None:
         """Add an event handler.
 
         Args:
