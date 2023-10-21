@@ -13,6 +13,7 @@ from typing import Any, TypeVar, cast
 
 import aiohttp
 from aiohttp import ClientWebSocketResponse, WSMsgType
+from pydantic import ValidationError
 from rich.pretty import pretty_repr
 
 from asyncord.client.models.activity import Activity, ActivityType
@@ -157,15 +158,18 @@ class GatewayClient:
         while self.is_started:
             msg = await ws.receive()
 
-            if msg.type == WSMsgType.TEXT:
-                await self._handle_message(GatewayMessage(**msg.json()))
+            match msg.type:
+                case WSMsgType.TEXT:
+                    body = msg.json()
+                    gw_message = GatewayMessage.model_validate(body)
+                    await self._handle_message(gw_message)
 
-            elif msg.type in {WSMsgType.CLOSE, WSMsgType.CLOSING, WSMsgType.CLOSED}:
-                logger.info(f'Connection closed: {msg.data} {msg.extra}')
-                break
+                case WSMsgType.CLOSE | WSMsgType.CLOSING | WSMsgType.CLOSED:
+                    logger.info(f'Connection closed: {msg.data} {msg.extra}')
+                    break
 
-            else:
-                logger.warning(f'Unhandled websocket message type: {msg.type}')
+                case _:
+                    logger.warning(f'Unhandled websocket message type: {msg.type}')
 
     async def _send_command(self, op: GatewayCommandOpcode, command_data: Any) -> None:  # noqa: ANN401
         """Send a command to the gateway.
@@ -199,7 +203,11 @@ class GatewayClient:
             case GatewayEventOpcode.DISPATCH:
                 event_class = EVENT_MAP.get(cast(str, msg.event_name))
                 if event_class:
-                    event = event_class.model_validate(msg.msg_data)
+                    try:
+                        event = event_class.model_validate(msg.msg_data)
+                    except ValidationError as err:
+                        logger.exception(err)
+                        return
                     if isinstance(event, ReadyEvent):
                         self._resume_url = event.resume_gateway_url
                         self._session_id = event.session_id
