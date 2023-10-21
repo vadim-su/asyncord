@@ -9,14 +9,13 @@ https://discord.com/developers/docs/resources/guild
 
 from __future__ import annotations
 
-import base64
 import datetime
 import enum
-import imghdr
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
+from asyncord.base64_image import Base64ImageInput
 from asyncord.client.models.channels import ChannelType, Overwrite
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.roles import Role
@@ -52,12 +51,8 @@ class CreateGuildData(BaseModel):
     name: str = Field(min_length=2, max_length=100)
     """Name of the guild (2-100 characters)."""
 
-    icon: str | bytes | None = None
-    """Base64 128x128 image for the guild icon.
-
-    Exmaple:
-        data:image/jpeg;base64,{BASE64_ENCODED_JPEG_IMAGE_DATA}
-    """
+    icon: Base64ImageInput | None = None
+    """Base64 128x128 image for the guild icon."""
 
     verification_level: int | None = None
     """Verification level."""
@@ -108,23 +103,6 @@ class CreateGuildData(BaseModel):
 
     system_channel_flags: int | None = None
     """System channel flags."""
-
-    @field_validator('icon')
-    def validate_icon(cls, image_data: str | bytes | None) -> str | None:
-        """Validate the icon."""
-        if not image_data:
-            return None
-
-        if isinstance(image_data, str):
-            if not image_data.startswith('data:image/'):
-                raise ValueError('Icon must be a base64 encoded image.')
-            return image_data
-
-        encoded_string = base64.b64encode(image_data).decode('utf-8')
-        img_type = imghdr.what(None, image_data)
-        if not img_type:
-            raise ValueError('Icon must be a valid image.')
-        return f'data:image/{img_type};base64,{encoded_string}'
 
 
 class WelcomeScreenChannel(BaseModel):
@@ -587,7 +565,7 @@ class GuildCreateChannel(BaseModel):
     user_limit: int | None = None
     """User limit of the voice channel."""
 
-    rate_limit_per_user: int | None = Field(None, min=0, max=21600)
+    rate_limit_per_user: int | None = Field(None, ge=0, le=21600)
     """Amount of seconds a user has to wait before sending another message(0 - 21600).
 
     Bots, as well as users with the permission manage_messages or manage_channel,

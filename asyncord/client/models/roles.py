@@ -1,8 +1,12 @@
+"""Role models for the client."""
+
 import typing
 
 from pydantic import BaseModel
 
+from asyncord.base64_image import Base64ImageInput
 from asyncord.client.models.permissions import PermissionFlag
+from asyncord.color import DEFAULT_COLOR, ColorInput
 from asyncord.snowflake import Snowflake
 
 
@@ -11,22 +15,31 @@ class CreateRoleData(BaseModel):
     """Name of the role."""
 
     permissions: str | None = None
-    'bitwise value of the enabled/disabled permissions. Defaults to @everyone permissions in guild'
+    """Bitwise value of the enabled/disabled permissions.
 
-    color: int = 0
-    """RGB color value of the role. Defaults to 0."""
+    Defaults to @everyone permissions in guild
+    """
+
+    color: ColorInput = DEFAULT_COLOR
+    """RGB color value of the role.
+
+    Defaults to 0.
+    """
 
     hoist: bool = False
-    'Whether the role should be displayed separately in the sidebar. Defaults to False.'
+    """Whether the role should be displayed separately in the sidebar. Defaults to False."""
 
-    icon: str | None = None
-    """The role's icon image (if the guild has the ROLE_ICONS feature). Defaults to False."""
+    icon: Base64ImageInput | None = None
+    """Role's icon image (if the guild has the ROLE_ICONS feature)."""
 
     unicode_emoji: str | None = None
-    """the role's unicode emoji as a standard emoji(if the guild has the ROLE_ICONS feature)."""
+    """Role's unicode emoji as a standard emoji (if the guild has the ROLE_ICONS feature)."""
 
     mentionable: bool = False
-    """Whether the role should be mentionable. Defaults to False."""
+    """Whether the role should be mentionable.
+
+    Defaults to False.
+    """
 
 
 class UpdateRoleData(BaseModel):
@@ -34,19 +47,28 @@ class UpdateRoleData(BaseModel):
     """Name of the role."""
 
     permissions: str | None = None
-    'bitwise value of the enabled/disabled permissions. Defaults to @everyone permissions in guild'
+    """Bitwise value of the enabled/disabled permissions.
 
-    color: int | None = None
+    Defaults to @everyone permissions in guild.
+    """
+
+    color: ColorInput | None = None
     """RGB color value of the role."""
 
     hoist: bool | None = None
-    'Whether the role should be displayed separately in the sidebar. Defaults to False.'
+    """Whether the role should be displayed separately in the sidebar.
+
+    Defaults to False.
+    """
 
     icon: str | None = None
-    """The role's icon image (if the guild has the ROLE_ICONS feature). Defaults to False."""
+    """Role's icon image (if the guild has the ROLE_ICONS feature).
+
+    Defaults to False.
+    """
 
     unicode_emoji: str | None = None
-    """the role's unicode emoji as a standard emoji(if the guild has the ROLE_ICONS feature).
+    """Role's unicode emoji as a standard emoji(if the guild has the ROLE_ICONS feature).
 
     Defaults to False.
     """
@@ -56,13 +78,13 @@ class UpdateRoleData(BaseModel):
 
 class RoleTags(BaseModel):
     bot_id: Snowflake | None = None
-    """the id of the bot this role belongs to"""
+    """Id of the bot this role belongs to."""
 
     integration_id: Snowflake | None = None
-    """the id of the integration this role belongs to"""
+    """Id of the integration this role belongs to."""
 
     premium_subscriber: typing.Any = None
-    """whether this is the guild's premium subscriber role"""
+    """Whether this is the guild's premium subscriber role."""
 
 
 class Role(BaseModel):
@@ -80,7 +102,7 @@ class Role(BaseModel):
     name: str
     """Role name."""
 
-    color: int
+    color: ColorInput
     """Integer representation of hexadecimal color code."""
 
     hoist: bool
@@ -110,7 +132,7 @@ class Role(BaseModel):
 
 class RolePosition(BaseModel):
     id: Snowflake
-    """role id"""
+    """Role id."""
 
     position: int | None = None
-    """sorting position of the role"""
+    """Sorting position of the role."""

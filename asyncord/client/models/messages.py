@@ -22,6 +22,7 @@ from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.members import Member
 from asyncord.client.models.stickers import Sticker
 from asyncord.client.models.users import User
+from asyncord.color import ColorInput
 from asyncord.snowflake import Snowflake
 
 MAX_EMBED_TEXT_LENGTH = 6000
@@ -293,7 +294,7 @@ class Embed(BaseModel):
     timestamp: datetime.datetime | None = None
     """Timestamp of the embed content."""
 
-    color: int | None = None
+    color: ColorInput | None = None
     """Color code of the embed."""
 
     footer: EmbedFooter | None = None

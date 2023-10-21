@@ -9,6 +9,7 @@ import enum
 from typing import Any, Literal, Union
 
 from pydantic import BaseModel, Field, model_validator
+from asyncord.base64_image import Base64ImageInput
 
 from asyncord.client.models.channels import ChannelFlag, ChannelType, Overwrite
 from asyncord.snowflake import Snowflake
@@ -206,7 +207,7 @@ class UpdatGroupDMChannelData(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=100)
     """Character channel name."""
 
-    icon: str | None = None
+    icon: Base64ImageInput | None = None
     """Base64 encoded icon"""
 
 

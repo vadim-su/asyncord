@@ -6,6 +6,7 @@ import enum
 
 from pydantic import BaseModel
 
+from asyncord.color import ColorInput
 from asyncord.snowflake import Snowflake
 
 
@@ -126,9 +127,8 @@ class User(BaseModel):
     banner: str | None = None
     """User's banner hash."""
 
-    accent_color: int | None = None
-    """User's banner color encoded as an integer representation of
-        hexadecimal color code."""
+    accent_color: ColorInput | None = None
+    """User's banner color encoded as an integer representation of hexadecimal color code."""
 
     locale: str | None = None
     """User's chosen language option."""
