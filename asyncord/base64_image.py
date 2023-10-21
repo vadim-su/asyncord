@@ -59,7 +59,7 @@ class Base64Image:
                     raise ValueError('Icon must be a valid image')
 
             encoded_image = base64.b64encode(image_data).decode()
-            return cls(f'data: image/{image_type}base64, {encoded_image}')
+            return cls(f'data:image/{image_type};base64, {encoded_image}')
 
         if isinstance(image_data, cls):
             return image_data
