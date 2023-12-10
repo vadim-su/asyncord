@@ -1,18 +1,19 @@
 from __future__ import annotations
 
+import os
 import random
 import string
 
 import pytest
 
-from asyncord.typedefs import LikeSnowflake
-from asyncord.client.rest import RestClient
 from asyncord.client.messages import MessageResource
-from asyncord.client.models.messages import Message, CreateMessageData, UpdateMessageData
+from asyncord.client.models.messages import CreateMessageData, Message, UpdateMessageData
+from asyncord.client.rest import RestClient
+from asyncord.typedefs import LikeSnowflake
 
-TEST_CHANNEL_ID = '920187645265608714'
-TEST_MESSAGE_ID = '923584607427899402'
-TEST_IMAGE_FILE = 'tests/data/test_image.jpg'
+TEST_CHANNEL_ID = os.environ.get('TEST_CHANNEL_ID')
+TEST_MESSAGE_ID = os.environ.get('TEST_MESSAGE_ID')
+TEST_IMAGE_FILE = os.environ.get('TEST_IMAGE_FILE')
 
 
 class TestMessages:

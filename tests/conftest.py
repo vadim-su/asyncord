@@ -1,9 +1,14 @@
+import os
+
 import pytest
 
 
 @pytest.fixture(scope='session')
 def token():
-    return 'OTM0NTY0MjI1NzY5MTQ4NDM2.Yex6wg.AAkUaqRS0ACw8__ERfQ6d8gOdkE'
+    bot_token = os.environ.get('TOKEN')
+    if not bot_token:
+        pytest.skip('TOKEN environment variable is not set')
+    return bot_token
 
 
 def pytest_addoption(parser):

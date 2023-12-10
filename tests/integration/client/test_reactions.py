@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import os
+
 import pytest
 
-from asyncord.client.rest import RestClient
 from asyncord.client.messages import MessageResource
+from asyncord.client.models.messages import CreateMessageData, Message
 from asyncord.client.reactions import ReactionResource
-from asyncord.client.models.messages import Message, CreateMessageData
+from asyncord.client.rest import RestClient
 
-TEST_CHANNEL_ID = '920187645265608714'
-TEST_MESSAGE_ID = '923584607427899402'
-TEST_MEMBER_ID = '934564225769148436'
+TEST_CHANNEL_ID = os.environ.get('TEST_CHANNEL_ID')
+TEST_MESSAGE_ID = os.environ.get('TEST_MESSAGE_ID')
+TEST_MEMBER_ID = os.environ.get('TEST_MEMBER_ID')
 
 
 class TestReactions:

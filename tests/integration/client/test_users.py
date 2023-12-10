@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from http import HTTPStatus
 
 import pytest
@@ -7,8 +8,8 @@ import pytest
 from asyncord.client.rest import RestClient
 from asyncord.client.users import UserResource
 
-TEST_GUILD_ID = '763522265874694144'
-TEST_USER_ID = '760541547074027573'
+TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
+TEST_USER_ID = os.environ.get('TEST_USER_ID')
 
 
 class TestUsers:

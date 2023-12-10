@@ -1,10 +1,12 @@
+import os
+
 import pytest
 
+from asyncord.client.models.roles import CreateRoleData
 from asyncord.client.rest import RestClient
 from asyncord.client.roles import RoleResource
-from asyncord.client.models.roles import CreateRoleData
 
-TEST_GUILD_ID = '763522265874694144'
+TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
 
 
 class TestRoles:

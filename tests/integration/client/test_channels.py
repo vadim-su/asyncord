@@ -1,18 +1,20 @@
 from __future__ import annotations
 
+import os
+
 import pytest
 
-from asyncord.client.rest import RestClient
 from asyncord.client.channels import ChannelResource
 from asyncord.client.http.errors import ClientError
-from asyncord.client.models.channels import ChannelType
 from asyncord.client.models.channel_data import CreateChannelData, UpdateTextChannelData
+from asyncord.client.models.channels import ChannelType
+from asyncord.client.rest import RestClient
 
-TEST_GUILD_ID = '763522265874694144'
-TEST_CHANNEL_ID = '920187645265608714'
-TEST_MEMBER_ID = '934564225769148436'
-TEST_ROLE_ID = '1010835042957787181'
-TEST_MESSAGE_ID = '923584607427899402'
+TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
+TEST_CHANNEL_ID = os.environ.get('TEST_CHANNEL_ID')
+TEST_MEMBER_ID = os.environ.get('TEST_MEMBER_ID')
+TEST_ROLE_ID = os.environ.get('TEST_ROLE_ID')
+TEST_MESSAGE_ID = os.environ.get('TEST_MESSAGE_ID')
 
 
 class TestChannels:

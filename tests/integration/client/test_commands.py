@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import os
+
 import pytest
+
 from asyncord.client.commands import BaseCommandResource
-from asyncord.client.models.commands import AppCommandOptionType, ApplicationCommand, ApplicationCommandOptionChoice, ApplicationCommandType, CreateApplicationCommandData, ApplicationCommandOption
-
+from asyncord.client.models.commands import (
+    AppCommandOptionType,
+    ApplicationCommandOption,
+    ApplicationCommandOptionChoice,
+    ApplicationCommandType,
+    CreateApplicationCommandData,
+)
 from asyncord.client.rest import RestClient
-from asyncord.client.http.errors import ClientError
 
-TEST_APP_ID = '934564225769148436'
+TEST_APP_ID = os.environ.get('TEST_APP_ID')
 
 
 @pytest.fixture()

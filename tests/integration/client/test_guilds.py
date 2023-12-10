@@ -1,11 +1,13 @@
+import os
+
 import pytest
 
-from asyncord.client.rest import RestClient
 from asyncord.client.guilds import GuildResource
 from asyncord.client.models.guilds import CreateGuildData
+from asyncord.client.rest import RestClient
 
-TEST_GUILD_NAME = 'TestGuild'
-TEST_GUILD_ID = '763522265874694144'
+TEST_GUILD_NAME = os.environ.get('TEST_GUILD_NAME')
+TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
 
 
 class TestGuilds:

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import os
+
 import pytest
 
-from asyncord.client.rest import RestClient
-from asyncord.client.members import MemberResource
 from asyncord.client.http.errors import ClientError
+from asyncord.client.members import MemberResource
+from asyncord.client.rest import RestClient
 
-TEST_GUILD_ID = '763522265874694144'
-TEST_MEMBER_ID = '934564225769148436'
-TEST_ROLE_ID = '1010835042957787181'
+TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
+TEST_MEMBER_ID = os.environ.get('TEST_MEMBER_ID')
+TEST_ROLE_ID = os.environ.get('TEST_ROLE_ID')
 
 
 class TestMembers:
