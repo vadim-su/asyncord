@@ -1,3 +1,4 @@
+import os
 from typing import Any, AsyncGenerator
 
 import aiohttp
@@ -6,9 +7,9 @@ import pytest
 from asyncord.client.rest import RestClient
 from asyncord.gateway.client import GatewayClient
 
-TEST_CHANNEL_ID = '920187645265608714'
-TEST_VOICE_CHANNEL_ID = '1157605385826476062'
-TEST_GUILD_ID = '763522265874694144'
+TEST_CHANNEL_ID = os.environ.get('TEST_CHANNEL_ID')
+TEST_VOICE_CHANNEL_ID = os.environ.get('TEST_VOICE_CHANNEL_ID')
+TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
 
 
 @pytest.fixture()
