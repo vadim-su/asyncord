@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 import pytest
 
 from asyncord.client.commands import BaseCommandResource
@@ -13,13 +11,12 @@ from asyncord.client.models.commands import (
     CreateApplicationCommandData,
 )
 from asyncord.client.rest import RestClient
-
-TEST_APP_ID = os.environ.get('TEST_APP_ID')
+from tests.conftest import IntegrationData
 
 
 @pytest.fixture()
-async def commands_res(client: RestClient):
-    return client.applications.commands(TEST_APP_ID)
+async def commands_res(client: RestClient, integration_data: IntegrationData):
+    return client.applications.commands(integration_data.TEST_APP_ID)
 
 
 async def test_create_command(commands_res: BaseCommandResource):
@@ -102,7 +99,7 @@ async def test_create_subcommand_group(commands_res: BaseCommandResource):
 
     assert command.name == 'test-command-group'
     assert command.description == 'test command description'
-    await commands_res.delete(command.id)
+    # await commands_res.delete(command.id)
 
 
 async def test_get_command_list(commands_res: BaseCommandResource):

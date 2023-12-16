@@ -1,27 +1,30 @@
 from __future__ import annotations
 
-import os
-
 import pytest
 
 from asyncord.client.http.errors import ClientError
 from asyncord.client.members import MemberResource
 from asyncord.client.rest import RestClient
-
-TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
-TEST_MEMBER_ID = os.environ.get('TEST_MEMBER_ID')
-TEST_ROLE_ID = os.environ.get('TEST_ROLE_ID')
+from tests.conftest import IntegrationData
 
 
 class TestMembers:
     @pytest.fixture()
-    async def members(self, client: RestClient):
-        return client.guilds.members(TEST_GUILD_ID)
+    async def members(
+        self,
+        client: RestClient,
+        integration_data: IntegrationData
+    ):
+        return client.guilds.members(integration_data.TEST_GUILD_ID)
 
-    async def test_get_member(self, members: MemberResource):
-        member = await members.get(TEST_MEMBER_ID)
+    async def test_get_member(
+        self,
+        members: MemberResource,
+        integration_data: IntegrationData
+    ):
+        member = await members.get(integration_data.TEST_MEMBER_ID)
         assert member.user
-        assert member.user.id == TEST_MEMBER_ID
+        assert member.user.id == integration_data.TEST_MEMBER_ID
 
     # FIXME: this test needs OAUTH GUILD_MEMBERS permission to access members list
     @pytest.mark.skip(reason='Need OAUTH GUILD_MEMBERS permission to access members list')
@@ -33,11 +36,15 @@ class TestMembers:
 
     # FIXME: this test needs OAUTH GUILD_MEMBERS permission to access members list
     @pytest.mark.skip(reason='Need OAUTH GUILD_MEMBERS permission to access members list')
-    async def test_search_members(self, members: MemberResource):
+    async def test_search_members(
+            self,
+            members: MemberResource,
+            integration_data: IntegrationData
+    ):
         member_list = await members.search('Cucaryamba')
         assert len(member_list) == 1
         assert member_list[0].user
-        assert member_list[0].user.id == TEST_MEMBER_ID
+        assert member_list[0].user.id == integration_data.TEST_MEMBER_ID
 
     async def test_update_current_member(self, members: MemberResource):
         new_nickname = 'Cucaracha'
@@ -46,21 +53,25 @@ class TestMembers:
         # reset to default nickname
         await members.update_current_member(None)
 
-    async def test_add_and_remove_role(self, members: MemberResource):
-        member = await members.get(TEST_MEMBER_ID)
-        assert TEST_ROLE_ID not in member.roles
+    async def test_add_and_remove_role(
+        self,
+        members: MemberResource,
+        integration_data: IntegrationData
+    ):
+        member = await members.get(integration_data.TEST_MEMBER_ID)
+        assert integration_data.TEST_ROLE_ID not in member.roles
 
         # check role addition
-        await members.add_role(TEST_MEMBER_ID, TEST_ROLE_ID)
+        await members.add_role(integration_data.TEST_MEMBER_ID, integration_data.TEST_ROLE_ID)
 
-        member = await members.get(TEST_MEMBER_ID)
-        assert TEST_ROLE_ID in member.roles
+        member = await members.get(integration_data.TEST_MEMBER_ID)
+        assert integration_data.TEST_ROLE_ID in member.roles
 
         # check role removal
-        await members.remove_role(TEST_MEMBER_ID, TEST_ROLE_ID)
+        await members.remove_role(integration_data.TEST_MEMBER_ID, integration_data.TEST_ROLE_ID)
 
-        member = await members.get(TEST_MEMBER_ID)
-        assert TEST_ROLE_ID not in member.roles
+        member = await members.get(integration_data.TEST_MEMBER_ID)
+        assert integration_data.TEST_ROLE_ID not in member.roles
 
     @pytest.mark.skip(reason='Dangerous operation. Needs manual control.')
     async def test_kick(self, members: MemberResource):

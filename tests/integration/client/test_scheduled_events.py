@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 import datetime
 
 import pytest
+
 from asyncord.client.models.scheduled_events import (
     EventEntityMetadata,
     EventEntityType,
@@ -10,18 +12,22 @@ from asyncord.client.models.scheduled_events import (
     ScheduledEventCreateData,
     ScheduledEventUpdateData,
 )
-
 from asyncord.client.rest import RestClient
 from asyncord.client.scheduled_events import ScheduledEventsResource
+from tests.conftest import IntegrationData
 
 
 class TestScheduledEvents:
     @pytest.fixture()
-    async def events(self, client: RestClient, guild_id: str) -> ScheduledEventsResource:
-        return client.guilds.events(guild_id)
+    async def events(
+        self,
+        client: RestClient,
+        integration_data: IntegrationData
+    ) -> ScheduledEventsResource:
+        return client.guilds.events(integration_data.TEST_GUILD_ID)
 
     @pytest.fixture()
-    async def event(self, events: ScheduledEventsResource, voice_channel_id: str):
+    async def event(self, events: ScheduledEventsResource):
         creation_data = ScheduledEventCreateData(
             entity_type=EventEntityType.EXTERNAL,
             name='Test Event',
@@ -37,7 +43,10 @@ class TestScheduledEvents:
 
     @pytest.mark.parametrize('event_type', [EventEntityType.EXTERNAL, EventEntityType.VOICE])
     async def test_create_event(
-        self, events: ScheduledEventsResource, voice_channel_id: str, event_type: EventEntityType,
+        self,
+        events: ScheduledEventsResource,
+        integration_data: IntegrationData,
+        event_type: EventEntityType,
     ):
         if event_type is EventEntityType.EXTERNAL:
             creation_data = ScheduledEventCreateData(
@@ -54,7 +63,7 @@ class TestScheduledEvents:
                 entity_type=event_type,
                 name='Test Event',
                 description='This is a test event.',
-                channel_id=voice_channel_id,
+                channel_id=integration_data.TEST_VOICE_CHANNEL_ID,
                 privacy_level=EventPrivacyLevel.GUILD_ONLY,
                 scheduled_start_time=datetime.datetime.utcnow() + datetime.timedelta(minutes=1),
             )

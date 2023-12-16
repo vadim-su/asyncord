@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import random
 import string
 
@@ -10,16 +9,19 @@ from asyncord.client.messages import MessageResource
 from asyncord.client.models.messages import CreateMessageData, Message, UpdateMessageData
 from asyncord.client.rest import RestClient
 from asyncord.typedefs import LikeSnowflake
+from tests.conftest import IntegrationData
 
-TEST_CHANNEL_ID = os.environ.get('TEST_CHANNEL_ID')
-TEST_MESSAGE_ID = os.environ.get('TEST_MESSAGE_ID')
-TEST_IMAGE_FILE = os.environ.get('TEST_IMAGE_FILE')
+integrational_data = IntegrationData()
 
 
 class TestMessages:
     @pytest.fixture()
-    async def messages_res(self, client: RestClient):
-        return client.channels.messages(TEST_CHANNEL_ID)
+    async def messages_res(
+        self,
+        client: RestClient,
+        integration_data: IntegrationData,
+    ):
+        return client.channels.messages(integration_data.TEST_CHANNEL_ID)
 
     @pytest.fixture()
     async def message(self, messages_res: MessageResource):
@@ -32,9 +34,9 @@ class TestMessages:
     @pytest.mark.parametrize(
         'around,before,after,limit',
         [
-            (TEST_MESSAGE_ID, None, None, 3),
-            (None, TEST_MESSAGE_ID, None, 1),
-            (None, None, TEST_MESSAGE_ID, 1),
+            (integrational_data.TEST_MESSAGE_ID, None, None, 3),
+            (None, integrational_data.TEST_MESSAGE_ID, None, 1),
+            (None, None, integrational_data.TEST_MESSAGE_ID, 1),
         ],
     )
     async def test_get_channel_messages(

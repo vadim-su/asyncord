@@ -1,4 +1,3 @@
-import os
 from typing import Any, AsyncGenerator
 
 import aiohttp
@@ -6,10 +5,7 @@ import pytest
 
 from asyncord.client.rest import RestClient
 from asyncord.gateway.client import GatewayClient
-
-TEST_CHANNEL_ID = os.environ.get('TEST_CHANNEL_ID')
-TEST_VOICE_CHANNEL_ID = os.environ.get('TEST_VOICE_CHANNEL_ID')
-TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
+from tests.conftest import IntegrationData
 
 
 @pytest.fixture()
@@ -28,20 +24,5 @@ async def gateway(client: RestClient, token: str) -> AsyncGenerator[GatewayClien
 
 
 @pytest.fixture()
-async def messages_res(client: RestClient):
-    return client.channels.messages(TEST_CHANNEL_ID)
-
-
-@pytest.fixture()
-def guild_id() -> str:
-    return TEST_GUILD_ID
-
-
-@pytest.fixture()
-def channel_id() -> str:
-    return TEST_CHANNEL_ID
-
-
-@pytest.fixture()
-def voice_channel_id() -> str:
-    return TEST_VOICE_CHANNEL_ID
+async def messages_res(client: RestClient, integration_data: IntegrationData):
+    return client.channels.messages(IntegrationData.TEST_CHANNEL_ID)

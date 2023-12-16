@@ -117,7 +117,7 @@ class Overwrite(BaseModel):
     """Type of overwrite."""
 
     # TODO: #10 Every channel type has different permissions so we need to validate this
-    allow: str
+    allow: PermissionFlag
     """Permission flags to allow."""
 
     deny: PermissionFlag

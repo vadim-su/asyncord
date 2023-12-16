@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-import os
 from http import HTTPStatus
 
 import pytest
 
 from asyncord.client.rest import RestClient
 from asyncord.client.users import UserResource
-
-TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
-TEST_USER_ID = os.environ.get('TEST_USER_ID')
+from tests.conftest import IntegrationData
 
 
 class TestUsers:
@@ -41,14 +38,22 @@ class TestUsers:
         assert guilds[0].id
 
     @pytest.mark.skip(reason='Skip the test because bots cannot use this endpoint')
-    async def test_get_current_user_guild_member(self, users: UserResource):
-        member = await users.get_current_user_guild_member(TEST_GUILD_ID)
+    async def test_get_current_user_guild_member(
+        self,
+        users: UserResource,
+        integration_data: IntegrationData
+    ):
+        member = await users.get_current_user_guild_member(integration_data.TEST_GUILD_ID)
         assert member.user
-        assert member.user.id == TEST_USER_ID
+        assert member.user.id == integration_data.TEST_USER_ID
 
-    async def test_create_dm(self, users: UserResource):
-        channel = await users.create_dm(TEST_USER_ID)
+    async def test_create_dm(
+            self,
+            users: UserResource,
+            integration_data: IntegrationData
+    ):
+        channel = await users.create_dm(integration_data.TEST_USER_ID)
         recipients = channel.recipients
         assert recipients
         assert len(recipients)
-        assert TEST_USER_ID in {recipient.id for recipient in recipients}
+        assert integration_data.TEST_USER_ID in {recipient.id for recipient in recipients}
