@@ -1,55 +1,86 @@
+import random
+
 import pytest
 
-from asyncord.client.rest import RestClient
 from asyncord.client.guilds import GuildResource
 from asyncord.client.models.guilds import CreateGuildData
+from asyncord.client.users import UserResource
+from tests.conftest import IntegrationTestData
 
-TEST_GUILD_NAME = 'TestGuild'
-TEST_GUILD_ID = '763522265874694144'
+
+@pytest.mark.parametrize('with_counts', [True, False])
+async def test_get_guild(
+    guilds_res: GuildResource,
+    with_counts: bool,
+    integration_data: IntegrationTestData
+):
+    guild = await guilds_res.get(integration_data.guild_id, with_counts=True)
+    if with_counts:
+        assert guild.approximate_member_count is not None
+        assert guild.approximate_presence_count is not None
+    assert await guilds_res.get(integration_data.guild_id)
 
 
-class TestGuilds:
-    @pytest.fixture()
-    async def guilds(self, client: RestClient):
-        yield client.guilds
+async def test_get_preview(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData
+):
+    assert await guilds_res.get_preview(integration_data.guild_id)
 
-    @pytest.mark.parametrize('with_counts', [True, False])
-    async def test_get_guild(self, guilds: GuildResource, with_counts: bool):
-        guild = await guilds.get(TEST_GUILD_ID, with_counts=True)
-        if with_counts:
-            assert guild.approximate_member_count is not None
-            assert guild.approximate_presence_count is not None
-        assert await guilds.get(TEST_GUILD_ID)
 
-    async def test_get_preview(self, guilds: GuildResource):
-        assert await guilds.get_preview(TEST_GUILD_ID)
+async def test_create_delete_guild(
+    guilds_res: GuildResource,
+    users_res: UserResource,
+    integration_data: IntegrationTestData
+):
+    suffix = random.randint(0, 1000)
+    guild_params = CreateGuildData(
+        name=f'{integration_data.guild_prefix_to_delete}_{suffix}',
+    )
+    guild = await guilds_res.create(guild_params)
+    assert guild.name.startswith(integration_data.guild_prefix_to_delete)
 
-    async def test_craete_guild(self, guilds: GuildResource):
-        guild_params = CreateGuildData(
-            name=TEST_GUILD_NAME,
-        )
-        guild = await guilds.create(guild_params)
-        assert guild.name == TEST_GUILD_NAME
+    all_guilds = await users_res.get_guilds()
 
-    async def test_delete(self, client: RestClient, guilds: GuildResource):
-        for guild in await client.users.get_guilds():
-            if guild.name == TEST_GUILD_NAME:
-                await guilds.delete(guild.id)
+    if not any(guild.name.startswith(integration_data.guild_prefix_to_delete) for guild in all_guilds):
+        pytest.fail('Guild was not created')
 
-    async def test_get_prune_count(self, guilds: GuildResource):
-        prune_count = await guilds.get_prune_count(TEST_GUILD_ID)
-        assert prune_count.pruned is not None
+    await guilds_res.delete(guild.id)
 
-    async def test_get_voice_regions(self, guilds: GuildResource):
-        assert await guilds.get_voice_regions(TEST_GUILD_ID)
 
-    async def test_get_invites(self, guilds: GuildResource):
-        invites = await guilds.get_invites(TEST_GUILD_ID)
-        assert isinstance(invites, list)
-        assert invites
+async def test_get_prune_count(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData
+):
+    prune_count = await guilds_res.get_prune_count(integration_data.guild_id)
+    assert prune_count.pruned is not None
 
-    async def test_get_channels(self, guilds: GuildResource):
-        assert await guilds.get_channels(TEST_GUILD_ID)
 
-    async def test_get_integrations(self, guilds: GuildResource):
-        assert await guilds.get_integrations(TEST_GUILD_ID)
+async def test_get_voice_regions(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData
+):
+    assert await guilds_res.get_voice_regions(integration_data.guild_id)
+
+
+async def test_get_invites(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData
+):
+    invites = await guilds_res.get_invites(integration_data.guild_id)
+    assert isinstance(invites, list)
+    assert invites
+
+
+async def test_get_channels(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData
+):
+    assert await guilds_res.get_channels(integration_data.guild_id)
+
+
+async def test_get_integrations(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData
+):
+    assert await guilds_res.get_integrations(integration_data.guild_id)

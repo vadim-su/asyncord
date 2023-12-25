@@ -1,18 +1,13 @@
 from __future__ import annotations
 
-import pytest
 from asyncord.client.commands import BaseCommandResource
-from asyncord.client.models.commands import AppCommandOptionType, ApplicationCommand, ApplicationCommandOptionChoice, ApplicationCommandType, CreateApplicationCommandData, ApplicationCommandOption
-
-from asyncord.client.rest import RestClient
-from asyncord.client.http.errors import ClientError
-
-TEST_APP_ID = '934564225769148436'
-
-
-@pytest.fixture()
-async def commands_res(client: RestClient):
-    return client.applications.commands(TEST_APP_ID)
+from asyncord.client.models.commands import (
+    AppCommandOptionType,
+    ApplicationCommandOption,
+    ApplicationCommandOptionChoice,
+    ApplicationCommandType,
+    CreateApplicationCommandData,
+)
 
 
 async def test_create_command(commands_res: BaseCommandResource):
@@ -95,7 +90,7 @@ async def test_create_subcommand_group(commands_res: BaseCommandResource):
 
     assert command.name == 'test-command-group'
     assert command.description == 'test command description'
-    await commands_res.delete(command.id)
+    # await commands_res.delete(command.id)
 
 
 async def test_get_command_list(commands_res: BaseCommandResource):

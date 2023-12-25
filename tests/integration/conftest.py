@@ -1,14 +1,20 @@
-from typing import Any, AsyncGenerator
+from typing import AsyncGenerator
 
 import aiohttp
 import pytest
 
+from asyncord.client.channels import ChannelResource
+from asyncord.client.commands import BaseCommandResource
+from asyncord.client.guilds import GuildResource
+from asyncord.client.messages import MessageResource
+from asyncord.client.models.messages import CreateMessageData, Message
+from asyncord.client.reactions import ReactionResource
 from asyncord.client.rest import RestClient
+from asyncord.client.roles import RoleResource
+from asyncord.client.scheduled_events import ScheduledEventsResource
+from asyncord.client.users import UserResource
 from asyncord.gateway.client import GatewayClient
-
-TEST_CHANNEL_ID = '920187645265608714'
-TEST_VOICE_CHANNEL_ID = '1157605385826476062'
-TEST_GUILD_ID = '763522265874694144'
+from tests.conftest import IntegrationTestData
 
 
 @pytest.fixture()
@@ -17,30 +23,79 @@ async def client(token: str) -> RestClient:
 
 
 @pytest.fixture()
-async def gateway(client: RestClient, token: str) -> AsyncGenerator[GatewayClient, Any]:
+async def gateway(client: RestClient, token: str) -> AsyncGenerator[GatewayClient, None]:
     async with aiohttp.ClientSession() as session:
         gw = GatewayClient(token, session=session)
         client = RestClient(token)
-        client._http._session = session
+        client._http._session = session  # type: ignore
         gw.dispatcher.add_argument('client', client)
         yield gw
 
 
 @pytest.fixture()
-async def messages_res(client: RestClient):
-    return client.channels.messages(TEST_CHANNEL_ID)
+async def channels_res(client: RestClient) -> ChannelResource:
+    return client.channels
 
 
 @pytest.fixture()
-def guild_id() -> str:
-    return TEST_GUILD_ID
+async def messages_res(
+    channels_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> MessageResource:
+    return channels_res.messages(integration_data.channel_id)
 
 
 @pytest.fixture()
-def channel_id() -> str:
-    return TEST_CHANNEL_ID
+async def guilds_res(client: RestClient) -> GuildResource:
+    return client.guilds
 
 
 @pytest.fixture()
-def voice_channel_id() -> str:
-    return TEST_VOICE_CHANNEL_ID
+async def users_res(client: RestClient) -> UserResource:
+    return client.users
+
+
+@pytest.fixture()
+async def members_res(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData
+):
+    return guilds_res.members(integration_data.guild_id)
+
+
+@pytest.fixture()
+async def roles_res(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> RoleResource:
+    return guilds_res.roles(integration_data.guild_id)
+
+
+@pytest.fixture()
+async def events_res(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData
+) -> ScheduledEventsResource:
+    return guilds_res.events(integration_data.guild_id)
+
+
+@pytest.fixture()
+async def reactions_res(message: Message, messages_res: MessageResource) -> ReactionResource:
+    return messages_res.reactions(message.id)
+
+
+@pytest.fixture()
+async def commands_res(
+    client: RestClient,
+    integration_data: IntegrationTestData,
+) -> BaseCommandResource:
+    return client.applications.commands(integration_data.app_id)
+
+
+@pytest.fixture()
+async def message(messages_res: MessageResource) -> AsyncGenerator[Message, None]:
+    message = await messages_res.create(
+        CreateMessageData(content='test'),
+    )
+    yield message
+    await messages_res.delete(message.id)
