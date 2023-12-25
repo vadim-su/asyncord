@@ -31,4 +31,17 @@ jobs:
       - name: Install dependencies
         run: pdm sync -G testing
       - name: Run pytest
+        env:
+          ASYNCORD_TEST_TOKEN: ${{ secrets.ASYNCORD_TEST_TOKEN }}
+          ASYNCORD_TEST_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_CHANNEL_ID }}
+          ASYNCORD_TEST_VOICE_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_VOICE_CHANNEL_ID }}
+          ASYNCORD_TEST_GUILD_ID: ${{ vars.ASYNCORD_TEST_GUILD_ID }}
+          ASYNCORD_TEST_USER_ID: ${{ vars.ASYNCORD_TEST_USER_ID }}
+          ASYNCORD_TEST_MESSAGE_ID: ${{ vars.ASYNCORD_TEST_MESSAGE_ID }}
+          ASYNCORD_TEST_MEMBER_ID: ${{ vars.ASYNCORD_TEST_MEMBER_ID }}
+          ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE: "${{ vars.ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE }}"
+          ASYNCORD_TEST_APP_ID: ${{ vars.ASYNCORD_TEST_APP_ID }}
+          ASYNCORD_TEST_ROLE_ID: ${{ vars.ASYNCORD_TEST_ROLE_ID }}
+          ASYNCORD_TEST_USER_TO_BAN: ${{ vars.ASYNCORD_TEST_USER_TO_BAN }}
+
         run: pdm run pytest
