@@ -5,32 +5,46 @@ import pytest
 
 
 @dataclass
-class IntegrationData:
-    TOKEN = os.environ.get('TOKEN')
-    TEST_CHANNEL_ID = os.environ.get('TEST_CHANNEL_ID')
-    TEST_VOICE_CHANNEL_ID = os.environ.get('TEST_VOICE_CHANNEL_ID')
-    TEST_GUILD_ID = os.environ.get('TEST_GUILD_ID')
-    TEST_USER_ID = os.environ.get('TEST_USER_ID')
-    TEST_MESSAGE_ID = os.environ.get('TEST_MESSAGE_ID')
-    TEST_MEMBER_ID = os.environ.get('TEST_MEMBER_ID')
-    TEST_GUILD_NAME = os.environ.get('TEST_GUILD_NAME')
-    TEST_APP_ID = os.environ.get('TEST_APP_ID')
-    TEST_IMAGE_FILE = os.environ.get('TEST_IMAGE_FILE')
-    TEST_ROLE_ID = os.environ.get('TEST_ROLE_ID')
-    TEST_USER_TO_BAN = os.environ.get('TEST_USER_TO_BAN')
+class IntegrationTestData:
+    token: str
+    channel_id: str
+    voice_channel_id: str
+    guild_id: str
+    user_id: str
+    message_id: str
+    member_id: str
+    guild_prefix_to_delete: str
+    app_id: str
+    role_id: str
+    user_to_ban: str
 
 
 @pytest.fixture(scope='session')
-def integration_data() -> IntegrationData:
-    return IntegrationData()
+def integration_data() -> IntegrationTestData:
+    token = os.environ.get('ASYNCORD_TEST_TOKEN')
+    if not token:
+        pytest.skip('ASYNCORD_TEST_TOKEN environment variable is not set')
+    try:
+        return IntegrationTestData(
+            token=token,
+            channel_id=os.environ['ASYNCORD_TEST_CHANNEL_ID'],
+            voice_channel_id=os.environ['ASYNCORD_TEST_VOICE_CHANNEL_ID'],
+            guild_id=os.environ['ASYNCORD_TEST_GUILD_ID'],
+            user_id=os.environ['ASYNCORD_TEST_USER_ID'],
+            message_id=os.environ['ASYNCORD_TEST_MESSAGE_ID'],
+            member_id=os.environ['ASYNCORD_TEST_MEMBER_ID'],
+            guild_prefix_to_delete=os.environ['ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE'],
+            app_id=os.environ['ASYNCORD_TEST_APP_ID'],
+            role_id=os.environ['ASYNCORD_TEST_ROLE_ID'],
+            user_to_ban=os.environ['ASYNCORD_TEST_USER_TO_BAN'],
+        )
+    except KeyError as err:
+        pytest.skip(f"'{err.args[0]}' environment variable is not set")
 
 
 @pytest.fixture(scope='session')
-def token(integration_data: IntegrationData):
-    bot_token = integration_data.TOKEN
-    if not bot_token:
-        pytest.skip('TOKEN environment variable is not set')
-    return bot_token
+def token(integration_data: IntegrationTestData):
+    return integration_data.token
 
 
 def pytest_addoption(parser):

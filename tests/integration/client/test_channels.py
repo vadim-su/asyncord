@@ -1,66 +1,48 @@
-from __future__ import annotations
-
 import pytest
 
 from asyncord.client.channels import ChannelResource
 from asyncord.client.http.errors import ClientError
 from asyncord.client.models.channel_data import CreateChannelData, UpdateTextChannelData
 from asyncord.client.models.channels import ChannelType
-from asyncord.client.rest import RestClient
-from tests.conftest import IntegrationData
+from tests.conftest import IntegrationTestData
 
 
-class TestChannels:
-    @pytest.fixture()
-    async def channels(self, client: RestClient):
-        return client.channels
+async def test_create_and_delete_channel(channels_res: ChannelResource, integration_data: IntegrationTestData):
+    channel = await channels_res.create_channel(
+        integration_data.guild_id,
+        CreateChannelData(
+            name='test',
+            type=ChannelType.GUILD_TEXT,
+        ),
+    )
+    assert channel.guild_id == integration_data.guild_id
+    assert channel.name == 'test'
 
-    async def test_create_and_delete_channel(
-        self,
-        channels: ChannelResource,
-        integration_data: IntegrationData
-    ):
-        channel = await channels.create_channel(
-            integration_data.TEST_GUILD_ID,
-            CreateChannelData(
-                name='test',
-                type=ChannelType.GUILD_TEXT,
-            ),
-        )
-        assert channel.guild_id == integration_data.TEST_GUILD_ID
-        assert channel.name == 'test'
+    await channels_res.delete(channel.id)
+    with pytest.raises(ClientError, match='Unknown Channel'):
+        await channels_res.get(channel.id)
 
-        await channels.delete(channel.id)
-        with pytest.raises(ClientError, match='Unknown Channel'):
-            await channels.get(channel.id)
 
-    async def test_get_channel(
-        self,
-        channels: ChannelResource,
-        integration_data: IntegrationData
-    ):
-        channel = await channels.get(integration_data.TEST_CHANNEL_ID)
-        assert channel.id == integration_data.TEST_CHANNEL_ID
-        assert channel.guild_id == integration_data.TEST_GUILD_ID
-        assert channel.type is ChannelType.GUILD_TEXT
+async def test_get_channel(channels_res: ChannelResource, integration_data: IntegrationTestData):
+    channel = await channels_res.get(integration_data.channel_id)
+    assert channel.id == integration_data.channel_id
+    assert channel.guild_id == integration_data.guild_id
+    assert channel.type is ChannelType.GUILD_TEXT
 
-    @pytest.mark.limited
-    async def test_update_channel(
-        self,
-        channels: ChannelResource,
-        integration_data: IntegrationData
-    ):
-        preserved_name = (await channels.get(integration_data.TEST_CHANNEL_ID)).name
 
-        channel = await channels.update(
-            integration_data.TEST_CHANNEL_ID,
-            UpdateTextChannelData(name='test')
-        )
-        assert channel.id == integration_data.TEST_CHANNEL_ID
-        assert channel.name == 'test'
+@pytest.mark.limited
+async def test_update_channel(channels_res: ChannelResource, integration_data: IntegrationTestData):
+    preserved_name = (await channels_res.get(integration_data.channel_id)).name
 
-        channel = await channels.update(
-            integration_data.TEST_CHANNEL_ID,
-            UpdateTextChannelData(name=preserved_name)
-        )
-        assert channel.name == preserved_name
+    channel = await channels_res.update(
+        integration_data.channel_id,
+        UpdateTextChannelData(name='test')
+    )
+    assert channel.id == integration_data.channel_id
+    assert channel.name == 'test'
+
+    channel = await channels_res.update(
+        integration_data.channel_id,
+        UpdateTextChannelData(name=preserved_name)
+    )
+    assert channel.name == preserved_name

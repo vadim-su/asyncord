@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from asyncord.client.commands import BaseCommandResource
 from asyncord.client.models.commands import (
     AppCommandOptionType,
@@ -10,13 +8,6 @@ from asyncord.client.models.commands import (
     ApplicationCommandType,
     CreateApplicationCommandData,
 )
-from asyncord.client.rest import RestClient
-from tests.conftest import IntegrationData
-
-
-@pytest.fixture()
-async def commands_res(client: RestClient, integration_data: IntegrationData):
-    return client.applications.commands(integration_data.TEST_APP_ID)
 
 
 async def test_create_command(commands_res: BaseCommandResource):
