@@ -30,6 +30,7 @@ from asyncord.typedefs import StrOrURL
 from asyncord.urls import GATEWAY_URL
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class GatewayClient:
@@ -74,7 +75,6 @@ class GatewayClient:
     async def start(self) -> None:
         """Start the gateway client."""
         self.is_started = True
-
         async with self._session.ws_connect(self.url) as ws:
             self.ws = ws
             logger.info('Connected to gateway')
