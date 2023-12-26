@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 from typing import Self
 
-from pydantic import BaseModel, Field, FieldValidationInfo, field_validator, model_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
 from asyncord.snowflake import Snowflake
 
@@ -221,7 +221,7 @@ class AutoModerationRule(BaseModel):
     """
 
     @field_validator('actions')
-    def check_actions(cls, actions: list[RuleAction], field_info: FieldValidationInfo) -> list[RuleAction]:
+    def check_actions(cls, actions: list[RuleAction], field_info: ValidationInfo) -> list[RuleAction]:
         """Validate actions for the rule."""
         trigger_type: TriggerType = field_info.data['trigger_type']
 

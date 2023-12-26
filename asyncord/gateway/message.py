@@ -3,7 +3,7 @@
 import enum
 from typing import Any
 
-from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 @enum.unique
@@ -60,7 +60,7 @@ class GatewayMessage(BaseModel):
 
     @field_validator('event_name', 'sequence_number')
     def validate_values_are_not_none(
-        cls, validating_value: str | int | None, field_info: FieldValidationInfo,
+        cls, validating_value: str | int | None, field_info: ValidationInfo,
     ) -> str | int | None:
         """Ensure that event name and sequence number are set correctly."""
         if field_info.data['opcode'] == GatewayEventOpcode.DISPATCH:

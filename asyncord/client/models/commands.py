@@ -9,7 +9,7 @@ from __future__ import annotations
 import enum
 from typing import Annotated, Final, Self
 
-from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from asyncord.client.models.channels import ChannelType
 from asyncord.client.models.permissions import PermissionFlag
@@ -172,7 +172,7 @@ class ApplicationCommandOption(BaseModel):
     def validate_options(
         cls,
         options: list[ApplicationCommandOption] | None,
-        field_info: FieldValidationInfo,
+        field_info: ValidationInfo,
     ) -> list[ApplicationCommandOption] | None:
         """Validate options."""
         if options is None:
@@ -191,7 +191,7 @@ class ApplicationCommandOption(BaseModel):
     def validate_choices(
         cls,
         field_value: list[ApplicationCommandOptionChoice] | None,
-        field_info: FieldValidationInfo,
+        field_info: ValidationInfo,
     ) -> list[ApplicationCommandOptionChoice] | None:
         """Validate options."""
         if field_value is None:
@@ -209,7 +209,7 @@ class ApplicationCommandOption(BaseModel):
 
     @field_validator('channel_types')
     def validate_channel_types(
-        cls, field_value: list[ChannelType] | None, field_info: FieldValidationInfo,
+        cls, field_value: list[ChannelType] | None, field_info: ValidationInfo,
     ) -> list[ChannelType] | None:
         """Validates the channel_types field."""
         if field_value is None:
@@ -221,7 +221,7 @@ class ApplicationCommandOption(BaseModel):
 
     @field_validator('min_value', 'max_value')
     def validate_min_max_value(
-        cls, field_value: int | None, field_info: FieldValidationInfo,
+        cls, field_value: int | None, field_info: ValidationInfo,
     ) -> int | None:
         """Validates the min_value and max_value fields."""
         if field_value is None:
@@ -232,7 +232,7 @@ class ApplicationCommandOption(BaseModel):
 
     @field_validator('min_length', 'max_length')
     def validate_min_max_length(
-        cls, field_value: int | None, field_info: FieldValidationInfo,
+        cls, field_value: int | None, field_info: ValidationInfo,
     ) -> int | None:
         """Validates the min_length and max_length fields."""
         if field_value is None:
@@ -308,7 +308,7 @@ class CreateApplicationCommandData(BaseModel):
 
     @field_validator('options')
     def validate_options(
-        cls, options: list[ApplicationCommandOption] | None, field_info: FieldValidationInfo,
+        cls, options: list[ApplicationCommandOption] | None, field_info: ValidationInfo,
     ) -> list[ApplicationCommandOption] | None:
         """Validate options."""
         if options is None:

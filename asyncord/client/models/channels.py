@@ -9,7 +9,7 @@ from __future__ import annotations
 import enum
 from datetime import datetime
 
-from pydantic import BaseModel, Field, FieldValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.models.users import User
@@ -317,7 +317,7 @@ class Channel(BaseModel):
     """
 
     @field_validator('topic')
-    def validate_topic(cls, topic: str | None, field_info: FieldValidationInfo) -> str | None:
+    def validate_topic(cls, topic: str | None, field_info: ValidationInfo) -> str | None:
         """Validate topic field."""
         if not topic:
             return topic
@@ -382,7 +382,7 @@ class ForumTag(BaseModel):
     """Unicode character of the emoji."""
 
     @field_validator('emoji_name')
-    def validate_emoji(cls, emoji_name: str | None, field_info: FieldValidationInfo) -> Snowflake | None:
+    def validate_emoji(cls, emoji_name: str | None, field_info: ValidationInfo) -> Snowflake | None:
         """Validate emoji_name and emoji_id fields."""
         if emoji_name is not None and field_info.data['emoji_id'] is not None:
             raise ValueError('emoji_name and emoji_id cannot be set at the same time')

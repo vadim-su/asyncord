@@ -10,7 +10,7 @@ import enum
 from typing import Annotated, Any, Literal, Self
 from typing import get_args as get_typing_args
 
-from pydantic import BaseModel, Field, FieldValidationInfo, field_validator, model_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
 
 @enum.unique
@@ -246,7 +246,7 @@ class SelectMenu(BaseComponent):
 
     @field_validator('options')
     def validate_options(
-        cls, options: list[SelectMenuOption], field_info: FieldValidationInfo,
+        cls, options: list[SelectMenuOption], field_info: ValidationInfo,
     ) -> list[SelectMenuOption]:
         """Check that `options` is set for `SelectComponentType.STRING_SELECT`."""
         menu_type = field_info.data['type']
@@ -340,7 +340,7 @@ class TextInput(BaseComponent):
         self.model_fields_set.add('style')
 
     @field_validator('max_length')
-    def validate_length(cls, max_length: int | None, field_info: FieldValidationInfo) -> int | None:
+    def validate_length(cls, max_length: int | None, field_info: ValidationInfo) -> int | None:
         """Validate `min_length` and `max_length`."""
         min_length: int | None = field_info.data['min_length']
 

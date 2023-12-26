@@ -55,7 +55,7 @@ class MentionUser(BaseModel):
     username: str
     """User's username, not unique across the platform."""
 
-    discriminator: str = Field(min_len=4, max_len=4)
+    discriminator: str = Field(min_length=4, max_length=4)
     """User's 4 - digit discord-tag."""
 
     avatar: str | None
