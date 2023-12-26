@@ -30,7 +30,6 @@ from asyncord.typedefs import StrOrURL
 from asyncord.urls import GATEWAY_URL
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class GatewayClient:
