@@ -8,8 +8,9 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
+from typing import Annotated, Any
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.models.users import User
@@ -239,7 +240,7 @@ class Channel(BaseModel):
     user_limit: int | None = None
     """User limit of the voice channel."""
 
-    rate_limit_per_user: int | None = Field(None, min=0, max=21600)
+    rate_limit_per_user: Annotated[int, Field(ge=0, le=21600)] | None = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600.
@@ -381,8 +382,10 @@ class ForumTag(BaseModel):
     emoji_name: str | None
     """Unicode character of the emoji."""
 
-    @field_validator('emoji_name')
-    def validate_emoji(cls, emoji_name: str | None, field_info: ValidationInfo) -> Snowflake | None:
-        """Validate emoji_name and emoji_id fields."""
-        if emoji_name is not None and field_info.data['emoji_id'] is not None:
-            raise ValueError('emoji_name and emoji_id cannot be set at the same time')
+    @model_validator(mode='before')
+    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Validate that only one of emoji_id and emoji_name is set."""
+        if 'emoji_id' in values and 'emoji_name' in values:
+            raise ValueError('At most one of emoji_id and emoji_name may be set.')
+
+        return values
