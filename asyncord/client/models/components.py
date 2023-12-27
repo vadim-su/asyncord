@@ -80,7 +80,7 @@ class ComponentEmoji(BaseModel):
     id: int
     """ID of the emoji."""
 
-    animated: bool
+    animated: bool | None = None
     """Whether the emoji is animated."""
 
 

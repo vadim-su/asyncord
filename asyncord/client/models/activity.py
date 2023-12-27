@@ -6,6 +6,7 @@ https://discord.com/developers/docs/game-sdk/activities#activities
 
 from __future__ import annotations
 
+import datetime
 import enum
 
 from pydantic import BaseModel, Field
@@ -71,6 +72,11 @@ class ActivityType(enum.IntEnum):
 
     Example:
         `Competing in Arena World Champions`
+    """
+
+    HANG_STATUS = 6
+    """User is setting up a new status
+    This status isn't documented by Discord, but real. 
     """
 
 
@@ -230,7 +236,7 @@ class Activity(BaseModel):
     Only https://twitch.tv/ and https://youtube.com/ urls will work.
     """
 
-    created_at: int | None = None
+    created_at: datetime.datetime | None = None
     """Unix timestamp of when the activity was added to the user's session."""
 
     timestamps: ActivityTimestamps | None = None

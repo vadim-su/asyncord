@@ -7,6 +7,7 @@ https://discord.com/developers/docs/resources/application
 from __future__ import annotations
 
 import enum
+from typing import Any
 
 from pydantic import AnyHttpUrl, BaseModel, Field
 
@@ -54,6 +55,7 @@ class ApplicationFlag(enum.IntFlag):
     https://discord.com/developers/docs/resources/application#application-object-application-flags
     """
 
+    APPLICATION_AUTO_MODERATION_RULE_CREATE_BADGE = 1 << 6
     GATEWAY_PRESENCE = 1 << 12
     GATEWAY_PRESENCE_LIMITED = 1 << 13
     GATEWAY_GUILD_MEMBERS = 1 << 14
@@ -192,6 +194,12 @@ class Application(BaseModel):
     bot_require_code_grant: bool
     """when true the app's bot will only join upon completion of the full oauth2 code grant flow"""
 
+    # TODO: add support for partial user object
+    # https://discord.com/developers/docs/resources/application#application-object-application-structure
+    # Unknown structure for the partial user object
+    bot: dict[str, Any] | None
+    """Partial user object for the bot user associated with the app"""
+
     terms_of_service_url: str | None = None
     """the url of the app's terms of service"""
 
@@ -200,9 +208,6 @@ class Application(BaseModel):
 
     owner: ApplicationUser | None = None
     """the owner of the application"""
-
-    summary: str | None = None
-    """deprecated and will be removed in v11. An empty string"""
 
     verify_key: str | None = None
     """the hex encoded key for verification in interactions and the `GameSDK's GetTicket`"""
@@ -225,6 +230,18 @@ class Application(BaseModel):
     flags: ApplicationFlag | None = None
     """the application's public flags"""
 
+    approximate_guild_count: int | None = None
+    """Approximate count of guilds the app has been added to"""
+
+    redirect_uris: list[str] | None = None
+    """Array of redirect URIs for the app"""
+
+    interactions_endpoint_url: AnyHttpUrl | None = None
+    """Interactions endpoint URL for the app"""
+
+    role_connections_verification_url: AnyHttpUrl | None = None
+    """Application's default role connection verification url."""
+
     tags: list[str] = Field(default_factory=list, max_length=5)
     """Tags describing the content and functionality of the application.
 
@@ -237,15 +254,12 @@ class Application(BaseModel):
     custom_install_url: AnyHttpUrl | None = None
     """Application's default custom authorization link"""
 
-    role_connections_verification_url: AnyHttpUrl | None = None
-    """Application's default role connection verification url."""
-
 
 class ApplicationCommandPermissions(BaseModel):
     """Returned when fetching the permissions for a command in a guild.
 
     Reference:
-    https://discord.com/developers/docs/interactions/slash-commands#applicationcommandpermissions
+    https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure
     """
 
     id: Snowflake  # TODO: add permission constants support

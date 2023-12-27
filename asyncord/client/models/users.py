@@ -71,6 +71,12 @@ class UserFlags(enum.IntFlag):
     https://discord.com/developers/docs/interactions/receiving-and-responding#receiving-an-interaction
     """
 
+    ACTIVE_DEVELOPER = 1 << 22
+    """User is an Active Developer
+    More info at: 
+    https://support-dev.discord.com/hc/en-us/articles/10113997751447
+    """
+
 
 @enum.unique
 class PremiumType(enum.IntEnum):
@@ -78,6 +84,9 @@ class PremiumType(enum.IntEnum):
 
     Visit the Nitro page to learn more:
     https://discord.com/nitro
+
+    More info at:
+    https://discord.com/developers/docs/game-sdk/users#data-models-premiumtype-enum
     """
 
     NONE = 0
@@ -88,6 +97,9 @@ class PremiumType(enum.IntEnum):
 
     NITRO = 2
     """Nitro."""
+
+    NITRO_BASIC = 3
+    """Nitro Basic."""
 
 
 class User(BaseModel):
@@ -147,3 +159,10 @@ class User(BaseModel):
 
     public_flags: UserFlags | None = None
     """Public flags on a user's account."""
+
+    avatar_decoration: str | None = None
+    """User's avatar decoration hash.
+
+    Reference: 
+    https://discord.com/developers/docs/reference#image-formatting
+    """
