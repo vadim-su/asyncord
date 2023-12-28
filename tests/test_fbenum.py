@@ -1,4 +1,4 @@
-from asyncord.fbenum import FallbackEnum
+from asyncord.fbenum import UNKNOWN, FallbackEnum
 
 
 def test_get_unknow_item():
@@ -12,12 +12,12 @@ def test_get_unknow_item():
 
     unknown_item = TestFBEnum(3)
     assert isinstance(unknown_item, TestFBEnum)
-    assert unknown_item.name == "UNKNOWN"
+    assert unknown_item.name == UNKNOWN
     assert unknown_item.value == 3
 
     unknown_item = TestFBEnum(35)
     assert isinstance(unknown_item, TestFBEnum)
-    assert unknown_item.name == "UNKNOWN"
+    assert unknown_item.name == UNKNOWN
     assert unknown_item.value == 35
     assert unknown_item in TestFBEnum
     assert list(TestFBEnum) == [TestFBEnum.A, TestFBEnum.B]

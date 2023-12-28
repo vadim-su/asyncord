@@ -25,5 +25,5 @@ class FallbackEnum(Enum):
             pseudo_member = cls._member_type_.__new__(cls, value)  # type: ignore
         if not hasattr(pseudo_member, '_value_'):
             pseudo_member._value_ = value
-        pseudo_member._name_ = 'UNKNOWN'
+        pseudo_member._name_ = UNKNOWN
         return pseudo_member
