@@ -28,7 +28,7 @@ def _get_all_event_classes(modules: list[object]) -> Generator[type[base.Gateway
             is_event_class = (
                 name.endswith('Event')
                 and issubclass(some_obj, base.GatewayEvent)
-                and some_obj != base.GatewayEvent
+                and some_obj is not base.GatewayEvent
             )
             if is_event_class:
                 yield some_obj
