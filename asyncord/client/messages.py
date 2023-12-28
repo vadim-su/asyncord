@@ -39,6 +39,7 @@ class MessageResource(ClientSubresources):
 
     async def get(
         self,
+        *,
         around: LikeSnowflake | None = None,
         before: LikeSnowflake | None = None,
         after: LikeSnowflake | None = None,
@@ -58,7 +59,7 @@ class MessageResource(ClientSubresources):
         if bool(around) + bool(before) + bool(after) > 1:
             raise ValueError('Only one of around, before, after can be specified.')
 
-        url_params = {}
+        url_params: dict[str, str | int] = {}
         if around is not None:
             url_params['around'] = str(around)
         if before is not None:
