@@ -431,7 +431,7 @@ class UpdateForumChannelData(_BaseGuildChannelUpdateData):
     """Default forum layout type used to display posts in GUILD_FORUM channels"""
 
 
-class UpdateMediaChannelData(UpdateForumChannelData):
+class UpdateMediaChannelData(_BaseGuildChannelUpdateData):
     """Model for updating a Media Channel.
 
     Reference:

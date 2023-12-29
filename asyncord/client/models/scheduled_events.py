@@ -77,7 +77,11 @@ class EventEntityMetadata(BaseModel):
 
 
 class ScheduledEventCreateData(BaseModel):
-    """Represents a scheduled event data to create."""
+    """Represents a scheduled event data to create.
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-create
+    """
 
     entity_type: EventEntityType
     """Entity type of the scheduled event."""
@@ -126,7 +130,11 @@ class ScheduledEventCreateData(BaseModel):
 
 
 class ScheduledEventUpdateData(BaseModel):
-    """Represents a scheduled event data to update."""
+    """Represents a scheduled event data to update.
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-update
+    """
 
     channel_id: LikeSnowflake | None = None
     """Channel id of the scheduled event."""

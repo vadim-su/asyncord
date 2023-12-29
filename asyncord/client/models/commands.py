@@ -23,7 +23,11 @@ _DescriptionAnnotation = Annotated[str, Field(min_length=1, max_length=100)]
 
 @enum.unique
 class AppCommandOptionType(enum.IntEnum):
-    """Type of the command option."""
+    """Type of the command option.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+    """
 
     SUB_COMMAND = 1
     """Subcommand is a child of a slash command."""
@@ -81,7 +85,11 @@ class ApplicationCommandType(enum.IntEnum):
 
 
 class ApplicationCommandOptionChoice(BaseModel):
-    """Represents a choice for a Discord application command option."""
+    """Represents a choice for a Discord application command option.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+    """
 
     name: str = Field(min_length=1, max_length=100)
     """Name of the choice.
@@ -256,9 +264,6 @@ class CreateApplicationCommandData(BaseModel):
     Must be 1-32 characters long.
     """
 
-    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
-    """Type of the command. Defaults to `ApplicationCommandType.CHAT_INPUT`."""
-
     name_localizations: dict[Locale, _NameAnnotation] | None = None
     """Dictionary of language codes to localized names. Defaults to None."""
 
@@ -293,6 +298,12 @@ class CreateApplicationCommandData(BaseModel):
     Not recommended for use as field will soon be deprecated.
     Defaults to true.
     """
+
+    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
+    """Type of the command. Defaults to `ApplicationCommandType.CHAT_INPUT`."""
+
+    nsfw: bool | None = False
+    """Indicates whether the command is age-restricted"""
 
     @classmethod
     def from_command(cls, command: ApplicationCommand) -> Self:
@@ -378,14 +389,7 @@ class ApplicationCommand(BaseModel):
     Defaults to True.
     """
 
-    default_permission: bool | None = True
-    """Indicates whether the command is enabled by default when the app is added to a guild
-
-    Not recommended for use as field will soon be deprecated.
-    Defaults to true.
-    """
-
-    nsfw: bool = False
+    nsfw: bool | None = False
     """Indicates whether the command is age-restricted. Defaults to False."""
 
     version: Snowflake

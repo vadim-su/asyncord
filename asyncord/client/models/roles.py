@@ -1,5 +1,6 @@
 """Role models for the client."""
 
+import enum
 import typing
 
 from pydantic import BaseModel
@@ -86,6 +87,20 @@ class RoleTags(BaseModel):
     premium_subscriber: typing.Any = None
     """Whether this is the guild's premium subscriber role."""
 
+# enum and unique
+
+
+@enum.unique
+class RoleFlag(enum.IntFlag):
+    """Role Flags
+
+    Reference:
+    https://discord.com/developers/docs/topics/permissions#role-object-role-flags
+    """
+
+    IN_PROMPT = 1 << 0
+    """Role can be selected by members in an onboarding prompt"""
+
 
 class Role(BaseModel):
     """Roles represent a set of permissions attached to a group of users.
@@ -128,6 +143,9 @@ class Role(BaseModel):
 
     tags: RoleTags | None = None
     """Role tags."""
+
+    flags: RoleFlag
+    """Role flags combined as a bitfield."""
 
 
 class RolePosition(BaseModel):

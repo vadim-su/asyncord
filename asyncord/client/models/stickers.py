@@ -32,6 +32,9 @@ class StickerFormatType(enum.IntEnum):
     LOTTIE = 3
     """LOTTIE sticker format"""
 
+    GIF = 4
+    """GIF sticker format"""
+
 
 class Sticker(BaseModel):
     """Represents a sticker that can be sent in messages.

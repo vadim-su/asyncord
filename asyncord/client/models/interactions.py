@@ -60,6 +60,12 @@ class InteractionResponseType(enum.IntEnum):
     MODAL = 9
     """Respond to an interaction with a popup modal."""
 
+    PREMIUM_REQUIRED = 10
+    """Respond to an interaction with an upgrade button.
+    
+    Only available for apps with monetization enabled.
+    """
+
 
 class InteractionPongResponseData(BaseModel):
     """Interaction response data for PONG."""
