@@ -1119,16 +1119,16 @@ class RoleSubscriptionData(BaseModel):
     https://discord.com/developers/docs/resources/channel#role-subscription-data-object
     """
 
-    role_subscription_listing_id = Snowflake
+    role_subscription_listing_id: Snowflake
     """the id of the sku and listing that the user is subscribed to"""
 
-    tier_name = str
+    tier_name: str
     """name of the tier that the user is subscribed to."""
 
-    total_months_subscribed = int
+    total_months_subscribed: int
     """cumulative number of months that the user has been subscribed for."""
 
-    is_renewal = bool
+    is_renewal: bool
     """whether this notification is for a renewal rather than a new purchase"""
 
 
