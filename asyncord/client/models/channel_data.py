@@ -11,7 +11,7 @@ from typing import Any, Literal, Union
 from pydantic import BaseModel, Field, model_validator
 
 from asyncord.base64_image import Base64ImageInput
-from asyncord.client.models.channels import ChannelFlag, ChannelType, Overwrite
+from asyncord.client.models.channels import ChannelType, Overwrite
 from asyncord.snowflake import Snowflake
 
 MIN_BITRATE = 8000
@@ -20,6 +20,32 @@ MAX_BITRATE = 384000
 """Maximum bitrate for voice channels."""
 MAX_RATELIMIT = 21600
 """Maximum ratelimit for channels."""
+
+
+@enum.unique
+class ChannelFlag(enum.IntFlag):
+    """Channel flags.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#channel-object-channel-flags
+    """
+
+    NONE = 0
+    """No flags set."""
+
+    PINNED = 1 << 1
+    """Whether the channel is pinned."""
+
+    REQUIRE_TAG = 1 << 4
+    """Whether a tag is requiredin a GUILD_FORUM channel.
+
+    Tags are specified in the applied_tags field.
+    """
+
+    HIDE_MEDIA_DOWNLOAD_OPTIONS = 1 << 15
+    """	When set hides the embedded media download options.
+    Available only for media channels
+    """
 
 
 class ThreadSortOrder(enum.IntEnum):

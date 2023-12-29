@@ -12,7 +12,7 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
-from asyncord.client.models.channel_data import DefaultForumLayoutType, DefaultReaction, ThreadSortOrder
+from asyncord.client.models.channel_data import ChannelFlag, DefaultForumLayoutType, DefaultReaction, ThreadSortOrder
 from asyncord.client.models.members import Member
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.models.users import User
@@ -72,32 +72,6 @@ class ChannelType(enum.IntEnum):
 
     GUILD_MEDIA = 16
     """Channel that can only contain threads, similar to GUILD_FORUM channels"""
-
-
-@enum.unique
-class ChannelFlag(enum.IntFlag):
-    """Channel flags.
-
-    Read more info at:
-    https://discord.com/developers/docs/resources/channel#channel-object-channel-flags
-    """
-
-    NONE = 0
-    """No flags set."""
-
-    PINNED = 1 << 1
-    """Whether the channel is pinned."""
-
-    REQUIRE_TAG = 1 << 4
-    """Whether a tag is requiredin a GUILD_FORUM channel.
-
-    Tags are specified in the applied_tags field.
-    """
-
-    HIDE_MEDIA_DOWNLOAD_OPTIONS = 1 << 15
-    """	When set hides the embedded media download options.
-    Available only for media channels
-    """
 
 
 @enum.unique
