@@ -258,6 +258,9 @@ class CreateApplicationCommandData(BaseModel):
     https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params
     """
 
+    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
+    """Type of the command. Defaults to `ApplicationCommandType.CHAT_INPUT`."""
+
     name: _NameAnnotation
     """Name of the command.
 
@@ -298,9 +301,6 @@ class CreateApplicationCommandData(BaseModel):
     Not recommended for use as field will soon be deprecated.
     Defaults to true.
     """
-
-    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
-    """Type of the command. Defaults to `ApplicationCommandType.CHAT_INPUT`."""
 
     nsfw: bool | None = False
     """Indicates whether the command is age-restricted"""
