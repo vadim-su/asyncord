@@ -21,10 +21,9 @@ Installing
 
 You can install or upgrade ``asyncord`` via
 
-.. code:: shell
-
+```sh
     $ pip install asyncord --upgrade
-
+```
 
 Quick Start
 ===========
