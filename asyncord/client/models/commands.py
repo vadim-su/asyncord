@@ -11,7 +11,7 @@ from typing import Annotated, Final, Self
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
-from asyncord.client.models.channels import ChannelType
+from asyncord.client.models.channel_data import ChannelType
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.locale import Locale
 from asyncord.snowflake import Snowflake

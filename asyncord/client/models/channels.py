@@ -6,107 +6,22 @@ https://discord.com/developers/docs/resources/channel
 
 from __future__ import annotations
 
-import enum
 from datetime import datetime
 from typing import Annotated, Any
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
-from asyncord.client.models.channel_data import ChannelFlag, DefaultForumLayoutType, DefaultReaction, ThreadSortOrder
+from asyncord.client.models.channel_data import (
+    ChannelFlag,
+    ChannelType,
+    DefaultForumLayoutType,
+    DefaultReaction,
+    Overwrite,
+    ThreadSortOrder,
+)
 from asyncord.client.models.members import Member
-from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.models.users import User
 from asyncord.snowflake import Snowflake
-
-
-@enum.unique
-class ChannelType(enum.IntEnum):
-    """Channel type.
-
-    Read more info at:
-    https://discord.com/developers/docs/resources/channel#channel-object-channel-types
-    """
-
-    GUILD_TEXT = 0
-    """Text channel within a server."""
-
-    DM = 1
-    """Direct message between users."""
-
-    GUILD_VOICE = 2
-    """Voice channel within a server."""
-
-    GROUP_DM = 3
-    """Direct message between multiple users."""
-
-    GUILD_CATEGORY = 4
-    """Organizational category that contains up to 50 channels."""
-
-    GUILD_ANNOUNCEMENT = 5
-    """Channel that users can follow and crosspost into their own server.
-
-    Formerly news channels.
-    """
-
-    ANNOUNCEMENT_THREAD = 10
-    """Temporary sub-channel within a GUILD_ANNOUNCEMENT channel."""
-
-    GUILD_PUBLIC_THREAD = 11
-    """Temporary sub-channel within a GUILD_TEXT channel."""
-
-    GUILD_PRIVATE_THREAD = 12
-    """Temporary sub-channel within a `GUILD_TEXT` channel.
-
-    The channel is only viewable by those invited and those with
-    the `MANAGE_THREADS` permission.
-    """
-
-    GUILD_STAGE_VOICE = 13
-    """Voice channel for hosting events with an audience."""
-
-    GUILD_DIRECTORY = 14
-    """Channel in a hub containing the listed servers."""
-
-    GUILD_FORUM = 15
-    """Channel that can only contain threads."""
-
-    GUILD_MEDIA = 16
-    """Channel that can only contain threads, similar to GUILD_FORUM channels"""
-
-
-@enum.unique
-class OverwriteType(enum.IntEnum):
-    """Type of overwrite."""
-
-    ROLE = 0
-    USER = 1
-
-
-class Overwrite(BaseModel):
-    """Overwrite object.
-
-    See permissions for more info about `allow` and `deny` fields:
-    https://discord.com/developers/docs/topics/permissions#permissions
-
-    Structure defined at:
-    https://discord.com/developers/docs/resources/channel#overwrite-object
-    """
-
-    id: Snowflake
-    """Role or user id.
-
-    Set corresponding type field.
-    """
-
-    type: OverwriteType
-    """Type of overwrite."""
-
-    # TODO: #10 Every channel type has different permissions so we need to validate this
-    allow: PermissionFlag
-    """Permission flags to allow."""
-
-    deny: PermissionFlag
-    """Permission flags to deny."""
 
 
 class ThreadMetadata(BaseModel):

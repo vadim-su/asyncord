@@ -6,7 +6,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, RootModel
 
-from asyncord.client.models.channels import ChannelType
+from asyncord.client.models.channel_data import ChannelType
 from asyncord.client.models.commands import AppCommandOptionType, ApplicationCommandType
 from asyncord.client.models.components import ActionRow, ComponentType, SelectMenuOption
 from asyncord.client.models.members import Member

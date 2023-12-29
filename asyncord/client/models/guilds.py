@@ -16,7 +16,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInput
-from asyncord.client.models.channels import ChannelType
+from asyncord.client.models.channel_data import ChannelType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.roles import Role
 from asyncord.client.models.scheduled_events import ScheduledEvent
