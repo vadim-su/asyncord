@@ -1,23 +1,20 @@
-Introduction
-============
+# Asyncord
 
-This library provides a Python, asynchronous interface for the
-`Discord Bot API <https://discord.com/developers/docs/reference>`_.
-It's compatible with Python versions **3.12+**.
+## Introduction
 
-The library features two main classes:
+This library offers a Python, asynchronous interface for the [Discord Bot API](https://discord.com/developers/docs/reference). It's compatible with Python versions **3.12+**.
 
-GatewayClient: Handles the WebSocket connection to Discord, managing real-time events like messages, user updates, and server changes. It's designed for handling lots of events efficiently with asynchronous programming.
+### Key Features
 
-RestClient: Manages all the HTTP requests to the Discord API, like sending messages or managing servers and users. 
+- **GatewayClient**: Handles the WebSocket connection to Discord. This class is essential for managing real-time events such as messages, user updates, and server changes. Designed with asynchronous programming, it efficiently handles a high volume of events.
 
-Discord API support
-====================
+- **RestClient**: Manages all HTTP requests to the Discord API. It's responsible for operations like sending messages or managing servers and users, ensuring smooth communication with Discord's API.
+
+## Discord API support
 
 All types and methods of the Discord Bot API **10** are supported.
 
-Installing
-==========
+## Installing
 
 You can install or upgrade ``asyncord`` via
 
@@ -25,8 +22,7 @@ You can install or upgrade ``asyncord`` via
     $ pip install asyncord --upgrade
 ```
 
-Quick Start
-===========
+## Quick Start
 
 The followed example shows how to create a simple bot that responds to user messages.
 And has a status of "Playing with asyncord".
@@ -92,22 +88,20 @@ if __name__ == '__main__':
     asyncio.run(main())
 ```
 
-Features
-============
+## Features
 
-1 - Fully asynchronous 
 
-2 - Full Discord bot API coverage
+1. **Fully Asynchronous**: Asyncord is built with asynchronous programming from the ground up. 
 
-3 - Full pydantic schema coverage
+2. **Full Discord Bot API Coverage**: The library offers complete coverage of the Discord Bot API, enabling access to all the functionalities that Discord provides for bots. This includes handling messages, managing servers, user interactions, and more.
 
-Contributing
-============
+3. **Complete Pydantic Schema Coverage**: Asyncord incorporates full pydantic schema coverage, ensuring robust data validation and management. 
+
+## Contributing
 
 Contributions of all sizes are welcome.
 
 If you find a bug or have a feature request, please report an issue on GitHub.
 
-License
-=======
+## License
 
