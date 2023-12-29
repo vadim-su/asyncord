@@ -78,7 +78,7 @@ class TriggerMetadata(BaseModel):
     [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
     """
 
-    regex_patterns = list[str]
+    regex_patterns: list[str]
     """regular expression patterns which will be matched against content (Maximum of 10)
     
     Associated with `TriggerType.KEYWORD`.
