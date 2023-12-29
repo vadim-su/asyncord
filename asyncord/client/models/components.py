@@ -404,3 +404,6 @@ class ActionRow(BaseComponent):
 
 
 Component = Annotated[ActionRow | Button | SelectMenu, Field(discriminator='type')]
+
+# Rebuild ActionRow model to add `components` field after Component type created.
+ActionRow.model_rebuild()
