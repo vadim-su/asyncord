@@ -7,15 +7,16 @@ https://discord.com/developers/docs/resources/channel
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Annotated, Any
+from typing import Annotated
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from asyncord.client.models.channel_data import (
     ChannelFlag,
     ChannelType,
     DefaultForumLayoutType,
     DefaultReaction,
+    ForumTag,
     Overwrite,
     ThreadSortOrder,
 )
@@ -307,37 +308,3 @@ class ChannelMention(BaseModel):
 
     name: str
     """Channel name."""
-
-
-class ForumTag(BaseModel):
-    """Forum tag representation.
-
-    Read more info at:
-    https://discord.com/developers/docs/resources/channel#forum-tag-object
-    """
-
-    id: Snowflake
-    """Tag id."""
-
-    name: str = Field(min_length=0, max_length=20)
-    """Tag name.
-
-    Should be between 0 and 20 characters.
-    """
-
-    moderated: bool
-    """Whether this tag can only be used a member with the MANAGE_THREADS permission."""
-
-    emoji_id: Snowflake | None
-    """Id of a guild's custom emoji."""
-
-    emoji_name: str | None
-    """Unicode character of the emoji."""
-
-    @model_validator(mode='before')
-    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
-        """Validate that only one of emoji_id and emoji_name is set."""
-        if 'emoji_id' in values and 'emoji_name' in values:
-            raise ValueError('At most one of emoji_id and emoji_name may be set.')
-
-        return values
