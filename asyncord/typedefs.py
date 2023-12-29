@@ -13,7 +13,7 @@ LikeSnowflake = Snowflake | int | str
 Payload = NewType('Payload', Any)
 
 
-# Fix for pydanitc and pylance. Pylance don't correctly infer the type
+# Fix for pydanitc and pylance. Pylance doesn't correctly infer the type
 # of the list_model function.
 if TYPE_CHECKING:
     def list_model[ListItemType](type_: type[ListItemType]) -> TypeAdapter[list[ListItemType]]:

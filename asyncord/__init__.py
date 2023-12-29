@@ -11,9 +11,17 @@ Example:
 """
 from importlib import metadata
 
-metadata = metadata.metadata(__package__)
-__version__ = metadata['version']
-__url__ = metadata['project-url']
-__author__ = metadata['author']
+from asyncord.logger import setup_logging
 
-del metadata
+# Set package metadata
+package_metadata = metadata.metadata(__package__)
+__version__ = package_metadata['version']
+__url__ = package_metadata['project-url']
+__author__ = package_metadata['author']
+
+
+# Setup logging
+setup_logging(__package__)
+
+
+del metadata, setup_logging, package_metadata
