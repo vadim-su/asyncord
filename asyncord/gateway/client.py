@@ -16,13 +16,11 @@ from aiohttp import ClientWebSocketResponse, WSMsgType
 from pydantic import ValidationError
 from rich.pretty import pretty_repr
 
-from asyncord.client.models.activity import Activity, ActivityType
 from asyncord.gateway import errors
 from asyncord.gateway.commands import IdentifyCommand, PresenceUpdateData, ResumeCommand
 from asyncord.gateway.dispatcher import EventDispatcher, EventHandlerType
 from asyncord.gateway.events.base import GatewayEvent, HelloEvent, ReadyEvent
 from asyncord.gateway.events.event_map import EVENT_MAP
-from asyncord.gateway.events.messages import MessageCreateEvent
 from asyncord.gateway.hearbeat import Heartbeat
 from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 from asyncord.gateway.message import GatewayCommandOpcode, GatewayEventOpcode, GatewayMessage
@@ -77,7 +75,10 @@ class GatewayClient:
 
         async with self._session.ws_connect(self.url) as ws:
             self.ws = ws
-            logger.info('Connected to gateway')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('Connected to gateway at %s', self.url)
+            else:
+                logger.info('Connected to gateway')
 
             for _ in range(5, 0, -1):
                 try:
@@ -89,14 +90,18 @@ class GatewayClient:
                     errors.HeartbeatAckTimeoutError,
                     errors.InvalidSessionError,
                 ) as err:
-                    logging.error(err)
+                    logger.error(err)
                     await asyncio.sleep(5)
 
                 except errors.NecessaryReconnectError:
-                    logging.info('Reconnect is necessary')
+                    logger.info('Reconnect is necessary')
+
+                except Exception as err:
+                    logger.exception('Unhandled exception in gateway loop: %s', err)
+                    raise
 
             else:
-                raise RuntimeError('Could not connect to the gateway')
+                raise RuntimeError('Could not connect to the gateway at %s', self.url)
 
     async def stop(self) -> None:
         """Stop the gateway client."""
@@ -211,7 +216,7 @@ class GatewayClient:
                         self._session_id = event.session_id
 
                     await self.dispatcher.dispatch(event)
-                else:
+                elif logger.isEnabledFor(logging.DEBUG):
                     logger.warning("Event '%s' unhandled", msg.event_name)
 
             case GatewayEventOpcode.INVALID_SESSION:
@@ -233,7 +238,8 @@ class GatewayClient:
                 raise errors.NecessaryReconnectError
 
             case _:
-                logger.debug('Unhandled message:\n%s', pretty_repr(msg))
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.warning('Unhandled message:\n%s', pretty_repr(msg))
 
     async def _hello(self, event: HelloEvent) -> None:
         """Handle a hello event.
@@ -259,39 +265,3 @@ class GatewayClient:
     async def _handle_heartbeat_timeout(self) -> None:
         """Handle a heartbeat timeout."""
         await self.stop()
-
-
-async def main() -> None:
-    """Main function for fast gateway testing."""
-    session = aiohttp.ClientSession()
-    c = GatewayClient('OTM0NTY0MjI1NzY5MTQ4NDM2.Yex6wg.AAkUaqRS0ACw8__ERfQ6d8gOdkE', session=session)
-
-    async def test_ready_handler(_: ReadyEvent, gateway: GatewayClient) -> None:  # noqa: PT019
-        await gateway.update_presence(PresenceUpdateData(
-            activities=[
-                Activity(
-                    name='with you',
-                    type=ActivityType.GAME,
-                ),
-            ],
-        ))
-    c.add_handler(test_ready_handler)
-
-    async def test_get_message_handler(event: MessageCreateEvent, gateway: GatewayClient) -> None:
-        await gateway.update_presence(PresenceUpdateData(
-            activities=[
-                Activity(
-                    name=event.content,
-                    type=ActivityType.GAME,
-                ),
-            ],
-        ))
-
-    c.add_handler(test_get_message_handler)
-
-    await c.start()
-    await session.close()
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
