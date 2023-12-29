@@ -76,7 +76,7 @@ class GatewayClient:
         async with self._session.ws_connect(self.url) as ws:
             self.ws = ws
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug('Connected to gateway at %s', self.url)
+                logger.info('Connected to gateway at %s', self.url)
             else:
                 logger.info('Connected to gateway')
 
@@ -96,19 +96,27 @@ class GatewayClient:
                 except errors.NecessaryReconnectError:
                     logger.info('Reconnect is necessary')
 
+                except asyncio.CancelledError:
+                    logger.info('Gateway stopping')
+                    await self.stop()
+                    logger.info('Gateway stopped')
+                    break
+
                 except Exception as err:
                     logger.exception('Unhandled exception in gateway loop: %s', err)
                     raise
 
             else:
+                logger.exception('Could not connect to the gateway at %s', self.url)
                 raise RuntimeError('Could not connect to the gateway at %s', self.url)
 
     async def stop(self) -> None:
         """Stop the gateway client."""
         await self._heartbeat.stop()
-        self.is_started = False
         if self.ws:
             await self.ws.close()
+            self.ws = None
+        self.is_started = False
 
     def add_handler[EVENT_T: GatewayEvent](self, event_handler: EventHandlerType[EVENT_T]) -> None:
         """Add an event handler.
