@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -10,8 +11,35 @@ from asyncord.client.models.users import User
 from asyncord.snowflake import Snowflake
 
 
+class GuildMemberFlags(enum.IntFlag):
+    """Guild member flags.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
+    """
+
+    NONE = 0
+    """No flags set."""
+
+    DID_REJOIN = 1 << 0
+    """Member has left and rejoined the guild"""
+
+    COMPLETED_ONBOARDING = 1 << 1
+    """Member has completed onboarding"""
+
+    BYPASSES_VERIFICATION = 1 << 2
+    """Member is exempt from guild verification requirements"""
+
+    STARTED_ONBOARDING = 1 << 3
+    """Member has started onboarding"""
+
+
 class Member(BaseModel):
-    """Represents a member of a guild."""
+    """Represents a member of a guild.
+
+    Reference: 
+    https://discord.com/developers/docs/resources/guild#guild-member-object
+    """
 
     user: User | None = None
     """User this guild member represents."""
@@ -36,6 +64,9 @@ class Member(BaseModel):
 
     mute: bool
     """Whether the user is muted in voice channels."""
+
+    flags: GuildMemberFlags
+    """Guild member flags represented as a bit set, defaults to 0"""
 
     pending: bool | None = None
     """Whether the user has not yet passed the guild's Membership Screening requirements."""

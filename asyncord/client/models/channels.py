@@ -12,6 +12,8 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
+from asyncord.client.models.channel_data import DefaultForumLayoutType, DefaultReaction, ThreadSortOrder
+from asyncord.client.models.members import Member
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.models.users import User
 from asyncord.snowflake import Snowflake
@@ -68,6 +70,9 @@ class ChannelType(enum.IntEnum):
     GUILD_FORUM = 15
     """Channel that can only contain threads."""
 
+    GUILD_MEDIA = 16
+    """Channel that can only contain threads, similar to GUILD_FORUM channels"""
+
 
 @enum.unique
 class ChannelFlag(enum.IntFlag):
@@ -87,6 +92,11 @@ class ChannelFlag(enum.IntFlag):
     """Whether a tag is requiredin a GUILD_FORUM channel.
 
     Tags are specified in the applied_tags field.
+    """
+
+    HIDE_MEDIA_DOWNLOAD_OPTIONS = 1 << 15
+    """	When set hides the embedded media download options.
+    Available only for media channels
     """
 
 
@@ -159,6 +169,12 @@ class ThreadMetadata(BaseModel):
     Only available on private threads.
     """
 
+    create_timestamp: datetime | None = None
+    """Timestamp when the thread was created;
+    
+    only populated for threads created after 2022-01-09
+    """
+
 
 class ThreadMember(BaseModel):
     """Thread member object.
@@ -188,6 +204,13 @@ class ThreadMember(BaseModel):
     """Any user-thread settings.
 
     Currently only used for notifications.
+    """
+
+    member: Member | None = None
+    """Additional information about the user
+    
+    The member field is only present when with_member is set to true 
+    when calling List Thread Members or Get Thread Member.
     """
 
 
@@ -307,6 +330,15 @@ class Channel(BaseModel):
     Can be set to: 60, 1440, 4320, 10080.
     """
 
+    permissions: str | None = None
+    """Computed permissions for the invoking user in the channel,
+    including overwrites.
+     
+    Only included when part of the resolved data received 
+    on a slash command interaction. This does not include implicit permissions, 
+    which may need to be checked separately
+    """
+
     flags: ChannelFlag | None = None
     """Flags for the channel."""
 
@@ -315,6 +347,37 @@ class Channel(BaseModel):
 
     It's similar to message_count on message creation, but will not decrement
     the number when a message is deleted.
+    """
+
+    available_tags: list[ForumTag] | None = None
+    """Set of tags that can be used in a GUILD_FORUM or a GUILD_MEDIA channel"""
+
+    applied_tags: list[Snowflake] | None = None
+    """IDs of the set of tags that have been applied to a thread
+    in a GUILD_FORUM or a GUILD_MEDIA channel
+    """
+
+    default_reaction_emoji: DefaultReaction | None = None
+    """Emoji to show in the add reaction button on a thread in a GUILD_FORUM
+    or a GUILD_MEDIA channel
+    """
+
+    default_thread_rate_limit_per_user: int | None = None
+    """Initial rate_limit_per_user to set on newly created threads in a channel.
+     
+    This field is copied to the thread at creation time and does not live update.
+    """
+
+    default_sort_order: ThreadSortOrder | None = None
+    """Default sort order type used to order posts in GUILD_FORUM channels.
+    
+    Defaults to null, which indicates a preferred sort order hasn't been set by a channel admin
+    """
+
+    default_forum_layout: DefaultForumLayoutType | None = None
+    """Default forum layout view used to display posts in GUILD_FORUM channels
+    
+    Defaults to 0, which indicates a layout view has not been set by a channel admin
     """
 
     @field_validator('topic')

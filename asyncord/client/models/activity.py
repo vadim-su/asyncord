@@ -76,7 +76,7 @@ class ActivityType(enum.IntEnum):
 
     HANG_STATUS = 6
     """User is setting up a new status
-    This status isn't documented by Discord, but real. 
+    This status isn't documented by Discord, but real.
     """
 
 

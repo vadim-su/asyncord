@@ -9,8 +9,8 @@ import enum
 from typing import Any, Literal, Union
 
 from pydantic import BaseModel, Field, model_validator
-from asyncord.base64_image import Base64ImageInput
 
+from asyncord.base64_image import Base64ImageInput
 from asyncord.client.models.channels import ChannelFlag, ChannelType, Overwrite
 from asyncord.snowflake import Snowflake
 
@@ -34,6 +34,23 @@ class ThreadSortOrder(enum.IntEnum):
 
     CREATION_DATE = 1
     """Sort forum posts by creation time (from most recent to oldest)."""
+
+
+class DefaultForumLayoutType(enum.IntEnum):
+    """Default forum layout type.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#channel-object-forum-layout-types
+    """
+
+    NOT_SET = 0
+    """No default has been set for forum channel"""
+
+    LIST_VIEW = 1
+    """Display posts as a list"""
+
+    GALLERY_VIEW = 2
+    """Display posts as a collection of tiles"""
 
 
 @enum.unique
@@ -181,12 +198,6 @@ class CreateChannelData(BaseModel):
     after recent activity.
     """
 
-    default_thread_rate_limit_per_user: int | None = None
-    """Initial rate_limit_per_user to set on newly created threads in a channel.
-
-    This field is copied to the thread at creation time and does not live update.
-    """
-
     default_reaction_emoji: DefaultReaction | None = None
     """Emoji to show in the add reaction button on a thread in a GUILD_FORUM channel."""
 
@@ -195,6 +206,15 @@ class CreateChannelData(BaseModel):
 
     default_sort_order: ThreadSortOrder | None = None
     """Default sort order type used to order posts in GUILD_FORUM channels."""
+
+    default_forum_layout: DefaultForumLayoutType | None = None
+    """The default forum layout view used to display posts in GUILD_FORUM channels"""
+
+    default_thread_rate_limit_per_user: int | None = None
+    """Initial rate_limit_per_user to set on newly created threads in a channel.
+
+    This field is copied to the thread at creation time and does not live update.
+    """
 
 
 class UpdatGroupDMChannelData(BaseModel):
@@ -407,6 +427,57 @@ class UpdateForumChannelData(_BaseGuildChannelUpdateData):
     default_sort_order: ThreadSortOrder | None = None
     """Default sort order type used to order posts in GUILD_FORUM channels."""
 
+    default_forum_layout: DefaultForumLayoutType | None = None
+    """Default forum layout type used to display posts in GUILD_FORUM channels"""
+
+
+class UpdateMediaChannelData(UpdateForumChannelData):
+    """Model for updating a Media Channel.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel
+    """
+
+    topic: str | None = Field(None, max_length=4096)
+    """Character channel topic (0-4096 characters)."""
+
+    nsfw: bool | None = None
+    """Whether the channel is nsfw."""
+
+    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    """Amount of seconds a user has to wait before sending another message.
+
+    Should be between 0 and 21600. Bots, as well as users with the permission
+    manage_messages or manage_channel, are unaffected.
+    """
+
+    parent_id: Snowflake | None = None
+    """ID of the new parent category for a channel."""
+
+    default_auto_archive_duration: int | None = None
+    """This field represents the default duration in minutes.
+
+    That clients use to automatically archive newly created threads in the channel
+    after recent activity."""
+
+    flags: Literal[ChannelFlag.NONE, ChannelFlag.REQUIRE_TAG] | None = None
+    """Flags of the channel."""
+
+    available_tags: list[ForumTag] | None = None
+    """Set of tags that can be used in a GUILD_FORUM channel."""
+
+    default_reaction_emoji: DefaultReaction | None = None
+    """Emoji to show in the add reaction button on a thread in a GUILD_FORUM channel."""
+
+    default_thread_rate_limit_per_user: int | None = None
+    """Initial rate_limit_per_user to set on newly created threads in a channel.
+
+    This field is copied to the thread at creation time and does not live update.
+    """
+
+    default_sort_order: ThreadSortOrder | None = None
+    """Default sort order type used to order posts in GUILD_FORUM channels."""
+
 
 UpdateChannelDataType = Union[  # noqa: UP007
     UpdateTextChannelData,
@@ -415,5 +486,6 @@ UpdateChannelDataType = Union[  # noqa: UP007
     UpdateVoiceChannelData,
     UpdatGroupDMChannelData,
     UpdateAnnounceChannelData,
+    UpdateMediaChannelData
 ]
 """Type of data to update a channel."""
