@@ -72,7 +72,6 @@ class GatewayClient:
     async def start(self) -> None:
         """Start the gateway client."""
         self.is_started = True
-
         async with self._session.ws_connect(self.url) as ws:
             self.ws = ws
             if logger.isEnabledFor(logging.DEBUG):
