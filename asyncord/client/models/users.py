@@ -73,6 +73,7 @@ class UserFlags(enum.IntFlag):
 
     ACTIVE_DEVELOPER = 1 << 22
     """User is an Active Developer
+
     More info at: 
     https://support-dev.discord.com/hc/en-us/articles/10113997751447
     """
@@ -85,7 +86,7 @@ class PremiumType(enum.IntEnum):
     Visit the Nitro page to learn more:
     https://discord.com/nitro
 
-    More info at:
+    Reference:
     https://discord.com/developers/docs/game-sdk/users#data-models-premiumtype-enum
     """
 

@@ -319,12 +319,12 @@ class SelectMenu(BaseComponent):
 
         menu_type = field_info.data['type']
 
-        auto_populated_channels = (
+        auto_populated_channels = {
             ComponentType.USER_SELECT,
             ComponentType.ROLE_SELECT,
             ComponentType.MENTIONABLE_SELECT,
             ComponentType.CHANNEL_SELECT,
-        )
+        }
 
         if menu_type not in auto_populated_channels:
             raise ValueError(f'Channel types is allowed only for {auto_populated_channels}')
@@ -344,7 +344,8 @@ class TextInputStyle(enum.IntEnum):
     """Text input styles.
 
     Reference:
-    https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-styles    """
+    https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-styles
+    """
 
     SHORT = 1
     """Single-line input."""
@@ -360,7 +361,8 @@ class TextInput(BaseComponent):
     Can be used in modal interactions only.
 
     Reference:
-    https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-structure    """
+    https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-structure
+    """
 
     type: Literal[ComponentType.TEXT_INPUT] = ComponentType.TEXT_INPUT
     """Type of the component.

@@ -78,7 +78,7 @@ class TriggerMetadata(BaseModel):
     [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
     """
 
-    regex_patterns: list[str]
+    regex_patterns: list[str] = Field(max_length=10)
     """regular expression patterns which will be matched against content (Maximum of 10)
     
     Associated with `TriggerType.KEYWORD`.
@@ -159,6 +159,7 @@ class RuleActionMetadata(BaseModel):
 
     Maximum of 2419200 seconds or 4 weeks.
     """
+
     custom_message: str | None = Field(None, max_length=150)
     """additional explanation that will be shown to members whenever their message is blocked
     

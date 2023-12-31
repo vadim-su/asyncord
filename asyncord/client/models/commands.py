@@ -258,14 +258,14 @@ class CreateApplicationCommandData(BaseModel):
     https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params
     """
 
-    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
-    """Type of the command. Defaults to `ApplicationCommandType.CHAT_INPUT`."""
-
     name: _NameAnnotation
     """Name of the command.
 
     Must be 1-32 characters long.
     """
+
+    type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
+    """Type of the command. Defaults to `ApplicationCommandType.CHAT_INPUT`."""
 
     name_localizations: dict[Locale, _NameAnnotation] | None = None
     """Dictionary of language codes to localized names. Defaults to None."""
@@ -288,21 +288,14 @@ class CreateApplicationCommandData(BaseModel):
     default_member_permissions: PermissionFlag | None = None
     """Default permissions for members in the guild."""
 
-    dm_permission: bool = True
+    dm_permission: bool | None = None
     """Indicates whether the command is available in DMs with the app.
 
     Only for globally-scoped commands.
     Defaults to True.
     """
 
-    default_permission: bool | None = True
-    """Indicates whether the command is enabled by default when the app is added to a guild
-
-    Not recommended for use as field will soon be deprecated.
-    Defaults to true.
-    """
-
-    nsfw: bool | None = False
+    nsfw: bool | None = None
     """Indicates whether the command is age-restricted"""
 
     @classmethod
@@ -389,7 +382,7 @@ class ApplicationCommand(BaseModel):
     Defaults to True.
     """
 
-    nsfw: bool | None = False
+    nsfw: bool | None = None
     """Indicates whether the command is age-restricted. Defaults to False."""
 
     version: Snowflake

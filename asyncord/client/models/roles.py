@@ -99,7 +99,7 @@ class RoleFlag(enum.IntFlag):
     """
 
     IN_PROMPT = 1 << 0
-    """Role can be selected by members in an onboarding prompt"""
+    """Role can be selected by members in an onboarding prompt."""
 
 
 class Role(BaseModel):

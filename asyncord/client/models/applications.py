@@ -233,7 +233,7 @@ class Application(BaseModel):
     approximate_guild_count: int | None = None
     """Approximate count of guilds the app has been added to"""
 
-    redirect_uris: list[str] | None = None
+    redirect_uris: list[AnyHttpUrl] | None = None
     """Array of redirect URIs for the app"""
 
     interactions_endpoint_url: AnyHttpUrl | None = None
