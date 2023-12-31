@@ -74,7 +74,7 @@ class UserFlags(enum.IntFlag):
     ACTIVE_DEVELOPER = 1 << 22
     """User is an Active Developer
 
-    More info at: 
+    More info at:
     https://support-dev.discord.com/hc/en-us/articles/10113997751447
     """
 
