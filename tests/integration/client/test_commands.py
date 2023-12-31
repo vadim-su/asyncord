@@ -115,4 +115,3 @@ async def test_convert_command_to_create_command(commands_res: BaseCommandResour
     assert command_data.description == command.description
     assert command_data.type == command.type
     assert command_data.options == command.options
-    assert command_data.default_permission == command.default_permission

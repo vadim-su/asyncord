@@ -12,6 +12,9 @@ from typing import get_args as get_typing_args
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
+from asyncord.client.models.channel_data import ChannelType
+from asyncord.snowflake import Snowflake
+
 
 @enum.unique
 class ComponentType(enum.IntEnum):
@@ -80,7 +83,7 @@ class ComponentEmoji(BaseModel):
     id: int
     """ID of the emoji."""
 
-    animated: bool
+    animated: bool | None = None
     """Whether the emoji is animated."""
 
 
@@ -141,14 +144,14 @@ class Button(BaseComponent):
     Only `ComponentType.BUTTON` is allowed.
     """
 
+    style: ButtonStyle = ButtonStyle.PRIMARY
+    """Style of the button."""
+
     label: str | None = Field(None, max_length=80)
     """Text to be displayed on the button.
 
     Max 80 characters.
     """
-
-    style: ButtonStyle = ButtonStyle.PRIMARY
-    """Style of the button."""
 
     emoji: ComponentEmoji | None = None
     """Emoji to be displayed on the button."""
@@ -217,6 +220,19 @@ class SelectMenuOption(BaseModel):
     """Whether the option is shown as selected by default."""
 
 
+class SelectDefaultValue(BaseModel):
+    """
+
+    Reference:
+    https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
+    """
+    id: Snowflake
+    """ID of a user, role, or channel"""
+
+    type: Literal['user', 'role', 'channel']
+    """Type of value that id represents. Either user, role, or channel"""
+
+
 class SelectMenu(BaseComponent):
     """Select menu is interactive components that allow users to select options in messages.
 
@@ -244,6 +260,27 @@ class SelectMenu(BaseComponent):
     Max 25 options.
     """
 
+    channel_types: list[ChannelType] = Field(default_factory=list)
+    """List of channel types to include in the channel select component"""
+
+    placeholder: str | None = Field(None, max_length=150)
+    """Placeholder text if nothing is selected; max 150 characters."""
+
+    default_values: list[SelectDefaultValue] | None = None
+    """List of default values for auto-populated select menu components; 
+    
+    number of default values must be in the range defined by min_values and max_values.
+    """
+
+    min_values: int = Field(1, ge=0, le=25)
+    """Minimum number of items that must be chosen; default 1, min 0, max 25."""
+
+    max_values: int = Field(1, ge=0, le=25)
+    """Maximum number of items that can be chosen; default 1, max 25."""
+
+    disabled: bool = False
+    """Whether the select menu is disabled."""
+
     @field_validator('options')
     def validate_options(
         cls, options: list[SelectMenuOption], field_info: ValidationInfo,
@@ -259,12 +296,55 @@ class SelectMenu(BaseComponent):
 
         return options
 
+    @field_validator('channel_types')
+    def validate_channel_types(
+        cls, channel_types: list[ChannelType], field_info: ValidationInfo,
+    ) -> list[ChannelType]:
+        """Check that `channel_types` is set for `SelectComponentType.CHANNEL_SELECT`."""
+        menu_type = field_info.data['type']
+
+        if channel_types:
+            if menu_type is not ComponentType.CHANNEL_SELECT:
+                raise ValueError('Channel types is allowed only for `SelectComponentType.CHANNEL_SELECT`')
+
+        return channel_types
+
+    @field_validator('default_values')
+    def validate_default_values(
+        cls, default_values: list[SelectDefaultValue] | None, field_info: ValidationInfo,
+    ) -> list[SelectDefaultValue] | None:
+        """Check that `default_values` is set for `SelectComponentType.STRING_SELECT`."""
+        if not default_values:
+            return default_values
+
+        menu_type = field_info.data['type']
+
+        auto_populated_channels = {
+            ComponentType.USER_SELECT,
+            ComponentType.ROLE_SELECT,
+            ComponentType.MENTIONABLE_SELECT,
+            ComponentType.CHANNEL_SELECT,
+        }
+
+        if menu_type not in auto_populated_channels:
+            raise ValueError(f'Channel types is allowed only for {auto_populated_channels}')
+
+        default_values_len = len(default_values)
+
+        if default_values_len > field_info.data['max_values']:
+            raise ValueError('Number of default values must be less than or equal to max_values')
+
+        if default_values_len < field_info.data['min_values']:
+            raise ValueError('Number of default values must be greater than or equal to min_values')
+
+        return default_values
+
 
 class TextInputStyle(enum.IntEnum):
     """Text input styles.
 
     Reference:
-    https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles
+    https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-styles
     """
 
     SHORT = 1
@@ -281,7 +361,7 @@ class TextInput(BaseComponent):
     Can be used in modal interactions only.
 
     Reference:
-    https://discord.com/developers/docs/interactions/message-components#text-inputs
+    https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-structure
     """
 
     type: Literal[ComponentType.TEXT_INPUT] = ComponentType.TEXT_INPUT

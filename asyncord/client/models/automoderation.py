@@ -78,6 +78,16 @@ class TriggerMetadata(BaseModel):
     [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
     """
 
+    regex_patterns: list[str] = Field(max_length=10)
+    """regular expression patterns which will be matched against content (Maximum of 10)
+    
+    Associated with `TriggerType.KEYWORD`.
+
+    Only Rust flavored regex is currently supported, 
+    which can be tested in online editors such as Rustexp. 
+    Each regex pattern must be 260 characters or less.
+    """
+
     presets: int
     """Internally pre-defined wordsets which will be searched for in content.
 
@@ -101,6 +111,12 @@ class TriggerMetadata(BaseModel):
     """Total number of mentions(role & user) allowed per message.
 
     Maximum of 50.
+    Associated with `TriggerType.MENTION_SPAM`.
+    """
+
+    mention_raid_protection_enabled: bool = False
+    """whether to automatically detect mention raids.
+    
     Associated with `TriggerType.MENTION_SPAM`.
     """
 
@@ -144,6 +160,12 @@ class RuleActionMetadata(BaseModel):
     Maximum of 2419200 seconds or 4 weeks.
     """
 
+    custom_message: str | None = Field(None, max_length=150)
+    """additional explanation that will be shown to members whenever their message is blocked
+    
+    maximum of 150 characters
+    """
+
 
 class RuleAction(BaseModel):
     """Represents an action which will execute when a rule is triggered.
@@ -179,7 +201,11 @@ class RuleAction(BaseModel):
 
 
 class AutoModerationRule(BaseModel):
-    """Represents a rule for AutoModeration system."""
+    """Represents a rule for AutoModeration system.
+
+    Reference:
+    https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object
+    """
 
     id: Snowflake
     """Rule's id."""

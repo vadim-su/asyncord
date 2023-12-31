@@ -11,7 +11,7 @@ from typing import Annotated, Final, Self
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
-from asyncord.client.models.channels import ChannelType
+from asyncord.client.models.channel_data import ChannelType
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.locale import Locale
 from asyncord.snowflake import Snowflake
@@ -23,7 +23,11 @@ _DescriptionAnnotation = Annotated[str, Field(min_length=1, max_length=100)]
 
 @enum.unique
 class AppCommandOptionType(enum.IntEnum):
-    """Type of the command option."""
+    """Type of the command option.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
+    """
 
     SUB_COMMAND = 1
     """Subcommand is a child of a slash command."""
@@ -81,7 +85,11 @@ class ApplicationCommandType(enum.IntEnum):
 
 
 class ApplicationCommandOptionChoice(BaseModel):
-    """Represents a choice for a Discord application command option."""
+    """Represents a choice for a Discord application command option.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+    """
 
     name: str = Field(min_length=1, max_length=100)
     """Name of the choice.
@@ -280,19 +288,15 @@ class CreateApplicationCommandData(BaseModel):
     default_member_permissions: PermissionFlag | None = None
     """Default permissions for members in the guild."""
 
-    dm_permission: bool = True
+    dm_permission: bool | None = None
     """Indicates whether the command is available in DMs with the app.
 
     Only for globally-scoped commands.
     Defaults to True.
     """
 
-    default_permission: bool | None = True
-    """Indicates whether the command is enabled by default when the app is added to a guild
-
-    Not recommended for use as field will soon be deprecated.
-    Defaults to true.
-    """
+    nsfw: bool | None = None
+    """Indicates whether the command is age-restricted"""
 
     @classmethod
     def from_command(cls, command: ApplicationCommand) -> Self:
@@ -378,14 +382,7 @@ class ApplicationCommand(BaseModel):
     Defaults to True.
     """
 
-    default_permission: bool | None = True
-    """Indicates whether the command is enabled by default when the app is added to a guild
-
-    Not recommended for use as field will soon be deprecated.
-    Defaults to true.
-    """
-
-    nsfw: bool = False
+    nsfw: bool | None = None
     """Indicates whether the command is age-restricted. Defaults to False."""
 
     version: Snowflake

@@ -16,22 +16,26 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInput
-from asyncord.client.models.channels import ChannelType, Overwrite
+from asyncord.client.models.channel_data import ChannelType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.roles import Role
 from asyncord.client.models.scheduled_events import ScheduledEvent
+from asyncord.client.models.stickers import Sticker
 from asyncord.client.models.users import User
 from asyncord.snowflake import Snowflake
 
 
 class CreateGuildChannel(BaseModel):
-    """Data for creating a guild channel.
+    """Data for creating a guild channel in a moment of creating guild.
 
-    https://discord.com/developers/docs/resources/guild#create-guild-channel
+    Reference:
+https://discord.com/developers/docs/resources/guild#create-guild-example-partial-channel-object    """
+
+    id: int | None = None
+    """Channel ID.
+    
+    This id is used for parent_id field when creating a category channel
     """
-
-    id: Snowflake
-    """Channel ID."""
 
     name: str = Field(min_length=1, max_length=100)
     """channel name.
@@ -42,10 +46,17 @@ class CreateGuildChannel(BaseModel):
     type: ChannelType
     """Type of the channel."""
 
+    parent_id: int | None = None
+    """Sub category channels are linked to category channel"""
+
 
 class CreateGuildData(BaseModel):
     """Data for creating a guild.
 
+    Endpoint for which this model is used can only be used by bots
+    in less than 10 guilds
+
+    Reference: 
     https://discord.com/developers/docs/resources/guild#create-guild
     """
     name: str = Field(min_length=2, max_length=100)
@@ -298,6 +309,9 @@ class Guild(BaseModel):
     nsfw_level: int
     """Guild NSFW level."""
 
+    stickers: list[Sticker] | None = None
+    """custom guild stickers"""
+
     premium_progress_bar_enabled: bool
     """Whether the guild has the boost progress bar enabled."""
 
@@ -350,15 +364,19 @@ class GuildPreview(BaseModel):
     description: str | None = None
     """Description for the guild, if the guild is discoverable."""
 
+    stickers: list[Sticker] | None = None
+    """Custom guild stickers"""
+
 
 class BeginPruneData(BaseModel):
     """Data for begin prune.
 
-    https://discord.com/developers/docs/resources/guild#begin-guild-prune-query-string-params
+    Reference:
+    https://discord.com/developers/docs/resources/guild#begin-guild-prune-json-params
     """
 
-    days: int | None = None
-    """Number of days to count prune for(1 or more)."""
+    days: int | None = Field(None, ge=1, le=30)
+    """Number of days to count prune for(1 - 30)."""
 
     compute_prune_count: bool | None = None
     """Whether 'pruned' is returned, discouraged for large guilds."""
@@ -370,7 +388,7 @@ class BeginPruneData(BaseModel):
 class Prune(BaseModel):
     """Object returned by the prune endpoints.
 
-    Reference: https://discord.com/developers/docs/resources/guild#prune-object
+    Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
     """
 
     pruned: int
@@ -419,7 +437,9 @@ class InviteChannel(BaseModel):
 class InviteGuild(BaseModel):
     """Partial guild object in an invite.
 
-    Reference: https://discord.com/developers/docs/resources/guild#guild-object
+    Reference: 
+    https://discord.com/developers/docs/resources/guild#guild-object
+    https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object
     """
 
     id: str
@@ -481,10 +501,17 @@ class IntegrationType(enum.StrEnum):
 
 @enum.unique
 class InviteTargetType(enum.IntEnum):
-    """The target type of an invite."""
+    """The target type of an invite.
+
+    Reference:
+    https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types
+    """
 
     STREAM = 1
     """The invite is for a stream."""
+
+    EMBEDDED_APPLICATION = 2
+    """The invite is for an embedded application."""
 
 
 class Invite(BaseModel):
@@ -538,68 +565,6 @@ class Invite(BaseModel):
 
     Return from get_invite endpoint only when `guild_scheduled_event_id` is not None
     and contains a valid id.
-    """
-
-
-class GuildCreateChannel(BaseModel):
-    """Object returned by the guild create channel endpoints.
-
-    Reference: https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params
-    """
-
-    id: int | None = None
-    """Channel id."""
-
-    type: ChannelType
-    """Type of channel."""
-
-    name: str | None = Field(None, min_length=1, max_length=100)
-    """Channel name (1 - 100 characters)."""
-
-    topic: str | None = Field(None, min_length=0, max_length=1024)
-    """Channel topic(0 - 1024 characters)."""
-
-    bitrate: int | None = None
-    """Bitrate (in bits) of the voice channel."""
-
-    user_limit: int | None = None
-    """User limit of the voice channel."""
-
-    rate_limit_per_user: int | None = Field(None, ge=0, le=21600)
-    """Amount of seconds a user has to wait before sending another message(0 - 21600).
-
-    Bots, as well as users with the permission manage_messages or manage_channel,
-    are unaffected. `rate_limit_per_user` also applies to thread creation.
-    Users can send one message and create one thread during each
-    `rate_limit_per_user` interval.
-    """
-
-    permission_overwrites: list[Overwrite] | None = None
-    """Explicit permission overwrites for members and roles."""
-
-    parent_id: Snowflake | None = None
-    """Parent category or channel id.
-
-    For guild channels: id of the parent category for a channel.
-    for threads:
-        id of the text channel this thread was created.
-    Each parent category can contain up to 50 channels.
-    """
-
-    nsfw: bool | None = None
-    """Whether the channel is nsfw."""
-
-    rtc_region: str | None = None
-    """Voice region id for the voice channel, automatic when set to null."""
-
-    video_quality_mode: int | None = None
-    """Camera video quality mode of the voice channel, 1 when not present."""
-
-    default_auto_archive_duration: Literal[60, 1440, 4320, 10080] | None = None
-    """Default duration (in minutes) that the clients (not the API) will use for newly created threads.
-
-    To automatically archive the thread after recent activity.
-    Can be set to: 60, 1440, 4320, 10080.
     """
 
 
@@ -718,6 +683,12 @@ class DiscordIntegration(BaseModel):
 
     type: Literal[IntegrationType.DISCORD]
     """Integration type (twitch, youtube, or discord)."""
+
+    enabled: bool
+    """Is this integration enabled"""
+
+    user: User | None = None
+    """User for this integration."""
 
     account: IntegrationAccount
     """Integration account information."""

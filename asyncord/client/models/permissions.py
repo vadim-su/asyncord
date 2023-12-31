@@ -157,6 +157,21 @@ class PermissionFlag(enum.IntFlag):
     USE_SOUNDBOARD = 1 << 42
     """Allows for using soundboard in a voice channel."""
 
+    CREATE_GUILD_EXPRESSIONS = 1 << 43
+    """Allows for creating, deleting emojis, stickers, and soundboard sounds.
+    
+    Not yet available to developers.
+    """
+
+    CREATE_EVENTS = 1 << 44
+    """Allows for creating, editing and deleting scheduled events.
+
+    Not yet available to developers.
+    """
+
+    USE_EXTERNAL_SOUNDS = 1 << 45
+    """Allows the usage of custom soundboard sounds from other servers"""
+
     SEND_VOICE_MESSAGES = 1 << 46
     """Allows sending voice messages."""
 

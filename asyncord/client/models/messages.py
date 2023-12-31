@@ -20,9 +20,9 @@ from asyncord.client.models.channels import Channel, ChannelMention
 from asyncord.client.models.components import SELECT_COMPONENT_TYPE_LIST, Component, ComponentType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.members import Member
-from asyncord.client.models.stickers import Sticker
+from asyncord.client.models.stickers import StickerFormatType
 from asyncord.client.models.users import User
-from asyncord.color import ColorInput
+from asyncord.color import Color, ColorInput
 from asyncord.snowflake import Snowflake
 
 MAX_EMBED_TEXT_LENGTH = 6000
@@ -201,6 +201,9 @@ class EmbedThumbnail(BaseModel):
 class EmbedVideo(BaseModel):
     """Object representing video in an embed.
 
+    Bots can not send this object.
+    Discord API will ignore it if provided.
+
     Reference:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
     """
@@ -307,7 +310,11 @@ class Embed(BaseModel):
     """Thumbnail information."""
 
     video: EmbedVideo | None = None
-    """Video information."""
+    """Video information.
+    
+    Bots can not use this field.
+    Discord API will ignore it if provided
+    """
 
     provider: EmbedProvider | None = None
     """Provider information."""
@@ -357,6 +364,24 @@ class MessageFlags(enum.IntFlag):
     FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8
     """This message failed to mention some roles and add their members to the thread."""
 
+    SUPPRESS_NOTIFICATIONS = 1 << 12
+    """This message will not trigger push and desktop notifications"""
+
+    IS_VOICE_MESSAGE = 1 << 13
+    """This message is a voice message"""
+
+
+@enum.unique
+class AttachmentFlags(enum.IntFlag):
+    """Attachment flags.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#attachment-object-attachment-flags
+    """
+
+    IS_REMIX = 1 << 2
+    """This attachment has been edited using the remix feature on mobile"""
+
 
 class AttachmentData(BaseModel):
     """Attachment object used for creating and editing messages.
@@ -399,6 +424,18 @@ class AttachmentData(BaseModel):
     Ephemeral attachments on messages are guaranteed to be available as long as
     the message itself exists.
     """
+
+    duration_secs: float | None = None
+    """Duration of the audio file (currently for voice messages)"""
+
+    waveform: str | None = None
+    """base64 encoded bytearray representing a sampled waveform.
+    
+    Currently for voice messages
+    """
+
+    flags: AttachmentFlags | None = None
+    """Attachment flags combined as a bitfield"""
 
 
 class BaseMessageData(BaseModel):
@@ -855,6 +892,31 @@ class Attachment(BaseModel):
     the message itself exists.
     """
 
+    duration_secs: float | None = None
+    """Duration of the audio file (currently for voice messages)"""
+
+    waveform: str | None = None
+    """base64 encoded bytearray representing a sampled waveform.
+    
+    Currently for voice messages
+    """
+
+    flags: AttachmentFlags | None = None
+    """Attachment flags combined as a bitfield"""
+
+
+class ReactionCountDetails(BaseModel):
+    """Reaction Count Details object.
+
+    The reaction count details object contains
+    a breakdown of normal and super reaction counts for the associated emoji.
+    """
+    burst: int
+    """Count of super reactions"""
+
+    normal: int
+    """Count of normal reactions"""
+
 
 class Reaction(BaseModel):
     """Reaction object.
@@ -866,12 +928,20 @@ class Reaction(BaseModel):
     count: int
     """Times this emoji has been used to react."""
 
+    count_details: ReactionCountDetails
+
     me: bool
     """Whether the current user reacted using this emoji."""
+
+    me_burst: bool
+    """Whether the current user super-reacted using this emoji"""
 
     # FIXME: emoji is partial emoji object. I didn't find any info about it.
     emoji: Emoji
     """Emoji information."""
+
+    burst_colors: list[Color]
+    """HEX colors used for super reaction"""
 
 
 @enum.unique
@@ -954,6 +1024,27 @@ class MessageType(enum.IntEnum):
     AUTO_MODERATION_ACTION = 24
     """Auto moderation action was taken."""
 
+    ROLE_SUBSCRIPTION_PURCHASE = 25
+    """User purchased a Nitro subscription."""
+
+    INTERACTION_PREMIUM_UPSELL = 26
+    """User has upgraded their guild subscription."""
+
+    STAGE_START = 27
+    """Represents start of a stage in a voice channel."""
+
+    STAGE_END = 28
+    """Represents end of a stage in a voice channel."""
+
+    STAGE_SPEAKER = 29
+    """Represents speaker in a stage in a voice channel."""
+
+    STAGE_TOPIC = 31
+    """Represents topic change in a stage in a voice channel."""
+
+    GUILD_APPLICATION_PREMIUM_SUBSCRIPTION = 32
+    """Guild application premium subscription."""
+
 
 class MessageActivityType(enum.IntEnum):
     """Type of activity.
@@ -1007,6 +1098,45 @@ class MessageApplication(BaseModel):
 
     name: str
     """Name of the application"""
+
+
+class MessageStickerItem(BaseModel):
+    """Smallest amount of data required to render a sticker.
+
+    Partial sticker object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/sticker#sticker-item-object
+    """
+
+    id: Snowflake
+    """id of the sticker."""
+
+    name: str
+    """Name of the sticker."""
+
+    format_type: StickerFormatType
+    """type of sticker format"""
+
+
+class RoleSubscriptionData(BaseModel):
+    """Role Subscription Data Object
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#role-subscription-data-object
+    """
+
+    role_subscription_listing_id: Snowflake
+    """the id of the sku and listing that the user is subscribed to"""
+
+    tier_name: str
+    """name of the tier that the user is subscribed to."""
+
+    total_months_subscribed: int
+    """cumulative number of months that the user has been subscribed for."""
+
+    is_renewal: bool
+    """whether this notification is for a renewal rather than a new purchase"""
 
 
 class Message(BaseModel):
@@ -1088,11 +1218,11 @@ class Message(BaseModel):
     flags: MessageFlags
     """Message flags combined as a bitfield."""
 
-    stickers: list[Sticker] | None = None
-    """Message stickers."""
-
     referenced_message: Message | None = None
     """The message this message references, if the message is a reply."""
+
+    interaction: MessageInteraction | None = None
+    """Sent if the message is a response to an Interaction."""
 
     thread: Channel | None = None
     """The thread that was started from this message, includes thread member object."""
@@ -1100,8 +1230,27 @@ class Message(BaseModel):
     components: list[Component] | None = None
     """Sent if the message is a response to an Interaction."""
 
-    interaction: MessageInteraction | None = None
-    """Sent if the message is a response to an Interaction."""
+    sticker_items: list[MessageStickerItem] | None = None
+    """Sent if the message contains stickers"""
 
-    message: str | None = None
-    """Error message."""
+    position: int | None = None
+    """Generally increasing integer (there may be gaps or duplicates)
+     
+    Represents the approximate position of the message in a thread,
+    it can be used to estimate the relative position of the message in a thread
+    in company with total_message_sent on parent thread
+    """
+
+    role_subscription_data: RoleSubscriptionData | None = None
+    """Data of the role subscription purchase or renewal.
+    
+    that prompted this ROLE_SUBSCRIPTION_PURCHASE message
+    """
+
+    # TODO: resolved needs a model
+    # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
+    resolved: dict[str, Any] | None = None
+    """data for users, members, channels, and roles.
+     
+    In the message's auto-populated select menus.
+    """

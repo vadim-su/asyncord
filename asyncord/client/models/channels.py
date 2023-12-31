@@ -6,123 +6,23 @@ https://discord.com/developers/docs/resources/channel
 
 from __future__ import annotations
 
-import enum
 from datetime import datetime
-from typing import Annotated, Any
+from typing import Annotated
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
-from asyncord.client.models.permissions import PermissionFlag
+from asyncord.client.models.channel_data import (
+    ChannelFlag,
+    ChannelType,
+    DefaultForumLayoutType,
+    DefaultReaction,
+    ForumTag,
+    Overwrite,
+    ThreadSortOrder,
+)
+from asyncord.client.models.members import Member
 from asyncord.client.models.users import User
 from asyncord.snowflake import Snowflake
-
-
-@enum.unique
-class ChannelType(enum.IntEnum):
-    """Channel type.
-
-    Read more info at:
-    https://discord.com/developers/docs/resources/channel#channel-object-channel-types
-    """
-
-    GUILD_TEXT = 0
-    """Text channel within a server."""
-
-    DM = 1
-    """Direct message between users."""
-
-    GUILD_VOICE = 2
-    """Voice channel within a server."""
-
-    GROUP_DM = 3
-    """Direct message between multiple users."""
-
-    GUILD_CATEGORY = 4
-    """Organizational category that contains up to 50 channels."""
-
-    GUILD_ANNOUNCEMENT = 5
-    """Channel that users can follow and crosspost into their own server.
-
-    Formerly news channels.
-    """
-
-    ANNOUNCEMENT_THREAD = 10
-    """Temporary sub-channel within a GUILD_ANNOUNCEMENT channel."""
-
-    GUILD_PUBLIC_THREAD = 11
-    """Temporary sub-channel within a GUILD_TEXT channel."""
-
-    GUILD_PRIVATE_THREAD = 12
-    """Temporary sub-channel within a `GUILD_TEXT` channel.
-
-    The channel is only viewable by those invited and those with
-    the `MANAGE_THREADS` permission.
-    """
-
-    GUILD_STAGE_VOICE = 13
-    """Voice channel for hosting events with an audience."""
-
-    GUILD_DIRECTORY = 14
-    """Channel in a hub containing the listed servers."""
-
-    GUILD_FORUM = 15
-    """Channel that can only contain threads."""
-
-
-@enum.unique
-class ChannelFlag(enum.IntFlag):
-    """Channel flags.
-
-    Read more info at:
-    https://discord.com/developers/docs/resources/channel#channel-object-channel-flags
-    """
-
-    NONE = 0
-    """No flags set."""
-
-    PINNED = 1 << 1
-    """Whether the channel is pinned."""
-
-    REQUIRE_TAG = 1 << 4
-    """Whether a tag is requiredin a GUILD_FORUM channel.
-
-    Tags are specified in the applied_tags field.
-    """
-
-
-@enum.unique
-class OverwriteType(enum.IntEnum):
-    """Type of overwrite."""
-
-    ROLE = 0
-    USER = 1
-
-
-class Overwrite(BaseModel):
-    """Overwrite object.
-
-    See permissions for more info about `allow` and `deny` fields:
-    https://discord.com/developers/docs/topics/permissions#permissions
-
-    Structure defined at:
-    https://discord.com/developers/docs/resources/channel#overwrite-object
-    """
-
-    id: Snowflake
-    """Role or user id.
-
-    Set corresponding type field.
-    """
-
-    type: OverwriteType
-    """Type of overwrite."""
-
-    # TODO: #10 Every channel type has different permissions so we need to validate this
-    allow: PermissionFlag
-    """Permission flags to allow."""
-
-    deny: PermissionFlag
-    """Permission flags to deny."""
 
 
 class ThreadMetadata(BaseModel):
@@ -159,6 +59,12 @@ class ThreadMetadata(BaseModel):
     Only available on private threads.
     """
 
+    create_timestamp: datetime | None = None
+    """Timestamp when the thread was created;
+    
+    only populated for threads created after 2022-01-09
+    """
+
 
 class ThreadMember(BaseModel):
     """Thread member object.
@@ -188,6 +94,13 @@ class ThreadMember(BaseModel):
     """Any user-thread settings.
 
     Currently only used for notifications.
+    """
+
+    member: Member | None = None
+    """Additional information about the user
+    
+    The member field is only present when with_member is set to true 
+    when calling List Thread Members or Get Thread Member.
     """
 
 
@@ -307,6 +220,15 @@ class Channel(BaseModel):
     Can be set to: 60, 1440, 4320, 10080.
     """
 
+    permissions: str | None = None
+    """Computed permissions for the invoking user in the channel,
+    including overwrites.
+     
+    Only included when part of the resolved data received 
+    on a slash command interaction. This does not include implicit permissions, 
+    which may need to be checked separately
+    """
+
     flags: ChannelFlag | None = None
     """Flags for the channel."""
 
@@ -315,6 +237,37 @@ class Channel(BaseModel):
 
     It's similar to message_count on message creation, but will not decrement
     the number when a message is deleted.
+    """
+
+    available_tags: list[ForumTag] | None = None
+    """Set of tags that can be used in a GUILD_FORUM or a GUILD_MEDIA channel"""
+
+    applied_tags: list[Snowflake] | None = None
+    """IDs of the set of tags that have been applied to a thread
+    in a GUILD_FORUM or a GUILD_MEDIA channel
+    """
+
+    default_reaction_emoji: DefaultReaction | None = None
+    """Emoji to show in the add reaction button on a thread in a GUILD_FORUM
+    or a GUILD_MEDIA channel
+    """
+
+    default_thread_rate_limit_per_user: int | None = None
+    """Initial rate_limit_per_user to set on newly created threads in a channel.
+     
+    This field is copied to the thread at creation time and does not live update.
+    """
+
+    default_sort_order: ThreadSortOrder | None = None
+    """Default sort order type used to order posts in GUILD_FORUM channels.
+    
+    Defaults to null, which indicates a preferred sort order hasn't been set by a channel admin
+    """
+
+    default_forum_layout: DefaultForumLayoutType | None = None
+    """Default forum layout view used to display posts in GUILD_FORUM channels
+    
+    Defaults to 0, which indicates a layout view has not been set by a channel admin
     """
 
     @field_validator('topic')
@@ -355,37 +308,3 @@ class ChannelMention(BaseModel):
 
     name: str
     """Channel name."""
-
-
-class ForumTag(BaseModel):
-    """Forum tag representation.
-
-    Read more info at:
-    https://discord.com/developers/docs/resources/channel#forum-tag-object
-    """
-
-    id: Snowflake
-    """Tag id."""
-
-    name: str = Field(min_length=0, max_length=20)
-    """Tag name.
-
-    Should be between 0 and 20 characters.
-    """
-
-    moderated: bool
-    """Whether this tag can only be used a member with the MANAGE_THREADS permission."""
-
-    emoji_id: Snowflake | None
-    """Id of a guild's custom emoji."""
-
-    emoji_name: str | None
-    """Unicode character of the emoji."""
-
-    @model_validator(mode='before')
-    def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
-        """Validate that only one of emoji_id and emoji_name is set."""
-        if 'emoji_id' in values and 'emoji_name' in values:
-            raise ValueError('At most one of emoji_id and emoji_name may be set.')
-
-        return values
