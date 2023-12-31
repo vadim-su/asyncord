@@ -26,11 +26,12 @@ from asyncord.color import Color, ColorInput
 from asyncord.snowflake import Snowflake
 
 MAX_EMBED_TEXT_LENGTH = 6000
+"""Maximum length of the embed text."""
 
 _OpennedFileType = io.BufferedReader | io.BufferedRandom
-
-AttachmentContentType = bytes | BinaryIO | _OpennedFileType
-FilePathType = str | Path
+_AttachmentContentType = bytes | BinaryIO | _OpennedFileType
+_FilePathType = str | Path
+_AttachedFileInputType = Annotated[_FilePathType | _AttachmentContentType, _AttachmentContentType]
 
 
 class AttachedFile(BaseModel):
@@ -40,22 +41,21 @@ class AttachedFile(BaseModel):
     https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
     """
 
-    filename: str
+    filename: str = None  # type: ignore
     """Name of attached file."""
 
-    content_type: str
+    content_type: str = None  # type: ignore
     """Media type of the file."""
 
-    content: AttachmentContentType
+    content: _AttachedFileInputType
     """File content."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    """Pydantic config."""
-
-    def __init__(  # noqa: D107
-        self, *, content: FilePathType | AttachmentContentType, **kwargs: dict[str, Any],
-    ) -> None:
-        super().__init__(content=content, **kwargs)
+    """Pydantic config.# type: ignore
+    
+    Arbitrary types are allowed because of the `content` field can be BinaryIO
+    and other unsupported pydantic types.
+    """
 
     @model_validator(mode='before')
     def validate_file_info(cls, values: dict[str, Any]) -> dict[str, Any]:
@@ -105,9 +105,9 @@ class AttachedFile(BaseModel):
         return values
 
 
-_FilesListType = list[AttachedFile | FilePathType | _OpennedFileType]
-_FileMapType = Mapping[str | Path, 'AttachmentContentType']
-FilesType = _FilesListType | _FileMapType
+_FilesListType = list[AttachedFile | _FilePathType | _OpennedFileType]
+_FileMapType = Mapping[str | Path, _AttachmentContentType]
+_FilesType = _FilesListType | _FileMapType
 
 
 @enum.unique
@@ -506,7 +506,7 @@ class BaseMessageData(BaseModel):
         return embeds
 
     @field_validator('files', mode='before', check_fields=False)
-    def validate_attached_files(cls, files: FilesType) -> list[AttachedFile]:
+    def validate_attached_files(cls, files: _FilesType) -> list[AttachedFile]:
         """Prepare attached files.
 
         Args:
@@ -532,11 +532,11 @@ class BaseMessageData(BaseModel):
                     prepared_files.append(AttachedFile(content=content))
 
                 # if mapping item - filename, file
-                case str() | Path() as filename, content if isinstance(content, AttachmentContentType):
+                case str() | Path() as filename, content if isinstance(content, _AttachmentContentType):
                     if isinstance(filename, Path):
                         filename = filename.name
                     prepared_files.append(
-                        AttachedFile(filename=filename, content=content),  # type: ignore
+                        AttachedFile(filename=filename, content=content),
                     )
 
                 case _:
