@@ -60,30 +60,6 @@ class Color:
         return hex(self.value)
 
     @classmethod
-    def validate(cls, value: int | str | RGB | tuple[int, int, int] | Self) -> Self:
-        """Pydantic auxiliary validation method.
-
-        Args:
-            value: Value to validate.
-
-        Returns:
-            Validated Color.
-
-        Raises:
-            ValueError: If value is not
-        """
-        if isinstance(value, int | str | RGB):
-            return cls.build(value)
-
-        if isinstance(value, tuple) and len(value) == 3 and all(isinstance(v, int) for v in value):
-            return cls.build(value)
-
-        if isinstance(value, cls):
-            return value
-
-        raise ValueError('Invalid value type')
-
-    @classmethod
     def __get_pydantic_core_schema__(
         cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
     ) -> CoreSchema:
@@ -107,9 +83,12 @@ class Color:
         ])
 
         return core_schema.no_info_after_validator_function(
-            function=cls.validate,
+            function=cls._validate,
             schema=schema,
-            serialization=core_schema.simple_ser_schema('int'),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                function=cls._serialize,
+                when_used='json-unless-none',
+            ),
         )
 
     def __repr__(self) -> str:
@@ -129,6 +108,42 @@ class Color:
     def __int__(self) -> int:
         """Return the integer value of the color."""
         return self.value
+
+    @classmethod
+    def _validate(cls, value: int | str | RGB | tuple[int, int, int] | Self) -> Self:
+        """Pydantic auxiliary validation method.
+
+        Args:
+            value: Value to validate.
+
+        Returns:
+            Validated Color.
+
+        Raises:
+            ValueError: If value is not
+        """
+        if isinstance(value, int | str | RGB):
+            return cls.build(value)
+
+        if isinstance(value, tuple) and len(value) == 3 and all(isinstance(v, int) for v in value):
+            return cls.build(value)
+
+        if isinstance(value, cls):
+            return value
+
+        raise ValueError('Invalid value type')
+
+    @classmethod
+    def _serialize(cls, value: Self) -> int:
+        """Pydantic auxiliary method to serialize the color.
+
+        Args:
+            value: Value to serialize.
+
+        Returns:
+            Serialized value.
+        """
+        return int(value)
 
 
 ColorInput = Annotated[int | str | RGB | tuple[int, int, int] | Color, Color]
