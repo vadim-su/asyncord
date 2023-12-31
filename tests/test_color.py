@@ -89,6 +89,9 @@ def test_color_in_models(color_value: int | str | RGB | tuple[int, int, int], co
     assert isinstance(model.color, Color)
     assert model.color == color
 
+    assert model.model_dump(mode='json') == f'{{"color": "{int(color)}"}}'
+    assert model.model_dump() == {'color': int(color)}
+
 
 def test_color_error_in_models():
     class TestModel(BaseModel):
@@ -96,6 +99,7 @@ def test_color_error_in_models():
 
     with pytest.raises(ValueError):
         TestModel(color='not a color')
+
 
 # @pytest.mark.parametrize('img_name', [Path(f'tests/data/{file_name}') for file_name in TEST_FILE_NAMES])
 # def test_base64_images_in_models(img_name: Path):
