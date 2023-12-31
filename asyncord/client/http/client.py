@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 from collections.abc import Mapping, Sequence
 from http import HTTPStatus
 from types import MappingProxyType, TracebackType
@@ -22,23 +23,39 @@ if TYPE_CHECKING:
     from typing import Self
 
 
-AttachedFile = tuple[str, str, BinaryIO | bytes]
-"""Type alias for a file to be attached to a request.
-
-The tuple contains the filename, the content type, and the file object.
-"""
-
-
 MAX_NEXT_RETRY_SEC = 10
 """Maximum number of seconds to wait before retrying a request."""
+
+logger = logging.getLogger(__name__)
+
+
+class AttachedFile(NamedTuple):
+    """Type alias for a file to be attached to a request.
+
+    The tuple contains the filename, the content type, and the file object.
+    """
+
+    filename: str
+    """Name of the file."""
+
+    content_type: str
+    """Content type of the file."""
+
+    file: BinaryIO
+    """File object."""
 
 
 class Response(NamedTuple):
     """Response structure for the HTTP client."""
 
     status: int
+    """Response status code."""
+
     headers: Mapping[str, str]
+    """Response headers."""
+
     body: Any
+    """Response body."""
 
 
 class RateLimitBody(BaseModel):
@@ -50,7 +67,7 @@ class RateLimitBody(BaseModel):
     retry_after: float
     """Number of seconds to wait before submitting another request."""
 
-    global_: bool = Field(alias='global')
+    is_global: bool = Field(alias='global')
     """Whether this is a global rate limit."""
 
 
@@ -219,76 +236,93 @@ class AsyncHttpClient:
             ServerError: If the response status code is in the 500 range.
             RateLimitError: If the response status code is 429 and the retry_after is greater than 10.
         """
-        if headers is None:
-            headers = self._headers
-        else:
-            headers = {**self._headers, **headers}
+        headers = {**self._headers, **(headers or {})}
 
         async with self._make_raw_request(method, url, payload, files, headers) as resp:
-            body, message = await self._extract_body_and_message(resp)
+            body = await self._extract_body(resp)
+            status = resp.status
 
-            match resp.status:
-                case status if status < HTTPStatus.BAD_REQUEST:
-                    return Response(
-                        status=resp.status,
-                        headers=MappingProxyType(dict(resp.headers.items())),
-                        body=body,
-                    )
+            if resp.status < HTTPStatus.BAD_REQUEST:
+                return Response(
+                    status=resp.status,
+                    headers=MappingProxyType(dict(resp.headers.items())),
+                    body=body,
+                )
 
-                case HTTPStatus.TOO_MANY_REQUESTS:
-                    # FIXME: It's a simple hack for now. Potentially 'endless' recursion
-                    ratelimit = RateLimitBody(**body)
-                    if ratelimit.retry_after > MAX_NEXT_RETRY_SEC:
-                        raise errors.RateLimitError(
-                            message=message or 'Unknown error',
-                            resp=resp,
-                            retry_after=ratelimit.retry_after or None,
-                        )
-                    # FIXME: Move to decorator
-                    await asyncio.sleep(ratelimit.retry_after + 0.1)
-                    return await self._request(
-                        method=method,
-                        url=url,
+            if not isinstance(body, dict):
+                raise errors.ServerError(
+                    message='Expected JSON body',
+                    payload=payload,
+                    headers=headers,
+                    resp=resp,
+                    body=body,
+                )
+
+            if status == HTTPStatus.TOO_MANY_REQUESTS:
+                # FIXME: It's a simple hack for now. Potentially 'endless' recursion
+                ratelimit = RateLimitBody.model_validate(body)
+                logger.warning(f'Rate limited: {ratelimit.message} (retry after {ratelimit.retry_after})')
+
+                if ratelimit.retry_after > MAX_NEXT_RETRY_SEC:
+                    raise errors.RateLimitError(
+                        message=ratelimit.message,
                         payload=payload,
-                        files=files,
                         headers=headers,
-                    )
-
-                case status if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
-                    # TODO: #8 Add more specific errors for 400 range
-                    raise errors.ClientError(
-                        message=message or 'Unknown error',
                         resp=resp,
-                        code=body.get('code'),
+                        retry_after=ratelimit.retry_after,
                     )
 
-                case _:
-                    raise errors.ServerError(
-                        message=message or 'Unknown error',
-                        resp=resp,
-                        status_code=resp.status,
-                    )
+                # FIXME: Move to decorator
+                await asyncio.sleep(ratelimit.retry_after + 0.1)
+                return await self._request(
+                    method=method,
+                    url=url,
+                    payload=payload,
+                    files=files,
+                    headers=headers,
+                )
 
-    async def _extract_body_and_message(self, resp: ClientResponse) -> tuple[Any, str | None]:
-        """Extract the body and message from the response.
+            error_body = errors.RequestErrorBody.model_validate(body)
+            if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
+                raise errors.ClientError(
+                    message=error_body.message,
+                    payload=payload,
+                    headers=headers,
+                    resp=resp,
+                    body=error_body,
+                )
+
+            raise errors.ServerError(
+                message=error_body.message,
+                payload=payload,
+                headers=headers,
+                resp=resp,
+                body=error_body,
+            )
+
+    async def _extract_body(self, resp: ClientResponse) -> dict[str, Any] | str:
+        """Extract the body.
 
         Args:
             resp: Request response.
 
         Returns:
-            Body and message from the response.
+            Body of the response.
         """
         if resp.status == HTTPStatus.NO_CONTENT:
-            body = {}
-            message = None
-        elif resp.headers.get('Content-Type') == JSON_CONTENT_TYPE:
-            body = await resp.json()
-            message = body.get('message') if isinstance(body, Mapping) else None
-        else:
-            body = {}
-            message = await resp.text()
+            return {}
 
-        return body, message
+        if resp.headers.get('Content-Type') == JSON_CONTENT_TYPE:
+            try:
+                return await resp.json()
+            except json.JSONDecodeError:
+                body = await resp.text()
+                logger.warning(f'Failed to decode JSON body: {body}')
+                if body:
+                    return body
+                return {}
+
+        return {}
 
     def _make_raw_request(  # noqa: PLR0913
         self,
