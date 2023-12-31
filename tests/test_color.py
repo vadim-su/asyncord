@@ -89,8 +89,8 @@ def test_color_in_models(color_value: int | str | RGB | tuple[int, int, int], co
     assert isinstance(model.color, Color)
     assert model.color == color
 
-    assert model.model_dump(mode='json') == f'{{"color": "{int(color)}"}}'
-    assert model.model_dump() == {'color': int(color)}
+    assert model.model_dump() == {'color': color}
+    assert model.model_dump(mode='json') == {'color': DECIMAL_VALUE}
 
 
 def test_color_error_in_models():
