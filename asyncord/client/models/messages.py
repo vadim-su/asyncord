@@ -201,6 +201,9 @@ class EmbedThumbnail(BaseModel):
 class EmbedVideo(BaseModel):
     """Object representing video in an embed.
 
+    Bots can not send this object.
+    Discord API will ignore it if provided.
+
     Reference:
     https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
     """
@@ -307,7 +310,11 @@ class Embed(BaseModel):
     """Thumbnail information."""
 
     video: EmbedVideo | None = None
-    """Video information."""
+    """Video information.
+    
+    Bots can not use this field.
+    Discord API will ignore it if provided
+    """
 
     provider: EmbedProvider | None = None
     """Provider information."""
