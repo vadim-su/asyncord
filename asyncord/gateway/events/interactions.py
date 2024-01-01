@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, RootModel
 
 from asyncord.client.models.channel_data import ChannelType
 from asyncord.client.models.commands import AppCommandOptionType, ApplicationCommandType
-from asyncord.client.models.components import ActionRow, ComponentType, SelectMenuOption
+from asyncord.client.models.components import ActionRow, ComponentType
 from asyncord.client.models.members import Member
 from asyncord.client.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType
 from asyncord.client.models.permissions import PermissionFlag
@@ -326,7 +326,7 @@ class MessageComponentInteractionData(BaseModel):
     component_type: ComponentType
     """Type of the component."""
 
-    values: list[SelectMenuOption] | None = None
+    values: list[str] | None = None
     """Values the user selected."""
 
 
