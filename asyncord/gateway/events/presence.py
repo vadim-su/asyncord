@@ -43,7 +43,7 @@ class PresenceUpdateUser(BaseModel):
     """
 
     discriminator: str | None = None
-    """User's 4-digit discord-tag."""
+    """User's 4 - digit discord-tag or 0 if the user has no tag."""
 
     avatar: str | None = None
     """User's avatar hash."""
