@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from asyncord.client.models import messages
 from asyncord.client.models.channels import Channel
@@ -55,8 +55,8 @@ class MentionUser(BaseModel):
     username: str
     """User's username, not unique across the platform."""
 
-    discriminator: str = Field(min_length=4, max_length=4)
-    """User's 4 - digit discord-tag."""
+    discriminator: str
+    """User's 4 - digit discord-tag or 0 if the user has no tag."""
 
     avatar: str | None
     """User's avatar hash."""
