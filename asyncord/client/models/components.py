@@ -75,16 +75,29 @@ class BaseComponent(BaseModel):
 
 
 class ComponentEmoji(BaseModel):
-    """Emoji to be displayed on the button."""
+    """Emoji to be displayed on the button.
 
-    name: str
+    At least one of `name` or `id` must be provided.
+    Name is used for unicode emojies,
+    Id is a snowflake of custom emojies.
+    """
+
+    name: str | None = None
     """Name of the emoji."""
 
-    id: int
+    id: Snowflake | None = None
     """ID of the emoji."""
 
     animated: bool | None = None
     """Whether the emoji is animated."""
+
+    @model_validator(mode='after')
+    def name_or_id_required(self):
+        """Check that `name` or `id` is set."""
+        if not self.name and not self.id:
+            raise ValueError('At least one of `name` or `id` must be provided')
+
+        return self
 
 
 class ButtonStyle(enum.IntEnum):
