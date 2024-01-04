@@ -13,6 +13,7 @@ class IntegrationTestData:
     user_id: str
     message_id: str
     member_id: str
+    custom_emoji: str
     guild_prefix_to_delete: str
     app_id: str
     role_id: str
@@ -33,6 +34,7 @@ def integration_data() -> IntegrationTestData:
             user_id=os.environ['ASYNCORD_TEST_USER_ID'],
             message_id=os.environ['ASYNCORD_TEST_MESSAGE_ID'],
             member_id=os.environ['ASYNCORD_TEST_MEMBER_ID'],
+            custom_emoji=os.environ['ASYNCORD_TEST_CUSTOM_EMOJI'],
             guild_prefix_to_delete=os.environ['ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE'],
             app_id=os.environ['ASYNCORD_TEST_APP_ID'],
             role_id=os.environ['ASYNCORD_TEST_ROLE_ID'],

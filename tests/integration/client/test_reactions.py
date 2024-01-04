@@ -63,3 +63,14 @@ async def test_delete_all_reactions_for_emoji(reactions_res: ReactionResource):
     await reactions_res.delete(test_emoji1)
     assert not await reactions_res.get(test_emoji1)
     assert await reactions_res.get(test_emoji2)
+
+
+async def test_add_and_delete(
+    reactions_res: ReactionResource,
+    integration_data: IntegrationTestData,
+):
+    await reactions_res.add(integration_data.custom_emoji)
+    assert await reactions_res.get(integration_data.custom_emoji)
+
+    await reactions_res.delete(integration_data.custom_emoji)
+    assert not await reactions_res.get(integration_data.custom_emoji)
