@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Any
 
-from asyncord.client.models.channel_data import ChannelType
-from asyncord.client.models.channels import Channel, ThreadMember
-from asyncord.client.models.members import Member
+from asyncord.client.channels.models.output import Channel, ThreadMember
+from asyncord.client.channels.models.payload import ChannelType
+from asyncord.client.members.models import Member
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 

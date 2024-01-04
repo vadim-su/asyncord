@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Any
 
-from asyncord.client.models.guilds import Guild
-from asyncord.client.models.members import Member
-from asyncord.client.models.users import User
-from asyncord.client.roles import Role
+from asyncord.client.guilds.resources import Guild
+from asyncord.client.members.models import Member
+from asyncord.client.roles.models import Role
+from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 

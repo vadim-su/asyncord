@@ -12,9 +12,9 @@ from typing import NamedTuple
 
 from pydantic import BaseModel, Field
 
-from asyncord.client.models.applications import ApplicationFlag
-from asyncord.client.models.guilds import UnavailableGuild
-from asyncord.client.models.users import User
+from asyncord.client.applications.models import ApplicationFlag
+from asyncord.client.guilds.models import UnavailableGuild
+from asyncord.client.users.models import User
 from asyncord.snowflake import Snowflake
 
 

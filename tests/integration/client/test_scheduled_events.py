@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from asyncord.client.models.scheduled_events import (
+from asyncord.client.scheduled_events.models import (
     EventEntityMetadata,
     EventEntityType,
     EventPrivacyLevel,
@@ -10,7 +10,7 @@ from asyncord.client.models.scheduled_events import (
     ScheduledEventCreateData,
     ScheduledEventUpdateData,
 )
-from asyncord.client.scheduled_events import ScheduledEventsResource
+from asyncord.client.scheduled_events.resources import ScheduledEventsResource
 from tests.conftest import IntegrationTestData
 
 

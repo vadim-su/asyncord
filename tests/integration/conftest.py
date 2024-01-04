@@ -3,16 +3,16 @@ from typing import AsyncGenerator
 import aiohttp
 import pytest
 
-from asyncord.client.channels import ChannelResource
-from asyncord.client.commands import BaseCommandResource
-from asyncord.client.guilds import GuildResource
-from asyncord.client.messages import MessageResource
-from asyncord.client.models.messages import CreateMessageData, Message
-from asyncord.client.reactions import ReactionResource
+from asyncord.client.channels.resources import ChannelResource
+from asyncord.client.commands.resources import CommandResource
+from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.messages.models.messages import CreateMessageData, Message
+from asyncord.client.messages.resources import MessageResource
+from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.rest import RestClient
-from asyncord.client.roles import RoleResource
-from asyncord.client.scheduled_events import ScheduledEventsResource
-from asyncord.client.users import UserResource
+from asyncord.client.roles.resources import RoleResource
+from asyncord.client.scheduled_events.resources import ScheduledEventsResource
+from asyncord.client.users.resources import UserResource
 from asyncord.gateway.client import GatewayClient
 from tests.conftest import IntegrationTestData
 
@@ -27,7 +27,7 @@ async def gateway(client: RestClient, token: str) -> AsyncGenerator[GatewayClien
     async with aiohttp.ClientSession() as session:
         gw = GatewayClient(token, session=session)
         client = RestClient(token)
-        client._http._session = session  # type: ignore
+        client._http_client._session = session  # type: ignore
         gw.dispatcher.add_argument('client', client)
         yield gw
 
@@ -88,7 +88,7 @@ async def reactions_res(message: Message, messages_res: MessageResource) -> Reac
 async def commands_res(
     client: RestClient,
     integration_data: IntegrationTestData,
-) -> BaseCommandResource:
+) -> CommandResource:
     return client.applications.commands(integration_data.app_id)
 
 

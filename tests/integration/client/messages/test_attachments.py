@@ -1,7 +1,6 @@
 from yarl import URL
 
-from asyncord.client.messages import MessageResource
-from asyncord.client.models.messages import (
+from asyncord.client.messages.models.messages import (
     AttachmentData,
     CreateMessageData,
     Embed,
@@ -10,6 +9,7 @@ from asyncord.client.models.messages import (
     Message,
     UpdateMessageData,
 )
+from asyncord.client.messages.resources import MessageResource
 
 TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.jpg']
 

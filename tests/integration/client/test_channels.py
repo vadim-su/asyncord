@@ -1,8 +1,8 @@
 import pytest
 
-from asyncord.client.channels import ChannelResource
+from asyncord.client.channels.models.payload import ChannelType, CreateChannelData, UpdateTextChannelData
+from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.http.errors import ClientError
-from asyncord.client.models.channel_data import ChannelType, CreateChannelData, UpdateTextChannelData
 from tests.conftest import IntegrationTestData
 
 

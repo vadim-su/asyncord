@@ -4,7 +4,7 @@ import enum
 
 from pydantic import BaseModel
 
-from asyncord.client.models.users import User
+from asyncord.client.users.models import User
 from asyncord.snowflake import Snowflake
 
 

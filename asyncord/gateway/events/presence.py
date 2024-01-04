@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from asyncord.client.models.activity import Activity
-from asyncord.client.models.members import Member
-from asyncord.client.models.users import User
+from asyncord.client.commands.models.activity import Activity
+from asyncord.client.members.models import Member
+from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 

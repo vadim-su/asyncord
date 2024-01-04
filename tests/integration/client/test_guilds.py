@@ -2,9 +2,9 @@ import random
 
 import pytest
 
-from asyncord.client.guilds import GuildResource
-from asyncord.client.models.guilds import CreateGuildData
-from asyncord.client.users import UserResource
+from asyncord.client.guilds.models import CreateGuildData
+from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.users.resources import UserResource
 from tests.conftest import IntegrationTestData
 
 

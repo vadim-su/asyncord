@@ -2,16 +2,16 @@ import re
 
 import pytest
 
-from asyncord.client.messages import MessageResource
-from asyncord.client.models.messages import CreateMessageData
-from asyncord.client.models.components import (
-    Button,
+from asyncord.client.messages.models.components import (
     ActionRow,
-    SelectMenu,
+    Button,
     ButtonStyle,
     ComponentType,
+    SelectMenu,
     SelectMenuOption,
 )
+from asyncord.client.messages.models.messages import CreateMessageData
+from asyncord.client.messages.resources import MessageResource
 
 
 async def test_create_message_with_buttons(messages_res: MessageResource):

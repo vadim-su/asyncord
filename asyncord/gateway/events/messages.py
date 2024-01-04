@@ -4,12 +4,12 @@ import datetime
 
 from pydantic import BaseModel
 
-from asyncord.client.models import messages
-from asyncord.client.models.channels import Channel
-from asyncord.client.models.components import Component
-from asyncord.client.models.members import Member
+from asyncord.client.channels.models.output import Channel
+from asyncord.client.members.models import Member
+from asyncord.client.messages.models import messages
+from asyncord.client.messages.models.components import Component
 from asyncord.client.models.stickers import Sticker
-from asyncord.client.models.users import User
+from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 

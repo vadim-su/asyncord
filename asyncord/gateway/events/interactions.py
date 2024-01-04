@@ -6,14 +6,14 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, RootModel
 
-from asyncord.client.models.channel_data import ChannelType
-from asyncord.client.models.commands import AppCommandOptionType, ApplicationCommandType
-from asyncord.client.models.components import ActionRow, ComponentType
-from asyncord.client.models.members import Member
-from asyncord.client.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType
+from asyncord.client.channels.models.payload import ChannelType
+from asyncord.client.commands.models import AppCommandOptionType, ApplicationCommandType
+from asyncord.client.members.models import Member
+from asyncord.client.messages.models.components import ActionRow, ComponentType
+from asyncord.client.messages.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType
 from asyncord.client.models.permissions import PermissionFlag
-from asyncord.client.models.roles import Role
-from asyncord.client.models.users import User
+from asyncord.client.roles.models import Role
+from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.locale import Locale
 from asyncord.snowflake import Snowflake

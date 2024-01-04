@@ -4,8 +4,8 @@ from typing import Literal
 
 import pytest
 
-from asyncord.client.messages import MessageResource
-from asyncord.client.models.messages import CreateMessageData, Message, UpdateMessageData
+from asyncord.client.messages.models.messages import CreateMessageData, Message, UpdateMessageData
+from asyncord.client.messages.resources import MessageResource
 from asyncord.typedefs import LikeSnowflake
 from tests.conftest import IntegrationTestData
 

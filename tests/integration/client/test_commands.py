@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from asyncord.client.commands import BaseCommandResource
-from asyncord.client.models.commands import (
+from asyncord.client.commands.models import (
     AppCommandOptionType,
     ApplicationCommandOption,
     ApplicationCommandOptionChoice,
     ApplicationCommandType,
     CreateApplicationCommandData,
 )
+from asyncord.client.commands.resources import CommandResource
 
 
-async def test_create_command(commands_res: BaseCommandResource):
+async def test_create_command(commands_res: CommandResource):
     command_data = CreateApplicationCommandData(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command',
@@ -57,7 +57,7 @@ async def test_create_command(commands_res: BaseCommandResource):
     await commands_res.delete(command.id)
 
 
-async def test_create_subcommand_group(commands_res: BaseCommandResource):
+async def test_create_subcommand_group(commands_res: CommandResource):
     command_data = CreateApplicationCommandData(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command-group',
@@ -93,11 +93,11 @@ async def test_create_subcommand_group(commands_res: BaseCommandResource):
     # await commands_res.delete(command.id)
 
 
-async def test_get_command_list(commands_res: BaseCommandResource):
+async def test_get_command_list(commands_res: CommandResource):
     assert await commands_res.get_list()
 
 
-async def test_get_command(commands_res: BaseCommandResource):
+async def test_get_command(commands_res: CommandResource):
     commands_list = await commands_res.get_list()
     command = await commands_res.get(commands_list[0].id)
 
@@ -106,7 +106,7 @@ async def test_get_command(commands_res: BaseCommandResource):
     assert commands_list[0].description == command.description
 
 
-async def test_convert_command_to_create_command(commands_res: BaseCommandResource):
+async def test_convert_command_to_create_command(commands_res: CommandResource):
     commands_list = await commands_res.get_list()
     command = await commands_res.get(commands_list[0].id)
 

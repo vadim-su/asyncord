@@ -6,7 +6,7 @@ import platform
 from pydantic import BaseModel
 
 from asyncord import __version__
-from asyncord.client.models.activity import Activity
+from asyncord.client.commands.models.activity import Activity
 from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 
 

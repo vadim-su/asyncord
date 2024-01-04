@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from asyncord.client.models.users import User
+from asyncord.client.users.models import User
 from asyncord.snowflake import Snowflake
 
 
@@ -11,28 +11,31 @@ class Emoji(BaseModel):
     """
 
     id: Snowflake | None
-    """emoji id"""
+    """Emoji id."""
 
     name: str | None
-    """emoji name
+    """Emoji name.
 
-    can be null only in reaction emoji objects
+    Can be null only in reaction emoji objects.
     """
 
     roles: list[Snowflake] | None = None
-    """roles allowed to use this emoji"""
+    """Roles allowed to use this emoji."""
 
     user: User | None = None
-    """the user that created this emoji"""
+    """User that created this emoji."""
 
     require_colons: bool | None = None
-    """whether this emoji must be wrapped in colons"""
+    """Whether this emoji must be wrapped in colons."""
 
     managed: bool | None = None
-    """whether this emoji is managed"""
+    """Whether this emoji is managed."""
 
     animated: bool | None = None
-    """whether this emoji is animated"""
+    """Whether this emoji is animated."""
 
     available: bool | None = None
-    """whether this emoji can be used, may be false due to loss of Server Boosts"""
+    """Whether this emoji can be used.
+    
+    May be false due to loss of Server Boosts.
+    """

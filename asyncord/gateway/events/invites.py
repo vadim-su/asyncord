@@ -1,8 +1,8 @@
 import datetime
 
+from asyncord.client.guilds.resources import InviteTargetType
 from asyncord.client.models.applications import Application
-from asyncord.client.models.guilds import InviteTargetType
-from asyncord.client.models.users import User
+from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 

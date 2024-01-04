@@ -1,5 +1,5 @@
-from asyncord.client.models.roles import CreateRoleData
-from asyncord.client.roles import RoleResource
+from asyncord.client.roles.models import CreateRoleData
+from asyncord.client.roles.resources import RoleResource
 
 
 async def test_create_and_delete_role(roles_res: RoleResource):
