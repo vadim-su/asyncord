@@ -7,7 +7,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.snowflake import Snowflake
 
 
@@ -41,7 +41,7 @@ class MemberOutput(BaseModel):
     https://discord.com/developers/docs/resources/guild#guild-member-object
     """
 
-    user: User | None = None
+    user: UserOutput | None = None
     """User this guild member represents."""
 
     nick: str | None = None

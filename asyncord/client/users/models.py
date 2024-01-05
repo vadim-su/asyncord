@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from asyncord.color import ColorInput
 from asyncord.snowflake import Snowflake
@@ -103,7 +103,7 @@ class PremiumType(enum.IntEnum):
     """Nitro Basic."""
 
 
-class User(BaseModel):
+class UserOutput(BaseModel):
     """User model representing a Discord user entity.
 
     Reference:
@@ -167,3 +167,28 @@ class User(BaseModel):
     Reference: 
     https://discord.com/developers/docs/reference#image-formatting
     """
+
+
+class UserGuildOutput(BaseModel):
+    """User guild model."""
+
+    id: Snowflake
+    """Guild id."""
+
+    name: str
+    """Guild name
+
+    Should be 2 - 100 characters, excluding trailing and leading whitespace.
+    """
+
+    icon: str | None = None
+    """Icon hash."""
+
+    owner: bool | None = None
+    """True if the user is the owner of the guild."""
+
+    permissions: str | None = None
+    """Total permissions for the user in the guild (excludes overwrites)."""
+
+    features:  list[str] = Field(default_factory=list)
+    """Strings enabled guild features."""

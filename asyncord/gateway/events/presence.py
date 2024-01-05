@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from asyncord.client.commands.models.activity import Activity
 from asyncord.client.members.models import MemberOutput
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
@@ -126,7 +126,7 @@ class TypingStartEvent(GatewayEvent):
     """Member who started typing if this happened in a guild."""
 
 
-class UserUpdateEvent(GatewayEvent, User):
+class UserUpdateEvent(GatewayEvent, UserOutput):
     """Sent when properties about the user change.
 
     https://discord.com/developers/docs/topics/gateway-events#user-update

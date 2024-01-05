@@ -22,7 +22,7 @@ from asyncord.client.members.models import MemberOutput
 from asyncord.client.messages.models.components import SELECT_COMPONENT_TYPE_LIST, Component, ComponentType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import StickerFormatType
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.color import Color, ColorInput
 from asyncord.snowflake import Snowflake
 
@@ -769,7 +769,7 @@ class MessageInteraction(BaseModel):
     name: str
     """Name of the application command, including subcommands and subcommand groups."""
 
-    user: User
+    user: UserOutput
     """User who invoked the interaction."""
 
     member: MemberOutput | None = None
@@ -957,7 +957,6 @@ class Reaction(BaseModel):
     me_burst: bool
     """Whether the current user super-reacted using this emoji"""
 
-    # FIXME: emoji is partial emoji object. I didn't find any info about it.
     emoji: Emoji
     """Emoji information."""
 
@@ -1173,7 +1172,7 @@ class Message(BaseModel):
     channel_id: Snowflake
     """ID of the channel the message was sent in."""
 
-    author: User
+    author: UserOutput
     """Author of the message."""
 
     content: str
@@ -1191,7 +1190,7 @@ class Message(BaseModel):
     mention_everyone: bool
     """Whether this message mentions everyone."""
 
-    mentions: list[User]
+    mentions: list[UserOutput]
     """Users specifically mentioned in the message."""
 
     mention_roles: list[Snowflake]

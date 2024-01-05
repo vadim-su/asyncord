@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 
 
 class BanOutput(BaseModel):
@@ -12,5 +12,5 @@ class BanOutput(BaseModel):
     reason: str | None
     """Reason for banning the user."""
 
-    user: User
+    user: UserOutput
     """User that was banned."""

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from asyncord.client.resources import ClientResource, ClientSubresource
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.typedefs import LikeSnowflake, list_model
 from asyncord.urls import REST_API_URL
 
@@ -31,7 +31,7 @@ class ReactionResource(ClientSubresource):
         emoji: str,
         after: LikeSnowflake | None = None,
         limit: int | None = None,
-    ) -> list[User]:
+    ) -> list[UserOutput]:
         """Get a list of users that reacted with this emoji.
 
         Args:
@@ -50,7 +50,7 @@ class ReactionResource(ClientSubresource):
 
         url = self.reactions_url / emoji % url_params
         resp = await self._http_client.get(url)
-        return list_model(User).validate_python(resp.body)
+        return list_model(UserOutput).validate_python(resp.body)
 
     async def add(self, emoji: str) -> None:
         """Create a reaction for the message.

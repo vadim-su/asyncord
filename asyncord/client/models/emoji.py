@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.snowflake import Snowflake
 
 
@@ -22,7 +22,7 @@ class Emoji(BaseModel):
     roles: list[Snowflake] | None = None
     """Roles allowed to use this emoji."""
 
-    user: User | None = None
+    user: UserOutput | None = None
     """User that created this emoji."""
 
     require_colons: bool | None = None

@@ -9,9 +9,8 @@ from typing import Self
 from pydantic import BaseModel, Field, model_validator
 
 from asyncord.client.members.models import MemberOutput
-from asyncord.client.users.models import User
-from asyncord.snowflake import Snowflake
-from asyncord.typedefs import LikeSnowflake
+from asyncord.client.users.models import UserOutput
+from asyncord.snowflake import Snowflake, SnowflakeInput
 
 
 @enum.unique
@@ -65,7 +64,7 @@ class EventEntityType(enum.IntEnum):
     """Scheduled event is not associated with a guild channel."""
 
 
-class EventEntityMetadata(BaseModel):
+class EventEntityMetadataInput(BaseModel):
     """Represents a scheduled event's entity metadata.
 
     Reference:
@@ -76,7 +75,7 @@ class EventEntityMetadata(BaseModel):
     """Location of the event."""
 
 
-class ScheduledEventCreateData(BaseModel):
+class CreateScheduledEventInput(BaseModel):
     """Represents a scheduled event data to create.
 
     Reference:
@@ -92,10 +91,10 @@ class ScheduledEventCreateData(BaseModel):
     description: str | None = None
     """Description of the scheduled event."""
 
-    channel_id: LikeSnowflake | None = None
+    channel_id: SnowflakeInput | None = None
     """Channel id of the scheduled event."""
 
-    entity_metadata: EventEntityMetadata | None = None
+    entity_metadata: EventEntityMetadataInput | None = None
     """Entity metadata of the scheduled event."""
 
     privacy_level: EventPrivacyLevel
@@ -129,17 +128,17 @@ class ScheduledEventCreateData(BaseModel):
         return self
 
 
-class ScheduledEventUpdateData(BaseModel):
+class UpdateScheduledEventInput(BaseModel):
     """Represents a scheduled event data to update.
 
     Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-update
     """
 
-    channel_id: LikeSnowflake | None = None
+    channel_id: SnowflakeInput | None = None
     """Channel id of the scheduled event."""
 
-    entity_metadata: EventEntityMetadata | None = None
+    entity_metadata: EventEntityMetadataInput | None = None
     """Entity metadata of the scheduled event."""
 
     name: str | None = None
@@ -189,7 +188,7 @@ class ScheduledEventUpdateData(BaseModel):
         return self
 
 
-class ScheduledEvent(BaseModel):
+class ScheduledEventOutput(BaseModel):
     """Represents a scheduled event in a guild.
 
     Reference:
@@ -211,10 +210,10 @@ class ScheduledEvent(BaseModel):
     creator_id: Snowflake
     """Id of user that created scheduled event."""
 
-    name: str = Field(min_length=1, max_length=100)
+    name: str
     """Name of scheduled event."""
 
-    description: str | None = Field(min_length=1, max_length=1000)
+    description: str | None
     """Description of scheduled event"""
 
     scheduled_start_time: datetime.datetime
@@ -238,10 +237,10 @@ class ScheduledEvent(BaseModel):
     entity_id: Snowflake | None
     """Id of an entity associated with a guild scheduled event."""
 
-    entity_metadata: EventEntityMetadata | None
+    entity_metadata: EventEntityMetadataInput | None
     """Metadata for the guild scheduled event."""
 
-    creator: User | None = None
+    creator: UserOutput | None = None
     """User that created scheduled event."""
 
     user_count: int | None = None
@@ -251,13 +250,13 @@ class ScheduledEvent(BaseModel):
     """Cover image hash of scheduled event."""
 
 
-class ScheduledEventUser(BaseModel):
+class ScheduledEventUserOutput(BaseModel):
     """Represents a user that has signed up for a guild scheduled event."""
 
     guild_scheduled_event_id: Snowflake
     """Scheduled event id which user subscribed to."""
 
-    user: User
+    user: UserOutput
     """User which subscribed to an event."""
 
     member: MemberOutput | None = None

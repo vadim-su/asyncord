@@ -4,7 +4,7 @@ from typing import Any
 from asyncord.client.guilds.resources import GuildOutput
 from asyncord.client.members.models import MemberOutput
 from asyncord.client.roles.models import RoleOutput
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
@@ -89,7 +89,7 @@ class GuildBanAddEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    user: User
+    user: UserOutput
     """Banned user."""
 
 
@@ -102,7 +102,7 @@ class GuildBanRemoveEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    user: User
+    user: UserOutput
     """Unbanned user."""
 
 
@@ -161,7 +161,7 @@ class GuildMemberRemoveEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    user: User
+    user: UserOutput
     """Removed user."""
 
 
@@ -177,7 +177,7 @@ class GuildMemberUpdateEvent(GatewayEvent, MemberOutput):
     roles: list[Snowflake]
     """User role ids."""
 
-    user: User
+    user: UserOutput
     """User."""
 
     nick: str | None = None

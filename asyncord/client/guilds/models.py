@@ -18,8 +18,8 @@ from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
 from asyncord.client.roles.models import RoleOutput
-from asyncord.client.scheduled_events.models import ScheduledEvent
-from asyncord.client.users.models import User
+from asyncord.client.scheduled_events.models import ScheduledEventOutput
+from asyncord.client.users.models import UserOutput
 from asyncord.snowflake import Snowflake
 
 
@@ -253,7 +253,10 @@ class GuildOutput(BaseModel):
     """Custom guild emojis."""
 
     features: list[str]
-    """Allowed guild features (replaced by str because it often changes without any notifications)."""
+    """Allowed guild features.
+    
+    Replaced by str because it often changes without any notifications.
+    """
 
     mfa_level: int
     """Required MFA level for the guild."""
@@ -530,13 +533,13 @@ class InviteOutput(BaseModel):
     channel: InviteChannelOutput | None
     """channel the invite is for"""
 
-    inviter: User | None = None
+    inviter: UserOutput | None = None
     """user who created the invite"""
 
     target_type: InviteTargetType | None = None
     """Type of target for this voice channel invite."""
 
-    target_user: User | None = None
+    target_user: UserOutput | None = None
     """User whose stream to display for this voice channel stream invite."""
 
     # TODO: Add target_application specific type
@@ -561,7 +564,7 @@ class InviteOutput(BaseModel):
     Return from get_invite endpoint only when `with_expiration` is True.
     """
 
-    guild_scheduled_event: ScheduledEvent | None = None
+    guild_scheduled_event: ScheduledEventOutput | None = None
     """Guild scheduled event.
 
     Return from get_invite endpoint only when `guild_scheduled_event_id` is not None
@@ -610,7 +613,7 @@ class IntegrationApplication(BaseModel):
     description: str
     """Description of the app."""
 
-    bot: User | None = None
+    bot: UserOutput | None = None
     """Bot associated with this application."""
 
 
@@ -647,7 +650,7 @@ class GeneralIntegration(BaseModel):
     expire_grace_period: int
     """Grace period (in days) before expiring subscribers."""
 
-    user: User
+    user: UserOutput
     """User for this integration."""
 
     account: IntegrationAccount
@@ -688,7 +691,7 @@ class DiscordIntegration(BaseModel):
     enabled: bool
     """Is this integration enabled"""
 
-    user: User | None = None
+    user: UserOutput | None = None
     """User for this integration."""
 
     account: IntegrationAccount

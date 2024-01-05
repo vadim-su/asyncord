@@ -9,7 +9,7 @@ from asyncord.client.members.models import MemberOutput
 from asyncord.client.messages.models import messages
 from asyncord.client.messages.models.components import Component
 from asyncord.client.models.stickers import Sticker
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
@@ -101,7 +101,7 @@ class MessageUpdateEvent(GatewayEvent):
     channel_id: Snowflake
     """Channel id the message was sent in."""
 
-    author: User | None = None
+    author: UserOutput | None = None
     """Author of the message."""
 
     content: str | None = None

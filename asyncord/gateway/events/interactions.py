@@ -13,7 +13,7 @@ from asyncord.client.messages.models.components import ActionRow, ComponentType
 from asyncord.client.messages.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.roles.models import RoleOutput
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.locale import Locale
 from asyncord.snowflake import Snowflake
@@ -47,7 +47,7 @@ class BaseInteraction(BaseModel):
     member: MemberOutput | None = None
     """Member object for the invoking user, if invoked in a guild."""
 
-    user: User | None = None
+    user: UserOutput | None = None
     """User object for the invoking user, if invoked in a DM."""
 
     token: str
@@ -154,7 +154,7 @@ class ApplicationCommandInteractionMessage(BaseModel):
     type: MessageType
     """Message type."""
 
-    author: User
+    author: UserOutput
     """User who sent the message."""
 
     content: str
@@ -172,7 +172,7 @@ class ApplicationCommandInteractionMessage(BaseModel):
     mention_everyone: bool
     """Whether the message mentions everyone."""
 
-    mentions: list[User]
+    mentions: list[UserOutput]
     """Users mentioned in the message."""
 
     mention_roles: list[Snowflake]
@@ -231,7 +231,7 @@ ApplicationCommandInteractionChannelType = ApplicationCommandInterationChannel |
 class ApplicationCommandResolvedData(BaseModel):
     """Represent the resolved data payload of an application command interaction."""
 
-    users: dict[Snowflake, User] | None = None
+    users: dict[Snowflake, UserOutput] | None = None
     """Map of Snowflakes to user objects.
 
     If data for a Member is included, data for its corresponding User will also be included.

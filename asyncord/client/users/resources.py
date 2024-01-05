@@ -2,14 +2,10 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel
-
 from asyncord.client.channels.models.output import ChannelOutput
 from asyncord.client.members.models import MemberOutput
-from asyncord.client.ports import Response
 from asyncord.client.resources import ClientSubresource
-from asyncord.client.users.models import User
-from asyncord.snowflake import Snowflake
+from asyncord.client.users.models import UserGuildOutput, UserOutput
 from asyncord.typedefs import LikeSnowflake, list_model
 from asyncord.urls import REST_API_URL
 
@@ -25,16 +21,16 @@ class UserResource(ClientSubresource):
     users_url = REST_API_URL / 'users'
     current_user_url = users_url / '@me'
 
-    async def get_current_user(self) -> User:
+    async def get_current_user(self) -> UserOutput:
         """Get the current user.
 
         Reference:
             https://discord.com/developers/docs/resources/user#modify-current-user
         """
         resp = await self._http_client.get(self.current_user_url)
-        return User(**resp.body)
+        return UserOutput.model_validate(resp.body)
 
-    async def get_user(self, user_id: LikeSnowflake) -> User:
+    async def get_user(self, user_id: LikeSnowflake) -> UserOutput:
         """Get a user.
 
         Reference: https://discord.com/developers/docs/resources/user#modify-current-user
@@ -44,9 +40,9 @@ class UserResource(ClientSubresource):
         """
         url = self.users_url / str(user_id)
         resp = await self._http_client.get(url)
-        return User(**resp.body)
+        return UserOutput.model_validate(resp.body)
 
-    async def update_user(self, username: str) -> Response:
+    async def update_user(self, username: str) -> UserOutput:
         """Update the current user.
 
         Args:
@@ -55,21 +51,23 @@ class UserResource(ClientSubresource):
         Reference: https://discord.com/developers/docs/resources/user#modify-current-user
         """
         payload = {'username': username}
-        return await self._http_client.patch(self.current_user_url, payload)
+        resp = await self._http_client.patch(self.current_user_url, payload)
+        return UserOutput.model_validate(resp.body)
 
     async def get_guilds(
         self,
         before: LikeSnowflake | None = None,
         after: LikeSnowflake | None = None,
         limit: int | None = None,
-    ) -> list[UserGuild]:
+    ) -> list[UserGuildOutput]:
         """Get the current user's guilds.
 
         This endpoint returns 200 guilds by default, which is the maximum
         number of guilds a non-bot user can join. Therefore, pagination is not needed
         for integrations that need to get a list of the users' guilds.
 
-        Reference: https://discord.com/developers/docs/resources/user#get-current-user-guilds
+        Reference: 
+        https://discord.com/developers/docs/resources/user#get-current-user-guilds
 
         Args:
             before: Get guilds before this guild ID.
@@ -89,7 +87,7 @@ class UserResource(ClientSubresource):
 
         url = self.current_user_url / 'guilds' % url_params
         resp = await self._http_client.get(url)
-        return list_model(UserGuild).validate_python(resp.body)
+        return list_model(UserGuildOutput).validate_python(resp.body)
 
     async def get_current_user_guild_member(self, guild_id: LikeSnowflake) -> MemberOutput:
         """Get the current user's guild member.
@@ -103,7 +101,7 @@ class UserResource(ClientSubresource):
         """
         url = self.current_user_url / f'guilds/{guild_id}/member'
         resp = await self._http_client.get(url)
-        return MemberOutput(**resp.body)
+        return MemberOutput.model_validate(resp.body)
 
     async def leave_guild(self, guild_id: LikeSnowflake) -> None:
         """Leave a guild.
@@ -127,9 +125,9 @@ class UserResource(ClientSubresource):
         url = self.current_user_url / 'channels'
         payload = {'recipient_id': user_id}
         resp = await self._http_client.post(url, payload)
-        return ChannelOutput(**resp.body)
+        return ChannelOutput.model_validate(resp.body)
 
-    async def create_group_dm(self, user_ids: list[LikeSnowflake]) -> Response:
+    async def create_group_dm(self, user_ids: list[LikeSnowflake]) -> ChannelOutput:
         """Create a group DM.
 
         This endpoint was intended to be used with the now-deprecated GameBridge SDK.
@@ -141,6 +139,9 @@ class UserResource(ClientSubresource):
             user_ids: IDs of the users to create a group DM with.
                 The maximum number of users is 10.
 
+        Returns:
+            The created group DM.
+
         Raises:
             ValueError: If the number of users is greater than 10.
         """
@@ -149,29 +150,5 @@ class UserResource(ClientSubresource):
             raise ValueError('Cannot create a group DM with more than 10 users.')
         url = self.current_user_url / 'channels'
         payload = {'recipient_ids': user_ids}
-        return await self._http_client.post(url, payload)
-
-
-class UserGuild(BaseModel):
-    """A partial user guild object."""
-
-    id: Snowflake
-    """Guild id."""
-
-    name: str
-    """Guild name
-
-    2 - 100 characters, excluding trailing and leading whitespace.
-    """
-
-    icon: str | None = None
-    """Icon hash."""
-
-    owner: bool | None = None
-    """True if the user is the owner of the guild."""
-
-    permissions: str | None = None
-    """Total permissions for the user in the guild (excludes overwrites)."""
-
-    feature: dict | None = None
-    """Strings enabled guild features/"""
+        resp = await self._http_client.post(url, payload)
+        return ChannelOutput.model_validate(resp.body)

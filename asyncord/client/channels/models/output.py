@@ -22,7 +22,7 @@ from asyncord.client.channels.models.common import (
     VideoQualityMode,
 )
 from asyncord.client.members.models import MemberOutput
-from asyncord.client.users.models import User
+from asyncord.client.users.models import UserOutput
 from asyncord.snowflake import Snowflake
 
 
@@ -194,7 +194,7 @@ class ChannelOutput(BaseModel):
     `rate_limit_per_user` interval.
     """
 
-    recipients: list[User] | None = None
+    recipients: list[UserOutput] | None = None
     """Recipients of the DM."""
 
     icon: str | None = None
