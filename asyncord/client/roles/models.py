@@ -11,7 +11,21 @@ from asyncord.color import DEFAULT_COLOR, ColorInput
 from asyncord.snowflake import Snowflake
 
 
-class CreateRoleData(BaseModel):
+@enum.unique
+class RoleFlag(enum.IntFlag):
+    """Role Flags
+
+    Reference:
+    https://discord.com/developers/docs/topics/permissions#role-object-role-flags
+    """
+
+    IN_PROMPT = 1 << 0
+    """Role can be selected by members in an onboarding prompt."""
+
+
+class CreateRoleInput(BaseModel):
+    """Data for creating a role."""
+
     name: str
     """Name of the role."""
 
@@ -43,7 +57,19 @@ class CreateRoleData(BaseModel):
     """
 
 
-class UpdateRoleData(BaseModel):
+class RolePositionInput(BaseModel):
+    """Data for changing the position of a role."""
+
+    id: Snowflake
+    """Role id."""
+
+    position: int | None = None
+    """Sorting position of the role."""
+
+
+class UpdateRoleInput(BaseModel):
+    """Data for updating a role."""
+
     name: str | None = None
     """Name of the role."""
 
@@ -77,7 +103,9 @@ class UpdateRoleData(BaseModel):
     """Whether the role should be mentionable. Defaults to False."""
 
 
-class RoleTags(BaseModel):
+class RoleTagsOutput(BaseModel):
+    """Tags for a role."""
+
     bot_id: Snowflake | None = None
     """Id of the bot this role belongs to."""
 
@@ -90,19 +118,7 @@ class RoleTags(BaseModel):
 # enum and unique
 
 
-@enum.unique
-class RoleFlag(enum.IntFlag):
-    """Role Flags
-
-    Reference:
-    https://discord.com/developers/docs/topics/permissions#role-object-role-flags
-    """
-
-    IN_PROMPT = 1 << 0
-    """Role can be selected by members in an onboarding prompt."""
-
-
-class Role(BaseModel):
+class RoleOutput(BaseModel):
     """Roles represent a set of permissions attached to a group of users.
 
     The @everyone role has the same ID as the guild it belongs to.
@@ -141,16 +157,8 @@ class Role(BaseModel):
     mentionable: bool
     """Whether this role is mentionable."""
 
-    tags: RoleTags | None = None
+    tags: RoleTagsOutput | None = None
     """Role tags."""
 
     flags: RoleFlag
     """Role flags combined as a bitfield."""
-
-
-class RolePosition(BaseModel):
-    id: Snowflake
-    """Role id."""
-
-    position: int | None = None
-    """Sorting position of the role."""

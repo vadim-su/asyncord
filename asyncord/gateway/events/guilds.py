@@ -3,7 +3,7 @@ from typing import Any
 
 from asyncord.client.guilds.resources import GuildOutput
 from asyncord.client.members.models import MemberOutput
-from asyncord.client.roles.models import Role
+from asyncord.client.roles.models import RoleOutput
 from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
@@ -249,7 +249,7 @@ class GuildRoleCreateEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    role: Role
+    role: RoleOutput
     """Created role."""
 
 
@@ -262,7 +262,7 @@ class GuildRoleUpdateEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    role: Role
+    role: RoleOutput
     """Updated role."""
 
 

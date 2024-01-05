@@ -12,7 +12,7 @@ from asyncord.client.members.models import MemberOutput
 from asyncord.client.messages.models.components import ActionRow, ComponentType
 from asyncord.client.messages.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType
 from asyncord.client.models.permissions import PermissionFlag
-from asyncord.client.roles.models import Role
+from asyncord.client.roles.models import RoleOutput
 from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.locale import Locale
@@ -240,7 +240,7 @@ class ApplicationCommandResolvedData(BaseModel):
     members: dict[Snowflake, ApplicationCommandInteractionMember] | None = None
     """Map of Snowflakes to partial member objects."""
 
-    roles: dict[Snowflake, Role] | None = None
+    roles: dict[Snowflake, RoleOutput] | None = None
     """Map of Snowflakes to role objects."""
 
     channels: dict[Snowflake, ApplicationCommandInteractionChannelType] | None = None

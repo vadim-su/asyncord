@@ -17,7 +17,7 @@ from asyncord.client.channels.models.channel_create import CreateChannelInputTyp
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
-from asyncord.client.roles.models import Role
+from asyncord.client.roles.models import RoleOutput
 from asyncord.client.scheduled_events.models import ScheduledEvent
 from asyncord.client.users.models import User
 from asyncord.snowflake import Snowflake
@@ -92,7 +92,7 @@ class CreateGuildInput(BaseModel):
     explicit_content_filter: ExplicitContentFilterLevel | None = None
     """Explicit content filter level."""
 
-    roles: list[Role] | None = None
+    roles: list[RoleOutput] | None = None
     """New guild roles.
 
     The first member of the array is used to change properties of the guild's
@@ -246,7 +246,7 @@ class GuildOutput(BaseModel):
     explicit_content_filter: int
     """Explicit content filter level."""
 
-    roles: list[Role] | None = None
+    roles: list[RoleOutput] | None = None
     """Roles in the guild."""
 
     emojis: list[Emoji] | None = None
