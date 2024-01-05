@@ -16,7 +16,8 @@ from typing import Annotated, Any, BinaryIO, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from asyncord.client.channels.models.output import Channel, ChannelMention
+from asyncord.client.channels.models.common import ChannelType
+from asyncord.client.channels.models.output import ChannelOutput
 from asyncord.client.members.models import Member
 from asyncord.client.messages.models.components import SELECT_COMPONENT_TYPE_LIST, Component, ComponentType
 from asyncord.client.models.emoji import Emoji
@@ -32,6 +33,26 @@ _OpennedFileType = io.BufferedReader | io.BufferedRandom
 _AttachmentContentType = bytes | BinaryIO | _OpennedFileType
 _FilePathType = str | Path
 _AttachedFileInputType = Annotated[_FilePathType | _AttachmentContentType, _AttachmentContentType]
+
+
+class ChannelMention(BaseModel):
+    """Channel mention object.
+
+    Read more info at:
+    https://discord.com/developers/docs/resources/channel#channel-mention-object
+    """
+
+    id: Snowflake
+    """Channel id."""
+
+    guild_id: Snowflake
+    """Guild id containing the channel."""
+
+    type: ChannelType
+    """Channel type."""
+
+    name: str
+    """Channel name."""
 
 
 class AttachedFile(BaseModel):
@@ -803,7 +824,7 @@ class CreateMessageData(BaseMessageData):
     https://discord.com/developers/docs/reference#uploading-files
     """
 
-    flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
+    flags: Literal[MessageFlags.SUPPRESS_EMBEDS, MessageFlags.SUPPRESS_NOTIFICATIONS] | None = None
     """The flags to use when sending the message.
 
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
@@ -1224,7 +1245,7 @@ class Message(BaseModel):
     interaction: MessageInteraction | None = None
     """Sent if the message is a response to an Interaction."""
 
-    thread: Channel | None = None
+    thread: ChannelOutput | None = None
     """The thread that was started from this message, includes thread member object."""
 
     components: list[Component] | None = None

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from asyncord.client.bans.models import Ban
+from asyncord.client.bans.models import BanOutput
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import ClientResource, ClientSubresource
 from asyncord.typedefs import LikeSnowflake, list_model
@@ -24,18 +24,18 @@ class BanResource(ClientSubresource):
         self.guild_id = guild_id
         self.bans_url = self.guilds_url / str(self.guild_id) / 'bans'
 
-    async def get(self, user_id: LikeSnowflake) -> Ban:
+    async def get(self, user_id: LikeSnowflake) -> BanOutput:
         """Get a ban object for a user."""
         url = self.bans_url / str(user_id)
         resp = await self._http_client.get(url)
-        return Ban.model_validate(resp.body)
+        return BanOutput.model_validate(resp.body)
 
     async def get_list(
         self,
         limit: int | None = None,
         before: LikeSnowflake | None = None,
         after: LikeSnowflake | None = None,
-    ) -> list[Ban]:
+    ) -> list[BanOutput]:
         """List bans of a guild.
 
         Args:
@@ -56,7 +56,7 @@ class BanResource(ClientSubresource):
 
         url = self.bans_url % url_params
         resp = await self._http_client.get(url)
-        return list_model(Ban).validate_python(resp.body)
+        return list_model(BanOutput).validate_python(resp.body)
 
     async def ban(
         self,

@@ -9,7 +9,7 @@ import datetime
 from typing import TYPE_CHECKING
 
 from asyncord.client.bans.resources import BanResource
-from asyncord.client.channels.models.output import Channel
+from asyncord.client.channels.models.output import ChannelOutput
 from asyncord.client.guilds.models import (
     CreateGuildData,
     Guild,
@@ -275,7 +275,7 @@ class GuildResource(ClientSubresource):
         resp = await self._http_client.get(url)
         return list_model(Invite).validate_python(resp.body)
 
-    async def get_channels(self, guild_id: LikeSnowflake) -> list[Channel]:
+    async def get_channels(self, guild_id: LikeSnowflake) -> list[ChannelOutput]:
         """Get the channels for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-channels
@@ -288,7 +288,7 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'channels'
         resp = await self._http_client.get(url)
-        return list_model(Channel).validate_python(resp.body)
+        return list_model(ChannelOutput).validate_python(resp.body)
 
     async def get_integrations(self, guild_id: LikeSnowflake) -> list[IntegrationVariants]:
         """Get the integrations for a guild.

@@ -14,10 +14,10 @@ class ClientResource:
         self._token = token
         if http_client:
             self._http_client = http_client
-        else:
-            self._http_client: AsyncHttpClientPort = AsyncHttpClient(
-                headers={AUTHORIZATION: f"Bot {token}"},
-            )
+
+        self._http_client: AsyncHttpClientPort = AsyncHttpClient(
+            headers={AUTHORIZATION: f"Bot {token}"},
+        )
 
 
 class ClientSubresource(ClientResource):

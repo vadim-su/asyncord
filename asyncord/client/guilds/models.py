@@ -16,7 +16,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInput
-from asyncord.client.channels.models.payload import ChannelType
+from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
 from asyncord.client.roles.models import Role
@@ -29,7 +29,7 @@ class CreateGuildChannel(BaseModel):
     """Data for creating a guild channel in a moment of creating guild.
 
     Reference:
-https://discord.com/developers/docs/resources/guild#create-guild-example-partial-channel-object    """
+    https://discord.com/developers/docs/resources/guild#create-guild-example-partial-channel-object"""
 
     id: int | None = None
     """Channel ID.

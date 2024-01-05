@@ -12,7 +12,7 @@ from typing import get_args as get_typing_args
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
-from asyncord.client.channels.models.payload import ChannelType
+from asyncord.client.channels.models.common import ChannelType
 from asyncord.snowflake import Snowflake
 
 

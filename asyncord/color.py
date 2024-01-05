@@ -146,7 +146,8 @@ class Color:
         return int(value)
 
 
-ColorInput = Annotated[int | str | RGB | tuple[int, int, int] | Color, Color]
+type ColorInput = Annotated[int | str | RGB | tuple[int, int, int] | Color, Color]
+"""Color input type."""
 
 # Define some color constants for convenience
 

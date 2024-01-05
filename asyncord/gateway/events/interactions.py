@@ -6,8 +6,8 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, RootModel
 
-from asyncord.client.channels.models.payload import ChannelType
-from asyncord.client.commands.models import AppCommandOptionType, ApplicationCommandType
+from asyncord.client.channels.models.common import ChannelType
+from asyncord.client.commands.models.common import AppCommandOptionType, ApplicationCommandType
 from asyncord.client.members.models import Member
 from asyncord.client.messages.models.components import ActionRow, ComponentType
 from asyncord.client.messages.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType

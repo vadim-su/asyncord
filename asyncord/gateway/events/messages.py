@@ -4,7 +4,7 @@ import datetime
 
 from pydantic import BaseModel
 
-from asyncord.client.channels.models.output import Channel
+from asyncord.client.channels.models.output import ChannelOutput
 from asyncord.client.members.models import Member
 from asyncord.client.messages.models import messages
 from asyncord.client.messages.models.components import Component
@@ -176,7 +176,7 @@ class MessageUpdateEvent(GatewayEvent):
     referenced_message: messages.Message | None = None
     """The message this message references, if the message is a reply."""
 
-    thread: Channel | None = None
+    thread: ChannelOutput | None = None
     """The thread that was started from this message, includes thread member object."""
 
     components: list[Component] | None = None

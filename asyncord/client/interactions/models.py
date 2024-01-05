@@ -9,7 +9,7 @@ from typing import Literal, cast
 
 from pydantic import BaseModel, Field, field_validator
 
-from asyncord.client.commands.models import ApplicationCommandOptionChoice
+from asyncord.client.commands.models.input import ApplicationCommandOptionChoiceInput
 from asyncord.client.messages.models.components import ActionRow, Component, TextInput
 from asyncord.client.messages.models.messages import (
     AllowedMentions,
@@ -203,7 +203,7 @@ class InteractionAutocompleteResultData(BaseModel):
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
     """
 
-    choices: list[ApplicationCommandOptionChoice] = Field(min_length=1, max_length=25)
+    choices: list[ApplicationCommandOptionChoiceInput] = Field(min_length=1, max_length=25)
     """List of autocomplete choices."""
 
 

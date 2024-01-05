@@ -5,13 +5,13 @@ from asyncord.client.commands.models import (
     ApplicationCommandOption,
     ApplicationCommandOptionChoice,
     ApplicationCommandType,
-    CreateApplicationCommandData,
+    CreateApplicationCommandInput,
 )
 from asyncord.client.commands.resources import CommandResource
 
 
 async def test_create_command(commands_res: CommandResource):
-    command_data = CreateApplicationCommandData(
+    command_data = CreateApplicationCommandInput(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command',
         name_localizations={'en-US': 'test'},
@@ -58,7 +58,7 @@ async def test_create_command(commands_res: CommandResource):
 
 
 async def test_create_subcommand_group(commands_res: CommandResource):
-    command_data = CreateApplicationCommandData(
+    command_data = CreateApplicationCommandInput(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command-group',
         description='test command description',
@@ -110,7 +110,7 @@ async def test_convert_command_to_create_command(commands_res: CommandResource):
     commands_list = await commands_res.get_list()
     command = await commands_res.get(commands_list[0].id)
 
-    command_data = CreateApplicationCommandData.from_command(command)
+    command_data = CreateApplicationCommandInput.from_command(command)
     assert command_data.name == command.name
     assert command_data.description == command.description
     assert command_data.type == command.type

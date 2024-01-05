@@ -1,4 +1,7 @@
 from enum import StrEnum
+from typing import Annotated
+
+from pydantic import Field
 
 
 class Locale(StrEnum):
@@ -38,3 +41,6 @@ class Locale(StrEnum):
     JA = 'ja'
     ZH_TW = 'zh-TW'
     KO = 'ko'
+
+
+type LocaleInputType = Annotated[str | Locale, Annotated[Locale, Field(min_length=2)]]

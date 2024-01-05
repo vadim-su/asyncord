@@ -5,11 +5,13 @@ endpoints like message creation.
 """
 from __future__ import annotations
 
-from asyncord.client.channels.models.output import Channel
-from asyncord.client.channels.models.payload import CreateChannelData, UpdateChannelDataType
+from asyncord.client.channels.models.channel_create import CreateChannelInputType
+from asyncord.client.channels.models.channel_update import UpdateChannelInputType
+from asyncord.client.channels.models.output import ChannelOutput
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.resources import ClientSubresource
+from asyncord.snowflake import SnowflakeInput
 from asyncord.typedefs import LikeSnowflake
 from asyncord.urls import REST_API_URL
 
@@ -36,7 +38,7 @@ class ChannelResource(ClientSubresource):
         """
         return MessageResource(self, channel_id)
 
-    async def get(self, channel_id: LikeSnowflake) -> Channel:
+    async def get(self, channel_id: LikeSnowflake) -> ChannelOutput:
         """Get a channel by id.
 
         Args:
@@ -47,14 +49,14 @@ class ChannelResource(ClientSubresource):
         """
         url = self.channels_url / str(channel_id)
         resp = await self._http_client.get(url)
-        return Channel(**resp.body)
+        return ChannelOutput(**resp.body)
 
     async def create_channel(
         self,
         guild_id: LikeSnowflake,
-        channel_data: CreateChannelData,
+        channel_data: CreateChannelInputType,
         reason: str | None = None,
-    ) -> Channel:
+    ) -> ChannelOutput:
         """Create a new channel object for the guild.
 
         This endpoint can only be used on guilds.
@@ -74,17 +76,19 @@ class ChannelResource(ClientSubresource):
         else:
             headers = {}
 
+        channel_data.type = channel_data.type  # type: ignore
+
         payload = channel_data.model_dump(mode='json', exclude_unset=True)
 
         resp = await self._http_client.post(url, payload, headers=headers)
-        return Channel(**resp.body)
+        return ChannelOutput(**resp.body)
 
     async def update(
         self,
-        channel_id: LikeSnowflake,
-        channel_data: UpdateChannelDataType,
+        channel_id: SnowflakeInput,
+        channel_data: UpdateChannelInputType,
         reason: str | None = None,
-    ) -> Channel:
+    ) -> ChannelOutput:
         """Update a channel's settings.
 
         Args:
@@ -105,7 +109,7 @@ class ChannelResource(ClientSubresource):
         payload = channel_data.model_dump(mode='json', exclude_unset=True)
 
         resp = await self._http_client.patch(url, payload, headers=headers)
-        return Channel.model_validate(resp.body)
+        return ChannelOutput.model_validate(resp.body)
 
     async def delete(self, channel_id: LikeSnowflake, reason: str | None = None) -> None:
         """Delete a channel, or close a private message.

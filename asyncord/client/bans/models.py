@@ -3,9 +3,10 @@ from pydantic import BaseModel
 from asyncord.client.users.models import User
 
 
-class Ban(BaseModel):
-    """Data for creating a guild.
+class BanOutput(BaseModel):
+    """Ban object.
 
+    Reference:
     https://discord.com/developers/docs/resources/guild#ban-object
     """
     reason: str | None

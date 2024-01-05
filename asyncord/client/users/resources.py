@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from asyncord.client.channels.models.output import Channel
+from asyncord.client.channels.models.output import ChannelOutput
 from asyncord.client.members.models import Member
 from asyncord.client.ports import Response
 from asyncord.client.resources import ClientSubresource
@@ -116,7 +116,7 @@ class UserResource(ClientSubresource):
         url = self.current_user_url / f'guilds/{guild_id}'
         await self._http_client.delete(url)
 
-    async def create_dm(self, user_id: LikeSnowflake) -> Channel:
+    async def create_dm(self, user_id: LikeSnowflake) -> ChannelOutput:
         """Create a DM with a user.
 
         Reference: https://discord.com/developers/docs/resources/user#create-dm
@@ -127,7 +127,7 @@ class UserResource(ClientSubresource):
         url = self.current_user_url / 'channels'
         payload = {'recipient_id': user_id}
         resp = await self._http_client.post(url, payload)
-        return Channel(**resp.body)
+        return ChannelOutput(**resp.body)
 
     async def create_group_dm(self, user_ids: list[LikeSnowflake]) -> Response:
         """Create a group DM.

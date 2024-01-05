@@ -4,7 +4,8 @@ Reference:
 https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
 """
 
-from asyncord.client.commands.models import ApplicationCommand, CreateApplicationCommandData
+from asyncord.client.commands.models.input import CreateApplicationCommandInput
+from asyncord.client.commands.models.output import ApplicationCommandOutput
 from asyncord.client.resources import ClientResource, ClientSubresource
 from asyncord.typedefs import LikeSnowflake, list_model
 from asyncord.urls import REST_API_URL
@@ -12,6 +13,9 @@ from asyncord.urls import REST_API_URL
 
 class CommandResource(ClientSubresource):
     """Represents the commands resource for the client.
+
+    Reference:
+        https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands
 
     Attributes:
         applications_url: Base applications url.
@@ -25,7 +29,7 @@ class CommandResource(ClientSubresource):
         self.app_id = app_id
         self.commands_url = self.applications_url / str(app_id) / 'commands'
 
-    async def get(self, command_id: LikeSnowflake) -> ApplicationCommand:
+    async def get(self, command_id: LikeSnowflake) -> ApplicationCommandOutput:
         """Get a command by id.
 
         Args:
@@ -36,18 +40,18 @@ class CommandResource(ClientSubresource):
         """
         url = self.commands_url / str(command_id)
         resp = await self._http_client.get(url)
-        return ApplicationCommand.model_validate(resp.body)
+        return ApplicationCommandOutput.model_validate(resp.body)
 
-    async def get_list(self) -> list[ApplicationCommand]:
+    async def get_list(self) -> list[ApplicationCommandOutput]:
         """Get a list of commands.
 
         Returns:
             List of commands.
         """
         resp = await self._http_client.get(self.commands_url)
-        return list_model(ApplicationCommand).validate_python(resp.body)
+        return list_model(ApplicationCommandOutput).validate_python(resp.body)
 
-    async def create(self, command_data: CreateApplicationCommandData) -> ApplicationCommand:
+    async def create(self, command_data: CreateApplicationCommandInput) -> ApplicationCommandOutput:
         """Create a command.
 
         If a command with the same name already exists, it will be overwritten.
@@ -60,7 +64,7 @@ class CommandResource(ClientSubresource):
         """
         payload = command_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.post(self.commands_url, payload)
-        return ApplicationCommand.model_validate(resp.body)
+        return ApplicationCommandOutput.model_validate(resp.body)
 
     async def delete(self, command_id: LikeSnowflake) -> None:
         """Delete a command.

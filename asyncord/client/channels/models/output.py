@@ -1,34 +1,64 @@
-"""Channel models for Discord API.
+"""Channel response models.
 
-Discord channel documentation starts here:
+Reference:
 https://discord.com/developers/docs/resources/channel
 """
 
 from __future__ import annotations
 
-from datetime import datetime
+import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field
 
-from asyncord.client.channels.models.payload import (
+from asyncord.client.channels.models.common import (
+    BaseDefaultReaction,
+    BaseOverwrite,
+    BaseTag,
     ChannelFlag,
     ChannelType,
     DefaultForumLayoutType,
-    DefaultReaction,
-    ForumTag,
-    Overwrite,
     ThreadSortOrder,
+    VideoQualityMode,
 )
 from asyncord.client.members.models import Member
 from asyncord.client.users.models import User
 from asyncord.snowflake import Snowflake
 
 
-class ThreadMetadata(BaseModel):
+class OverwriteOutput(BaseOverwrite):
+    """Overwrite object.
+
+    See permissions for more info about `allow` and `deny` fields:
+    https://discord.com/developers/docs/topics/permissions#permissions
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#overwrite-object
+    """
+
+
+class DefaultReactionOutput(BaseDefaultReaction):
+    """Model specifies the emoji to use as the default way to react to a forum post.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#default-reaction-object
+    """
+
+
+class TagOutput(BaseTag):
+    """Object that represents a tag.
+
+    Can be used in GUILD_FORUM and GUILD_MEDIA channels.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#forum-tag-object
+    """
+
+
+class ThreadMetadataOutput(BaseModel):
     """Thread metadata object.
 
-    Read more info at:
+    Reference:
     https://discord.com/developers/docs/resources/channel#thread-metadata-object
     """
 
@@ -41,7 +71,7 @@ class ThreadMetadata(BaseModel):
     Can be set to: 60, 1440, 4320, 10080.
     """
 
-    archive_timestamp: datetime
+    archive_timestamp: datetime.datetime
     """Timestamp when the thread's archive status was last changed.
 
     Used for calculating recent activity.
@@ -59,17 +89,17 @@ class ThreadMetadata(BaseModel):
     Only available on private threads.
     """
 
-    create_timestamp: datetime | None = None
+    create_timestamp: datetime.datetime | None = None
     """Timestamp when the thread was created;
     
     only populated for threads created after 2022-01-09
     """
 
 
-class ThreadMember(BaseModel):
+class ThreadMemberOutput(BaseModel):
     """Thread member object.
 
-    Read more info at:
+    Reference:
     https://discord.com/developers/docs/resources/channel#thread-member-object
     """
 
@@ -87,7 +117,7 @@ class ThreadMember(BaseModel):
     More info at https://discord.com/developers/docs/topics/gateway-events#guild-create
     """
 
-    join_timestamp: datetime
+    join_timestamp: datetime.datetime
     """Time the current user last joined the thread."""
 
     flags: int
@@ -104,10 +134,10 @@ class ThreadMember(BaseModel):
     """
 
 
-class Channel(BaseModel):
+class ChannelOutput(BaseModel):
     """Channel object.
 
-    Read more info at:
+    Reference:
     https://discord.com/developers/docs/resources/channel#channel-object-channel-structure
     """
 
@@ -126,7 +156,7 @@ class Channel(BaseModel):
     position: int | None = None
     """Sorting position of the channel"""
 
-    permission_overwrites: list[Overwrite] | None = None
+    permission_overwrites: list[OverwriteOutput] | None = None
     """Explicit permission overwrites for members and roles."""
 
     name: str | None = Field(None, min_length=1, max_length=100)
@@ -185,7 +215,7 @@ class Channel(BaseModel):
     Each parent category can contain up to 50 channels.
     """
 
-    last_pin_timestamp: datetime | None = None
+    last_pin_timestamp: datetime.datetime | None = None
     """Timestamp when the last pinned message was pinned.
 
     This may be null in events such as GUILD_CREATE when a message is not pinned.
@@ -194,7 +224,7 @@ class Channel(BaseModel):
     rtc_region: str | None = None
     """Voice region id for the voice channel, automatic when set to null."""
 
-    video_quality_mode: int | None = None
+    video_quality_mode: VideoQualityMode | None = None
     """Camera video quality mode of the voice channel, 1 when not present."""
 
     message_count: int | None = None
@@ -203,10 +233,10 @@ class Channel(BaseModel):
     member_count: int | None = None
     """Approximate count of users in a thread, stops counting at 50."""
 
-    thread_metadata: ThreadMetadata | None = None
+    thread_metadata: ThreadMetadataOutput | None = None
     """Thread-specific fields not needed by other channels."""
 
-    member: ThreadMember | None = None
+    member: ThreadMemberOutput | None = None
     """Thread member object for the current user.
 
     If they have joined the thread, only included on certain API endpoints.
@@ -239,7 +269,7 @@ class Channel(BaseModel):
     the number when a message is deleted.
     """
 
-    available_tags: list[ForumTag] | None = None
+    available_tags: list[TagOutput] | None = None
     """Set of tags that can be used in a GUILD_FORUM or a GUILD_MEDIA channel"""
 
     applied_tags: list[Snowflake] | None = None
@@ -247,7 +277,7 @@ class Channel(BaseModel):
     in a GUILD_FORUM or a GUILD_MEDIA channel
     """
 
-    default_reaction_emoji: DefaultReaction | None = None
+    default_reaction_emoji: DefaultReactionOutput | None = None
     """Emoji to show in the add reaction button on a thread in a GUILD_FORUM
     or a GUILD_MEDIA channel
     """
@@ -269,42 +299,3 @@ class Channel(BaseModel):
     
     Defaults to 0, which indicates a layout view has not been set by a channel admin
     """
-
-    @field_validator('topic')
-    def validate_topic(cls, topic: str | None, field_info: ValidationInfo) -> str | None:
-        """Validate topic field."""
-        if not topic:
-            return topic
-
-        channel_type = field_info.data['type']
-
-        max_guold_text_topic_length = 1024
-        max_guild_forum_topic_length = 4096
-
-        if channel_type is ChannelType.GUILD_TEXT and len(topic) > max_guold_text_topic_length:
-            raise ValueError('Text channel topic must be between 0 and 1024 characters.')
-
-        if channel_type is ChannelType.GUILD_FORUM and len(topic) > max_guild_forum_topic_length:
-            raise ValueError('Forum channel topic must be between 0 and 4096 characters.')
-
-        return topic
-
-
-class ChannelMention(BaseModel):
-    """Channel mention object.
-
-    Read more info at:
-    https://discord.com/developers/docs/resources/channel#channel-mention-object
-    """
-
-    id: Snowflake
-    """Channel id."""
-
-    guild_id: Snowflake
-    """Guild id containing the channel."""
-
-    type: ChannelType
-    """Channel type."""
-
-    name: str
-    """Channel name."""
