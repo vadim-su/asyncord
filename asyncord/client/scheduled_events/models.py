@@ -8,7 +8,7 @@ from typing import Self
 
 from pydantic import BaseModel, Field, model_validator
 
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.client.users.models import User
 from asyncord.snowflake import Snowflake
 from asyncord.typedefs import LikeSnowflake
@@ -260,5 +260,5 @@ class ScheduledEventUser(BaseModel):
     user: User
     """User which subscribed to an event."""
 
-    member: Member | None = None
+    member: MemberOutput | None = None
     """Guild member data for this user for the guild which this event belongs to."""

@@ -5,7 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from asyncord.client.channels.models.output import ChannelOutput
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.client.ports import Response
 from asyncord.client.resources import ClientSubresource
 from asyncord.client.users.models import User
@@ -91,7 +91,7 @@ class UserResource(ClientSubresource):
         resp = await self._http_client.get(url)
         return list_model(UserGuild).validate_python(resp.body)
 
-    async def get_current_user_guild_member(self, guild_id: LikeSnowflake) -> Member:
+    async def get_current_user_guild_member(self, guild_id: LikeSnowflake) -> MemberOutput:
         """Get the current user's guild member.
 
         Requires the guilds.members.read OAuth2 scope.
@@ -103,7 +103,7 @@ class UserResource(ClientSubresource):
         """
         url = self.current_user_url / f'guilds/{guild_id}/member'
         resp = await self._http_client.get(url)
-        return Member(**resp.body)
+        return MemberOutput(**resp.body)
 
     async def leave_guild(self, guild_id: LikeSnowflake) -> None:
         """Leave a guild.

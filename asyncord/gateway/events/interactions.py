@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, RootModel
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.common import AppCommandOptionType, ApplicationCommandType
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.client.messages.models.components import ActionRow, ComponentType
 from asyncord.client.messages.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType
 from asyncord.client.models.permissions import PermissionFlag
@@ -44,7 +44,7 @@ class BaseInteraction(BaseModel):
     channel_id: Snowflake | None = None
     """Channel that the interaction was sent from."""
 
-    member: Member | None = None
+    member: MemberOutput | None = None
     """Member object for the invoking user, if invoked in a guild."""
 
     user: User | None = None

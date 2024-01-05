@@ -21,7 +21,7 @@ from asyncord.client.channels.models.common import (
     ThreadSortOrder,
     VideoQualityMode,
 )
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.client.users.models import User
 from asyncord.snowflake import Snowflake
 
@@ -126,7 +126,7 @@ class ThreadMemberOutput(BaseModel):
     Currently only used for notifications.
     """
 
-    member: Member | None = None
+    member: MemberOutput | None = None
     """Additional information about the user
     
     The member field is only present when with_member is set to true 

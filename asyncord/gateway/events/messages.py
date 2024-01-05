@@ -5,7 +5,7 @@ import datetime
 from pydantic import BaseModel
 
 from asyncord.client.channels.models.output import ChannelOutput
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.client.messages.models import messages
 from asyncord.client.messages.models.components import Component
 from asyncord.client.models.stickers import Sticker
@@ -261,7 +261,7 @@ class MessageReactionAddEvent(GatewayEvent):
     guild_id: Snowflake | None = None
     """Guild id."""
 
-    member: Member | None = None
+    member: MemberOutput | None = None
     """<ember properties for this reaction's user.
 
     Included only when the message is in a guild.

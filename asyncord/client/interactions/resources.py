@@ -5,22 +5,22 @@ provide any other actions for interactions.
 """
 
 from asyncord.client.interactions.models import (
-    InteractionDeferredUpdateMessageResponseData,
-    InteractionPongResponseData,
-    InteractionResponse,
-    InteractionUpdateMessageResponseData,
-    IteractionChannelMessageResponseData,
-    IteractionDeferredChannelMessageResponseData,
+    InteractionDeferredUpdateMessageResponseInput,
+    InteractionPongResponseInput,
+    InteractionResponseInputType,
+    InteractionUpdateMessageResponseInput,
+    IteractionChannelMessageResponsInput,
+    IteractionDeferredChannelMessageResponseInput,
 )
 from asyncord.client.resources import ClientSubresource
 from asyncord.typedefs import LikeSnowflake
 from asyncord.urls import REST_API_URL
 
 _INTERACTIONS_CAN_CONTAIN_FILES = (
-    IteractionChannelMessageResponseData
-    | IteractionDeferredChannelMessageResponseData
-    | InteractionDeferredUpdateMessageResponseData
-    | InteractionUpdateMessageResponseData
+    IteractionChannelMessageResponsInput
+    | IteractionDeferredChannelMessageResponseInput
+    | InteractionDeferredUpdateMessageResponseInput
+    | InteractionUpdateMessageResponseInput
 )
 
 
@@ -33,7 +33,7 @@ class InteractionResource(ClientSubresource):
         self,
         interaction_id: LikeSnowflake,
         interaction_token: str,
-        interaction_response: InteractionResponse,
+        interaction_response: InteractionResponseInputType,
     ) -> None:
         """Send a response to an interaction.
 
@@ -65,5 +65,5 @@ class InteractionResource(ClientSubresource):
         await self.send_response(
             interaction_id=interaction_id,
             interaction_token=interaction_token,
-            interaction_response=InteractionPongResponseData(),
+            interaction_response=InteractionPongResponseInput(),
         )

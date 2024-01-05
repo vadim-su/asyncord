@@ -18,7 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.channels.models.output import ChannelOutput
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.client.messages.models.components import SELECT_COMPONENT_TYPE_LIST, Component, ComponentType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import StickerFormatType
@@ -772,7 +772,7 @@ class MessageInteraction(BaseModel):
     user: User
     """User who invoked the interaction."""
 
-    member: Member | None = None
+    member: MemberOutput | None = None
     """Member who invoked the interaction."""
 
 

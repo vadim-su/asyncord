@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from asyncord.client.commands.models.activity import Activity
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
@@ -122,7 +122,7 @@ class TypingStartEvent(GatewayEvent):
     timestamp: int
     """Unix time (in seconds) of when the user started typing."""
 
-    member: Member | None = None
+    member: MemberOutput | None = None
     """Member who started typing if this happened in a guild."""
 
 

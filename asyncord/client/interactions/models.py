@@ -5,7 +5,7 @@ https://discord.com/developers/docs/interactions/receiving-and-responding#intera
 """
 
 import enum
-from typing import Literal, cast
+from typing import Literal, Union, cast
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -67,14 +67,14 @@ class InteractionResponseType(enum.IntEnum):
     """
 
 
-class InteractionPongResponseData(BaseModel):
-    """Interaction response data for PONG."""
+class InteractionPongResponseInput(BaseModel):
+    """Interaction response request data for PONG."""
 
     type: Literal[InteractionResponseType.PONG] = InteractionResponseType.PONG
 
 
-class IteractionCreateMessageData(BaseMessageData):
-    """Message response data.
+class IteractionCreateMessageDataInput(BaseMessageData):
+    """Message response request data.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
@@ -116,27 +116,27 @@ class IteractionCreateMessageData(BaseMessageData):
     """
 
 
-class IteractionChannelMessageResponseData(BaseModel):
-    """Interaction response data for CHANNEL_MESSAGE_WITH_SOURCE."""
+class IteractionChannelMessageResponsInput(BaseModel):
+    """Interaction response request data for CHANNEL_MESSAGE_WITH_SOURCE."""
 
     type: Literal[InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE] = (
         InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
     )
 
-    data: IteractionCreateMessageData
+    data: IteractionCreateMessageDataInput
 
 
-class IteractionDeferredChannelMessageResponseData(BaseModel):
+class IteractionDeferredChannelMessageResponseInput(BaseModel):
     """Interaction response data for DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE."""
 
     type: Literal[InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE] = (
         InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
     )
 
-    data: IteractionCreateMessageData
+    data: IteractionCreateMessageDataInput
 
 
-class InteractionUpdateMessageData(BaseModel):
+class InteractionUpdateMessageDataInput(BaseModel):
     """Interaction response data for UPDATE_MESSAGE.
 
     References:
@@ -176,28 +176,28 @@ class InteractionUpdateMessageData(BaseModel):
     """
 
 
-class InteractionDeferredUpdateMessageResponseData(BaseModel):
-    """Interaction response data for DEFERRED_UPDATE_MESSAGE."""
+class InteractionDeferredUpdateMessageResponseInput(BaseModel):
+    """Interaction response request data for DEFERRED_UPDATE_MESSAGE."""
 
     type: Literal[InteractionResponseType.DEFERRED_UPDATE_MESSAGE] = (
         InteractionResponseType.DEFERRED_UPDATE_MESSAGE
     )
 
-    data: InteractionUpdateMessageData
+    data: InteractionUpdateMessageDataInput
 
 
-class InteractionUpdateMessageResponseData(BaseModel):
-    """Interaction response data for UPDATE_MESSAGE."""
+class InteractionUpdateMessageResponseInput(BaseModel):
+    """Interaction response request data for UPDATE_MESSAGE."""
 
     type: Literal[InteractionResponseType.UPDATE_MESSAGE] = (
         InteractionResponseType.UPDATE_MESSAGE
     )
 
-    data: InteractionUpdateMessageData
+    data: InteractionUpdateMessageDataInput
 
 
-class InteractionAutocompleteResultData(BaseModel):
-    """Autocomplete response data.
+class InteractionAutocompleteResultDataInput(BaseModel):
+    """Autocomplete response request data.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
@@ -207,18 +207,18 @@ class InteractionAutocompleteResultData(BaseModel):
     """List of autocomplete choices."""
 
 
-class InteractionAutocompleteResponseData(BaseModel):
-    """Interaction response data for AUTOCOMPLETE."""
+class InteractionAutocompleteResponseInput(BaseModel):
+    """Autocomplete response request data."""
 
     type: Literal[InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT] = (
         InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
     )
 
-    data: InteractionAutocompleteResultData
+    data: InteractionAutocompleteResultDataInput
 
 
-class InteractionModalData(BaseModel):
-    """Modal response data.
+class InteractionModalDataInput(BaseModel):
+    """Modal response request data.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal
@@ -265,20 +265,20 @@ class InteractionModalData(BaseModel):
         return components
 
 
-class InteractionModalResponseData(BaseModel):
-    """Interaction response data for MODAL."""
+class InteractionModalResponseInput(BaseModel):
+    """Interaction response request data for MODAL."""
 
     type: Literal[InteractionResponseType.MODAL] = InteractionResponseType.MODAL
-    data: InteractionModalData
+    data: InteractionModalDataInput
 
 
-InteractionResponse = (
-    InteractionPongResponseData
-    | IteractionChannelMessageResponseData
-    | IteractionDeferredChannelMessageResponseData
-    | InteractionDeferredUpdateMessageResponseData
-    | InteractionUpdateMessageResponseData
-    | InteractionAutocompleteResponseData
-    | InteractionModalResponseData
-)
+type InteractionResponseInputType = Union[
+    InteractionPongResponseInput,
+    IteractionChannelMessageResponsInput,
+    IteractionDeferredChannelMessageResponseInput,
+    InteractionDeferredUpdateMessageResponseInput,
+    InteractionUpdateMessageResponseInput,
+    InteractionAutocompleteResponseInput,
+    InteractionModalResponseInput,
+]
 """Collection of all interaction response data models."""

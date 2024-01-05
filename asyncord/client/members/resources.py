@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.members.models import Member, UpdateMemberData
+from asyncord.client.members.models import MemberOutput, UpdateMemberInput
 from asyncord.client.resources import ClientResource, ClientSubresource
 from asyncord.typedefs import LikeSnowflake, list_model
 from asyncord.urls import REST_API_URL
@@ -23,7 +23,7 @@ class MemberResource(ClientSubresource):
         self.guild_id = guild_id
         self.members_url = self.guilds_url / str(self.guild_id) / 'members'
 
-    async def get(self, user_id: LikeSnowflake) -> Member:
+    async def get(self, user_id: LikeSnowflake) -> MemberOutput:
         """Get a member of a guild.
 
         This endpoint is restricted according to whether the GUILD_MEMBERS Privileged.
@@ -36,9 +36,9 @@ class MemberResource(ClientSubresource):
         """
         url = self.members_url / str(user_id)
         resp = await self._http_client.get(url)
-        return Member(**resp.body)
+        return MemberOutput.model_validate(resp.body)
 
-    async def get_list(self, limit: int | None = 1, after: LikeSnowflake | None = None) -> list[Member]:
+    async def get_list(self, limit: int | None = 1, after: LikeSnowflake | None = None) -> list[MemberOutput]:
         """List members of guild.
 
         This endpoint is restricted according to whether the GUILD_MEMBERS Privileged
@@ -60,9 +60,9 @@ class MemberResource(ClientSubresource):
 
         url = self.members_url % url_params
         resp = await self._http_client.get(url)
-        return list_model(Member).validate_python(resp.body)
+        return list_model(MemberOutput).validate_python(resp.body)
 
-    async def search(self, nick_or_name: str, limit: int | None = 1) -> list[Member]:
+    async def search(self, nick_or_name: str, limit: int | None = 1) -> list[MemberOutput]:
         """Search members of a guild by username or nickname.
 
         Args:
@@ -81,11 +81,14 @@ class MemberResource(ClientSubresource):
 
         url = self.members_url % url_params
         resp = await self._http_client.get(url)
-        return list_model(Member).validate_python(resp.body)
+        return list_model(MemberOutput).validate_python(resp.body)
 
     async def update(
-        self, user_id: LikeSnowflake, member_data: UpdateMemberData, reason: str | None = None,
-    ) -> Member:
+        self,
+        user_id: LikeSnowflake,
+        member_data: UpdateMemberInput,
+        reason: str | None = None,
+    ) -> MemberOutput:
         """Update a member.
 
         Args:
@@ -102,9 +105,13 @@ class MemberResource(ClientSubresource):
         else:
             headers = {}
         resp = await self._http_client.patch(url, member_data, headers=headers)
-        return Member(**resp.body)
+        return MemberOutput(**resp.body)
 
-    async def update_current_member(self, nickname: str | None, reason: str | None = None) -> Member:
+    async def update_current_member(
+        self,
+        nickname: str | None,
+        reason: str | None = None,
+    ) -> MemberOutput:
         """Update the current member.
 
         Args:
@@ -122,10 +129,13 @@ class MemberResource(ClientSubresource):
             headers = {}
         payload = {'nick': nickname}
         resp = await self._http_client.patch(url, payload, headers=headers)
-        return Member(**resp.body)
+        return MemberOutput.model_validate(resp.body)
 
     async def add_role(
-        self, user_id: LikeSnowflake, role_id: LikeSnowflake, reason: str | None = None,
+        self,
+        user_id: LikeSnowflake,
+        role_id: LikeSnowflake,
+        reason: str | None = None,
     ) -> None:
         """Add a role to a member.
 
@@ -142,7 +152,10 @@ class MemberResource(ClientSubresource):
         await self._http_client.put(url, None, headers=headers)
 
     async def remove_role(
-        self, user_id: LikeSnowflake, role_id: LikeSnowflake, reason: str | None = None,
+        self,
+        user_id: LikeSnowflake,
+        role_id: LikeSnowflake,
+        reason: str | None = None,
     ) -> None:
         """Remove a role from a member.
 

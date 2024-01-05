@@ -34,7 +34,7 @@ class GuildMemberFlags(enum.IntFlag):
     """Member has started onboarding"""
 
 
-class Member(BaseModel):
+class MemberOutput(BaseModel):
     """Represents a member of a guild.
 
     Reference: 
@@ -84,7 +84,7 @@ class Member(BaseModel):
     """
 
 
-class UpdateMemberData(BaseModel):
+class UpdateMemberInput(BaseModel):
     """Represents data to update a member."""
 
     nick: str | None = None

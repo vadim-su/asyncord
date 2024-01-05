@@ -3,7 +3,7 @@ from typing import Any
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.channels.models.output import ChannelOutput, ThreadMemberOutput
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
@@ -111,7 +111,7 @@ class ThreadListSyncEvent(GatewayEvent):
     threads: list[dict[str, Any]]  # FIXME: Add thread object
     """All active threads in the given channels that the current user can access."""
 
-    members: list[Member]
+    members: list[MemberOutput]
     """All thread member objects from the synced threads for the current user.
 
     Indicating which threads the current user has been added to.
@@ -128,7 +128,7 @@ class ThreadMemberUpdateEvent(GatewayEvent, ThreadMemberOutput):
 class ThreadMemberUpdate(ThreadMemberOutput):
     """https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields"""
 
-    member: Member
+    member: MemberOutput
     """Member object."""
 
     presence: dict[str, Any] | None = None  # FIXME: Add presence object

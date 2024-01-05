@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any
 
 from asyncord.client.guilds.resources import GuildOutput
-from asyncord.client.members.models import Member
+from asyncord.client.members.models import MemberOutput
 from asyncord.client.roles.models import Role
 from asyncord.client.users.models import User
 from asyncord.gateway.events.base import GatewayEvent
@@ -38,7 +38,7 @@ class GuildCreateEvent(GatewayEvent, GuildOutput):
     voice_states: list[dict[str, Any]] | None = None
     """States of members currently in voice channels."""
 
-    members: list[Member] | None = None
+    members: list[MemberOutput] | None = None
     """List of guild members."""
 
     channels: list[dict[str, Any]] | None = None
@@ -142,7 +142,7 @@ class GuildIntegrationsUpdateEvent(GatewayEvent):
     """Guild id whose integrations were updated."""
 
 
-class GuildMemberAddEvent(GatewayEvent, Member):
+class GuildMemberAddEvent(GatewayEvent, MemberOutput):
     """Sent when a new user joins a guild.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-member-add
@@ -165,7 +165,7 @@ class GuildMemberRemoveEvent(GatewayEvent):
     """Removed user."""
 
 
-class GuildMemberUpdateEvent(GatewayEvent, Member):
+class GuildMemberUpdateEvent(GatewayEvent, MemberOutput):
     """Sent when a guild member is updated.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-member-update
@@ -218,7 +218,7 @@ class GuildMembersChunkEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    members: list[Member]
+    members: list[MemberOutput]
     """list of guild members"""
 
     chunk_index: int
