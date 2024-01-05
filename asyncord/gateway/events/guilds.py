@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any
 
-from asyncord.client.guilds.resources import Guild
+from asyncord.client.guilds.resources import GuildOutput
 from asyncord.client.members.models import Member
 from asyncord.client.roles.models import Role
 from asyncord.client.users.models import User
@@ -9,7 +9,7 @@ from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
 
-class GuildCreateEvent(GatewayEvent, Guild):
+class GuildCreateEvent(GatewayEvent, GuildOutput):
     """Sent when a guild is created/joined.
 
     This event can be sent in three different scenarios:
@@ -57,7 +57,7 @@ class GuildCreateEvent(GatewayEvent, Guild):
     """List of scheduled events."""
 
 
-class GuildUpdateEvent(GatewayEvent, Guild):
+class GuildUpdateEvent(GatewayEvent, GuildOutput):
     """Sent when a guild is updated.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-update

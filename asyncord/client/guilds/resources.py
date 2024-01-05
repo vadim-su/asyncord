@@ -6,32 +6,29 @@ Reference: https://discord.com/developers/docs/resources/guild
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
 
 from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.output import ChannelOutput
 from asyncord.client.guilds.models import (
-    CreateGuildData,
-    Guild,
-    GuildPreview,
-    IntegrationVariants,
-    Invite,
+    CreateGuildInput,
+    GuildOutput,
+    GuildPreviewOutput,
+    IntegrationOutput,
+    InviteOutput,
     MFALevel,
-    Prune,
-    UpdateWelcomeScreenData,
-    VoiceRegion,
-    WelcomeScreen,
+    PruneOutput,
+    UpdateWelcomeScreenInput,
+    VoiceRegionOutput,
+    WelcomeScreenOutput,
 )
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.members.resources import MemberResource
 from asyncord.client.resources import ClientSubresource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
+from asyncord.snowflake import SnowflakeInput
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
-
-if TYPE_CHECKING:
-    from asyncord.typedefs import LikeSnowflake
 
 
 class GuildResource(ClientSubresource):
@@ -43,7 +40,7 @@ class GuildResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def members(self, guild_id: LikeSnowflake) -> MemberResource:
+    def members(self, guild_id: SnowflakeInput) -> MemberResource:
         """Get the member subresource for a guild.
 
         Args:
@@ -54,7 +51,7 @@ class GuildResource(ClientSubresource):
         """
         return MemberResource(self, guild_id)
 
-    def ban_managment(self, guild_id: LikeSnowflake) -> BanResource:
+    def ban_managment(self, guild_id: SnowflakeInput) -> BanResource:
         """Get the ban subresource for a guild.
 
         Args:
@@ -65,7 +62,7 @@ class GuildResource(ClientSubresource):
         """
         return BanResource(self, guild_id)
 
-    def roles(self, guild_id: LikeSnowflake) -> RoleResource:
+    def roles(self, guild_id: SnowflakeInput) -> RoleResource:
         """Get the role subresource for a guild.
 
         Args:
@@ -76,7 +73,7 @@ class GuildResource(ClientSubresource):
         """
         return RoleResource(self, guild_id)
 
-    def events(self, guild_id: LikeSnowflake) -> ScheduledEventsResource:
+    def events(self, guild_id: SnowflakeInput) -> ScheduledEventsResource:
         """Get the events subresource for a guild.
 
         Args:
@@ -87,7 +84,7 @@ class GuildResource(ClientSubresource):
         """
         return ScheduledEventsResource(self, guild_id)
 
-    async def get(self, guild_id: LikeSnowflake, with_counts: bool = False) -> Guild:
+    async def get(self, guild_id: SnowflakeInput, with_counts: bool = False) -> GuildOutput:
         """Get a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#et-guild
@@ -101,9 +98,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) % {'with_counts': str(with_counts)}
         resp = await self._http_client.get(url)
-        return Guild(**resp.body)
+        return GuildOutput.model_validate(resp.body)
 
-    async def get_preview(self, guild_id: LikeSnowflake) -> GuildPreview:
+    async def get_preview(self, guild_id: SnowflakeInput) -> GuildPreviewOutput:
         """Get a guild preview.
 
         Preview guilds are a special type of guilds object that contain only
@@ -117,9 +114,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'preview'
         resp = await self._http_client.get(url)
-        return GuildPreview(**resp.body)
+        return GuildPreviewOutput.model_validate(resp.body)
 
-    async def create(self, guild_data: CreateGuildData) -> Guild:
+    async def create(self, guild_data: CreateGuildInput) -> GuildOutput:
         """Create a new guild.
 
         This endpoint can be used only by bots in less than 10 guilds.
@@ -134,9 +131,9 @@ class GuildResource(ClientSubresource):
         """
         payload = guild_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.post(self.guilds_url, payload)
-        return Guild.model_validate(resp.body)
+        return GuildOutput.model_validate(resp.body)
 
-    async def delete(self, guild_id: LikeSnowflake) -> None:
+    async def delete(self, guild_id: SnowflakeInput) -> None:
         """Delete a guild.
 
         Args:
@@ -145,7 +142,7 @@ class GuildResource(ClientSubresource):
         url = self.guilds_url / str(guild_id)
         await self._http_client.delete(url)
 
-    async def update_mfa(self, guild_id: LikeSnowflake, level: MFALevel) -> MFALevel:
+    async def update_mfa(self, guild_id: SnowflakeInput, level: MFALevel) -> MFALevel:
         """Update the MFA (Multi Factor Authentication) level for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level
@@ -164,11 +161,11 @@ class GuildResource(ClientSubresource):
 
     async def get_prune_count(
         self,
-        guild_id: LikeSnowflake,
+        guild_id: SnowflakeInput,
         days: int | None = None,
-        include_roles: list[LikeSnowflake] | None = None,
+        include_roles: list[SnowflakeInput] | None = None,
         reason: str | None = None,
-    ) -> Prune:
+    ) -> PruneOutput:
         """Get the number of members that would be removed from a guild if pruned.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
@@ -195,17 +192,17 @@ class GuildResource(ClientSubresource):
 
         url = self.guilds_url / str(guild_id) / 'prune' % url_params
         resp = await self._http_client.get(url, headers)
-        return Prune(**resp.body)
+        return PruneOutput.model_validate(resp.body)
 
     # TODO: #15 Replace args with a dataclass
     async def begin_prune(  # noqa: PLR0913
         self,
-        guild_id: LikeSnowflake,
+        guild_id: SnowflakeInput,
         days: int | None = None,
         compute_prune_count: bool | None = None,
-        include_roles: list[LikeSnowflake] | None = None,
+        include_roles: list[SnowflakeInput] | None = None,
         reason: str | None = None,
-    ) -> Prune:
+    ) -> PruneOutput:
         """Begin pruning a guild.
 
         For large guilds it's recommended to set the compute_prune_count option to false,
@@ -243,9 +240,9 @@ class GuildResource(ClientSubresource):
 
         url = self.guilds_url / str(guild_id) / 'prune'
         resp = await self._http_client.post(url, payload, headers=headers)
-        return Prune(**resp.body)
+        return PruneOutput.model_validate(resp.body)
 
-    async def get_voice_regions(self, guild_id: LikeSnowflake) -> list[VoiceRegion]:
+    async def get_voice_regions(self, guild_id: SnowflakeInput) -> list[VoiceRegionOutput]:
         """Get the voice regions for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
@@ -258,9 +255,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'regions'
         resp = await self._http_client.get(url)
-        return list_model(VoiceRegion).validate_python(resp.body)
+        return list_model(VoiceRegionOutput).validate_python(resp.body)
 
-    async def get_invites(self, guild_id: LikeSnowflake) -> list[Invite]:
+    async def get_invites(self, guild_id: SnowflakeInput) -> list[InviteOutput]:
         """Get the invites for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-invites
@@ -273,9 +270,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'invites'
         resp = await self._http_client.get(url)
-        return list_model(Invite).validate_python(resp.body)
+        return list_model(InviteOutput).validate_python(resp.body)
 
-    async def get_channels(self, guild_id: LikeSnowflake) -> list[ChannelOutput]:
+    async def get_channels(self, guild_id: SnowflakeInput) -> list[ChannelOutput]:
         """Get the channels for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-channels
@@ -290,7 +287,7 @@ class GuildResource(ClientSubresource):
         resp = await self._http_client.get(url)
         return list_model(ChannelOutput).validate_python(resp.body)
 
-    async def get_integrations(self, guild_id: LikeSnowflake) -> list[IntegrationVariants]:
+    async def get_integrations(self, guild_id: SnowflakeInput) -> list[IntegrationOutput]:
         """Get the integrations for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-integrations
@@ -303,12 +300,12 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'integrations'
         resp = await self._http_client.get(url)
-        return list_model(IntegrationVariants).validate_python(resp.body)
+        return list_model(IntegrationOutput).validate_python(resp.body)
 
     async def delete_integration(
         self,
-        guild_id: LikeSnowflake,
-        integration_id: LikeSnowflake,
+        guild_id: SnowflakeInput,
+        integration_id: SnowflakeInput,
         reason: str | None = None,
     ) -> None:
         """Delete an integration.
@@ -329,7 +326,7 @@ class GuildResource(ClientSubresource):
 
         await self._http_client.delete(url, headers=headers)
 
-    async def get_welcome_screen(self, guild_id: LikeSnowflake) -> WelcomeScreen:
+    async def get_welcome_screen(self, guild_id: SnowflakeInput) -> WelcomeScreenOutput:
         """Get the welcome screen for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen
@@ -342,14 +339,14 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'welcome-screen'
         resp = await self._http_client.get(url)
-        return WelcomeScreen(**resp.body)
+        return WelcomeScreenOutput.model_validate(resp.body)
 
     async def update_welcome_screen(
         self,
-        guild_id: LikeSnowflake,
-        welcome_screen_data: UpdateWelcomeScreenData,
+        guild_id: SnowflakeInput,
+        welcome_screen_data: UpdateWelcomeScreenInput,
         reason: str | None = None,
-    ) -> WelcomeScreen:
+    ) -> WelcomeScreenOutput:
         """Update the welcome screen for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#update-guild-welcome-screen
@@ -371,12 +368,12 @@ class GuildResource(ClientSubresource):
 
         payload = welcome_screen_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.patch(url, payload, headers=headers)
-        return WelcomeScreen.model_validate(resp.body)
+        return WelcomeScreenOutput.model_validate(resp.body)
 
     async def update_current_user_voice_state(
         self,
-        guild_id: LikeSnowflake,
-        channel_id: LikeSnowflake | None = None,
+        guild_id: SnowflakeInput,
+        channel_id: SnowflakeInput | None = None,
         suppress: bool | None = None,
         request_to_speak_timestamp: datetime.datetime | None = None,
     ) -> None:
@@ -403,9 +400,9 @@ class GuildResource(ClientSubresource):
 
     async def update_user_voice_state(
         self,
-        guild_id: LikeSnowflake,
-        user_id: LikeSnowflake,
-        channel_id: LikeSnowflake | None = None,
+        guild_id: SnowflakeInput,
+        user_id: SnowflakeInput,
+        channel_id: SnowflakeInput | None = None,
         suppress: bool | None = None,
     ) -> None:
         """Update a user's voice state.

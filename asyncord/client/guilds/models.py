@@ -1,8 +1,5 @@
 """Module containing models for guilds and guild related objects like invites.
 
-Invite models are integrated to this module temporarily until they are moved to
-their own module.
-
 Reference:
 https://discord.com/developers/docs/resources/guild
 """
@@ -16,6 +13,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInput
+from asyncord.client.channels.models.channel_create import CreateChannelInputType
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
@@ -25,32 +23,51 @@ from asyncord.client.users.models import User
 from asyncord.snowflake import Snowflake
 
 
-class CreateGuildChannel(BaseModel):
-    """Data for creating a guild channel in a moment of creating guild.
+@enum.unique
+class DefaultMessageNotificationLevel(enum.IntEnum):
+    """Level of default message notifications.
 
     Reference:
-    https://discord.com/developers/docs/resources/guild#create-guild-example-partial-channel-object"""
-
-    id: int | None = None
-    """Channel ID.
-    
-    This id is used for parent_id field when creating a category channel
+    https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level
     """
 
-    name: str = Field(min_length=1, max_length=100)
-    """channel name.
+    ALL_MESSAGES = 0
+    """Members will receive notifications for all messages by default."""
 
-    1-100 characters.
+    ONLY_MENTIONS = 1
+    """Members will receive notifications only for messages that @mention them by default."""
+
+
+@enum.unique
+class ExplicitContentFilterLevel(enum.IntEnum):
+    """Level of explicit content filter.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level
     """
 
-    type: ChannelType
-    """Type of the channel."""
+    DISABLED = 0
+    """Media content will not be scanned."""
 
-    parent_id: int | None = None
-    """Sub category channels are linked to category channel"""
+    MEMBERS_WITHOUT_ROLES = 1
+    """Media content sent by members without roles will be scanned."""
+
+    ALL_MEMBERS = 2
+    """Media content sent by all members will be scanned."""
 
 
-class CreateGuildData(BaseModel):
+@enum.unique
+class MFALevel(enum.IntEnum):
+    """Level of Multi Factor Authentication."""
+
+    NONE = 0
+    """guild has no MFA/2FA requirement for moderation actions"""
+
+    ELEVATED = 1
+    """guild has a 2FA requirement for moderation actions"""
+
+
+class CreateGuildInput(BaseModel):
     """Data for creating a guild.
 
     Endpoint for which this model is used can only be used by bots
@@ -59,6 +76,7 @@ class CreateGuildData(BaseModel):
     Reference: 
     https://discord.com/developers/docs/resources/guild#create-guild
     """
+
     name: str = Field(min_length=2, max_length=100)
     """Name of the guild (2-100 characters)."""
 
@@ -68,10 +86,10 @@ class CreateGuildData(BaseModel):
     verification_level: int | None = None
     """Verification level."""
 
-    default_message_notifications: int | None = None
+    default_message_notifications: DefaultMessageNotificationLevel | None = None
     """Default message notification level."""
 
-    explicit_content_filter: int | None = None
+    explicit_content_filter: ExplicitContentFilterLevel | None = None
     """Explicit content filter level."""
 
     roles: list[Role] | None = None
@@ -86,7 +104,7 @@ class CreateGuildData(BaseModel):
     channels with the channels array.
     """
 
-    channels: list[CreateGuildChannel] | None = None
+    channels: list[CreateChannelInputType] | None = None
     """New guild's channels.
 
     When using the channels, the position field is ignored, and
@@ -136,8 +154,8 @@ class WelcomeScreenChannel(BaseModel):
     """Emoji name if custom, the unicode character if standard, or null if no emoji is set."""
 
 
-class UpdateWelcomeScreenData(BaseModel):
-    """Welcome screen update data.
+class UpdateWelcomeScreenInput(BaseModel):
+    """Data for updating a welcome screen.
 
     Reference: https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
     """
@@ -146,13 +164,16 @@ class UpdateWelcomeScreenData(BaseModel):
     """Whether the welcome screen is enabled."""
 
     welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_length=5)
-    """Channels shown in the welcome screen, max 5."""
+    """Channels shown in the welcome screen.
+    
+    Up to 5 channels can be specified.
+    """
 
     description: str | None = None
     """Server description shown in the welcome screen."""
 
 
-class WelcomeScreen(BaseModel):
+class WelcomeScreenOutput(BaseModel):
     """Welcome screen object.
 
     Reference: https://discord.com/developers/docs/resources/guild#welcome-screen-object
@@ -161,15 +182,12 @@ class WelcomeScreen(BaseModel):
     description: str | None
     """Server description shown in the welcome screen."""
 
-    welcome_channels: list[WelcomeScreenChannel] = Field(max_length=5)
-    """List of channels shown in the welcome screen.
-
-    Up to 5 channels.
-    """
+    welcome_channels: list[WelcomeScreenChannel]
+    """List of channels shown in the welcome screen."""
 
 
-class Guild(BaseModel):
-    """Object representing a guild in Discord.
+class GuildOutput(BaseModel):
+    """Guild object.
 
     Reference:
     https://discord.com/developers/docs/resources/guild#guild-object
@@ -300,7 +318,7 @@ class Guild(BaseModel):
     Returned when with_counts is true.
     """
 
-    welcome_screen: WelcomeScreen | None = None
+    welcome_screen: WelcomeScreenOutput | None = None
     """Welcome screen of a Community guild.
 
     Shown to new members, returned in an Invite's guild object.
@@ -319,7 +337,7 @@ class Guild(BaseModel):
     """ID of the channel where admins and moderators of Community guilds receive safety alerts from Discord."""
 
 
-class GuildPreview(BaseModel):
+class GuildPreviewOutput(BaseModel):
     """Guild preview object.
 
     https://discord.com/developers/docs/resources/guild#guild-preview-object
@@ -368,25 +386,8 @@ class GuildPreview(BaseModel):
     """Custom guild stickers"""
 
 
-class BeginPruneData(BaseModel):
-    """Data for begin prune.
-
-    Reference:
-    https://discord.com/developers/docs/resources/guild#begin-guild-prune-json-params
-    """
-
-    days: int | None = Field(None, ge=1, le=30)
-    """Number of days to count prune for(1 - 30)."""
-
-    compute_prune_count: bool | None = None
-    """Whether 'pruned' is returned, discouraged for large guilds."""
-
-    include_roles: list[Snowflake] | None = None
-    """Roles to include."""
-
-
-class Prune(BaseModel):
-    """Object returned by the prune endpoints.
+class PruneOutput(BaseModel):
+    """Prune object.
 
     Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
     """
@@ -395,8 +396,8 @@ class Prune(BaseModel):
     """Number of members pruned."""
 
 
-class VoiceRegion(BaseModel):
-    """Object returned by the voice region endpoints.
+class VoiceRegionOutput(BaseModel):
+    """Voice region object.
 
     Reference: https://discord.com/developers/docs/resources/voice#voice-region-object-voice-region-structure
     """
@@ -417,8 +418,8 @@ class VoiceRegion(BaseModel):
     """Whether the voice region is custom."""
 
 
-class InviteChannel(BaseModel):
-    """Partial channel object in an invite.
+class InviteChannelOutput(BaseModel):
+    """Invite channel object.
 
     Reference:
     https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object
@@ -434,8 +435,8 @@ class InviteChannel(BaseModel):
     """Type of channel."""
 
 
-class InviteGuild(BaseModel):
-    """Partial guild object in an invite.
+class InviteGuildOutput(BaseModel):
+    """Invite guild object.
 
     Reference: 
     https://discord.com/developers/docs/resources/guild#guild-object
@@ -514,8 +515,8 @@ class InviteTargetType(enum.IntEnum):
     """The invite is for an embedded application."""
 
 
-class Invite(BaseModel):
-    """Object returned by the invite endpoints.
+class InviteOutput(BaseModel):
+    """Invite object.
 
     Reference: https://discord.com/developers/docs/resources/invite#invite-object-invite-structure
     """
@@ -523,10 +524,10 @@ class Invite(BaseModel):
     code: str
     """Unique identifier for the invite."""
 
-    guild: InviteGuild | None = None
+    guild: InviteGuildOutput | None = None
     """Guild the invite is for."""
 
-    channel: InviteChannel | None
+    channel: InviteChannelOutput | None
     """channel the invite is for"""
 
     inviter: User | None = None
@@ -700,40 +701,5 @@ class DiscordIntegration(BaseModel):
     """Scopes the application has been authorized for."""
 
 
-IntegrationVariants = Annotated[GeneralIntegration | DiscordIntegration, Field(discriminator='type')]
-
-
-@enum.unique
-class DefaultMessageNotificationLevel(enum.IntEnum):
-    """Level of default message notifications.
-
-    Reference:
-    https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level
-    """
-
-    ALL_MESSAGES = 0
-    """Members will receive notifications for all messages by default."""
-
-    ONLY_MENTIONS = 1
-    """Members will receive notifications only for messages that @mention them by default."""
-
-
-@enum.unique
-class MFALevel(enum.IntEnum):
-    """Level of Multi Factor Authentication."""
-
-    NONE = 0
-    """guild has no MFA/2FA requirement for moderation actions"""
-
-    ELEVATED = 1
-    """guild has a 2FA requirement for moderation actions"""
-
-
-class UnavailableGuild(BaseModel):
-    """Unavailable guild object."""
-
-    id: Snowflake
-    """Guild ID"""
-
-    unavailable: bool
-    """True if this guild is unavailable due to an outage."""
+IntegrationOutput = Annotated[GeneralIntegration | DiscordIntegration, Field(discriminator='type')]
+"""Integration object for all types of integrations."""

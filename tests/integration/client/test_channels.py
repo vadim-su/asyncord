@@ -107,13 +107,13 @@ async def test_update_channel(channels_res: ChannelResource, integration_data: I
 
     channel = await channels_res.update(
         integration_data.channel_id,
-        UpdateTextChannelInput(name='test'),
+        UpdateTextChannelInput(name='test'),  # type: ignore
     )
     assert channel.id == integration_data.channel_id
     assert channel.name == 'test'
 
     channel = await channels_res.update(
         integration_data.channel_id,
-        UpdateTextChannelInput(name=preserved_name),
+        UpdateTextChannelInput(name=preserved_name),  # type: ignore
     )
     assert channel.name == preserved_name

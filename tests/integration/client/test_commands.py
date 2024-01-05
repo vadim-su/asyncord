@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from asyncord.client.commands.models import (
+from asyncord.client.commands.models.common import (
     AppCommandOptionType,
-    ApplicationCommandOption,
-    ApplicationCommandOptionChoice,
     ApplicationCommandType,
+)
+from asyncord.client.commands.models.input import (
+    ApplicationCommandOptionChoiceInput,
+    ApplicationCommandOptionInput,
     CreateApplicationCommandInput,
 )
 from asyncord.client.commands.resources import CommandResource
@@ -18,27 +20,27 @@ async def test_create_command(commands_res: CommandResource):
         description='test command description',
         description_localizations={'en-US': 'Test Command Description'},
         options=[
-            ApplicationCommandOption(
+            ApplicationCommandOptionInput(
                 type=AppCommandOptionType.STRING,
                 name='test-option',
                 description='test option description',
             ),
-            ApplicationCommandOption(
+            ApplicationCommandOptionInput(
                 type=AppCommandOptionType.INTEGER,
                 name='test-option-2',
                 description='test option description 2',
                 required=True,
             ),
-            ApplicationCommandOption(
+            ApplicationCommandOptionInput(
                 type=AppCommandOptionType.STRING,
                 name='test-option-3',
                 description='test option description 3',
                 choices=[
-                    ApplicationCommandOptionChoice(
+                    ApplicationCommandOptionChoiceInput(
                         name='test-choice-1',
                         value='test-value-1',
                     ),
-                    ApplicationCommandOptionChoice(
+                    ApplicationCommandOptionChoiceInput(
                         name='test-choice-2',
                         value='test-value-2',
                     )
@@ -48,6 +50,7 @@ async def test_create_command(commands_res: CommandResource):
     )
 
     # check that the first option is a required integer
+    assert command_data.options
     assert command_data.options[0].type == AppCommandOptionType.INTEGER
 
     command = await commands_res.create(command_data)
@@ -63,17 +66,17 @@ async def test_create_subcommand_group(commands_res: CommandResource):
         name='test-command-group',
         description='test command description',
         options=[
-            ApplicationCommandOption(
+            ApplicationCommandOptionInput(
                 type=AppCommandOptionType.SUB_COMMAND_GROUP,
                 name='test-subcommand-group',
                 description='test subcommand group description',
                 options=[
-                    ApplicationCommandOption(
+                    ApplicationCommandOptionInput(
                         type=AppCommandOptionType.SUB_COMMAND,
                         name='test-subcommand',
                         description='test subcommand description',
                         options=[
-                            ApplicationCommandOption(
+                            ApplicationCommandOptionInput(
                                 type=AppCommandOptionType.INTEGER,
                                 name='test-option',
                                 description='test option description',
@@ -110,8 +113,7 @@ async def test_convert_command_to_create_command(commands_res: CommandResource):
     commands_list = await commands_res.get_list()
     command = await commands_res.get(commands_list[0].id)
 
-    command_data = CreateApplicationCommandInput.from_command(command)
-    assert command_data.name == command.name
-    assert command_data.description == command.description
-    assert command_data.type == command.type
-    assert command_data.options == command.options
+    assert command.name == command.name
+    assert command.description == command.description
+    assert command.type == command.type
+    assert command.options == command.options

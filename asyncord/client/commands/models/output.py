@@ -78,7 +78,7 @@ class ApplicationCommandOutput(BaseModel):
     description_localizations: dict[Locale, str] | None = None
     """Dictionary of language codes to localized descriptions. Defaults to None."""
 
-    options: list[ApplicationCommandOptionOutput]
+    options: list[ApplicationCommandOptionOutput] | None = None
     """List of options for the command.
 
     Must be 0-25 long. Defaults to None.

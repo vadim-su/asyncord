@@ -146,10 +146,10 @@ class BaseApplicationCommandOption[
     max_value: int | None = None
     """Maximum value for the option if the option type is `INTEGER` or `NUMBER`."""
 
-    min_length: int | None
+    min_length: int | None = None
     """Minimum length for the option if the option type is `STRING`."""
 
-    max_length: int | None
+    max_length: int | None = None
     """Maximum length for the option if the option type is `STRING`."""
 
     autocomplete: bool | None = None

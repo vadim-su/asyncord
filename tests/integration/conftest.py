@@ -3,6 +3,7 @@ from typing import AsyncGenerator
 import aiohttp
 import pytest
 
+from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.guilds.resources import GuildResource
@@ -90,6 +91,14 @@ async def commands_res(
     integration_data: IntegrationTestData,
 ) -> CommandResource:
     return client.applications.commands(integration_data.app_id)
+
+
+@pytest.fixture()
+async def ban_managment(
+    client: RestClient,
+    integration_data: IntegrationTestData
+) -> BanResource:
+    return client.guilds.ban_managment(integration_data.guild_id)
 
 
 @pytest.fixture()
