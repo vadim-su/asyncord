@@ -4,7 +4,7 @@ import enum
 
 from pydantic import BaseModel
 
-from asyncord.client.users.models import UserOutput
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
 
@@ -78,7 +78,7 @@ class Sticker(BaseModel):
     guild_id: Snowflake | None = None
     """id of the guild that owns this sticker"""
 
-    user: UserOutput | None = None
+    user: UserResponse | None = None
     """the user that uploaded the guild sticker"""
 
     sort_value: int | None = None

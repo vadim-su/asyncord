@@ -8,8 +8,7 @@ from typing import Literal, Union
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
-from asyncord.base64_image import Base64ImageInput
-from asyncord.client.channels.models.channel_create import DefaultReactionInput, OverwriteInput, TagInput
+from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.channels.models.common import (
     MAX_BITRATE,
     MAX_RATELIMIT,
@@ -20,7 +19,12 @@ from asyncord.client.channels.models.common import (
     ThreadSortOrder,
     VideoQualityMode,
 )
-from asyncord.snowflake import SnowflakeInput
+from asyncord.client.channels.models.requests.creation import (
+    DefaultReactionIn,
+    OverwriteIn,
+    TagIn,
+)
+from asyncord.snowflake import SnowflakeInputType
 
 
 class BaseUpdateChannel(BaseModel):
@@ -32,15 +36,15 @@ class BaseUpdateChannel(BaseModel):
     position: int | None = None
     """Position of the channel in the left-hand listing"""
 
-    permission_overwrites: list[OverwriteInput] | None = None
+    permission_overwrites: list[OverwriteIn] | None = None
     """Channel or category-specific permissions."""
 
 
-class UpdateGuildCategoryInput(BaseUpdateChannel):
+class UpdateGuildCategoryRequest(BaseUpdateChannel):
     """Data to update a guild category with."""
 
 
-class UpdateChannelInput(BaseUpdateChannel):
+class UpdateChannelRequest(BaseUpdateChannel):
     """Data to update a channel with.
 
     If you don't know the type of channel you're updating, use this.
@@ -82,7 +86,7 @@ class UpdateChannelInput(BaseUpdateChannel):
     No limit if set to 0.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     rtc_region: str | None = None
@@ -104,10 +108,10 @@ class UpdateChannelInput(BaseUpdateChannel):
     flags: ChannelFlag | None = None
     """Channel flags."""
 
-    available_tags: list[TagInput] | None = None
+    available_tags: list[TagIn] | None = None
     """List of available tags for the channel."""
 
-    default_reaction_emoji: DefaultReactionInput | None = None
+    default_reaction_emoji: DefaultReactionIn | None = None
     """Default reaction emoji for the forum channel."""
 
     default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
@@ -139,7 +143,7 @@ class UpdateChannelInput(BaseUpdateChannel):
         return flags
 
 
-class UpdatGroupDMChannelInput(BaseModel):
+class UpdatGroupDMChannelRequest(BaseModel):
     """Data to update a group DM channel with.
 
     Reference:
@@ -149,11 +153,11 @@ class UpdatGroupDMChannelInput(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=100)
     """Character channel name."""
 
-    icon: Base64ImageInput | None = None
+    icon: Base64ImageInputType | None = None
     """Base64 encoded icon"""
 
 
-class UpdateTextChannelInput(BaseUpdateChannel):
+class UpdateTextChannelRequest(BaseUpdateChannel):
     """Data to update a text channel with."""
 
     type: Literal[ChannelType.GUILD_TEXT] | None = None
@@ -187,7 +191,7 @@ class UpdateTextChannelInput(BaseUpdateChannel):
     """
 
 
-class UpdateAnoncementChannelInput(BaseUpdateChannel):
+class UpdateAnoncementChannelRequest(BaseUpdateChannel):
     """Data to update an announcement channel with."""
 
     type: Literal[ChannelType.GUILD_ANNOUNCEMENT] | None = None
@@ -199,7 +203,7 @@ class UpdateAnoncementChannelInput(BaseUpdateChannel):
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     default_auto_archive_duration: Literal[60, 1440, 4320, 10080] | None = None
@@ -210,7 +214,7 @@ class UpdateAnoncementChannelInput(BaseUpdateChannel):
     """
 
 
-class UpdateForumChannelInput(BaseUpdateChannel):
+class UpdateForumChannelRequest(BaseUpdateChannel):
     """Data to update a forum channel with."""
 
     topic: str | None = None
@@ -226,7 +230,7 @@ class UpdateForumChannelInput(BaseUpdateChannel):
     manage_messages or manage_channel, are unaffected.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     flags: ChannelFlag | None = None
@@ -249,7 +253,7 @@ class UpdateForumChannelInput(BaseUpdateChannel):
         return flags
 
 
-class UpdateMediaChannelInput(BaseUpdateChannel):
+class UpdateMediaChannelRequest(BaseUpdateChannel):
     """Data to update a media channel with."""
 
     topic: str | None = None
@@ -265,16 +269,16 @@ class UpdateMediaChannelInput(BaseUpdateChannel):
     manage_messages or manage_channel, are unaffected.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     flags: ChannelFlag | None = None
     """Channel flags."""
 
-    available_tags: list[TagInput] | None = None
+    available_tags: list[TagIn] | None = None
     """List of available tags for the channel."""
 
-    default_reaction_emoji: DefaultReactionInput | None = None
+    default_reaction_emoji: DefaultReactionIn | None = None
     """Default reaction emoji for the forum channel."""
 
     default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
@@ -285,7 +289,7 @@ class UpdateMediaChannelInput(BaseUpdateChannel):
     """
 
 
-class UpdateVoiceChannelInput(BaseUpdateChannel):
+class UpdateVoiceChannelRequest(BaseUpdateChannel):
     """Data to update a voice channel with."""
 
     nsfw: bool | None = None
@@ -313,7 +317,7 @@ class UpdateVoiceChannelInput(BaseUpdateChannel):
     No limit if set to 0.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     rtc_region: str | None = None
@@ -326,7 +330,7 @@ class UpdateVoiceChannelInput(BaseUpdateChannel):
     """Camera video quality mode of the voice channel."""
 
 
-class UpdateStageChannelInput(BaseUpdateChannel):
+class UpdateStageChannelReuqest(BaseUpdateChannel):
     """Data to update a stage channel with."""
 
     nsfw: bool | None = None
@@ -347,7 +351,7 @@ class UpdateStageChannelInput(BaseUpdateChannel):
     No limit if set to 0.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     rtc_region: str | None = None
@@ -360,15 +364,15 @@ class UpdateStageChannelInput(BaseUpdateChannel):
     """Camera video quality mode of the voice channel."""
 
 
-type UpdateChannelInputType = Union[
-    UpdateGuildCategoryInput,
-    UpdateChannelInput,
-    UpdatGroupDMChannelInput,
-    UpdateTextChannelInput,
-    UpdateAnoncementChannelInput,
-    UpdateForumChannelInput,
-    UpdateMediaChannelInput,
-    UpdateVoiceChannelInput,
-    UpdateStageChannelInput,
+type UpdateChannelRequestType = Union[
+    UpdateGuildCategoryRequest,
+    UpdateChannelRequest,
+    UpdatGroupDMChannelRequest,
+    UpdateTextChannelRequest,
+    UpdateAnoncementChannelRequest,
+    UpdateForumChannelRequest,
+    UpdateMediaChannelRequest,
+    UpdateVoiceChannelRequest,
+    UpdateStageChannelReuqest,
 ]
 """Type of data to update a channel with."""

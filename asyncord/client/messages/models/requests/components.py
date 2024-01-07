@@ -13,12 +13,12 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_va
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.messages.models.common import ButtonStyle, ComponentType, SelectComponentType, TextInputStyle
-from asyncord.snowflake import SnowflakeInput
+from asyncord.snowflake import SnowflakeInputType
 
 SELECT_COMPONENT_TYPE_LIST = get_typing_args(SelectComponentType)
 
 
-class BaseComponentInput(BaseModel):
+class BaseComponentIn(BaseModel):
     """Base component class."""
 
     type: ComponentType
@@ -33,7 +33,7 @@ class BaseComponentInput(BaseModel):
         self.model_fields_set.add('type')
 
 
-class ComponentEmojiInput(BaseModel):
+class ComponentEmojiIn(BaseModel):
     """Emoji to be displayed on the button.
 
     At least one of `name` or `id` must be provided.
@@ -44,7 +44,7 @@ class ComponentEmojiInput(BaseModel):
     name: str | None = None
     """Name of the emoji."""
 
-    id: SnowflakeInput | None = None
+    id: SnowflakeInputType | None = None
     """ID of the emoji."""
 
     animated: bool | None = None
@@ -59,7 +59,7 @@ class ComponentEmojiInput(BaseModel):
         return self
 
 
-class ButtonInput(BaseComponentInput):
+class ButtonIn(BaseComponentIn):
     """Buttons are interactive components that render in messages.
 
     They can be clicked by users, and send an interaction to your app when clicked.
@@ -87,7 +87,7 @@ class ButtonInput(BaseComponentInput):
     Max 80 characters.
     """
 
-    emoji: ComponentEmojiInput | None = None
+    emoji: ComponentEmojiIn | None = None
     """Emoji to be displayed on the button."""
 
     custom_id: str | None = Field(None, max_length=100)
@@ -122,7 +122,7 @@ class ButtonInput(BaseComponentInput):
         return self
 
 
-class SelectMenuOptionInput(BaseModel):
+class SelectMenuOptionIn(BaseModel):
     """Select menu option.
 
     Reference:
@@ -147,27 +147,27 @@ class SelectMenuOptionInput(BaseModel):
     Max 100 characters.
     """
 
-    emoji: ComponentEmojiInput | None = None
+    emoji: ComponentEmojiIn | None = None
     """Emoji to be displayed on the option."""
 
     default: bool = False
     """Whether the option is shown as selected by default."""
 
 
-class SelectDefaultValueInput(BaseModel):
+class SelectDefaultValueIn(BaseModel):
     """Select menu default value.
 
     Reference:
     https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
     """
-    id: SnowflakeInput
+    id: SnowflakeInputType
     """ID of a user, role, or channel"""
 
     type: Literal['user', 'role', 'channel']
     """Type of value that id represents. Either user, role, or channel"""
 
 
-class SelectMenuInput(BaseComponentInput):
+class SelectMenuIn(BaseComponentIn):
     """Select menu is interactive components that allow users to select options in messages.
 
     * Select menus must be sent inside an Action Row
@@ -187,7 +187,7 @@ class SelectMenuInput(BaseComponentInput):
     Max 100 characters.
     """
 
-    options: list[SelectMenuOptionInput] = Field(default_factory=list)
+    options: list[SelectMenuOptionIn] = Field(default_factory=list)
     """Choices in the select menu.
 
     Only required and allowed for `SelectComponentType.STRING_SELECT`.
@@ -200,7 +200,7 @@ class SelectMenuInput(BaseComponentInput):
     placeholder: str | None = Field(None, max_length=150)
     """Placeholder text if nothing is selected; max 150 characters."""
 
-    default_values: list[SelectDefaultValueInput] | None = None
+    default_values: list[SelectDefaultValueIn] | None = None
     """List of default values for auto-populated select menu components; 
     
     number of default values must be in the range defined by min_values and max_values.
@@ -217,8 +217,8 @@ class SelectMenuInput(BaseComponentInput):
 
     @field_validator('options')
     def validate_options(
-        cls, options: list[SelectMenuOptionInput], field_info: ValidationInfo,
-    ) -> list[SelectMenuOptionInput]:
+        cls, options: list[SelectMenuOptionIn], field_info: ValidationInfo,
+    ) -> list[SelectMenuOptionIn]:
         """Check that `options` is set for `SelectComponentType.STRING_SELECT`."""
         menu_type = field_info.data['type']
 
@@ -245,8 +245,8 @@ class SelectMenuInput(BaseComponentInput):
 
     @field_validator('default_values')
     def validate_default_values(
-        cls, default_values: list[SelectDefaultValueInput] | None, field_info: ValidationInfo,
-    ) -> list[SelectDefaultValueInput] | None:
+        cls, default_values: list[SelectDefaultValueIn] | None, field_info: ValidationInfo,
+    ) -> list[SelectDefaultValueIn] | None:
         """Check that `default_values` is set for `SelectComponentType.STRING_SELECT`."""
         if not default_values:
             return default_values
@@ -274,7 +274,7 @@ class SelectMenuInput(BaseComponentInput):
         return default_values
 
 
-class TextInputInput(BaseComponentInput):
+class TextInputIn(BaseComponentIn):
     """Text inputs are an interactive component that render on modals.
 
     They can be used to collect short-form or long-form text.
@@ -349,7 +349,7 @@ class TextInputInput(BaseComponentInput):
         return max_length
 
 
-class ActionRowInput(BaseComponentInput):
+class ActionRowIn(BaseComponentIn):
     """ActionRow is a non-interactive container component for other types of components.
 
     * You can have up to 5 Action Rows per message
@@ -365,14 +365,14 @@ class ActionRowInput(BaseComponentInput):
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
     """Type of the component."""
 
-    components: list[ComponentInput | TextInputInput]
+    components: list[ComponentIn | TextInputIn]
     """Components in the action row.
 
     Text input components are not allowed in action rows.
     """
 
     @field_validator('components')
-    def validate_components(cls, components: list[ComponentInput | TextInputInput]) -> list[ComponentInput | TextInputInput]:
+    def validate_components(cls, components: list[ComponentIn | TextInputIn]) -> list[ComponentIn | TextInputIn]:
         """Check ActionRow components."""
         component_types = [component.type for component in components]
         component_types_set = set(component_types)
@@ -393,14 +393,14 @@ class ActionRowInput(BaseComponentInput):
             raise ValueError('ActionRow can contain up to 5 buttons')
 
         # Check if TextInputInput is mixed with other components
-        if TextInputInput in component_types_set and len(component_types) != component_types.count(TextInputInput):
+        if TextInputIn in component_types_set and len(component_types) != component_types.count(TextInputIn):
             raise ValueError('Text input components cannot be mixed with other components')
 
         return components
 
 
-ComponentInput = Annotated[ActionRowInput | ButtonInput | SelectMenuInput, Field(discriminator='type')]
+ComponentIn = Annotated[ActionRowIn | ButtonIn | SelectMenuIn, Field(discriminator='type')]
 """Type of the component."""
 
 # Rebuild ActionRow model to add `components` field after Component type created.
-ActionRowInput.model_rebuild()
+ActionRowIn.model_rebuild()

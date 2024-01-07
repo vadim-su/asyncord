@@ -6,68 +6,17 @@ https://discord.com/developers/docs/resources/application
 
 from __future__ import annotations
 
-import enum
 from typing import Any
 
 from pydantic import AnyHttpUrl, BaseModel, Field
 
+from asyncord.client.applications.models.common import ApplicationCommandPermissionType, ApplicationFlag
 from asyncord.client.models.permissions import PermissionFlag
-from asyncord.client.users.models import UserFlags
+from asyncord.client.users.models.responses import UserFlags
 from asyncord.snowflake import Snowflake
 
 
-@enum.unique
-class ApplicationCommandPermissionType(enum.IntEnum):
-    """Discord application command permission type.
-
-    Reference:
-    https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type
-    """
-
-    ROLE = 1
-    """Role permission type"""
-
-    USER = 2
-    """User permission type"""
-
-    CHANNEL = 3
-    """Channel permission type"""
-
-
-@enum.unique
-class MembershipState(enum.Enum):
-    """Discord team member's membership state.
-
-    https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum
-    """
-
-    INVITED = 1
-    """the user has been invited to the team but has not yet accepted"""
-
-    ACCEPTED = 2
-    """the user has accepted the team invite"""
-
-
-@enum.unique
-class ApplicationFlag(enum.IntFlag):
-    """Discord application flag.
-
-    https://discord.com/developers/docs/resources/application#application-object-application-flags
-    """
-
-    APPLICATION_AUTO_MODERATION_RULE_CREATE_BADGE = 1 << 6
-    GATEWAY_PRESENCE = 1 << 12
-    GATEWAY_PRESENCE_LIMITED = 1 << 13
-    GATEWAY_GUILD_MEMBERS = 1 << 14
-    GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15
-    VERIFICATION_PENDING_GUILD_LIMIT = 1 << 16
-    EMBEDDED = 1 << 17
-    GATEWAY_MESSAGE_CONTENT = 1 << 18
-    GATEWAY_MESSAGE_CONTENT_LIMITED = 1 << 19
-    APPLICATION_COMMAND_BADGE = 1 << 23
-
-
-class InstallParams(BaseModel):
+class InstallParamsOut(BaseModel):
     """Application install parameters.
 
     Reference:
@@ -85,7 +34,7 @@ class InstallParams(BaseModel):
     """Bitwise flags representing the permissions your application."""
 
 
-class ApplicationUser(BaseModel):
+class ApplicationUserOut(BaseModel):
     """Represents a Discord application owner.
 
     It's a subset of the `asyncord.client.models.users.User` model.
@@ -107,7 +56,7 @@ class ApplicationUser(BaseModel):
     """The flags on a user's account."""
 
 
-class TeamMemberUser(BaseModel):
+class TeamMemberUserOut(BaseModel):
     """Represents a Discord team member user.
 
     It's a subset of the `asyncord.client.models.users.User` model.
@@ -126,7 +75,7 @@ class TeamMemberUser(BaseModel):
     """The user's avatar hash."""
 
 
-class TeamMember(BaseModel):
+class TeamMemberOut(BaseModel):
     """Represents a Discord team member.
 
     https://discord.com/developers/docs/topics/teams#data-models-team-member-object
@@ -141,11 +90,11 @@ class TeamMember(BaseModel):
     team_id: Snowflake
     """the id of the team"""
 
-    user: TeamMemberUser
+    user: TeamMemberUserOut
     """the user that is a member of the team"""
 
 
-class Team(BaseModel):
+class TeamOut(BaseModel):
     """Represents a Discord team.
 
     https://discord.com/developers/docs/topics/teams#data-models-team-object
@@ -163,11 +112,11 @@ class Team(BaseModel):
     owner_user_id: Snowflake
     """the id of the current team owner"""
 
-    members: list[TeamMember]
+    members: list[TeamMemberOut]
     """the members of the team"""
 
 
-class Application(BaseModel):
+class ApplicationOut(BaseModel):
     """Represents a Discord application.
 
     https://discord.com/developers/docs/resources/application#application-object-application-structure
@@ -206,13 +155,13 @@ class Application(BaseModel):
     privacy_policy_url: str | None = None
     """the url of the app's privacy policy"""
 
-    owner: ApplicationUser | None = None
+    owner: ApplicationUserOut | None = None
     """the owner of the application"""
 
     verify_key: str | None = None
     """the hex encoded key for verification in interactions and the `GameSDK's GetTicket`"""
 
-    team: Team | None
+    team: TeamOut | None
     """the app's team"""
 
     guild_id: Snowflake | None = None
@@ -248,14 +197,14 @@ class Application(BaseModel):
     Maximum of 5 tags.
     """
 
-    install_params: InstallParams | None = None
+    install_params: InstallParamsOut | None = None
     """Settings for the application's default in-app authorization link."""
 
     custom_install_url: AnyHttpUrl | None = None
     """Application's default custom authorization link"""
 
 
-class ApplicationCommandPermissions(BaseModel):
+class ApplicationCommandPermissionOut(BaseModel):
     """Returned when fetching the permissions for a command in a guild.
 
     Reference:
@@ -274,7 +223,7 @@ class ApplicationCommandPermissions(BaseModel):
     """Allow or deny permission"""
 
 
-class GuildApplicationCommandPermissions(BaseModel):
+class GuildApplicationCommandPermissionsOut(BaseModel):
     """Returned when fetching the permissions for an app's command(s) in a guild.
 
     https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object
@@ -293,7 +242,7 @@ class GuildApplicationCommandPermissions(BaseModel):
     guild_id: Snowflake
     """Guild id."""
 
-    permissions: list[ApplicationCommandPermissions]
+    permissions: list[ApplicationCommandPermissionOut]
     """Permissions for the command in the guild.
 
     Maximum of 100.

@@ -1,10 +1,10 @@
-from asyncord.client.roles.models import CreateRoleInput
+from asyncord.client.roles.models.requests import CreateRoleRequest
 from asyncord.client.roles.resources import RoleResource
 
 
 async def test_create_and_delete_role(roles_res: RoleResource):
     new_role_name = 'TestRole'
-    role = await roles_res.create(CreateRoleInput(name=new_role_name))
+    role = await roles_res.create(CreateRoleRequest(name=new_role_name))
     assert role.name == new_role_name
     await roles_res.delete(role.id)
 

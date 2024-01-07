@@ -4,24 +4,26 @@ Currently, the only action is to send a response to an interaction. Discord don'
 provide any other actions for interactions.
 """
 
-from asyncord.client.interactions.models.input import (
-    InteractionDeferredUpdateMessageResponseInput,
-    InteractionPongResponseInput,
-    InteractionResponseInputType,
-    InteractionUpdateMessageResponseInput,
-    IteractionChannelMessageResponsInput,
-    IteractionDeferredChannelMessageResponseInput,
+from typing import Union
+
+from asyncord.client.interactions.models.requests import (
+    InteractionDeferredUpdateMessageResponseRequest,
+    InteractionPongResponseRequest,
+    InteractionResponseRequestType,
+    InteractionUpdateMessageResponseRequest,
+    IteractionChannelMessageResponsRequest,
+    IteractionDeferredChannelMessageResponseRequest,
 )
 from asyncord.client.resources import ClientSubresource
 from asyncord.typedefs import LikeSnowflake
 from asyncord.urls import REST_API_URL
 
-_INTERACTIONS_CAN_CONTAIN_FILES = (
-    IteractionChannelMessageResponsInput
-    | IteractionDeferredChannelMessageResponseInput
-    | InteractionDeferredUpdateMessageResponseInput
-    | InteractionUpdateMessageResponseInput
-)
+_INTERACTIONS_CAN_CONTAIN_FILES = Union[
+    IteractionChannelMessageResponsRequest,
+    IteractionDeferredChannelMessageResponseRequest,
+    InteractionDeferredUpdateMessageResponseRequest,
+    InteractionUpdateMessageResponseRequest,
+]
 
 
 class InteractionResource(ClientSubresource):
@@ -33,7 +35,7 @@ class InteractionResource(ClientSubresource):
         self,
         interaction_id: LikeSnowflake,
         interaction_token: str,
-        interaction_response: InteractionResponseInputType,
+        interaction_response: InteractionResponseRequestType,
     ) -> None:
         """Send a response to an interaction.
 
@@ -65,5 +67,5 @@ class InteractionResource(ClientSubresource):
         await self.send_response(
             interaction_id=interaction_id,
             interaction_token=interaction_token,
-            interaction_response=InteractionPongResponseInput(),
+            interaction_response=InteractionPongResponseRequest(),
         )

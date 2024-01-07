@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
-from asyncord.client.commands.models.activity import Activity
-from asyncord.client.members.models import MemberOutput
-from asyncord.client.users.models import UserOutput
+from asyncord.client.members.models.responses import MemberResponse
+from asyncord.client.models.activities import Activity
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
@@ -122,11 +122,11 @@ class TypingStartEvent(GatewayEvent):
     timestamp: int
     """Unix time (in seconds) of when the user started typing."""
 
-    member: MemberOutput | None = None
+    member: MemberResponse | None = None
     """Member who started typing if this happened in a guild."""
 
 
-class UserUpdateEvent(GatewayEvent, UserOutput):
+class UserUpdateEvent(GatewayEvent, UserResponse):
     """Sent when properties about the user change.
 
     https://discord.com/developers/docs/topics/gateway-events#user-update

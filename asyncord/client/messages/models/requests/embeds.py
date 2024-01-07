@@ -6,7 +6,7 @@ from asyncord.client.messages.models.common import EmbedType
 from asyncord.color import ColorInput
 
 
-class EmbedFooterInput(BaseModel):
+class EmbedFooterIn(BaseModel):
     """Object representing footer of an embed.
 
     Reference:
@@ -23,7 +23,7 @@ class EmbedFooterInput(BaseModel):
     """Proxied URL of the footer icon."""
 
 
-class EmbedImageInput(BaseModel):
+class EmbedImageIn(BaseModel):
     """Object representing image in an embed.
 
     Reference:
@@ -43,7 +43,7 @@ class EmbedImageInput(BaseModel):
     """Width of image."""
 
 
-class EmbedThumbnailInput(BaseModel):
+class EmbedThumbnailIn(BaseModel):
     """Object representing thumbnail in an embed.
 
     Reference:
@@ -63,7 +63,7 @@ class EmbedThumbnailInput(BaseModel):
     """Width of thumbnail."""
 
 
-class EmbedVideoInput(BaseModel):
+class EmbedVideoIn(BaseModel):
     """Object representing video in an embed.
 
     Bots can not send this object.
@@ -86,7 +86,7 @@ class EmbedVideoInput(BaseModel):
     """Width of the video."""
 
 
-class EmbedProviderInput(BaseModel):
+class EmbedProviderIn(BaseModel):
     """Object representing the provider of an embed.
 
     Reference:
@@ -100,7 +100,7 @@ class EmbedProviderInput(BaseModel):
     """URL of the provider."""
 
 
-class EmbedAuthorInput(BaseModel):
+class EmbedAuthorIn(BaseModel):
     """Object representing the author of an embed.
 
     Reference:
@@ -120,7 +120,7 @@ class EmbedAuthorInput(BaseModel):
     """Proxied URL of author icon."""
 
 
-class EmbedFieldInput(BaseModel):
+class EmbedFieldIn(BaseModel):
     """Embed field object.
 
     Reference:
@@ -137,7 +137,7 @@ class EmbedFieldInput(BaseModel):
     """Whether or not this field should display inline."""
 
 
-class EmbedInput(BaseModel):
+class EmbedIn(BaseModel):
     """Embed object.
 
     Reference:
@@ -165,29 +165,29 @@ class EmbedInput(BaseModel):
     color: ColorInput | None = None
     """Color code of the embed."""
 
-    footer: EmbedFooterInput | None = None
+    footer: EmbedFooterIn | None = None
     """Footer information."""
 
-    image: EmbedImageInput | None = None
+    image: EmbedImageIn | None = None
     """Image information."""
 
-    thumbnail: EmbedThumbnailInput | None = None
+    thumbnail: EmbedThumbnailIn | None = None
     """Thumbnail information."""
 
-    video: EmbedVideoInput | None = None
+    video: EmbedVideoIn | None = None
     """Video information.
     
     Bots can not use this field.
     Discord API will ignore it if provided.
     """
 
-    provider: EmbedProviderInput | None = None
+    provider: EmbedProviderIn | None = None
     """Provider information."""
 
-    author: EmbedAuthorInput | None = None
+    author: EmbedAuthorIn | None = None
     """Author information."""
 
-    fields: list[EmbedFieldInput] = Field(default_factory=list, max_length=25)
+    fields: list[EmbedFieldIn] = Field(default_factory=list, max_length=25)
     """List of fields.
 
     Maximum of 25 items.

@@ -9,14 +9,14 @@ from pydantic import BaseModel, Field, RootModel
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.common import AppCommandOptionType, ApplicationCommandType
 from asyncord.client.interactions.models.common import InteractionType
-from asyncord.client.members.models import MemberOutput
+from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.messages.models.common import ComponentType, MessageFlags, MessageType
-from asyncord.client.messages.models.components_output import ActionRowOutput
-from asyncord.client.messages.models.embed_output import EmbedOutput
-from asyncord.client.messages.models.output import AttachmentOutput
+from asyncord.client.messages.models.responses.components import ActionRowOut
+from asyncord.client.messages.models.responses.embeds import EmbedOut
+from asyncord.client.messages.models.responses.messages import AttachmentOut
 from asyncord.client.models.permissions import PermissionFlag
-from asyncord.client.roles.models import RoleOutput
-from asyncord.client.users.models import UserOutput
+from asyncord.client.roles.models.responses import RoleResponse
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.locale import Locale
 from asyncord.snowflake import Snowflake
@@ -47,10 +47,10 @@ class BaseInteraction(BaseModel):
     channel_id: Snowflake | None = None
     """Channel that the interaction was sent from."""
 
-    member: MemberOutput | None = None
+    member: MemberResponse | None = None
     """Member object for the invoking user, if invoked in a guild."""
 
-    user: UserOutput | None = None
+    user: UserResponse | None = None
     """User object for the invoking user, if invoked in a DM."""
 
     token: str
@@ -157,7 +157,7 @@ class ApplicationCommandInteractionMessage(BaseModel):
     type: MessageType
     """Message type."""
 
-    author: UserOutput
+    author: UserResponse
     """User who sent the message."""
 
     content: str
@@ -175,16 +175,16 @@ class ApplicationCommandInteractionMessage(BaseModel):
     mention_everyone: bool
     """Whether the message mentions everyone."""
 
-    mentions: list[UserOutput]
+    mentions: list[UserResponse]
     """Users mentioned in the message."""
 
     mention_roles: list[Snowflake]
     """Roles mentioned in the message."""
 
-    attachments: list[AttachmentOutput]
+    attachments: list[AttachmentOut]
     """Attachments sent with the message."""
 
-    embeds: list[EmbedOutput]
+    embeds: list[EmbedOut]
     """Embeds sent with the message."""
 
     pinned: bool
@@ -234,7 +234,7 @@ ApplicationCommandInteractionChannelType = ApplicationCommandInterationChannel |
 class ApplicationCommandResolvedData(BaseModel):
     """Represent the resolved data payload of an application command interaction."""
 
-    users: dict[Snowflake, UserOutput] | None = None
+    users: dict[Snowflake, UserResponse] | None = None
     """Map of Snowflakes to user objects.
 
     If data for a Member is included, data for its corresponding User will also be included.
@@ -243,7 +243,7 @@ class ApplicationCommandResolvedData(BaseModel):
     members: dict[Snowflake, ApplicationCommandInteractionMember] | None = None
     """Map of Snowflakes to partial member objects."""
 
-    roles: dict[Snowflake, RoleOutput] | None = None
+    roles: dict[Snowflake, RoleResponse] | None = None
     """Map of Snowflakes to role objects."""
 
     channels: dict[Snowflake, ApplicationCommandInteractionChannelType] | None = None
@@ -252,7 +252,7 @@ class ApplicationCommandResolvedData(BaseModel):
     messages: dict[Snowflake, ApplicationCommandInteractionMessage] | None = None
     """Map of Snowflakes to partial messages objects."""
 
-    attachments: dict[Snowflake, AttachmentOutput] | None = None
+    attachments: dict[Snowflake, AttachmentOut] | None = None
     """Map of Snowflakes to attachment objects."""
 
 
@@ -357,7 +357,7 @@ class ModalSubmitInteractionData(BaseModel):
     custom_id: str
     """Custom id value of the modal."""
 
-    components: list[ActionRowOutput] | None = None
+    components: list[ActionRowOut] | None = None
     """Values submitted by the user."""
 
 

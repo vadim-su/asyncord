@@ -6,10 +6,10 @@ https://discord.com/developers/docs/interactions/message-components#message-comp
 
 from __future__ import annotations
 
-from typing import Annotated, Literal, Self
+from typing import Annotated, Literal
 from typing import get_args as get_typing_args
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.messages.models.common import ButtonStyle, ComponentType, SelectComponentType, TextInputStyle
@@ -18,11 +18,11 @@ from asyncord.snowflake import Snowflake
 SELECT_COMPONENT_TYPE_LIST = get_typing_args(SelectComponentType)
 
 
-class BaseComponentOutput(BaseModel):
+class BaseComponentOut(BaseModel):
     """Base component class."""
 
 
-class ComponentEmojiOutput(BaseModel):
+class ComponentEmojiOut(BaseModel):
     """Emoji to be displayed on the button.
 
     At least one of `name` or `id` must be provided.
@@ -39,19 +39,8 @@ class ComponentEmojiOutput(BaseModel):
     animated: bool | None = None
     """Whether the emoji is animated."""
 
-    @model_validator(mode='after')
-    def validate_emoji(self) -> Self:
-        """Check that `name` or `id` are set."""
-        name: str | None = self.name
-        id: Snowflake | None = self.id
 
-        if not name and not id:
-            raise ValueError('At least one of `name` or `id` must be provided.')
-
-        return self
-
-
-class ButtonOutput(BaseComponentOutput):
+class ButtonOut(BaseComponentOut):
     """Buttons are interactive components that render in messages.
 
     They can be clicked by users, and send an interaction to your app when clicked.
@@ -73,16 +62,16 @@ class ButtonOutput(BaseComponentOutput):
     style: ButtonStyle = ButtonStyle.PRIMARY
     """Style of the button."""
 
-    label: str | None = Field(None, max_length=80)
+    label: str | None = None
     """Text to be displayed on the button.
 
     Max 80 characters.
     """
 
-    emoji: ComponentEmojiOutput | None = None
+    emoji: ComponentEmojiOut | None = None
     """Emoji to be displayed on the button."""
 
-    custom_id: str | None = Field(None, max_length=100)
+    custom_id: str | None = None
     """Developer-defined identifier for the button.
 
     Max 100 characters.
@@ -94,27 +83,8 @@ class ButtonOutput(BaseComponentOutput):
     disabled: bool = False
     """Whether the button is disabled."""
 
-    @model_validator(mode='after')
-    def validate_style(self) -> Self:
-        """Check that `custom_id` or `url` are set."""
-        custom_id: str | None = self.custom_id
-        url: str | None = self.url
 
-        if self.style is ButtonStyle.LINK:
-            if custom_id:
-                raise ValueError('`custom_id` is not allowed for link-style buttons')
-            if not url:
-                raise ValueError('`url` is required for link-style buttons')
-        else:
-            if url:
-                raise ValueError('`url` is not allowed for non-link-style buttons')
-            if not custom_id:
-                raise ValueError('`custom_id` is required for non-link-style buttons.')
-
-        return self
-
-
-class SelectMenuOptionOutput(BaseModel):
+class SelectMenuOptionOut(BaseModel):
     """Select menu option.
 
     Reference:
@@ -139,14 +109,14 @@ class SelectMenuOptionOutput(BaseModel):
     Max 100 characters.
     """
 
-    emoji: ComponentEmojiOutput | None = None
+    emoji: ComponentEmojiOut | None = None
     """Emoji to be displayed on the option."""
 
     default: bool = False
     """Whether the option is shown as selected by default."""
 
 
-class SelectDefaultValueInput(BaseModel):
+class SelectDefaultValueOut(BaseModel):
     """Select menu default value.
 
     Reference:
@@ -159,7 +129,7 @@ class SelectDefaultValueInput(BaseModel):
     """Type of value that id represents. Either user, role, or channel"""
 
 
-class SelectMenuOutput(BaseComponentOutput):
+class SelectMenuOut(BaseComponentOut):
     """Select menu is interactive components that allow users to select options in messages.
 
     * Select menus must be sent inside an Action Row
@@ -179,7 +149,7 @@ class SelectMenuOutput(BaseComponentOutput):
     Max 100 characters.
     """
 
-    options: list[SelectMenuOptionOutput] = Field(default_factory=list)
+    options: list[SelectMenuOptionOut] = Field(default_factory=list)
     """Choices in the select menu.
 
     Only required and allowed for `SelectComponentType.STRING_SELECT`.
@@ -192,7 +162,7 @@ class SelectMenuOutput(BaseComponentOutput):
     placeholder: str | None = None
     """Placeholder text if nothing is selected; max 150 characters."""
 
-    default_values: list[SelectDefaultValueInput] | None = None
+    default_values: list[SelectDefaultValueOut] | None = None
     """List of default values for auto-populated select menu components; 
     
     number of default values must be in the range defined by min_values and max_values.
@@ -208,7 +178,7 @@ class SelectMenuOutput(BaseComponentOutput):
     """Whether the select menu is disabled."""
 
 
-class TextInputOutput(BaseComponentOutput):
+class TextInputOut(BaseComponentOut):
     """Text inputs are an interactive component that render on modals.
 
     They can be used to collect short-form or long-form text.
@@ -264,7 +234,7 @@ class TextInputOutput(BaseComponentOutput):
     """
 
 
-class ActionRowOutput(BaseComponentOutput):
+class ActionRowOut(BaseComponentOut):
     """ActionRow is a non-interactive container component for other types of components.
 
     * You can have up to 5 Action Rows per message
@@ -280,15 +250,15 @@ class ActionRowOutput(BaseComponentOutput):
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
     """Type of the component."""
 
-    components: list[ComponentOutput | TextInputOutput]
+    components: list[ComponentOut | TextInputOut]
     """Components in the action row.
 
     Text input components are not allowed in action rows.
     """
 
 
-ComponentOutput = Annotated[ActionRowOutput | ButtonOutput | SelectMenuOutput, Field(discriminator='type')]
+ComponentOut = Annotated[ActionRowOut | ButtonOut | SelectMenuOut, Field(discriminator='type')]
 """Type of the component."""
 
 # Rebuild ActionRow model to add `components` field after Component type created.
-ActionRowOutput.model_rebuild()
+ActionRowOut.model_rebuild()

@@ -1,17 +1,17 @@
 import pytest
 
-from asyncord.client.channels.models.channel_create import (
-    CreateAnoncementChannelInput,
-    CreateCategoryChannelInput,
-    CreateChannelInputType,
-    CreateForumChannelInput,
-    CreateMediaChannelInput,
-    CreateStageChannelInput,
-    CreateTextChannelInput,
-    CreateVoiceChannelInput,
-)
-from asyncord.client.channels.models.channel_update import UpdateTextChannelInput
 from asyncord.client.channels.models.common import ChannelType
+from asyncord.client.channels.models.requests.creation import (
+    CreateAnoncementChannelRequest,
+    CreateCategoryChannelRequest,
+    CreateChannelRequestType,
+    CreateForumChannelRequest,
+    CreateMediaChannelRequest,
+    CreateStageChannelRequest,
+    CreateTextChannelRequest,
+    CreateVoiceChannelRequest,
+)
+from asyncord.client.channels.models.requests.updating import UpdateTextChannelRequest
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.http.errors import ClientError
 from tests.conftest import IntegrationTestData
@@ -24,31 +24,31 @@ skip_server_unsupported = pytest.mark.skip(
 
 
 @pytest.mark.parametrize('channel_input', [
-    pytest.param(CreateCategoryChannelInput(name=CHANNEL_NAME), id='test_create_category_channel'),
-    pytest.param(CreateTextChannelInput(name=CHANNEL_NAME), id='test_create_text_channel'),  # type: ignore
+    pytest.param(CreateCategoryChannelRequest(name=CHANNEL_NAME), id='test_create_category_channel'),
+    pytest.param(CreateTextChannelRequest(name=CHANNEL_NAME), id='test_create_text_channel'),  # type: ignore
     pytest.param(
-        CreateAnoncementChannelInput(name=CHANNEL_NAME),  # type: ignore
+        CreateAnoncementChannelRequest(name=CHANNEL_NAME),  # type: ignore
         marks=skip_server_unsupported,
         id='test_create_announcement_channel',
     ),
     pytest.param(
-        CreateForumChannelInput(name=CHANNEL_NAME),  # type: ignore
+        CreateForumChannelRequest(name=CHANNEL_NAME),  # type: ignore
         marks=skip_server_unsupported,
         id='test_create_forum_channel',
     ),
     pytest.param(
-        CreateMediaChannelInput(name=CHANNEL_NAME),  # type: ignore
+        CreateMediaChannelRequest(name=CHANNEL_NAME),  # type: ignore
         marks=skip_server_unsupported,
         id='test_create_media_channel',
     ),
-    pytest.param(CreateVoiceChannelInput(name=CHANNEL_NAME), id='test_create_voice_channel'),  # type: ignore
+    pytest.param(CreateVoiceChannelRequest(name=CHANNEL_NAME), id='test_create_voice_channel'),  # type: ignore
     pytest.param(
-        CreateStageChannelInput(name=CHANNEL_NAME),  # type: ignore
+        CreateStageChannelRequest(name=CHANNEL_NAME),  # type: ignore
         marks=skip_server_unsupported,
         id='test_create_stage_channel',
     ),
 ])
-async def test_create_and_delete_channel(channel_input: CreateChannelInputType, channels_res: ChannelResource, integration_data: IntegrationTestData):
+async def test_create_and_delete_channel(channel_input: CreateChannelRequestType, channels_res: ChannelResource, integration_data: IntegrationTestData):
     channel = await channels_res.create_channel(
         integration_data.guild_id, channel_input,
     )
@@ -66,7 +66,7 @@ async def test_create_subchannel(
 ):
     category = await channels_res.create_channel(
         integration_data.guild_id,
-        CreateCategoryChannelInput(
+        CreateCategoryChannelRequest(
             name="test category",
             position=999,
         ),
@@ -74,7 +74,7 @@ async def test_create_subchannel(
 
     text_chan = await channels_res.create_channel(
         integration_data.guild_id,
-        channel_data=CreateTextChannelInput(
+        channel_data=CreateTextChannelRequest(
             name="test text subchannel",
             parent_id=category.id,
             rate_limit_per_user=2,
@@ -82,7 +82,7 @@ async def test_create_subchannel(
     )
     voice_chan = await channels_res.create_channel(
         integration_data.guild_id,
-        channel_data=CreateVoiceChannelInput(
+        channel_data=CreateVoiceChannelRequest(
             name="test voice subchannel",
             parent_id=category.id,
             bitrate=96000,
@@ -107,13 +107,13 @@ async def test_update_channel(channels_res: ChannelResource, integration_data: I
 
     channel = await channels_res.update(
         integration_data.channel_id,
-        UpdateTextChannelInput(name='test'),  # type: ignore
+        UpdateTextChannelRequest(name='test'),  # type: ignore
     )
     assert channel.id == integration_data.channel_id
     assert channel.name == 'test'
 
     channel = await channels_res.update(
         integration_data.channel_id,
-        UpdateTextChannelInput(name=preserved_name),  # type: ignore
+        UpdateTextChannelRequest(name=preserved_name),  # type: ignore
     )
     assert channel.name == preserved_name

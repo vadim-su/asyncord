@@ -4,43 +4,43 @@ from asyncord.client.commands.models.common import (
     AppCommandOptionType,
     ApplicationCommandType,
 )
-from asyncord.client.commands.models.input import (
-    ApplicationCommandOptionChoiceInput,
-    ApplicationCommandOptionInput,
-    CreateApplicationCommandInput,
+from asyncord.client.commands.models.requests import (
+    ApplicationCommandOptionChoiceIn,
+    ApplicationCommandOptionIn,
+    CreateApplicationCommandRequest,
 )
 from asyncord.client.commands.resources import CommandResource
 
 
 async def test_create_command(commands_res: CommandResource):
-    command_data = CreateApplicationCommandInput(
+    command_data = CreateApplicationCommandRequest(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command',
         name_localizations={'en-US': 'test'},
         description='test command description',
         description_localizations={'en-US': 'Test Command Description'},
         options=[
-            ApplicationCommandOptionInput(
+            ApplicationCommandOptionIn(
                 type=AppCommandOptionType.STRING,
                 name='test-option',
                 description='test option description',
             ),
-            ApplicationCommandOptionInput(
+            ApplicationCommandOptionIn(
                 type=AppCommandOptionType.INTEGER,
                 name='test-option-2',
                 description='test option description 2',
                 required=True,
             ),
-            ApplicationCommandOptionInput(
+            ApplicationCommandOptionIn(
                 type=AppCommandOptionType.STRING,
                 name='test-option-3',
                 description='test option description 3',
                 choices=[
-                    ApplicationCommandOptionChoiceInput(
+                    ApplicationCommandOptionChoiceIn(
                         name='test-choice-1',
                         value='test-value-1',
                     ),
-                    ApplicationCommandOptionChoiceInput(
+                    ApplicationCommandOptionChoiceIn(
                         name='test-choice-2',
                         value='test-value-2',
                     )
@@ -61,22 +61,22 @@ async def test_create_command(commands_res: CommandResource):
 
 
 async def test_create_subcommand_group(commands_res: CommandResource):
-    command_data = CreateApplicationCommandInput(
+    command_data = CreateApplicationCommandRequest(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command-group',
         description='test command description',
         options=[
-            ApplicationCommandOptionInput(
+            ApplicationCommandOptionIn(
                 type=AppCommandOptionType.SUB_COMMAND_GROUP,
                 name='test-subcommand-group',
                 description='test subcommand group description',
                 options=[
-                    ApplicationCommandOptionInput(
+                    ApplicationCommandOptionIn(
                         type=AppCommandOptionType.SUB_COMMAND,
                         name='test-subcommand',
                         description='test subcommand description',
                         options=[
-                            ApplicationCommandOptionInput(
+                            ApplicationCommandOptionIn(
                                 type=AppCommandOptionType.INTEGER,
                                 name='test-option',
                                 description='test option description',

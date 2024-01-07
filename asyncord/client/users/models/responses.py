@@ -103,7 +103,7 @@ class PremiumType(enum.IntEnum):
     """Nitro Basic."""
 
 
-class UserOutput(BaseModel):
+class UserResponse(BaseModel):
     """User model representing a Discord user entity.
 
     Reference:
@@ -169,7 +169,7 @@ class UserOutput(BaseModel):
     """
 
 
-class UserGuildOutput(BaseModel):
+class UserGuildResponse(BaseModel):
     """User guild model."""
 
     id: Snowflake

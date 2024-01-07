@@ -6,7 +6,7 @@ import platform
 from pydantic import BaseModel
 
 from asyncord import __version__
-from asyncord.client.commands.models.activity import Activity
+from asyncord.client.models.activities import Activity
 from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 
 
@@ -40,7 +40,7 @@ class StatusType(enum.StrEnum):
     """Do not disturb."""
 
     IDLE = 'idle'
-    """AFK"""
+    """AFK."""
 
     INVISIBLE = 'invisible'
     """Invisible and shown as offline."""

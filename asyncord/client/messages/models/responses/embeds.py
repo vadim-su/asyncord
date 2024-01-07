@@ -3,10 +3,10 @@ import datetime
 from pydantic import BaseModel, Field
 
 from asyncord.client.messages.models.common import EmbedType
-from asyncord.color import ColorInput
+from asyncord.color import Color
 
 
-class EmbedFooterOutput(BaseModel):
+class EmbedFooterOut(BaseModel):
     """Embed footer object.
 
     Reference:
@@ -23,7 +23,7 @@ class EmbedFooterOutput(BaseModel):
     """Proxied URL of the footer icon."""
 
 
-class EmbedImageOutput(BaseModel):
+class EmbedImageOut(BaseModel):
     """Embed image object.
 
     Reference:
@@ -43,7 +43,7 @@ class EmbedImageOutput(BaseModel):
     """Width of image."""
 
 
-class EmbedThumbnailOutput(BaseModel):
+class EmbedThumbnailOut(BaseModel):
     """Embed thumbnail object.
 
     Reference:
@@ -63,7 +63,7 @@ class EmbedThumbnailOutput(BaseModel):
     """Width of thumbnail."""
 
 
-class EmbedVideoOutput(BaseModel):
+class EmbedVideoOut(BaseModel):
     """Embed video object.
 
     Reference:
@@ -83,7 +83,7 @@ class EmbedVideoOutput(BaseModel):
     """Width of the video."""
 
 
-class EmbedProviderOutput(BaseModel):
+class EmbedProviderOut(BaseModel):
     """Embed provider object.
 
     Reference:
@@ -97,7 +97,7 @@ class EmbedProviderOutput(BaseModel):
     """URL of the provider."""
 
 
-class EmbedAuthorOutput(BaseModel):
+class EmbedAuthorOut(BaseModel):
     """Embed author object.
 
     Reference:
@@ -117,7 +117,7 @@ class EmbedAuthorOutput(BaseModel):
     """Proxied URL of author icon."""
 
 
-class EmbedFieldOutput(BaseModel):
+class EmbedFieldOut(BaseModel):
     """Embed field object.
 
     Reference:
@@ -134,7 +134,7 @@ class EmbedFieldOutput(BaseModel):
     """Whether or not this field should display inline."""
 
 
-class EmbedOutput(BaseModel):
+class EmbedOut(BaseModel):
     """Embed object.
 
     Reference:
@@ -159,32 +159,32 @@ class EmbedOutput(BaseModel):
     timestamp: datetime.datetime | None = None
     """Timestamp of the embed content."""
 
-    color: ColorInput | None = None
+    color: Color | None = None
     """Color code of the embed."""
 
-    footer: EmbedFooterOutput | None = None
+    footer: EmbedFooterOut | None = None
     """Footer information."""
 
-    image: EmbedImageOutput | None = None
+    image: EmbedImageOut | None = None
     """Image information."""
 
-    thumbnail: EmbedThumbnailOutput | None = None
+    thumbnail: EmbedThumbnailOut | None = None
     """Thumbnail information."""
 
-    video: EmbedVideoOutput | None = None
+    video: EmbedVideoOut | None = None
     """Video information.
     
     Bots can not use this field.
     Discord API will ignore it if provided.
     """
 
-    provider: EmbedProviderOutput | None = None
+    provider: EmbedProviderOut | None = None
     """Provider information."""
 
-    author: EmbedAuthorOutput | None = None
+    author: EmbedAuthorOut | None = None
     """Author information."""
 
-    fields: list[EmbedFieldOutput] = Field(default_factory=list)
+    fields: list[EmbedFieldOut] = Field(default_factory=list)
     """List of fields.
 
     Maximum of 25 items.

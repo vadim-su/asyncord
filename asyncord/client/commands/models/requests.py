@@ -14,8 +14,6 @@ from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.common import (
     AppCommandOptionType,
     ApplicationCommandType,
-    BaseApplicationCommandOption,
-    BaseApplicationCommandOptionChoice,
 )
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.locale import LocaleInputType
@@ -25,7 +23,7 @@ _NameAnnotation = Annotated[str, Field(min_length=1, max_length=32, pattern=_APP
 _DescriptionAnnotation = Annotated[str, Field(min_length=1, max_length=100)]
 
 
-class ApplicationCommandOptionChoiceInput(BaseApplicationCommandOptionChoice):
+class ApplicationCommandOptionChoiceIn(BaseModel):
     """Represents an option choice for a Discord application command.
 
     Reference:
@@ -38,6 +36,9 @@ class ApplicationCommandOptionChoiceInput(BaseApplicationCommandOptionChoice):
     Must be 1-100 characters long.
     """
 
+    name_localizations: dict[LocaleInputType, str] | None = None
+    """Dictionary of language codes to localized names. Defaults to None."""
+
     value: Annotated[str, Field(min_length=1, max_length=100)] | int | float
     """Value of the choice.
 
@@ -45,17 +46,15 @@ class ApplicationCommandOptionChoiceInput(BaseApplicationCommandOptionChoice):
     """
 
 
-class ApplicationCommandOptionInput(
-    BaseApplicationCommandOption[
-        ApplicationCommandOptionChoiceInput,
-        'ApplicationCommandOptionInput',
-    ],
-):
+class ApplicationCommandOptionIn(BaseModel):
     """Represents an option for a Discord application command.
 
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
+    type: AppCommandOptionType
+    """Type of option."""
 
     name: str = Field(min_length=1, max_length=32)
     """Name of the option.
@@ -69,18 +68,48 @@ class ApplicationCommandOptionInput(
     Must be 1-100 characters long.
     """
 
+    name_localizations: dict[LocaleInputType, str] | None = None
+    """Dictionary of language codes to localized names."""
+
+    description_localizations: dict[LocaleInputType, str] | None = None
+    """Dictionary of language codes to localized descriptions."""
+
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
+
+    choices: list[ApplicationCommandOptionChoiceIn] | None = None
+    """List of choices for string and number types."""
+
+    options: list[ApplicationCommandOptionIn] | None = None
+    """List of options for subcommand and subcommand group types."""
+
+    channel_types: list[ChannelType] | None = None
+    """List of available channel types if the option type is a `CHANNEL`."""
+
+    min_value: int | None = None
+    """Minimum value for the option if the option type is `INTEGER` or `NUMBER`."""
+
+    max_value: int | None = None
+    """Maximum value for the option if the option type is `INTEGER` or `NUMBER`."""
+
     min_length: int | None = Field(None, ge=0, le=6000)
     """Minimum length for the option if the option type is `STRING`."""
 
     max_length: int | None = Field(None, ge=0, le=6000)
     """Maximum length for the option if the option type is `STRING`."""
 
+    autocomplete: bool | None = None
+    """Whether the option is a custom autocomplete option for `STRING`, `INTEGER`, or `NUMBER` types.
+
+    Options using autocomplete are not confined to only use choices given by the application.
+    """
+
     @field_validator('choices')
     def validate_choices(
         cls,
-        choices: list[ApplicationCommandOptionChoiceInput] | None,
+        choices: list[ApplicationCommandOptionChoiceIn] | None,
         field_info: ValidationInfo,
-    ) -> list[ApplicationCommandOptionChoiceInput] | None:
+    ) -> list[ApplicationCommandOptionChoiceIn] | None:
         """Validate options."""
         if choices is None:
             return None
@@ -98,9 +127,9 @@ class ApplicationCommandOptionInput(
     @field_validator('options')
     def validate_options(
         cls,
-        options: list[ApplicationCommandOptionInput] | None,
+        options: list[ApplicationCommandOptionIn] | None,
         field_info: ValidationInfo,
-    ) -> list[ApplicationCommandOptionInput] | None:
+    ) -> list[ApplicationCommandOptionIn] | None:
         """Validate options."""
         if options is None:
             return None
@@ -151,7 +180,7 @@ class ApplicationCommandOptionInput(
         return field_value
 
 
-class CreateApplicationCommandInput(BaseModel):
+class CreateApplicationCommandRequest(BaseModel):
     """Data to create an application command.
 
     Reference:
@@ -179,7 +208,7 @@ class CreateApplicationCommandInput(BaseModel):
     description_localizations: dict[LocaleInputType, _DescriptionAnnotation] | None = None
     """Dictionary of language codes to localized descriptions. Defaults to None."""
 
-    options: list[ApplicationCommandOptionInput] | None = Field(None, max_length=25)
+    options: list[ApplicationCommandOptionIn] | None = Field(None, max_length=25)
     """List of options for the command.
 
     Must be 0-25 long. Defaults to None.
@@ -200,8 +229,8 @@ class CreateApplicationCommandInput(BaseModel):
 
     @field_validator('options')
     def validate_options(
-        cls, options: list[ApplicationCommandOptionInput] | None, field_info: ValidationInfo,
-    ) -> list[ApplicationCommandOptionInput] | None:
+        cls, options: list[ApplicationCommandOptionIn] | None, field_info: ValidationInfo,
+    ) -> list[ApplicationCommandOptionIn] | None:
         """Validate options."""
         if options is None:
             return None

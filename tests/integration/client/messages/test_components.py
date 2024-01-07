@@ -2,43 +2,43 @@ import re
 
 import pytest
 
-from asyncord.client.messages.models.components_input import (
-    ActionRowInput,
-    ButtonInput,
+from asyncord.client.messages.models.requests.components import (
+    ActionRowIn,
+    ButtonIn,
     ButtonStyle,
     ComponentType,
-    SelectMenuInput,
-    SelectMenuOptionInput,
+    SelectMenuIn,
+    SelectMenuOptionIn,
 )
-from asyncord.client.messages.models.input import CreateMessageInput
+from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.messages.resources import MessageResource
 
 
 async def test_create_message_with_buttons(messages_res: MessageResource):
     components = [
-        ActionRowInput(
+        ActionRowIn(
             components=[
-                ButtonInput(
+                ButtonIn(
                     label='Primary',
                     style=ButtonStyle.PRIMARY,
                     custom_id='primary',
                 ),
-                ButtonInput(
+                ButtonIn(
                     label='Secondary',
                     style=ButtonStyle.SECONDARY,
                     custom_id='secondary',
                 ),
-                ButtonInput(
+                ButtonIn(
                     label='Success',
                     style=ButtonStyle.SUCCESS,
                     custom_id='success',
                 ),
-                ButtonInput(
+                ButtonIn(
                     label='Danger',
                     style=ButtonStyle.DANGER,
                     custom_id='danger',
                 ),
-                ButtonInput(
+                ButtonIn(
                     label='Link',
                     style=ButtonStyle.LINK,
                     url='https://discord.com',
@@ -47,7 +47,7 @@ async def test_create_message_with_buttons(messages_res: MessageResource):
         ),
     ]
     message = await messages_res.create(
-        CreateMessageInput(
+        CreateMessageRequest(
             content='Test message with buttons',
             components=components,
         ),
@@ -80,18 +80,18 @@ async def test_crate_message_with_some_top_level_components_not_allowed(
 
     exc_pattern = re.compile('.* components must be inside ActionRow')
     with pytest.raises(ValueError, match=exc_pattern):
-        CreateMessageInput(components=[component])
+        CreateMessageRequest(components=[component])
 
 
 def test_dont_create_message_with_button_and_select_menu():
     exc_text = 'ActionRow containing a select menu cannot also contain buttons'
     with pytest.raises(ValueError, match=exc_text):
-        ActionRowInput(
+        ActionRowIn(
             components=[
-                ButtonInput(custom_id='custom_id'),
-                SelectMenuInput(
-                    custom_id='custom_id',
-                    options=[SelectMenuOptionInput(label='Option 1', value='option_1')],
+                ButtonIn(custom_id='custom_id'),
+                SelectMenuIn(
+                    custom_id='custom',
+                    options=[SelectMenuOptionIn(label='Option 1', value='option_1')],
                 ),
             ],
         )

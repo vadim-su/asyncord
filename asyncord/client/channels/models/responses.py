@@ -12,22 +12,21 @@ from typing import Annotated
 from pydantic import BaseModel, Field
 
 from asyncord.client.channels.models.common import (
-    BaseDefaultReaction,
-    BaseOverwrite,
-    BaseTag,
     ChannelFlag,
     ChannelType,
     DefaultForumLayoutType,
+    OverwriteType,
     ThreadSortOrder,
     VideoQualityMode,
 )
-from asyncord.client.members.models import MemberOutput
-from asyncord.client.users.models import UserOutput
+from asyncord.client.members.models.responses import MemberResponse
+from asyncord.client.models.permissions import PermissionFlag
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
 
-class OverwriteOutput(BaseOverwrite):
-    """Overwrite object.
+class OverwriteOut(BaseModel):
+    """Base overwrite object.
 
     See permissions for more info about `allow` and `deny` fields:
     https://discord.com/developers/docs/topics/permissions#permissions
@@ -36,16 +35,37 @@ class OverwriteOutput(BaseOverwrite):
     https://discord.com/developers/docs/resources/channel#overwrite-object
     """
 
+    id: Snowflake
+    """Role or user id.
 
-class DefaultReactionOutput(BaseDefaultReaction):
+    Set corresponding type field.
+    """
+
+    type: OverwriteType
+    """Type of overwrite."""
+
+    allow: PermissionFlag
+    """Permission flags to allow."""
+
+    deny: PermissionFlag
+    """Permission flags to deny."""
+
+
+class DefaultReactionOut(BaseModel):
     """Model specifies the emoji to use as the default way to react to a forum post.
 
     Reference:
     https://discord.com/developers/docs/resources/channel#default-reaction-object
     """
 
+    emoji_id: Snowflake | None = None
+    """ID of a guild's custom emoji."""
 
-class TagOutput(BaseTag):
+    emoji_name: str | None = None
+    """Unicode character of the emoji."""
+
+
+class TagOut(BaseModel):
     """Object that represents a tag.
 
     Can be used in GUILD_FORUM and GUILD_MEDIA channels.
@@ -54,8 +74,32 @@ class TagOutput(BaseTag):
     https://discord.com/developers/docs/resources/channel#forum-tag-object
     """
 
+    id: Snowflake
+    """ID of the tag."""
 
-class ThreadMetadataOutput(BaseModel):
+    name: str
+    """Name of the tag (0-20 characters)."""
+
+    moderated: bool
+    """Tag can only be added to or removed from threads.
+
+    It allowed only for members with the MANAGE_THREADS permission.
+    """
+
+    emoji_id: Snowflake
+    """ID of a guild's custom emoji.
+
+    At most one of emoji_id and emoji_name may be set.
+    """
+
+    emoji_name: str
+    """Unicode character of the emoji.
+
+    At most one of emoji_id and emoji_name may be set.
+    """
+
+
+class ThreadMetadataOut(BaseModel):
     """Thread metadata object.
 
     Reference:
@@ -96,7 +140,7 @@ class ThreadMetadataOutput(BaseModel):
     """
 
 
-class ThreadMemberOutput(BaseModel):
+class ThreadMemberOut(BaseModel):
     """Thread member object.
 
     Reference:
@@ -126,7 +170,7 @@ class ThreadMemberOutput(BaseModel):
     Currently only used for notifications.
     """
 
-    member: MemberOutput | None = None
+    member: MemberResponse | None = None
     """Additional information about the user
     
     The member field is only present when with_member is set to true 
@@ -134,7 +178,7 @@ class ThreadMemberOutput(BaseModel):
     """
 
 
-class ChannelOutput(BaseModel):
+class ChannelResponse(BaseModel):
     """Channel object.
 
     Reference:
@@ -156,7 +200,7 @@ class ChannelOutput(BaseModel):
     position: int | None = None
     """Sorting position of the channel"""
 
-    permission_overwrites: list[OverwriteOutput] | None = None
+    permission_overwrites: list[OverwriteOut] | None = None
     """Explicit permission overwrites for members and roles."""
 
     name: str | None = Field(None, min_length=1, max_length=100)
@@ -194,7 +238,7 @@ class ChannelOutput(BaseModel):
     `rate_limit_per_user` interval.
     """
 
-    recipients: list[UserOutput] | None = None
+    recipients: list[UserResponse] | None = None
     """Recipients of the DM."""
 
     icon: str | None = None
@@ -233,10 +277,10 @@ class ChannelOutput(BaseModel):
     member_count: int | None = None
     """Approximate count of users in a thread, stops counting at 50."""
 
-    thread_metadata: ThreadMetadataOutput | None = None
+    thread_metadata: ThreadMetadataOut | None = None
     """Thread-specific fields not needed by other channels."""
 
-    member: ThreadMemberOutput | None = None
+    member: ThreadMemberOut | None = None
     """Thread member object for the current user.
 
     If they have joined the thread, only included on certain API endpoints.
@@ -269,7 +313,7 @@ class ChannelOutput(BaseModel):
     the number when a message is deleted.
     """
 
-    available_tags: list[TagOutput] | None = None
+    available_tags: list[TagOut] | None = None
     """Set of tags that can be used in a GUILD_FORUM or a GUILD_MEDIA channel"""
 
     applied_tags: list[Snowflake] | None = None
@@ -277,7 +321,7 @@ class ChannelOutput(BaseModel):
     in a GUILD_FORUM or a GUILD_MEDIA channel
     """
 
-    default_reaction_emoji: DefaultReactionOutput | None = None
+    default_reaction_emoji: DefaultReactionOut | None = None
     """Emoji to show in the add reaction button on a thread in a GUILD_FORUM
     or a GUILD_MEDIA channel
     """

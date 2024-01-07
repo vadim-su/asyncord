@@ -12,26 +12,26 @@ from asyncord.client.channels.models.common import (
     MAX_BITRATE,
     MAX_RATELIMIT,
     MIN_BITRATE,
-    BaseDefaultReaction,
-    BaseOverwrite,
-    BaseTag,
     ChannelType,
     DefaultForumLayoutType,
     ThreadSortOrder,
     VideoQualityMode,
 )
-from asyncord.snowflake import SnowflakeInput
+from asyncord.snowflake import SnowflakeInputType
 
 
-class DefaultReactionInput(BaseDefaultReaction):
+class DefaultReactionIn(BaseModel):
     """Model specifies the emoji to use as the default way to react to a forum post.
 
     More info:
     https://discord.com/developers/docs/resources/channel#default-reaction-object
     """
 
-    emoji_id: SnowflakeInput | None = None
+    emoji_id: SnowflakeInputType | None = None
     """ID of a guild's custom emoji."""
+
+    emoji_name: str | None = None
+    """Unicode character of the emoji."""
 
     @model_validator(mode='before')
     def validate_emoji_id_or_name(cls, values: dict[str, Any]) -> dict[str, Any]:
@@ -42,7 +42,7 @@ class DefaultReactionInput(BaseDefaultReaction):
         return values
 
 
-class OverwriteInput(BaseOverwrite):
+class OverwriteIn(BaseModel):
     """Overwrite input object.
 
     See permissions for more info about `allow` and `deny` fields:
@@ -52,11 +52,11 @@ class OverwriteInput(BaseOverwrite):
     https://discord.com/developers/docs/resources/channel#overwrite-object
     """
 
-    id: SnowflakeInput
+    id: SnowflakeInputType
     """Role or user id."""
 
 
-class TagInput(BaseTag):
+class TagIn(BaseModel):
     """Object that represents a tag.
 
     Can be used in GUILD_FORUM and GUILD_MEDIA channels.
@@ -65,11 +65,26 @@ class TagInput(BaseTag):
     https://discord.com/developers/docs/resources/channel#forum-tag-object
     """
 
-    id: SnowflakeInput
+    id: SnowflakeInputType
     """ID of the tag."""
 
-    emoji_id: SnowflakeInput
+    name: str
+    """Name of the tag (0-20 characters)."""
+
+    moderated: bool
+    """Tag can only be added to or removed from threads.
+
+    It allowed only for members with the MANAGE_THREADS permission.
+    """
+
+    emoji_id: SnowflakeInputType
     """ID of a guild's custom emoji.
+
+    At most one of emoji_id and emoji_name may be set.
+    """
+
+    emoji_name: str
+    """Unicode character of the emoji.
 
     At most one of emoji_id and emoji_name may be set.
     """
@@ -95,18 +110,18 @@ class BaseCreateChannel(BaseModel):
     position: int | None = None
     """Position of the channel in the left-hand listing"""
 
-    permission_overwrites: list[OverwriteInput] | None = None
+    permission_overwrites: list[OverwriteIn] | None = None
     """Channel or category-specific permissions."""
 
 
-class CreateCategoryChannelInput(BaseCreateChannel):
+class CreateCategoryChannelRequest(BaseCreateChannel):
     """Data to create a guild category with."""
 
     type: Literal[ChannelType.GUILD_CATEGORY] = ChannelType.GUILD_CATEGORY
     """Type of channel."""
 
 
-class CreateTextChannelInput(BaseCreateChannel):
+class CreateTextChannelRequest(BaseCreateChannel):
     """Data to create a text channel with."""
 
     type: Literal[ChannelType.GUILD_TEXT] = ChannelType.GUILD_TEXT
@@ -122,7 +137,7 @@ class CreateTextChannelInput(BaseCreateChannel):
     manage_messages or manage_channel, are unaffected.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     nsfw: bool | None = None
@@ -143,7 +158,7 @@ class CreateTextChannelInput(BaseCreateChannel):
     """
 
 
-class CreateAnoncementChannelInput(BaseCreateChannel):
+class CreateAnoncementChannelRequest(BaseCreateChannel):
     """Data to create an announcement channel with."""
 
     type: Literal[ChannelType.GUILD_ANNOUNCEMENT] = ChannelType.GUILD_ANNOUNCEMENT
@@ -152,7 +167,7 @@ class CreateAnoncementChannelInput(BaseCreateChannel):
     topic: str | None = Field(None, max_length=1024)
     """Channel topic."""
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     nsfw: bool | None = None
@@ -173,7 +188,7 @@ class CreateAnoncementChannelInput(BaseCreateChannel):
     """
 
 
-class CreateForumChannelInput(BaseCreateChannel):
+class CreateForumChannelRequest(BaseCreateChannel):
     """Data to create a forum channel with."""
 
     type: Literal[ChannelType.GUILD_FORUM] = ChannelType.GUILD_FORUM
@@ -189,16 +204,16 @@ class CreateForumChannelInput(BaseCreateChannel):
     manage_messages or manage_channel, are unaffected.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
-    default_reaction_emoji: DefaultReactionInput | None = None
+    default_reaction_emoji: DefaultReactionIn | None = None
     """Default reaction emoji for the forum channel."""
 
-    available_tags: list[TagInput] | None = None
+    available_tags: list[TagIn] | None = None
     """List of available tags for the forum channel."""
 
     default_sort_order: ThreadSortOrder | None = None
@@ -215,7 +230,7 @@ class CreateForumChannelInput(BaseCreateChannel):
     """
 
 
-class CreateMediaChannelInput(BaseCreateChannel):
+class CreateMediaChannelRequest(BaseCreateChannel):
     """Data to create a media channel with."""
 
     type: Literal[ChannelType.GUILD_MEDIA] = ChannelType.GUILD_MEDIA
@@ -231,16 +246,16 @@ class CreateMediaChannelInput(BaseCreateChannel):
     manage_messages or manage_channel, are unaffected.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
-    default_reaction_emoji: DefaultReactionInput | None = None
+    default_reaction_emoji: DefaultReactionIn | None = None
     """Default reaction emoji for the media channel."""
 
-    available_tags: list[TagInput] | None = None
+    available_tags: list[TagIn] | None = None
     """List of available tags for the media channel."""
 
     default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
@@ -251,7 +266,7 @@ class CreateMediaChannelInput(BaseCreateChannel):
     """
 
 
-class CreateVoiceChannelInput(BaseCreateChannel):
+class CreateVoiceChannelRequest(BaseCreateChannel):
     """Data to create a voice channel with."""
 
     type: Literal[ChannelType.GUILD_VOICE] = ChannelType.GUILD_VOICE
@@ -280,7 +295,7 @@ class CreateVoiceChannelInput(BaseCreateChannel):
     manage_messages or manage_channel, are unaffected.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     nsfw: bool | None = None
@@ -296,7 +311,7 @@ class CreateVoiceChannelInput(BaseCreateChannel):
     """Camera video quality mode of the voice channel."""
 
 
-class CreateStageChannelInput(BaseCreateChannel):
+class CreateStageChannelRequest(BaseCreateChannel):
     """Data to create a stage channel with."""
 
     type: Literal[ChannelType.GUILD_STAGE_VOICE] = ChannelType.GUILD_STAGE_VOICE
@@ -324,7 +339,7 @@ class CreateStageChannelInput(BaseCreateChannel):
     manage_messages or manage_channel, are unaffected.
     """
 
-    parent_id: SnowflakeInput | None = None
+    parent_id: SnowflakeInputType | None = None
     """ID of the new parent category for a channel."""
 
     nsfw: bool | None = None
@@ -340,13 +355,13 @@ class CreateStageChannelInput(BaseCreateChannel):
     """Camera video quality mode of the voice channel."""
 
 
-type CreateChannelInputType = Union[
-    CreateCategoryChannelInput,
-    CreateTextChannelInput,
-    CreateAnoncementChannelInput,
-    CreateForumChannelInput,
-    CreateMediaChannelInput,
-    CreateVoiceChannelInput,
-    CreateStageChannelInput,
+type CreateChannelRequestType = Union[
+    CreateCategoryChannelRequest,
+    CreateTextChannelRequest,
+    CreateAnoncementChannelRequest,
+    CreateForumChannelRequest,
+    CreateMediaChannelRequest,
+    CreateVoiceChannelRequest,
+    CreateStageChannelRequest,
 ]
 """Type of data to create a channel with."""

@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from asyncord.client.guilds.models import CreateGuildInput
+from asyncord.client.guilds.models.requests import CreateGuildRequest
 from asyncord.client.guilds.resources import GuildResource
 from asyncord.client.users.resources import UserResource
 from tests.conftest import IntegrationTestData
@@ -34,7 +34,7 @@ async def test_create_delete_guild(
     integration_data: IntegrationTestData
 ):
     suffix = random.randint(0, 1000)
-    guild_params = CreateGuildInput(
+    guild_params = CreateGuildRequest(
         name=f'{integration_data.guild_prefix_to_delete}_{suffix}',
     )
     guild = await guilds_res.create(guild_params)

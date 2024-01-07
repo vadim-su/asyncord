@@ -12,12 +12,16 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Annotated, Any, BinaryIO, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from asyncord.client.messages.models.common import AllowedMentionType, AttachmentFlags, MessageFlags
-from asyncord.client.messages.models.components_input import SELECT_COMPONENT_TYPE_LIST, ComponentInput, ComponentType
-from asyncord.client.messages.models.embed_input import EmbedInput
-from asyncord.snowflake import SnowflakeInput
+from asyncord.client.messages.models.requests.components import (
+    SELECT_COMPONENT_TYPE_LIST,
+    ComponentIn,
+    ComponentType,
+)
+from asyncord.client.messages.models.requests.embeds import EmbedIn
+from asyncord.snowflake import SnowflakeInputType
 
 MAX_EMBED_TEXT_LENGTH = 6000
 """Maximum length of the embed text."""
@@ -28,7 +32,7 @@ _FilePathType = str | Path
 _AttachedFileInputType = Annotated[_FilePathType | _AttachmentContentType, _AttachmentContentType]
 
 
-class AttachedFileInput(BaseModel):
+class AttachedFileIn(BaseModel):
     """Attached file.
 
     Reference:
@@ -99,26 +103,29 @@ class AttachedFileInput(BaseModel):
         return values
 
 
-_FilesListType = list[AttachedFileInput | _FilePathType | _OpennedFileType]
+_FilesListType = list[AttachedFileIn | _FilePathType | _OpennedFileType]
 _FileMapType = Mapping[str | Path, _AttachmentContentType]
 _FilesType = _FilesListType | _FileMapType
 
 
-class AttachmentDataInput(BaseModel):
+class AttachmentDataIn(BaseModel):
     """Attachment object used for creating and editing messages.
 
     Reference:
     https://discord.com/developers/docs/resources/channel#attachment-object
     """
 
-    id: SnowflakeInput | int | None = None
+    id: SnowflakeInputType | int | None = None
     """Attachment ID."""
 
     filename: str | None = None
     """Name of the attached file."""
 
     description: str | None = Field(None, max_length=1024)
-    """Description for the file (max 1024 characters)."""
+    """Description for the file.
+    
+    Max 1024 characters.
+    """
 
     content_type: str | None = None
     """Media type of the file."""
@@ -126,10 +133,10 @@ class AttachmentDataInput(BaseModel):
     size: int | None = None
     """Size of the file in bytes."""
 
-    url: str | None = None
+    url: AnyHttpUrl | None = None
     """Source URL of the file."""
 
-    proxy_url: str | None = None
+    proxy_url: AnyHttpUrl | None = None
     """Proxied URL of the file."""
 
     height: int | None = None
@@ -156,10 +163,10 @@ class AttachmentDataInput(BaseModel):
     """
 
     flags: AttachmentFlags | None = None
-    """Attachment flags combined as a bitfield"""
+    """Attachment flags."""
 
 
-class BaseMessageInput(BaseModel):
+class BaseMessage(BaseModel):
     """Base message data class used for message creation and editing.
 
     Contains axillary validation methods.
@@ -197,7 +204,7 @@ class BaseMessageInput(BaseModel):
         return values
 
     @field_validator('embeds', check_fields=False)
-    def validate_embeds(cls, embeds: list[EmbedInput] | None) -> list[EmbedInput] | None:
+    def validate_embeds(cls, embeds: list[EmbedIn] | None) -> list[EmbedIn] | None:
         """Check total embed text length.
 
         Reference:
@@ -227,7 +234,7 @@ class BaseMessageInput(BaseModel):
         return embeds
 
     @field_validator('files', mode='before', check_fields=False)
-    def validate_attached_files(cls, files: _FilesType) -> list[AttachedFileInput]:
+    def validate_attached_files(cls, files: _FilesType) -> list[AttachedFileIn]:
         """Prepare attached files.
 
         Args:
@@ -245,19 +252,19 @@ class BaseMessageInput(BaseModel):
 
         for content in attached_files:
             match content:
-                case AttachedFileInput():
+                case AttachedFileIn():
                     prepared_files.append(content)
 
                 # if list item - file_path or BinaryIO
                 case str() | Path() | io.BufferedReader() | io.BufferedRandom() | BinaryIO():
-                    prepared_files.append(AttachedFileInput(content=content))
+                    prepared_files.append(AttachedFileIn(content=content))
 
                 # if mapping item - filename, file
                 case str() | Path() as filename, content if isinstance(content, _AttachmentContentType):
                     if isinstance(filename, Path):
                         filename = filename.name
                     prepared_files.append(
-                        AttachedFileInput(filename=filename, content=content),
+                        AttachedFileIn(filename=filename, content=content),
                     )
 
                 case _:
@@ -266,7 +273,7 @@ class BaseMessageInput(BaseModel):
         return prepared_files
 
     @field_validator('attachments', check_fields=False)
-    def validate_attachments(cls, attachments: list[AttachmentDataInput] | None) -> list[AttachmentDataInput] | None:
+    def validate_attachments(cls, attachments: list[AttachmentDataIn] | None) -> list[AttachmentDataIn] | None:
         """Validate attachments.
 
         Args:
@@ -301,7 +308,7 @@ class BaseMessageInput(BaseModel):
         return attachments
 
     @field_validator('components', check_fields=False)
-    def validate_components(cls, components: list[ComponentInput] | None) -> list[ComponentInput] | None:
+    def validate_components(cls, components: list[ComponentIn] | None) -> list[ComponentIn] | None:
         """Validate components.
 
         Args:
@@ -334,7 +341,7 @@ class BaseMessageInput(BaseModel):
         return components
 
     @classmethod
-    def _embed_text_length(cls, embed: EmbedInput) -> int:
+    def _embed_text_length(cls, embed: EmbedIn) -> int:
         """Get the length of the embed text.
 
         Args:
@@ -359,7 +366,7 @@ class BaseMessageInput(BaseModel):
         return embed_text_length
 
 
-class AllowedMentionsInput(BaseModel):
+class AllowedMentionsIn(BaseModel):
     """Allowed mentions object.
 
     Reference:
@@ -369,30 +376,30 @@ class AllowedMentionsInput(BaseModel):
     parse: list[AllowedMentionType] | None = None
     """Array of allowed mention types to parse from the content."""
 
-    roles: list[SnowflakeInput] | None = Field(None, max_length=100)
+    roles: list[SnowflakeInputType] | None = Field(None, max_length=100)
     """Array of role IDs to mention."""
 
-    users: list[SnowflakeInput] | None = Field(None, max_length=100)
+    users: list[SnowflakeInputType] | None = Field(None, max_length=100)
     """Array of user IDs to mention."""
 
     replied_user: bool | None = None
     """For replies, whether to mention the author of the message being replied to."""
 
 
-class MessageReferenceInput(BaseModel):
+class MessageReferenceIn(BaseModel):
     """Message reference object used for creating messages.
 
     Reference:
     https://discord.com/developers/docs/resources/channel#message-reference-object
     """
 
-    message_id: SnowflakeInput | None = None
+    message_id: SnowflakeInputType | None = None
     """ID of the originating message."""
 
-    channel_id: SnowflakeInput | None = None
+    channel_id: SnowflakeInputType | None = None
     """ID of the originating message's channel."""
 
-    guild_id: SnowflakeInput | None = None
+    guild_id: SnowflakeInputType | None = None
     """ID of the originating message's guild."""
 
     fail_if_not_exists: bool | None = None
@@ -406,7 +413,7 @@ class MessageReferenceInput(BaseModel):
     """
 
 
-class CreateMessageInput(BaseMessageInput):
+class CreateMessageRequest(BaseMessage):
     """Data to create a message with.
 
     Reference:
@@ -425,29 +432,29 @@ class CreateMessageInput(BaseMessageInput):
     tts: bool | None = None
     """True if this is a TTS message."""
 
-    embeds: list[EmbedInput] | None = None
+    embeds: list[EmbedIn] | None = None
     """Embedded rich content."""
 
-    allowed_mentions: AllowedMentionsInput | None = None
+    allowed_mentions: AllowedMentionsIn | None = None
     """Allowed mentions for the message."""
 
-    message_reference: MessageReferenceInput | None = None
+    message_reference: MessageReferenceIn | None = None
     """Reference data sent with crossposted messages."""
 
-    components: list[ComponentInput] | None = None
+    components: list[ComponentIn] | None = None
     """Components to include with the message."""
 
-    sticker_ids: list[SnowflakeInput] | None = None
+    sticker_ids: list[SnowflakeInputType] | None = None
     """Sticker ids to include with the message."""
 
-    files: list[AttachedFileInput] = Field(default_factory=list, exclude=True)
+    files: list[AttachedFileIn] = Field(default_factory=list, exclude=True)
     """Contents of the file being sent.
 
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
-    attachments: list[AttachmentDataInput] | None = None
+    attachments: list[AttachmentDataIn] | None = None
     """Attachment objects with filename and description.
 
     See Uploading Files:
@@ -461,7 +468,7 @@ class CreateMessageInput(BaseMessageInput):
     """
 
 
-class UpdateMessageInput(BaseMessageInput):
+class UpdateMessageRequest(BaseMessage):
     """Data to update a message with.
 
     Reference:
@@ -471,7 +478,7 @@ class UpdateMessageInput(BaseMessageInput):
     content: str | None = Field(None, max_length=2000)
     """Message content."""
 
-    embeds: list[EmbedInput] | None = None
+    embeds: list[EmbedIn] | None = None
     """Embedded rich content."""
 
     flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
@@ -480,20 +487,20 @@ class UpdateMessageInput(BaseMessageInput):
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    allowed_mentions: AllowedMentionsInput | None = None
+    allowed_mentions: AllowedMentionsIn | None = None
     """Allowed mentions for the message."""
 
-    components: list[ComponentInput] | None = None
+    components: list[ComponentIn] | None = None
     """Components to include with the message."""
 
-    files: list[AttachedFileInput] = Field(default_factory=list, exclude=True)
+    files: list[AttachedFileIn] = Field(default_factory=list, exclude=True)
     """Contents of the file being sent.
 
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
-    attachments: list[AttachmentDataInput] | None = None
+    attachments: list[AttachmentDataIn] | None = None
     """Attachment objects with filename and description.
 
     See Uploading Files:

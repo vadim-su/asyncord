@@ -4,23 +4,23 @@ import datetime
 
 from pydantic import BaseModel
 
-from asyncord.client.channels.models.output import ChannelOutput
-from asyncord.client.members.models import MemberOutput
+from asyncord.client.channels.models.responses import ChannelResponse
+from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.messages.models.common import MessageFlags, MessageType
-from asyncord.client.messages.models.components_output import ComponentOutput
-from asyncord.client.messages.models.embed_output import EmbedOutput
-from asyncord.client.messages.models.output import (
-    AttachmentOutput,
-    ChannelMentionOutput,
-    MessageActivity,
-    MessageApplicationOutput,
-    MessageInteractionOutput,
-    MessageOutput,
-    MessageReferenceOutput,
-    ReactionOutput,
+from asyncord.client.messages.models.responses.components import ComponentOut
+from asyncord.client.messages.models.responses.embeds import EmbedOut
+from asyncord.client.messages.models.responses.messages import (
+    AttachmentOut,
+    ChannelMentionOut,
+    MessageActivityOut,
+    MessageApplicationOut,
+    MessageInteractionOut,
+    MessageReferenceOut,
+    MessageResponse,
+    ReactionOut,
 )
 from asyncord.client.models.stickers import Sticker
-from asyncord.client.users.models import UserOutput
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
@@ -79,7 +79,7 @@ class MentionUser(BaseModel):
     """User's member properties in the guild."""
 
 
-class MessageCreateEvent(GatewayEvent, MessageOutput):
+class MessageCreateEvent(GatewayEvent, MessageResponse):
     """Sent when a message is created.
 
     https://discord.com/developers/docs/topics/gateway-events#message-create
@@ -112,7 +112,7 @@ class MessageUpdateEvent(GatewayEvent):
     channel_id: Snowflake
     """Channel id the message was sent in."""
 
-    author: UserOutput | None = None
+    author: UserResponse | None = None
     """Author of the message."""
 
     content: str | None = None
@@ -136,16 +136,16 @@ class MessageUpdateEvent(GatewayEvent):
     mention_roles: list[Snowflake] | None = None
     """Roles specifically mentioned in this message."""
 
-    mention_channels: list[ChannelMentionOutput] | None = None
+    mention_channels: list[ChannelMentionOut] | None = None
     """Channels specifically mentioned in this message."""
 
-    attachments: list[AttachmentOutput] | None = None
+    attachments: list[AttachmentOut] | None = None
     """Any attached files."""
 
-    embeds: list[EmbedOutput] | None = None
+    embeds: list[EmbedOut] | None = None
     """Any embedded content."""
 
-    reactions: list[ReactionOutput] | None = None
+    reactions: list[ReactionOut] | None = None
     """Any reactions to the message."""
 
     nonce: int | str | None = None
@@ -163,10 +163,10 @@ class MessageUpdateEvent(GatewayEvent):
     type: MessageType | None = None
     """Type of message."""
 
-    activity: MessageActivity | None = None
+    activity: MessageActivityOut | None = None
     """Sent with Rich Presence-related chat embeds."""
 
-    application: MessageApplicationOutput | None = None
+    application: MessageApplicationOut | None = None
     """Sent with Rich Presence-related chat embeds."""
 
     application_id: Snowflake | None = None
@@ -175,7 +175,7 @@ class MessageUpdateEvent(GatewayEvent):
     If the message is an Interaction or application-owned webhook.
     """
 
-    message_reference: MessageReferenceOutput | None = None
+    message_reference: MessageReferenceOut | None = None
     """Reference data sent with crossposted messages."""
 
     flags: MessageFlags | None = None
@@ -184,16 +184,16 @@ class MessageUpdateEvent(GatewayEvent):
     stickers: list[Sticker] | None = None
     """Message stickers."""
 
-    referenced_message: MessageOutput | None = None
+    referenced_message: MessageResponse | None = None
     """The message this message references, if the message is a reply."""
 
-    thread: ChannelOutput | None = None
+    thread: ChannelResponse | None = None
     """The thread that was started from this message, includes thread member object."""
 
-    components: list[ComponentOutput] | None = None
+    components: list[ComponentOut] | None = None
     """Sent if the message is a response to an Interaction."""
 
-    interaction: MessageInteractionOutput | None = None
+    interaction: MessageInteractionOut | None = None
     """Sent if the message is a response to an Interaction."""
 
     message: str | None = None
@@ -272,7 +272,7 @@ class MessageReactionAddEvent(GatewayEvent):
     guild_id: Snowflake | None = None
     """Guild id."""
 
-    member: MemberOutput | None = None
+    member: MemberResponse | None = None
     """<ember properties for this reaction's user.
 
     Included only when the message is in a guild.

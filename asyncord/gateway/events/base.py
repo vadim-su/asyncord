@@ -12,8 +12,8 @@ from typing import NamedTuple
 
 from pydantic import BaseModel, Field
 
-from asyncord.client.applications.models import ApplicationFlag
-from asyncord.client.users.models import UserOutput
+from asyncord.client.applications.models.responses import ApplicationFlag
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
 
@@ -87,7 +87,7 @@ class ReadyEvent(GatewayEvent):
     api_version: int = Field(alias='v')
     """Gateway protocol version."""
 
-    user: UserOutput
+    user: UserResponse
     """User object."""
 
     guilds: list[UnavailableGuild]

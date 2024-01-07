@@ -6,11 +6,6 @@ https://discord.com/developers/docs/resources/channel
 
 import enum
 
-from pydantic import BaseModel
-
-from asyncord.client.models.permissions import PermissionFlag
-from asyncord.snowflake import Snowflake
-
 MIN_BITRATE = 8000
 """Minimum bitrate for voice channels."""
 MAX_BITRATE = 384000
@@ -149,78 +144,3 @@ class VideoQualityMode(enum.IntEnum):
 
     FULL = 2
     """720p."""
-
-
-class BaseOverwrite(BaseModel):
-    """Base overwrite object.
-
-    See permissions for more info about `allow` and `deny` fields:
-    https://discord.com/developers/docs/topics/permissions#permissions
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#overwrite-object
-    """
-
-    id: Snowflake
-    """Role or user id.
-
-    Set corresponding type field.
-    """
-
-    type: OverwriteType
-    """Type of overwrite."""
-
-    # TODO: #10 Every channel type has different permissions so we need to validate this
-    allow: PermissionFlag
-    """Permission flags to allow."""
-
-    deny: PermissionFlag
-    """Permission flags to deny."""
-
-
-class BaseTag(BaseModel):
-    """Object that represents a tag.
-
-    Can be used in GUILD_FORUM and GUILD_MEDIA channels.
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#forum-tag-object
-    """
-
-    id: Snowflake
-    """ID of the tag."""
-
-    name: str
-    """Name of the tag (0-20 characters)."""
-
-    moderated: bool
-    """Tag can only be added to or removed from threads.
-
-    It allowed only for members with the MANAGE_THREADS permission.
-    """
-
-    emoji_id: Snowflake
-    """ID of a guild's custom emoji.
-
-    At most one of emoji_id and emoji_name may be set.
-    """
-
-    emoji_name: str
-    """Unicode character of the emoji.
-
-    At most one of emoji_id and emoji_name may be set.
-    """
-
-
-class BaseDefaultReaction(BaseModel):
-    """Model specifies the emoji to use as the default way to react to a forum post.
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#default-reaction-object
-    """
-
-    emoji_id: Snowflake | None = None
-    """ID of a guild's custom emoji."""
-
-    emoji_name: str | None = None
-    """Unicode character of the emoji."""

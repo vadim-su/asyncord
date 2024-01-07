@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from asyncord.client.resources import ClientResource, ClientSubresource
-from asyncord.client.users.models import UserOutput
-from asyncord.typedefs import LikeSnowflake, list_model
+from asyncord.client.users.models.responses import UserResponse
+from asyncord.snowflake import SnowflakeInputType
+from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
@@ -18,7 +19,10 @@ class ReactionResource(ClientSubresource):
     channels_url = REST_API_URL / 'channels'
 
     def __init__(
-        self, parent: ClientResource, channel_id: LikeSnowflake, message_id: LikeSnowflake,
+        self,
+        parent: ClientResource,
+        channel_id: SnowflakeInputType,
+        message_id: SnowflakeInputType,
     ):
         """Initialize the reaction resource."""
         super().__init__(parent)
@@ -29,9 +33,9 @@ class ReactionResource(ClientSubresource):
     async def get(
         self,
         emoji: str,
-        after: LikeSnowflake | None = None,
+        after: SnowflakeInputType | None = None,
         limit: int | None = None,
-    ) -> list[UserOutput]:
+    ) -> list[UserResponse]:
         """Get a list of users that reacted with this emoji.
 
         Args:
@@ -50,7 +54,7 @@ class ReactionResource(ClientSubresource):
 
         url = self.reactions_url / emoji % url_params
         resp = await self._http_client.get(url)
-        return list_model(UserOutput).validate_python(resp.body)
+        return list_model(UserResponse).validate_python(resp.body)
 
     async def add(self, emoji: str) -> None:
         """Create a reaction for the message.
@@ -74,7 +78,7 @@ class ReactionResource(ClientSubresource):
     async def delete(
         self,
         emoji: str | None = None,
-        user_id: LikeSnowflake | None = None,
+        user_id: SnowflakeInputType | None = None,
     ) -> None:
         """Delete a reaction a user made for the message.
 

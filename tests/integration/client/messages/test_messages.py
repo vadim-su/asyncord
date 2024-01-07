@@ -4,8 +4,8 @@ from typing import Literal
 
 import pytest
 
-from asyncord.client.messages.models.input import CreateMessageInput, UpdateMessageInput
-from asyncord.client.messages.models.output import MessageOutput
+from asyncord.client.messages.models.requests.messages import CreateMessageRequest, UpdateMessageRequest
+from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
 from asyncord.typedefs import LikeSnowflake
 from tests.conftest import IntegrationTestData
@@ -43,17 +43,17 @@ async def test_get_channel_messages(
 
 
 async def test_create_and_delete_simple_message(messages_res: MessageResource):
-    message = await messages_res.create(CreateMessageInput(content='test'))
+    message = await messages_res.create(CreateMessageRequest(content='test'))
     assert message.content == 'test'
     await messages_res.delete(message.id)
 
 
-async def test_update_message(message: MessageOutput, messages_res: MessageResource):
+async def test_update_message(message: MessageResponse, messages_res: MessageResource):
     random_content = ''.join([
         random.choice(string.ascii_letters)
         for _ in range(10)
     ])
     updated_message = await messages_res.update(
-        message.id, UpdateMessageInput(content=random_content),
+        message.id, UpdateMessageRequest(content=random_content),
     )
     assert updated_message.content == random_content

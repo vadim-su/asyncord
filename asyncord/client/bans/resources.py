@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from asyncord.client.bans.models import BanOutput
+from asyncord.client.bans.models.responses import BanResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import ClientResource, ClientSubresource
-from asyncord.typedefs import LikeSnowflake, list_model
+from asyncord.snowflake import SnowflakeInputType
+from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
@@ -18,24 +19,24 @@ class BanResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource, guild_id: LikeSnowflake):
+    def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):
         """Initialize the ban resource."""
         super().__init__(parent)
         self.guild_id = guild_id
         self.bans_url = self.guilds_url / str(self.guild_id) / 'bans'
 
-    async def get(self, user_id: LikeSnowflake) -> BanOutput:
+    async def get(self, user_id: SnowflakeInputType) -> BanResponse:
         """Get a ban object for a user."""
         url = self.bans_url / str(user_id)
         resp = await self._http_client.get(url)
-        return BanOutput.model_validate(resp.body)
+        return BanResponse.model_validate(resp.body)
 
     async def get_list(
         self,
         limit: int | None = None,
-        before: LikeSnowflake | None = None,
-        after: LikeSnowflake | None = None,
-    ) -> list[BanOutput]:
+        before: SnowflakeInputType | None = None,
+        after: SnowflakeInputType | None = None,
+    ) -> list[BanResponse]:
         """List bans of a guild.
 
         Args:
@@ -56,11 +57,11 @@ class BanResource(ClientSubresource):
 
         url = self.bans_url % url_params
         resp = await self._http_client.get(url)
-        return list_model(BanOutput).validate_python(resp.body)
+        return list_model(BanResponse).validate_python(resp.body)
 
     async def ban(
         self,
-        user_id: LikeSnowflake,
+        user_id: SnowflakeInputType,
         delete_message_days: int | None = None,
         reason: str | None = None,
     ) -> None:
@@ -86,7 +87,7 @@ class BanResource(ClientSubresource):
 
         await self._http_client.put(url, payload, headers=headers)
 
-    async def unban(self, user_id: LikeSnowflake, reason: str | None = None) -> None:
+    async def unban(self, user_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Unban a user from a guild.
 
         Args:

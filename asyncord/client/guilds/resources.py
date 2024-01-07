@@ -8,25 +8,24 @@ from __future__ import annotations
 import datetime
 
 from asyncord.client.bans.resources import BanResource
-from asyncord.client.channels.models.output import ChannelOutput
-from asyncord.client.guilds.models import (
-    CreateGuildInput,
-    GuildOutput,
-    GuildPreviewOutput,
-    IntegrationOutput,
-    InviteOutput,
-    MFALevel,
-    PruneOutput,
-    UpdateWelcomeScreenInput,
-    VoiceRegionOutput,
-    WelcomeScreenOutput,
+from asyncord.client.channels.models.responses import ChannelResponse
+from asyncord.client.guilds.models.common import MFALevel
+from asyncord.client.guilds.models.requests import CreateGuildRequest, UpdateWelcomeScreenRequest
+from asyncord.client.guilds.models.responses import (
+    GuildPreviewResponse,
+    GuildResponse,
+    IntegrationResponseType,
+    InviteResponse,
+    PruneResponse,
+    VoiceRegionResponse,
+    WelcomeScreenResponse,
 )
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.members.resources import MemberResource
 from asyncord.client.resources import ClientSubresource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
-from asyncord.snowflake import SnowflakeInput
+from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
@@ -40,7 +39,7 @@ class GuildResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def members(self, guild_id: SnowflakeInput) -> MemberResource:
+    def members(self, guild_id: SnowflakeInputType) -> MemberResource:
         """Get the member subresource for a guild.
 
         Args:
@@ -51,7 +50,7 @@ class GuildResource(ClientSubresource):
         """
         return MemberResource(self, guild_id)
 
-    def ban_managment(self, guild_id: SnowflakeInput) -> BanResource:
+    def ban_managment(self, guild_id: SnowflakeInputType) -> BanResource:
         """Get the ban subresource for a guild.
 
         Args:
@@ -62,7 +61,7 @@ class GuildResource(ClientSubresource):
         """
         return BanResource(self, guild_id)
 
-    def roles(self, guild_id: SnowflakeInput) -> RoleResource:
+    def roles(self, guild_id: SnowflakeInputType) -> RoleResource:
         """Get the role subresource for a guild.
 
         Args:
@@ -73,7 +72,7 @@ class GuildResource(ClientSubresource):
         """
         return RoleResource(self, guild_id)
 
-    def events(self, guild_id: SnowflakeInput) -> ScheduledEventsResource:
+    def events(self, guild_id: SnowflakeInputType) -> ScheduledEventsResource:
         """Get the events subresource for a guild.
 
         Args:
@@ -84,7 +83,7 @@ class GuildResource(ClientSubresource):
         """
         return ScheduledEventsResource(self, guild_id)
 
-    async def get(self, guild_id: SnowflakeInput, with_counts: bool = False) -> GuildOutput:
+    async def get(self, guild_id: SnowflakeInputType, with_counts: bool = False) -> GuildResponse:
         """Get a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#et-guild
@@ -98,9 +97,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) % {'with_counts': str(with_counts)}
         resp = await self._http_client.get(url)
-        return GuildOutput.model_validate(resp.body)
+        return GuildResponse.model_validate(resp.body)
 
-    async def get_preview(self, guild_id: SnowflakeInput) -> GuildPreviewOutput:
+    async def get_preview(self, guild_id: SnowflakeInputType) -> GuildPreviewResponse:
         """Get a guild preview.
 
         Preview guilds are a special type of guilds object that contain only
@@ -114,9 +113,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'preview'
         resp = await self._http_client.get(url)
-        return GuildPreviewOutput.model_validate(resp.body)
+        return GuildPreviewResponse.model_validate(resp.body)
 
-    async def create(self, guild_data: CreateGuildInput) -> GuildOutput:
+    async def create(self, guild_data: CreateGuildRequest) -> GuildResponse:
         """Create a new guild.
 
         This endpoint can be used only by bots in less than 10 guilds.
@@ -131,9 +130,9 @@ class GuildResource(ClientSubresource):
         """
         payload = guild_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.post(self.guilds_url, payload)
-        return GuildOutput.model_validate(resp.body)
+        return GuildResponse.model_validate(resp.body)
 
-    async def delete(self, guild_id: SnowflakeInput) -> None:
+    async def delete(self, guild_id: SnowflakeInputType) -> None:
         """Delete a guild.
 
         Args:
@@ -142,7 +141,7 @@ class GuildResource(ClientSubresource):
         url = self.guilds_url / str(guild_id)
         await self._http_client.delete(url)
 
-    async def update_mfa(self, guild_id: SnowflakeInput, level: MFALevel) -> MFALevel:
+    async def update_mfa(self, guild_id: SnowflakeInputType, level: MFALevel) -> MFALevel:
         """Update the MFA (Multi Factor Authentication) level for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level
@@ -161,11 +160,11 @@ class GuildResource(ClientSubresource):
 
     async def get_prune_count(
         self,
-        guild_id: SnowflakeInput,
+        guild_id: SnowflakeInputType,
         days: int | None = None,
-        include_roles: list[SnowflakeInput] | None = None,
+        include_roles: list[SnowflakeInputType] | None = None,
         reason: str | None = None,
-    ) -> PruneOutput:
+    ) -> PruneResponse:
         """Get the number of members that would be removed from a guild if pruned.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
@@ -192,17 +191,17 @@ class GuildResource(ClientSubresource):
 
         url = self.guilds_url / str(guild_id) / 'prune' % url_params
         resp = await self._http_client.get(url, headers)
-        return PruneOutput.model_validate(resp.body)
+        return PruneResponse.model_validate(resp.body)
 
     # TODO: #15 Replace args with a dataclass
     async def begin_prune(  # noqa: PLR0913
         self,
-        guild_id: SnowflakeInput,
+        guild_id: SnowflakeInputType,
         days: int | None = None,
         compute_prune_count: bool | None = None,
-        include_roles: list[SnowflakeInput] | None = None,
+        include_roles: list[SnowflakeInputType] | None = None,
         reason: str | None = None,
-    ) -> PruneOutput:
+    ) -> PruneResponse:
         """Begin pruning a guild.
 
         For large guilds it's recommended to set the compute_prune_count option to false,
@@ -240,9 +239,9 @@ class GuildResource(ClientSubresource):
 
         url = self.guilds_url / str(guild_id) / 'prune'
         resp = await self._http_client.post(url, payload, headers=headers)
-        return PruneOutput.model_validate(resp.body)
+        return PruneResponse.model_validate(resp.body)
 
-    async def get_voice_regions(self, guild_id: SnowflakeInput) -> list[VoiceRegionOutput]:
+    async def get_voice_regions(self, guild_id: SnowflakeInputType) -> list[VoiceRegionResponse]:
         """Get the voice regions for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
@@ -255,9 +254,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'regions'
         resp = await self._http_client.get(url)
-        return list_model(VoiceRegionOutput).validate_python(resp.body)
+        return list_model(VoiceRegionResponse).validate_python(resp.body)
 
-    async def get_invites(self, guild_id: SnowflakeInput) -> list[InviteOutput]:
+    async def get_invites(self, guild_id: SnowflakeInputType) -> list[InviteResponse]:
         """Get the invites for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-invites
@@ -270,9 +269,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'invites'
         resp = await self._http_client.get(url)
-        return list_model(InviteOutput).validate_python(resp.body)
+        return list_model(InviteResponse).validate_python(resp.body)
 
-    async def get_channels(self, guild_id: SnowflakeInput) -> list[ChannelOutput]:
+    async def get_channels(self, guild_id: SnowflakeInputType) -> list[ChannelResponse]:
         """Get the channels for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-channels
@@ -285,9 +284,9 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'channels'
         resp = await self._http_client.get(url)
-        return list_model(ChannelOutput).validate_python(resp.body)
+        return list_model(ChannelResponse).validate_python(resp.body)
 
-    async def get_integrations(self, guild_id: SnowflakeInput) -> list[IntegrationOutput]:
+    async def get_integrations(self, guild_id: SnowflakeInputType) -> list[IntegrationResponseType]:
         """Get the integrations for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-integrations
@@ -300,12 +299,12 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'integrations'
         resp = await self._http_client.get(url)
-        return list_model(IntegrationOutput).validate_python(resp.body)
+        return list_model(IntegrationResponseType).validate_python(resp.body)
 
     async def delete_integration(
         self,
-        guild_id: SnowflakeInput,
-        integration_id: SnowflakeInput,
+        guild_id: SnowflakeInputType,
+        integration_id: SnowflakeInputType,
         reason: str | None = None,
     ) -> None:
         """Delete an integration.
@@ -326,7 +325,7 @@ class GuildResource(ClientSubresource):
 
         await self._http_client.delete(url, headers=headers)
 
-    async def get_welcome_screen(self, guild_id: SnowflakeInput) -> WelcomeScreenOutput:
+    async def get_welcome_screen(self, guild_id: SnowflakeInputType) -> WelcomeScreenResponse:
         """Get the welcome screen for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen
@@ -339,14 +338,14 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'welcome-screen'
         resp = await self._http_client.get(url)
-        return WelcomeScreenOutput.model_validate(resp.body)
+        return WelcomeScreenResponse.model_validate(resp.body)
 
     async def update_welcome_screen(
         self,
-        guild_id: SnowflakeInput,
-        welcome_screen_data: UpdateWelcomeScreenInput,
+        guild_id: SnowflakeInputType,
+        welcome_screen_data: UpdateWelcomeScreenRequest,
         reason: str | None = None,
-    ) -> WelcomeScreenOutput:
+    ) -> WelcomeScreenResponse:
         """Update the welcome screen for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#update-guild-welcome-screen
@@ -368,12 +367,12 @@ class GuildResource(ClientSubresource):
 
         payload = welcome_screen_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.patch(url, payload, headers=headers)
-        return WelcomeScreenOutput.model_validate(resp.body)
+        return WelcomeScreenResponse.model_validate(resp.body)
 
     async def update_current_user_voice_state(
         self,
-        guild_id: SnowflakeInput,
-        channel_id: SnowflakeInput | None = None,
+        guild_id: SnowflakeInputType,
+        channel_id: SnowflakeInputType | None = None,
         suppress: bool | None = None,
         request_to_speak_timestamp: datetime.datetime | None = None,
     ) -> None:
@@ -400,9 +399,9 @@ class GuildResource(ClientSubresource):
 
     async def update_user_voice_state(
         self,
-        guild_id: SnowflakeInput,
-        user_id: SnowflakeInput,
-        channel_id: SnowflakeInput | None = None,
+        guild_id: SnowflakeInputType,
+        user_id: SnowflakeInputType,
+        channel_id: SnowflakeInputType | None = None,
         suppress: bool | None = None,
     ) -> None:
         """Update a user's voice state.

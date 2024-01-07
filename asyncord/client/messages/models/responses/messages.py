@@ -3,24 +3,45 @@ from __future__ import annotations
 import datetime
 import enum
 
-from pydantic import AnyHttpUrl, BaseModel, Field
+from pydantic import AnyHttpUrl, BaseModel
 
 from asyncord.client.channels.models.common import ChannelType
-from asyncord.client.channels.models.output import ChannelOutput, ThreadMetadataOutput
+from asyncord.client.channels.models.responses import ChannelResponse, ThreadMetadataOut
 from asyncord.client.interactions.models.common import InteractionType
-from asyncord.client.members.models import GuildMemberFlags, MemberOutput
+from asyncord.client.members.models.common import GuildMemberFlags
+from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.messages.models.common import AttachmentFlags, MessageFlags, MessageType
-from asyncord.client.messages.models.components_output import ComponentOutput
-from asyncord.client.messages.models.embed_output import EmbedOutput
+from asyncord.client.messages.models.responses.components import ComponentOut
+from asyncord.client.messages.models.responses.embeds import EmbedOut
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import StickerFormatType
-from asyncord.client.roles.models import RoleOutput
-from asyncord.client.users.models import UserOutput
+from asyncord.client.roles.models.responses import RoleResponse
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.color import Color
 from asyncord.snowflake import Snowflake
 
 
-class MessageInteractionOutput(BaseModel):
+class MessageActivityType(enum.IntEnum):
+    """Activity type.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#message-object-message-activity-types
+    """
+
+    JOIN = 1
+    """Join a party."""
+
+    SPECTATE = 2
+    """Spectate a game."""
+
+    LISTEN = 3
+    """Listen along to a song."""
+
+    JOIN_REQUEST = 5
+    """Join a request to play a game."""
+
+
+class MessageInteractionOut(BaseModel):
     """Message interaction object.
 
     This is sent on the message object when the message is a response to
@@ -39,14 +60,14 @@ class MessageInteractionOutput(BaseModel):
     name: str
     """Name of the application command, including subcommands and subcommand groups."""
 
-    user: UserOutput
+    user: UserResponse
     """User who invoked the interaction."""
 
-    member: MemberOutput | None = None
+    member: MemberResponse | None = None
     """Member who invoked the interaction."""
 
 
-class MessageReferenceOutput(BaseModel):
+class MessageReferenceOut(BaseModel):
     """Message reference object.
 
     Reference:
@@ -73,7 +94,7 @@ class MessageReferenceOutput(BaseModel):
     """
 
 
-class ChannelMentionOutput(BaseModel):
+class ChannelMentionOut(BaseModel):
     """Channel mention object.
 
     Read more info at:
@@ -93,7 +114,7 @@ class ChannelMentionOutput(BaseModel):
     """Channel name."""
 
 
-class AttachmentOutput(BaseModel):
+class AttachmentOut(BaseModel):
     """Attachment object.
 
     Reference:
@@ -151,27 +172,7 @@ class AttachmentOutput(BaseModel):
     """Attachment flags."""
 
 
-class MessageActivityType(enum.IntEnum):
-    """Activity type.
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#message-object-message-activity-types
-    """
-
-    JOIN = 1
-    """Join a party."""
-
-    SPECTATE = 2
-    """Spectate a game."""
-
-    LISTEN = 3
-    """Listen along to a song."""
-
-    JOIN_REQUEST = 5
-    """Join a request to play a game."""
-
-
-class MessageActivity(BaseModel):
+class MessageActivityOut(BaseModel):
     """Message activity object.
 
     Reference:
@@ -185,7 +186,7 @@ class MessageActivity(BaseModel):
     """Party ID from a Rich Presence event."""
 
 
-class MessageStickerItemOutput(BaseModel):
+class MessageStickerItemOut(BaseModel):
     """Smallest amount of data required to render a sticker.
 
     Reference:
@@ -202,7 +203,7 @@ class MessageStickerItemOutput(BaseModel):
     """Type of sticker format."""
 
 
-class RoleSubscriptionDataOutput(BaseModel):
+class RoleSubscriptionDataOut(BaseModel):
     """Role Subscription object.
 
     Reference:
@@ -223,7 +224,7 @@ class RoleSubscriptionDataOutput(BaseModel):
 
 
 # FIXME: It's AI guess, need to be tested
-class MessageApplicationOutput(BaseModel):
+class MessageApplicationOut(BaseModel):
     """Message application object."""
 
     id: Snowflake
@@ -242,7 +243,7 @@ class MessageApplicationOutput(BaseModel):
     """Name of the application"""
 
 
-class ReactionCountDetailsOutput(BaseModel):
+class ReactionCountDetailsOut(BaseModel):
     """Reaction Count Details object.
 
     The reaction count details object contains a breakdown of normal and 
@@ -255,7 +256,7 @@ class ReactionCountDetailsOutput(BaseModel):
     """Count of normal reactions"""
 
 
-class ReactionOutput(BaseModel):
+class ReactionOut(BaseModel):
     """Reaction object.
 
     Reference:
@@ -265,7 +266,7 @@ class ReactionOutput(BaseModel):
     count: int
     """Times this emoji has been used to react."""
 
-    count_details: ReactionCountDetailsOutput
+    count_details: ReactionCountDetailsOut
     """Times this emoji has been used to react."""
 
     me: bool
@@ -281,7 +282,7 @@ class ReactionOutput(BaseModel):
     """HEX colors used for super reaction."""
 
 
-class ResolvedMember(BaseModel):
+class ResolvedMemberOut(BaseModel):
     """Resolved Member object.
 
     Reference:
@@ -322,7 +323,7 @@ class ResolvedMember(BaseModel):
     """
 
 
-class ResolvedChannel(BaseModel):
+class ResolvedChannelOut(BaseModel):
     """Resolved Channel object.
 
     Reference:
@@ -334,8 +335,8 @@ class ResolvedChannel(BaseModel):
     type: ChannelType
     """Type of channel."""
 
-    name: str | None = Field(None, min_length=1, max_length=100)
-    """Channel name (1-100 characters)"""
+    name: str | None = None
+    """Channel name."""
 
     permissions: str | None = None
     """Computed permissions for the invoking user in the channel,
@@ -355,39 +356,39 @@ class ResolvedChannel(BaseModel):
     Each parent category can contain up to 50 channels.
     """
 
-    thread_metadata: ThreadMetadataOutput | None = None
+    thread_metadata: ThreadMetadataOut | None = None
     """Thread-specific fields not needed by other channels."""
 
 
-class ResolvedDataOutput(BaseModel):
+class ResolvedDataOut(BaseModel):
     """Resolved Data object.
 
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
     """
 
-    users: dict[Snowflake, UserOutput] | None = None
+    users: dict[Snowflake, UserResponse] | None = None
     """Ids and User objects."""
 
-    members: dict[Snowflake, ResolvedMember] | None = None
+    members: dict[Snowflake, ResolvedMemberOut] | None = None
     """Ids and partial Member objects."""
 
-    roles: dict[Snowflake, RoleOutput] | None = None
+    roles: dict[Snowflake, RoleResponse] | None = None
     """Ids and Role objects."""
 
-    channels: dict[Snowflake, ResolvedChannel] | None = None
+    channels: dict[Snowflake, ResolvedChannelOut] | None = None
     """Ids and partial Channel objects."""
 
     # FIXME: Partial Message object, not Message object
     # No ducomentation on this
-    messages: dict[Snowflake, MessageOutput] | None = None
+    messages: dict[Snowflake, MessageResponse] | None = None
     """Ids and partial Message objects."""
 
-    attachments: dict[Snowflake, AttachmentOutput] | None = None
+    attachments: dict[Snowflake, AttachmentOut] | None = None
     """Ids and attachment objects."""
 
 
-class MessageOutput(BaseModel):
+class MessageResponse(BaseModel):
     """Message object.
 
     Reference:
@@ -400,7 +401,7 @@ class MessageOutput(BaseModel):
     channel_id: Snowflake
     """ID of the channel the message was sent in."""
 
-    author: UserOutput
+    author: UserResponse
     """Author of the message."""
 
     content: str
@@ -418,22 +419,22 @@ class MessageOutput(BaseModel):
     mention_everyone: bool
     """Whether this message mentions everyone."""
 
-    mentions: list[UserOutput]
+    mentions: list[UserResponse]
     """Users specifically mentioned in the message."""
 
     mention_roles: list[Snowflake]
     """Roles specifically mentioned in this message."""
 
-    mention_channels: list[ChannelMentionOutput] | None = None
+    mention_channels: list[ChannelMentionOut] | None = None
     """Channels specifically mentioned in this message."""
 
-    attachments: list[AttachmentOutput]
+    attachments: list[AttachmentOut]
     """Any attached files."""
 
-    embeds: list[EmbedOutput]
+    embeds: list[EmbedOut]
     """Any embedded content."""
 
-    reactions: list[ReactionOutput] | None = None
+    reactions: list[ReactionOut] | None = None
     """Any reactions to the message."""
 
     nonce: int | str | None = None
@@ -448,10 +449,10 @@ class MessageOutput(BaseModel):
     type: MessageType
     """Type of message."""
 
-    activity: MessageActivity | None = None
+    activity: MessageActivityOut | None = None
     """Sent with Rich Presence-related chat embeds."""
 
-    application: MessageApplicationOutput | None = None
+    application: MessageApplicationOut | None = None
     """Sent with Rich Presence-related chat embeds."""
 
     application_id: Snowflake | None = None
@@ -460,25 +461,25 @@ class MessageOutput(BaseModel):
     This is the id of the application.
     """
 
-    message_reference: MessageReferenceOutput | None = None
+    message_reference: MessageReferenceOut | None = None
     """Reference data sent with crossposted messages."""
 
     flags: MessageFlags
     """Message flags combined as a bitfield."""
 
-    referenced_message: MessageOutput | None = None
+    referenced_message: MessageResponse | None = None
     """The message this message references, if the message is a reply."""
 
-    interaction: MessageInteractionOutput | None = None
+    interaction: MessageInteractionOut | None = None
     """Sent if the message is a response to an Interaction."""
 
-    thread: ChannelOutput | None = None
+    thread: ChannelResponse | None = None
     """The thread that was started from this message, includes thread member object."""
 
-    components: list[ComponentOutput] | None = None
+    components: list[ComponentOut] | None = None
     """Sent if the message is a response to an Interaction."""
 
-    sticker_items: list[MessageStickerItemOutput] | None = None
+    sticker_items: list[MessageStickerItemOut] | None = None
     """Sent if the message contains stickers"""
 
     position: int | None = None
@@ -489,13 +490,13 @@ class MessageOutput(BaseModel):
     in company with total_message_sent on parent thread
     """
 
-    role_subscription_data: RoleSubscriptionDataOutput | None = None
+    role_subscription_data: RoleSubscriptionDataOut | None = None
     """Data of the role subscription purchase or renewal.
     
     That prompted this ROLE_SUBSCRIPTION_PURCHASE message.
     """
 
-    resolved: ResolvedDataOutput | None = None
+    resolved: ResolvedDataOut | None = None
     """Data for users, members, channels, and roles.
      
     In the message's auto-populated select menus.

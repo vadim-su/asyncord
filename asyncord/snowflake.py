@@ -207,5 +207,5 @@ class Snowflake:
         return hash(str(self._raw_value))
 
 
-type SnowflakeInput = Annotated[int | str | Snowflake, Snowflake]
+type SnowflakeInputType = Annotated[int | str | Snowflake, Snowflake]
 """Snowflake input type."""
