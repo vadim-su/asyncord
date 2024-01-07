@@ -101,7 +101,7 @@ async def test_get_channel(channels_res: ChannelResource, integration_data: Inte
     assert channel.type is ChannelType.GUILD_TEXT
 
 
-@pytest.mark.limitedd
+@pytest.mark.limited
 async def test_update_channel(channels_res: ChannelResource, integration_data: IntegrationTestData):
     preserved_name = (await channels_res.get(integration_data.channel_id)).name
 

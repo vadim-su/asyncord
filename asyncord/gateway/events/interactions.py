@@ -8,9 +8,12 @@ from pydantic import BaseModel, Field, RootModel
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.common import AppCommandOptionType, ApplicationCommandType
+from asyncord.client.interactions.models.common import InteractionType
 from asyncord.client.members.models import MemberOutput
-from asyncord.client.messages.models.components import ActionRow, ComponentType
-from asyncord.client.messages.models.messages import Attachment, Embed, InteractionType, MessageFlags, MessageType
+from asyncord.client.messages.models.common import ComponentType, MessageFlags, MessageType
+from asyncord.client.messages.models.components_output import ActionRowOutput
+from asyncord.client.messages.models.embed_output import EmbedOutput
+from asyncord.client.messages.models.output import AttachmentOutput
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.roles.models import RoleOutput
 from asyncord.client.users.models import UserOutput
@@ -178,10 +181,10 @@ class ApplicationCommandInteractionMessage(BaseModel):
     mention_roles: list[Snowflake]
     """Roles mentioned in the message."""
 
-    attachments: list[Attachment]
+    attachments: list[AttachmentOutput]
     """Attachments sent with the message."""
 
-    embeds: list[Embed]
+    embeds: list[EmbedOutput]
     """Embeds sent with the message."""
 
     pinned: bool
@@ -249,7 +252,7 @@ class ApplicationCommandResolvedData(BaseModel):
     messages: dict[Snowflake, ApplicationCommandInteractionMessage] | None = None
     """Map of Snowflakes to partial messages objects."""
 
-    attachments: dict[Snowflake, Attachment] | None = None
+    attachments: dict[Snowflake, AttachmentOutput] | None = None
     """Map of Snowflakes to attachment objects."""
 
 
@@ -354,7 +357,7 @@ class ModalSubmitInteractionData(BaseModel):
     custom_id: str
     """Custom id value of the modal."""
 
-    components: list[ActionRow] | None = None
+    components: list[ActionRowOutput] | None = None
     """Values submitted by the user."""
 
 

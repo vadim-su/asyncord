@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.messages.models.messages import CreateMessageData, Message, UpdateMessageData
+from asyncord.client.messages.models.input import CreateMessageInput, UpdateMessageInput
+from asyncord.client.messages.models.output import MessageOutput
 from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.resources import ClientResource, ClientSubresource
 from asyncord.typedefs import LikeSnowflake, list_model
@@ -44,7 +45,7 @@ class MessageResource(ClientSubresource):
         before: LikeSnowflake | None = None,
         after: LikeSnowflake | None = None,
         limit: int | None = None,
-    ) -> list[Message]:
+    ) -> list[MessageOutput]:
         """Get the messages for a channel.
 
         Args:
@@ -72,9 +73,9 @@ class MessageResource(ClientSubresource):
         url = self.messages_url % url_params
 
         resp = await self._http_client.get(url)
-        return list_model(Message).validate_python(resp.body)
+        return list_model(MessageOutput).validate_python(resp.body)
 
-    async def create(self, message_data: CreateMessageData) -> Message:
+    async def create(self, message_data: CreateMessageInput) -> MessageOutput:
         """Create a new message object for the channel.
 
         Args:
@@ -94,9 +95,9 @@ class MessageResource(ClientSubresource):
             ],
         )
 
-        return Message.model_validate(resp.body)
+        return MessageOutput.model_validate(resp.body)
 
-    async def update(self, message_id: LikeSnowflake, message_data: UpdateMessageData) -> Message:
+    async def update(self, message_id: LikeSnowflake, message_data: UpdateMessageInput) -> MessageOutput:
         """Update a message.
 
         Args:
@@ -116,7 +117,7 @@ class MessageResource(ClientSubresource):
                 for file in message_data.files
             ],
         )
-        return Message(**resp.body)
+        return MessageOutput(**resp.body)
 
     async def delete(self, message_id: LikeSnowflake, reason: str | None = None) -> None:
         """Delete a message.

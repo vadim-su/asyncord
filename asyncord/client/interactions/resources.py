@@ -4,7 +4,7 @@ Currently, the only action is to send a response to an interaction. Discord don'
 provide any other actions for interactions.
 """
 
-from asyncord.client.interactions.models import (
+from asyncord.client.interactions.models.input import (
     InteractionDeferredUpdateMessageResponseInput,
     InteractionPongResponseInput,
     InteractionResponseInputType,

@@ -7,7 +7,8 @@ from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.guilds.resources import GuildResource
-from asyncord.client.messages.models.messages import CreateMessageData, Message
+from asyncord.client.messages.models.input import CreateMessageInput
+from asyncord.client.messages.models.output import MessageOutput
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.rest import RestClient
@@ -81,7 +82,7 @@ async def events_res(
 
 
 @pytest.fixture()
-async def reactions_res(message: Message, messages_res: MessageResource) -> ReactionResource:
+async def reactions_res(message: MessageOutput, messages_res: MessageResource) -> ReactionResource:
     return messages_res.reactions(message.id)
 
 
@@ -102,9 +103,9 @@ async def ban_managment(
 
 
 @pytest.fixture()
-async def message(messages_res: MessageResource) -> AsyncGenerator[Message, None]:
+async def message(messages_res: MessageResource) -> AsyncGenerator[MessageOutput, None]:
     message = await messages_res.create(
-        CreateMessageData(content='test'),
+        CreateMessageInput(content='test'),
     )
     yield message
     await messages_res.delete(message.id)
