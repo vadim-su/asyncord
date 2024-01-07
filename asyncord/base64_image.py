@@ -1,11 +1,11 @@
 """Base64 encoded image."""
 
 import base64
-import imghdr
 from collections.abc import Callable
 from pathlib import Path
 from typing import Annotated, Any, Self
 
+import filetype
 from pydantic import BaseModel
 from pydantic_core import CoreSchema, core_schema
 
@@ -53,18 +53,13 @@ class Base64Image:
 
         if isinstance(image_data, bytes):
             if image_type is None:
-                image_type = imghdr.what(None, image_data)
+                image_type = filetype.guess(image_data)
 
                 if not image_type:
                     raise ValueError('Icon must be a valid image')
 
             encoded_image = base64.b64encode(image_data).decode()
             return cls(f'data:image/{image_type};base64, {encoded_image}')
-
-        if isinstance(image_data, cls):
-            return image_data
-
-        raise ValueError('Invalid value type')
 
     @classmethod
     def from_file(cls, file_path: str | Path) -> Self:
