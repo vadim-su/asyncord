@@ -20,7 +20,7 @@ from asyncord.client.channels.models.common import (
 from asyncord.snowflake import SnowflakeInputType
 
 
-class DefaultReactionIn(BaseModel):
+class DefaultReaction(BaseModel):
     """Model specifies the emoji to use as the default way to react to a forum post.
 
     More info:
@@ -42,7 +42,7 @@ class DefaultReactionIn(BaseModel):
         return values
 
 
-class OverwriteIn(BaseModel):
+class Overwrite(BaseModel):
     """Overwrite input object.
 
     See permissions for more info about `allow` and `deny` fields:
@@ -56,7 +56,7 @@ class OverwriteIn(BaseModel):
     """Role or user id."""
 
 
-class TagIn(BaseModel):
+class Tag(BaseModel):
     """Object that represents a tag.
 
     Can be used in GUILD_FORUM and GUILD_MEDIA channels.
@@ -110,7 +110,7 @@ class BaseCreateChannel(BaseModel):
     position: int | None = None
     """Position of the channel in the left-hand listing"""
 
-    permission_overwrites: list[OverwriteIn] | None = None
+    permission_overwrites: list[Overwrite] | None = None
     """Channel or category-specific permissions."""
 
 
@@ -210,10 +210,10 @@ class CreateForumChannelRequest(BaseCreateChannel):
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
-    default_reaction_emoji: DefaultReactionIn | None = None
+    default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the forum channel."""
 
-    available_tags: list[TagIn] | None = None
+    available_tags: list[Tag] | None = None
     """List of available tags for the forum channel."""
 
     default_sort_order: ThreadSortOrder | None = None
@@ -252,10 +252,10 @@ class CreateMediaChannelRequest(BaseCreateChannel):
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
-    default_reaction_emoji: DefaultReactionIn | None = None
+    default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the media channel."""
 
-    available_tags: list[TagIn] | None = None
+    available_tags: list[Tag] | None = None
     """List of available tags for the media channel."""
 
     default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)

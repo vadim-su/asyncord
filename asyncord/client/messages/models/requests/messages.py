@@ -17,10 +17,10 @@ from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, field_validator, 
 from asyncord.client.messages.models.common import AllowedMentionType, AttachmentFlags, MessageFlags
 from asyncord.client.messages.models.requests.components import (
     SELECT_COMPONENT_TYPE_LIST,
-    ComponentIn,
+    Component,
     ComponentType,
 )
-from asyncord.client.messages.models.requests.embeds import EmbedIn
+from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.snowflake import SnowflakeInputType
 
 MAX_EMBED_TEXT_LENGTH = 6000
@@ -32,7 +32,7 @@ _FilePathType = str | Path
 _AttachedFileInputType = Annotated[_FilePathType | _AttachmentContentType, _AttachmentContentType]
 
 
-class AttachedFileIn(BaseModel):
+class AttachedFile(BaseModel):
     """Attached file.
 
     Reference:
@@ -72,7 +72,7 @@ class AttachedFileIn(BaseModel):
         if isinstance(content, str):
             content = Path(content)
 
-        # if file informaton is provided, skip
+        # if file informaton is provided, skip other checks
         if values.get('filename') and values.get('content_type'):
             return values
 
@@ -103,12 +103,12 @@ class AttachedFileIn(BaseModel):
         return values
 
 
-_FilesListType = list[AttachedFileIn | _FilePathType | _OpennedFileType]
+_FilesListType = list[AttachedFile | _FilePathType | _OpennedFileType]
 _FileMapType = Mapping[str | Path, _AttachmentContentType]
 _FilesType = _FilesListType | _FileMapType
 
 
-class AttachmentDataIn(BaseModel):
+class AttachmentData(BaseModel):
     """Attachment object used for creating and editing messages.
 
     Reference:
@@ -204,7 +204,7 @@ class BaseMessage(BaseModel):
         return values
 
     @field_validator('embeds', check_fields=False)
-    def validate_embeds(cls, embeds: list[EmbedIn] | None) -> list[EmbedIn] | None:
+    def validate_embeds(cls, embeds: list[Embed] | None) -> list[Embed] | None:
         """Check total embed text length.
 
         Reference:
@@ -234,7 +234,7 @@ class BaseMessage(BaseModel):
         return embeds
 
     @field_validator('files', mode='before', check_fields=False)
-    def validate_attached_files(cls, files: _FilesType) -> list[AttachedFileIn]:
+    def validate_attached_files(cls, files: _FilesType) -> list[AttachedFile]:
         """Prepare attached files.
 
         Args:
@@ -252,19 +252,19 @@ class BaseMessage(BaseModel):
 
         for content in attached_files:
             match content:
-                case AttachedFileIn():
+                case AttachedFile():
                     prepared_files.append(content)
 
                 # if list item - file_path or BinaryIO
                 case str() | Path() | io.BufferedReader() | io.BufferedRandom() | BinaryIO():
-                    prepared_files.append(AttachedFileIn(content=content))
+                    prepared_files.append(AttachedFile(content=content))
 
                 # if mapping item - filename, file
                 case str() | Path() as filename, content if isinstance(content, _AttachmentContentType):
                     if isinstance(filename, Path):
                         filename = filename.name
                     prepared_files.append(
-                        AttachedFileIn(filename=filename, content=content),
+                        AttachedFile(filename=filename, content=content),
                     )
 
                 case _:
@@ -273,7 +273,7 @@ class BaseMessage(BaseModel):
         return prepared_files
 
     @field_validator('attachments', check_fields=False)
-    def validate_attachments(cls, attachments: list[AttachmentDataIn] | None) -> list[AttachmentDataIn] | None:
+    def validate_attachments(cls, attachments: list[AttachmentData] | None) -> list[AttachmentData] | None:
         """Validate attachments.
 
         Args:
@@ -308,7 +308,7 @@ class BaseMessage(BaseModel):
         return attachments
 
     @field_validator('components', check_fields=False)
-    def validate_components(cls, components: list[ComponentIn] | None) -> list[ComponentIn] | None:
+    def validate_components(cls, components: list[Component] | None) -> list[Component] | None:
         """Validate components.
 
         Args:
@@ -341,7 +341,7 @@ class BaseMessage(BaseModel):
         return components
 
     @classmethod
-    def _embed_text_length(cls, embed: EmbedIn) -> int:
+    def _embed_text_length(cls, embed: Embed) -> int:
         """Get the length of the embed text.
 
         Args:
@@ -366,7 +366,7 @@ class BaseMessage(BaseModel):
         return embed_text_length
 
 
-class AllowedMentionsIn(BaseModel):
+class AllowedMentions(BaseModel):
     """Allowed mentions object.
 
     Reference:
@@ -386,7 +386,7 @@ class AllowedMentionsIn(BaseModel):
     """For replies, whether to mention the author of the message being replied to."""
 
 
-class MessageReferenceIn(BaseModel):
+class MessageReference(BaseModel):
     """Message reference object used for creating messages.
 
     Reference:
@@ -432,29 +432,29 @@ class CreateMessageRequest(BaseMessage):
     tts: bool | None = None
     """True if this is a TTS message."""
 
-    embeds: list[EmbedIn] | None = None
+    embeds: list[Embed] | None = None
     """Embedded rich content."""
 
-    allowed_mentions: AllowedMentionsIn | None = None
+    allowed_mentions: AllowedMentions | None = None
     """Allowed mentions for the message."""
 
-    message_reference: MessageReferenceIn | None = None
+    message_reference: MessageReference | None = None
     """Reference data sent with crossposted messages."""
 
-    components: list[ComponentIn] | None = None
+    components: list[Component] | None = None
     """Components to include with the message."""
 
     sticker_ids: list[SnowflakeInputType] | None = None
     """Sticker ids to include with the message."""
 
-    files: list[AttachedFileIn] = Field(default_factory=list, exclude=True)
+    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
     """Contents of the file being sent.
 
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
-    attachments: list[AttachmentDataIn] | None = None
+    attachments: list[AttachmentData] | None = None
     """Attachment objects with filename and description.
 
     See Uploading Files:
@@ -478,7 +478,7 @@ class UpdateMessageRequest(BaseMessage):
     content: str | None = Field(None, max_length=2000)
     """Message content."""
 
-    embeds: list[EmbedIn] | None = None
+    embeds: list[Embed] | None = None
     """Embedded rich content."""
 
     flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
@@ -487,20 +487,20 @@ class UpdateMessageRequest(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    allowed_mentions: AllowedMentionsIn | None = None
+    allowed_mentions: AllowedMentions | None = None
     """Allowed mentions for the message."""
 
-    components: list[ComponentIn] | None = None
+    components: list[Component] | None = None
     """Components to include with the message."""
 
-    files: list[AttachedFileIn] = Field(default_factory=list, exclude=True)
+    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
     """Contents of the file being sent.
 
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
-    attachments: list[AttachmentDataIn] | None = None
+    attachments: list[AttachmentData] | None = None
     """Attachment objects with filename and description.
 
     See Uploading Files:

@@ -20,9 +20,9 @@ from asyncord.client.channels.models.common import (
     VideoQualityMode,
 )
 from asyncord.client.channels.models.requests.creation import (
-    DefaultReactionIn,
-    OverwriteIn,
-    TagIn,
+    DefaultReaction,
+    Overwrite,
+    Tag,
 )
 from asyncord.snowflake import SnowflakeInputType
 
@@ -36,7 +36,7 @@ class BaseUpdateChannel(BaseModel):
     position: int | None = None
     """Position of the channel in the left-hand listing"""
 
-    permission_overwrites: list[OverwriteIn] | None = None
+    permission_overwrites: list[Overwrite] | None = None
     """Channel or category-specific permissions."""
 
 
@@ -108,10 +108,10 @@ class UpdateChannelRequest(BaseUpdateChannel):
     flags: ChannelFlag | None = None
     """Channel flags."""
 
-    available_tags: list[TagIn] | None = None
+    available_tags: list[Tag] | None = None
     """List of available tags for the channel."""
 
-    default_reaction_emoji: DefaultReactionIn | None = None
+    default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the forum channel."""
 
     default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
@@ -275,10 +275,10 @@ class UpdateMediaChannelRequest(BaseUpdateChannel):
     flags: ChannelFlag | None = None
     """Channel flags."""
 
-    available_tags: list[TagIn] | None = None
+    available_tags: list[Tag] | None = None
     """List of available tags for the channel."""
 
-    default_reaction_emoji: DefaultReactionIn | None = None
+    default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the forum channel."""
 
     default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)

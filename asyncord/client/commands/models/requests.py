@@ -23,7 +23,7 @@ _NameAnnotation = Annotated[str, Field(min_length=1, max_length=32, pattern=_APP
 _DescriptionAnnotation = Annotated[str, Field(min_length=1, max_length=100)]
 
 
-class ApplicationCommandOptionChoiceIn(BaseModel):
+class ApplicationCommandOptionChoice(BaseModel):
     """Represents an option choice for a Discord application command.
 
     Reference:
@@ -46,7 +46,7 @@ class ApplicationCommandOptionChoiceIn(BaseModel):
     """
 
 
-class ApplicationCommandOptionIn(BaseModel):
+class ApplicationCommandOption(BaseModel):
     """Represents an option for a Discord application command.
 
     Reference:
@@ -77,10 +77,10 @@ class ApplicationCommandOptionIn(BaseModel):
     required: bool = False
     """Indicates whether the option is required. Defaults to False."""
 
-    choices: list[ApplicationCommandOptionChoiceIn] | None = None
+    choices: list[ApplicationCommandOptionChoice] | None = None
     """List of choices for string and number types."""
 
-    options: list[ApplicationCommandOptionIn] | None = None
+    options: list[ApplicationCommandOption] | None = None
     """List of options for subcommand and subcommand group types."""
 
     channel_types: list[ChannelType] | None = None
@@ -107,9 +107,9 @@ class ApplicationCommandOptionIn(BaseModel):
     @field_validator('choices')
     def validate_choices(
         cls,
-        choices: list[ApplicationCommandOptionChoiceIn] | None,
+        choices: list[ApplicationCommandOptionChoice] | None,
         field_info: ValidationInfo,
-    ) -> list[ApplicationCommandOptionChoiceIn] | None:
+    ) -> list[ApplicationCommandOptionChoice] | None:
         """Validate options."""
         if choices is None:
             return None
@@ -127,9 +127,9 @@ class ApplicationCommandOptionIn(BaseModel):
     @field_validator('options')
     def validate_options(
         cls,
-        options: list[ApplicationCommandOptionIn] | None,
+        options: list[ApplicationCommandOption] | None,
         field_info: ValidationInfo,
-    ) -> list[ApplicationCommandOptionIn] | None:
+    ) -> list[ApplicationCommandOption] | None:
         """Validate options."""
         if options is None:
             return None
@@ -208,7 +208,7 @@ class CreateApplicationCommandRequest(BaseModel):
     description_localizations: dict[LocaleInputType, _DescriptionAnnotation] | None = None
     """Dictionary of language codes to localized descriptions. Defaults to None."""
 
-    options: list[ApplicationCommandOptionIn] | None = Field(None, max_length=25)
+    options: list[ApplicationCommandOption] | None = Field(None, max_length=25)
     """List of options for the command.
 
     Must be 0-25 long. Defaults to None.
@@ -229,8 +229,8 @@ class CreateApplicationCommandRequest(BaseModel):
 
     @field_validator('options')
     def validate_options(
-        cls, options: list[ApplicationCommandOptionIn] | None, field_info: ValidationInfo,
-    ) -> list[ApplicationCommandOptionIn] | None:
+        cls, options: list[ApplicationCommandOption] | None, field_info: ValidationInfo,
+    ) -> list[ApplicationCommandOption] | None:
         """Validate options."""
         if options is None:
             return None

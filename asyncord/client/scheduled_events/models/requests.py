@@ -7,7 +7,7 @@ from asyncord.client.scheduled_events.models.common import EventEntityType, Even
 from asyncord.snowflake import SnowflakeInputType
 
 
-class EventEntityMetadataIn(BaseModel):
+class EventEntityMetadata(BaseModel):
     """Metadata for the guild scheduled event.
 
     Reference:
@@ -37,7 +37,7 @@ class CreateScheduledEventRequest(BaseModel):
     channel_id: SnowflakeInputType | None = None
     """Channel id of the scheduled event."""
 
-    entity_metadata: EventEntityMetadataIn | None = None
+    entity_metadata: EventEntityMetadata | None = None
     """Entity metadata of the scheduled event."""
 
     privacy_level: EventPrivacyLevel
@@ -81,7 +81,7 @@ class UpdateScheduledEventRequest(BaseModel):
     channel_id: SnowflakeInputType | None = None
     """Channel id of the scheduled event."""
 
-    entity_metadata: EventEntityMetadataIn | None = None
+    entity_metadata: EventEntityMetadata | None = None
     """Entity metadata of the scheduled event."""
 
     name: str | None = None

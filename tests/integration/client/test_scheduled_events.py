@@ -9,7 +9,7 @@ from asyncord.client.scheduled_events.models.common import (
 )
 from asyncord.client.scheduled_events.models.requests import (
     CreateScheduledEventRequest,
-    EventEntityMetadataIn,
+    EventEntityMetadata,
     UpdateScheduledEventRequest,
 )
 from asyncord.client.scheduled_events.models.responces import ScheduledEventResponse
@@ -23,7 +23,7 @@ async def event(events_res: ScheduledEventsResource) -> AsyncGenerator[Scheduled
         entity_type=EventEntityType.EXTERNAL,
         name='Test Event',
         description='This is a test event.',
-        entity_metadata=EventEntityMetadataIn(location='https://example.com'),
+        entity_metadata=EventEntityMetadata(location='https://example.com'),
         privacy_level=EventPrivacyLevel.GUILD_ONLY,
         scheduled_start_time=datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=1),
         scheduled_end_time=datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1),
@@ -44,7 +44,7 @@ async def test_create_event(
             entity_type=event_type,
             name='Test Event',
             description='This is a test event.',
-            entity_metadata=EventEntityMetadataIn(location='https://example.com'),
+            entity_metadata=EventEntityMetadata(location='https://example.com'),
             privacy_level=EventPrivacyLevel.GUILD_ONLY,
             scheduled_start_time=datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=1),
             scheduled_end_time=datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1),

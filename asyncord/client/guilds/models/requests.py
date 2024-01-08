@@ -74,7 +74,7 @@ class CreateGuildRequest(BaseModel):
     """System channel flags."""
 
 
-class WelcomeScreenChannelIn(BaseModel):
+class WelcomeScreenChannel(BaseModel):
     """Welcome screen channel object.
 
     Reference:
@@ -103,7 +103,7 @@ class UpdateWelcomeScreenRequest(BaseModel):
     enabled: bool | None = None
     """Whether the welcome screen is enabled."""
 
-    welcome_channels: list[WelcomeScreenChannelIn] | None = Field(None, max_length=5)
+    welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_length=5)
     """Channels shown in the welcome screen.
     
     Up to 5 channels can be specified.

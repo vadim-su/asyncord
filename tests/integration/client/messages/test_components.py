@@ -3,12 +3,12 @@ import re
 import pytest
 
 from asyncord.client.messages.models.requests.components import (
-    ActionRowIn,
-    ButtonIn,
+    ActionRow,
+    Button,
     ButtonStyle,
     ComponentType,
-    SelectMenuIn,
-    SelectMenuOptionIn,
+    SelectMenu,
+    SelectMenuOption,
 )
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.messages.resources import MessageResource
@@ -16,29 +16,29 @@ from asyncord.client.messages.resources import MessageResource
 
 async def test_create_message_with_buttons(messages_res: MessageResource):
     components = [
-        ActionRowIn(
+        ActionRow(
             components=[
-                ButtonIn(
+                Button(
                     label='Primary',
                     style=ButtonStyle.PRIMARY,
                     custom_id='primary',
                 ),
-                ButtonIn(
+                Button(
                     label='Secondary',
                     style=ButtonStyle.SECONDARY,
                     custom_id='secondary',
                 ),
-                ButtonIn(
+                Button(
                     label='Success',
                     style=ButtonStyle.SUCCESS,
                     custom_id='success',
                 ),
-                ButtonIn(
+                Button(
                     label='Danger',
                     style=ButtonStyle.DANGER,
                     custom_id='danger',
                 ),
-                ButtonIn(
+                Button(
                     label='Link',
                     style=ButtonStyle.LINK,
                     url='https://discord.com',
@@ -86,12 +86,12 @@ async def test_crate_message_with_some_top_level_components_not_allowed(
 def test_dont_create_message_with_button_and_select_menu():
     exc_text = 'ActionRow containing a select menu cannot also contain buttons'
     with pytest.raises(ValueError, match=exc_text):
-        ActionRowIn(
+        ActionRow(
             components=[
-                ButtonIn(custom_id='custom_id'),
-                SelectMenuIn(
+                Button(custom_id='custom_id'),
+                SelectMenu(
                     custom_id='custom',
-                    options=[SelectMenuOptionIn(label='Option 1', value='option_1')],
+                    options=[SelectMenuOption(label='Option 1', value='option_1')],
                 ),
             ],
         )

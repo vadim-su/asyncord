@@ -8,15 +8,15 @@ from typing import Literal, Union, cast
 
 from pydantic import BaseModel, Field, field_validator
 
-from asyncord.client.commands.models.requests import ApplicationCommandOptionChoiceIn
+from asyncord.client.commands.models.requests import ApplicationCommandOptionChoice
 from asyncord.client.interactions.models.common import InteractionResponseType
 from asyncord.client.messages.models.common import MessageFlags
-from asyncord.client.messages.models.requests.components import ActionRowIn, ComponentIn, TextInputIn
-from asyncord.client.messages.models.requests.embeds import EmbedIn
+from asyncord.client.messages.models.requests.components import ActionRow, Component, TextInput
+from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import (
-    AllowedMentionsIn,
-    AttachedFileIn,
-    AttachmentDataIn,
+    AllowedMentions,
+    AttachedFile,
+    AttachmentData,
     BaseMessage,
 )
 
@@ -27,7 +27,7 @@ class InteractionPongResponseRequest(BaseModel):
     type: Literal[InteractionResponseType.PONG] = InteractionResponseType.PONG
 
 
-class IteractionCreateMessageDataIn(BaseMessage):
+class IteractionCreateMessageData(BaseMessage):
     """Message response request data.
 
     References:
@@ -40,10 +40,10 @@ class IteractionCreateMessageDataIn(BaseMessage):
     content: str | None = Field(None, max_length=2000)
     """Message content."""
 
-    embeds: list[EmbedIn] | None = None
+    embeds: list[Embed] | None = None
     """List of embeds."""
 
-    allowed_mentions: AllowedMentionsIn | None = None
+    allowed_mentions: AllowedMentions | None = None
     """Allowed mentions object."""
 
     flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
@@ -52,17 +52,17 @@ class IteractionCreateMessageDataIn(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: list[ComponentIn] | None = None
+    components: list[Component] | None = None
     """List of components."""
 
-    files: list[AttachedFileIn] = Field(default_factory=list, exclude=True)
+    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
     """Contents of the file being sent.
 
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
-    attachments: list[AttachmentDataIn] | None = None
+    attachments: list[AttachmentData] | None = None
     """Attachment objects with filename and description.
 
     See Uploading Files:
@@ -77,7 +77,7 @@ class IteractionChannelMessageResponsRequest(BaseModel):
         InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
     )
 
-    data: IteractionCreateMessageDataIn
+    data: IteractionCreateMessageData
 
 
 class IteractionDeferredChannelMessageResponseRequest(BaseModel):
@@ -87,10 +87,10 @@ class IteractionDeferredChannelMessageResponseRequest(BaseModel):
         InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
     )
 
-    data: IteractionCreateMessageDataIn
+    data: IteractionCreateMessageData
 
 
-class InteractionUpdateMessageDataIn(BaseModel):
+class InteractionUpdateMessageData(BaseModel):
     """Interaction response data for UPDATE_MESSAGE.
 
     References:
@@ -100,10 +100,10 @@ class InteractionUpdateMessageDataIn(BaseModel):
     content: str | None = Field(None, max_length=2000)
     """Message content."""
 
-    embeds: list[EmbedIn] | None = None
+    embeds: list[Embed] | None = None
     """List of embeds."""
 
-    allowed_mentions: AllowedMentionsIn | None = None
+    allowed_mentions: AllowedMentions | None = None
     """Allowed mentions object."""
 
     flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
@@ -112,17 +112,17 @@ class InteractionUpdateMessageDataIn(BaseModel):
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: list[ComponentIn] | None = None
+    components: list[Component] | None = None
     """List of components."""
 
-    files: list[AttachedFileIn] = Field(default_factory=list, exclude=True)
+    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
     """Contents of the file being sent.
 
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
-    attachments: list[AttachmentDataIn] | None = None
+    attachments: list[AttachmentData] | None = None
     """Attachment objects with filename and description.
 
     See Uploading Files:
@@ -137,7 +137,7 @@ class InteractionDeferredUpdateMessageResponseRequest(BaseModel):
         InteractionResponseType.DEFERRED_UPDATE_MESSAGE
     )
 
-    data: InteractionUpdateMessageDataIn
+    data: InteractionUpdateMessageData
 
 
 class InteractionUpdateMessageResponseRequest(BaseModel):
@@ -147,17 +147,17 @@ class InteractionUpdateMessageResponseRequest(BaseModel):
         InteractionResponseType.UPDATE_MESSAGE
     )
 
-    data: InteractionUpdateMessageDataIn
+    data: InteractionUpdateMessageData
 
 
-class InteractionAutocompleteResultDataIn(BaseModel):
+class InteractionAutocompleteResultData(BaseModel):
     """Autocomplete response request data.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
     """
 
-    choices: list[ApplicationCommandOptionChoiceIn] = Field(min_length=1, max_length=25)
+    choices: list[ApplicationCommandOptionChoice] = Field(min_length=1, max_length=25)
     """List of autocomplete choices."""
 
 
@@ -168,10 +168,10 @@ class InteractionAutocompleteResponseRequest(BaseModel):
         InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
     )
 
-    data: InteractionAutocompleteResultDataIn
+    data: InteractionAutocompleteResultData
 
 
-class InteractionModalDataIn(BaseModel):
+class InteractionModalData(BaseModel):
     """Modal response request data.
 
     References:
@@ -190,7 +190,7 @@ class InteractionModalDataIn(BaseModel):
     Max 45 characters.
     """
 
-    components: list[ActionRowIn] | list[TextInputIn] = Field(min_length=1, max_length=5)
+    components: list[ActionRow] | list[TextInput] = Field(min_length=1, max_length=5)
     """Components that make up the modal.
 
     Should be between 1 and 5 (inclusive). Only TextInput components are allowed.
@@ -198,22 +198,22 @@ class InteractionModalDataIn(BaseModel):
 
     @field_validator('components')
     def validate_components(
-        cls, components: list[ActionRowIn] | list[TextInputIn],
-    ) -> list[ActionRowIn] | list[TextInputIn]:
+        cls, components: list[ActionRow] | list[TextInput],
+    ) -> list[ActionRow] | list[TextInput]:
         """Validate the components.
 
         Components should be wrapped in an ActionRow. If it is not, wrap it in one.
         """
-        if isinstance(components[0], TextInputIn):
+        if isinstance(components[0], TextInput):
             # If the first component is a TextInput
             # (pydantic garuntees that all components are the same type), wrap it in an ActionRow.
-            text_inputs = cast(list[ComponentIn | TextInputIn], components)
-            components = [ActionRowIn(components=text_inputs)]
+            text_inputs = cast(list[Component | TextInput], components)
+            components = [ActionRow(components=text_inputs)]
 
-        components = cast(list[ActionRowIn], components)
+        components = cast(list[ActionRow], components)
         for action_row in components:
             for component in action_row.components:
-                if not isinstance(component, TextInputIn):
+                if not isinstance(component, TextInput):
                     raise ValueError('Only TextInput components are allowed.')
 
         return components
@@ -223,7 +223,7 @@ class InteractionModalResponseRequest(BaseModel):
     """Interaction response request data for MODAL."""
 
     type: Literal[InteractionResponseType.MODAL] = InteractionResponseType.MODAL
-    data: InteractionModalDataIn
+    data: InteractionModalData
 
 
 type InteractionResponseRequestType = Union[

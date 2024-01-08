@@ -5,8 +5,8 @@ from asyncord.client.commands.models.common import (
     ApplicationCommandType,
 )
 from asyncord.client.commands.models.requests import (
-    ApplicationCommandOptionChoiceIn,
-    ApplicationCommandOptionIn,
+    ApplicationCommandOption,
+    ApplicationCommandOptionChoice,
     CreateApplicationCommandRequest,
 )
 from asyncord.client.commands.resources import CommandResource
@@ -20,27 +20,27 @@ async def test_create_command(commands_res: CommandResource):
         description='test command description',
         description_localizations={'en-US': 'Test Command Description'},
         options=[
-            ApplicationCommandOptionIn(
+            ApplicationCommandOption(
                 type=AppCommandOptionType.STRING,
                 name='test-option',
                 description='test option description',
             ),
-            ApplicationCommandOptionIn(
+            ApplicationCommandOption(
                 type=AppCommandOptionType.INTEGER,
                 name='test-option-2',
                 description='test option description 2',
                 required=True,
             ),
-            ApplicationCommandOptionIn(
+            ApplicationCommandOption(
                 type=AppCommandOptionType.STRING,
                 name='test-option-3',
                 description='test option description 3',
                 choices=[
-                    ApplicationCommandOptionChoiceIn(
+                    ApplicationCommandOptionChoice(
                         name='test-choice-1',
                         value='test-value-1',
                     ),
-                    ApplicationCommandOptionChoiceIn(
+                    ApplicationCommandOptionChoice(
                         name='test-choice-2',
                         value='test-value-2',
                     )
@@ -66,17 +66,17 @@ async def test_create_subcommand_group(commands_res: CommandResource):
         name='test-command-group',
         description='test command description',
         options=[
-            ApplicationCommandOptionIn(
+            ApplicationCommandOption(
                 type=AppCommandOptionType.SUB_COMMAND_GROUP,
                 name='test-subcommand-group',
                 description='test subcommand group description',
                 options=[
-                    ApplicationCommandOptionIn(
+                    ApplicationCommandOption(
                         type=AppCommandOptionType.SUB_COMMAND,
                         name='test-subcommand',
                         description='test subcommand description',
                         options=[
-                            ApplicationCommandOptionIn(
+                            ApplicationCommandOption(
                                 type=AppCommandOptionType.INTEGER,
                                 name='test-option',
                                 description='test option description',
