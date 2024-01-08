@@ -1,22 +1,25 @@
 import datetime
+from typing import AsyncGenerator
 
 import pytest
 
-from asyncord.client.models.scheduled_events import (
-    EventEntityMetadata,
+from asyncord.client.scheduled_events.models.common import (
     EventEntityType,
     EventPrivacyLevel,
-    ScheduledEvent,
-    ScheduledEventCreateData,
-    ScheduledEventUpdateData,
 )
-from asyncord.client.scheduled_events import ScheduledEventsResource
+from asyncord.client.scheduled_events.models.requests import (
+    CreateScheduledEventRequest,
+    EventEntityMetadata,
+    UpdateScheduledEventRequest,
+)
+from asyncord.client.scheduled_events.models.responces import ScheduledEventResponse
+from asyncord.client.scheduled_events.resources import ScheduledEventsResource
 from tests.conftest import IntegrationTestData
 
 
 @pytest.fixture()
-async def event(events_res: ScheduledEventsResource):
-    creation_data = ScheduledEventCreateData(
+async def event(events_res: ScheduledEventsResource) -> AsyncGenerator[ScheduledEventResponse, None]:
+    creation_data = CreateScheduledEventRequest(
         entity_type=EventEntityType.EXTERNAL,
         name='Test Event',
         description='This is a test event.',
@@ -37,7 +40,7 @@ async def test_create_event(
     event_type: EventEntityType,
 ):
     if event_type is EventEntityType.EXTERNAL:
-        creation_data = ScheduledEventCreateData(
+        creation_data = CreateScheduledEventRequest(
             entity_type=event_type,
             name='Test Event',
             description='This is a test event.',
@@ -47,7 +50,7 @@ async def test_create_event(
             scheduled_end_time=datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1),
         )
     else:
-        creation_data = ScheduledEventCreateData(
+        creation_data = CreateScheduledEventRequest(
             entity_type=event_type,
             name='Test Event',
             description='This is a test event.',
@@ -60,9 +63,9 @@ async def test_create_event(
     await events_res.delete(event.id)
 
 
-async def test_get_event(events_res: ScheduledEventsResource, event: ScheduledEvent):
+async def test_get_event(events_res: ScheduledEventsResource, event: ScheduledEventResponse):
     getted_event = await events_res.get(event.id)
-    assert isinstance(getted_event, ScheduledEvent)
+    assert isinstance(getted_event, ScheduledEventResponse)
     assert getted_event.id == event.id
     assert getted_event.name == event.name
     assert getted_event.description == event.description
@@ -70,18 +73,18 @@ async def test_get_event(events_res: ScheduledEventsResource, event: ScheduledEv
     assert getted_event.entity_type == event.entity_type
 
 
-async def test_get_event_list(events_res: ScheduledEventsResource, event: ScheduledEvent):
+async def test_get_event_list(events_res: ScheduledEventsResource, event: ScheduledEventResponse):
     event_list = await events_res.get_list()
     assert isinstance(event_list, list)
     assert len(event_list) >= 1
-    assert isinstance(event_list[0], ScheduledEvent)
+    assert isinstance(event_list[0], ScheduledEventResponse)
 
 
-async def test_update_event(events_res: ScheduledEventsResource, event: ScheduledEvent):
-    updated_event = await events_res.update(event.id, ScheduledEventUpdateData(name='Updated Event'))
+async def test_update_event(events_res: ScheduledEventsResource, event: ScheduledEventResponse):
+    updated_event = await events_res.update(event.id, UpdateScheduledEventRequest(name='Updated Event'))
     assert updated_event.name == 'Updated Event'
 
 
-async def test_get_event_users(events_res: ScheduledEventsResource, event: ScheduledEvent):
+async def test_get_event_users(events_res: ScheduledEventsResource, event: ScheduledEventResponse):
     users = await events_res.get_event_users(event.id)
     assert isinstance(users, list)

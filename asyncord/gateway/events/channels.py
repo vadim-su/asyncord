@@ -1,14 +1,14 @@
-from datetime import datetime
+import datetime
 from typing import Any
 
-from asyncord.client.models.channel_data import ChannelType
-from asyncord.client.models.channels import Channel, ThreadMember
-from asyncord.client.models.members import Member
+from asyncord.client.channels.models.common import ChannelType
+from asyncord.client.channels.models.responses import ChannelResponse, ThreadMemberOut
+from asyncord.client.members.models.responses import MemberResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
 
-class ChannelCreateEvent(GatewayEvent, Channel):
+class ChannelCreateEvent(GatewayEvent, ChannelResponse):
     """Sent when a new guild channel is created.
 
     Relevant to the current user.
@@ -17,7 +17,7 @@ class ChannelCreateEvent(GatewayEvent, Channel):
     """
 
 
-class ChannelUpdateEvent(GatewayEvent, Channel):
+class ChannelUpdateEvent(GatewayEvent, ChannelResponse):
     """Sent when a channel is updated.
 
     https://discord.com/developers/docs/topics/gateway-events#channel-update
@@ -61,11 +61,11 @@ class ChannelPinsUpdateEvent(GatewayEvent):
     channel_id: Snowflake
     """the id of the channel"""
 
-    last_pin_timestamp: datetime | None
+    last_pin_timestamp: datetime.datetime | None
     """the time at which the most recent pinned message was pinned"""
 
 
-class ThreadCreateEvent(GatewayEvent, Channel):
+class ThreadCreateEvent(GatewayEvent, ChannelResponse):
     """Sent when a thread is created or when the current user is added to a private thread.
 
     https://discord.com/developers/docs/topics/gateway-events#thread-create
@@ -76,14 +76,14 @@ class ThreadCreateEvent(GatewayEvent, Channel):
     """when a thread is created"""
 
 
-class ThreadUpdateEvent(GatewayEvent, Channel):
+class ThreadUpdateEvent(GatewayEvent, ChannelResponse):
     """Sent when a thread is updated.
 
     https://discord.com/developers/docs/topics/gateway-events#thread-update
     """
 
 
-class ThreadDeleteEvent(GatewayEvent, Channel):
+class ThreadDeleteEvent(GatewayEvent, ChannelResponse):
     """Sent when a thread is deleted.
 
     https://discord.com/developers/docs/topics/gateway-events#thread-delete
@@ -111,24 +111,24 @@ class ThreadListSyncEvent(GatewayEvent):
     threads: list[dict[str, Any]]  # FIXME: Add thread object
     """All active threads in the given channels that the current user can access."""
 
-    members: list[Member]
+    members: list[MemberResponse]
     """All thread member objects from the synced threads for the current user.
 
     Indicating which threads the current user has been added to.
     """
 
 
-class ThreadMemberUpdateEvent(GatewayEvent, ThreadMember):
+class ThreadMemberUpdateEvent(GatewayEvent, ThreadMemberOut):
     """https://discord.com/developers/docs/topics/gateway-events#thread-member-update"""
 
     guild_id: Snowflake
     """Guild id."""
 
 
-class ThreadMemberUpdate(ThreadMember):
+class ThreadMemberUpdate(ThreadMemberOut):
     """https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields"""
 
-    member: Member
+    member: MemberResponse
     """Member object."""
 
     presence: dict[str, Any] | None = None  # FIXME: Add presence object

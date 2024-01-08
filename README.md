@@ -56,7 +56,7 @@ async def main():
             session=session,
         )
         client = RestClient(API_TOKEN)
-        client._http._session = session
+        client._http_client._session = session
         gw.dispatcher.add_argument('client', client)
 
         async def on_ready(
@@ -104,4 +104,3 @@ Contributions of all sizes are welcome.
 If you find a bug or have a feature request, please report an issue on GitHub.
 
 ## License
-

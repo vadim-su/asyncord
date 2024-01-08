@@ -1,15 +1,15 @@
 from datetime import datetime
 from typing import Any
 
-from asyncord.client.models.guilds import Guild
-from asyncord.client.models.members import Member
-from asyncord.client.models.users import User
-from asyncord.client.roles import Role
+from asyncord.client.guilds.resources import GuildResponse
+from asyncord.client.members.models.responses import MemberResponse
+from asyncord.client.roles.models.responses import RoleResponse
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
 
-class GuildCreateEvent(GatewayEvent, Guild):
+class GuildCreateEvent(GatewayEvent, GuildResponse):
     """Sent when a guild is created/joined.
 
     This event can be sent in three different scenarios:
@@ -38,7 +38,7 @@ class GuildCreateEvent(GatewayEvent, Guild):
     voice_states: list[dict[str, Any]] | None = None
     """States of members currently in voice channels."""
 
-    members: list[Member] | None = None
+    members: list[MemberResponse] | None = None
     """List of guild members."""
 
     channels: list[dict[str, Any]] | None = None
@@ -57,7 +57,7 @@ class GuildCreateEvent(GatewayEvent, Guild):
     """List of scheduled events."""
 
 
-class GuildUpdateEvent(GatewayEvent, Guild):
+class GuildUpdateEvent(GatewayEvent, GuildResponse):
     """Sent when a guild is updated.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-update
@@ -89,7 +89,7 @@ class GuildBanAddEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    user: User
+    user: UserResponse
     """Banned user."""
 
 
@@ -102,7 +102,7 @@ class GuildBanRemoveEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    user: User
+    user: UserResponse
     """Unbanned user."""
 
 
@@ -142,7 +142,7 @@ class GuildIntegrationsUpdateEvent(GatewayEvent):
     """Guild id whose integrations were updated."""
 
 
-class GuildMemberAddEvent(GatewayEvent, Member):
+class GuildMemberAddEvent(GatewayEvent, MemberResponse):
     """Sent when a new user joins a guild.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-member-add
@@ -161,11 +161,11 @@ class GuildMemberRemoveEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    user: User
+    user: UserResponse
     """Removed user."""
 
 
-class GuildMemberUpdateEvent(GatewayEvent, Member):
+class GuildMemberUpdateEvent(GatewayEvent, MemberResponse):
     """Sent when a guild member is updated.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-member-update
@@ -177,7 +177,7 @@ class GuildMemberUpdateEvent(GatewayEvent, Member):
     roles: list[Snowflake]
     """User role ids."""
 
-    user: User
+    user: UserResponse
     """User."""
 
     nick: str | None = None
@@ -218,7 +218,7 @@ class GuildMembersChunkEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    members: list[Member]
+    members: list[MemberResponse]
     """list of guild members"""
 
     chunk_index: int
@@ -249,7 +249,7 @@ class GuildRoleCreateEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    role: Role
+    role: RoleResponse
     """Created role."""
 
 
@@ -262,7 +262,7 @@ class GuildRoleUpdateEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    role: Role
+    role: RoleResponse
     """Updated role."""
 
 

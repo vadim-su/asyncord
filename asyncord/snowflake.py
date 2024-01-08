@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import datetime
 from collections.abc import Callable
-from typing import Any, Final, Self
+from typing import Annotated, Any, Final, Self
 
 from pydantic import BaseModel
 from pydantic_core import CoreSchema, core_schema
@@ -205,3 +205,7 @@ class Snowflake:
             Hash of snowflake.
         """
         return hash(str(self._raw_value))
+
+
+type SnowflakeInputType = Annotated[int | str | Snowflake, Snowflake]
+"""Snowflake input type."""

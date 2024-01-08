@@ -135,7 +135,7 @@ class Base64Image:
         return self.image_data
 
 
-Base64ImageInput = Annotated[Base64Image | bytes | str, Base64Image]
+Base64ImageInputType = Annotated[Base64Image | bytes | str, Base64Image]
 """Base64Image input type for pydantic models.
 
 Base64ImageInput must validate and convert other types to Base64Image.

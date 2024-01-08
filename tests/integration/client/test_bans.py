@@ -2,18 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from asyncord.client.bans import BanResource
+from asyncord.client.bans.resources import BanResource
 from asyncord.client.http.errors import ClientError
-from asyncord.client.rest import RestClient
 from tests.conftest import IntegrationTestData
-
-
-@pytest.fixture()
-def ban_managment(
-    client: RestClient,
-    integration_data: IntegrationTestData
-):
-    return client.guilds.ban_managment(integration_data.guild_id)
 
 
 @pytest.mark.skip(reason='Dangerous operation. Needs manual control.')

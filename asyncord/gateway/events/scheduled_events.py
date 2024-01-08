@@ -1,32 +1,32 @@
 """This module contains models related to scheduled events in a guild."""
 
-from asyncord.client.models.scheduled_events import ScheduledEvent
+from asyncord.client.scheduled_events.models.responces import ScheduledEventResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
 
-class GuildScheduledEventCreateEvent(GatewayEvent, ScheduledEvent):
+class GuildScheduledEventCreateEvent(GatewayEvent, ScheduledEventResponse):
     """Sent when a guild scheduled event is created.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-create
     """
 
 
-class GuildScheduledEventUpdateEvent(GatewayEvent, ScheduledEvent):
+class GuildScheduledEventUpdateEvent(GatewayEvent, ScheduledEventResponse):
     """Sent when a guild scheduled event is updated.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-update
     """
 
 
-class GuildScheduledEventDeleteEvent(GatewayEvent, ScheduledEvent):
+class GuildScheduledEventDeleteEvent(GatewayEvent, ScheduledEventResponse):
     """Sent when a guild scheduled event is deleted.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-delete
     """
 
 
-class GuildScheduledEventUserAddEvent(GatewayEvent, ScheduledEvent):
+class GuildScheduledEventUserAddEvent(GatewayEvent, ScheduledEventResponse):
     """Represents a GuildScheduledEventUserAddEvent.
 
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-user-add-guild-scheduled-event-user-add-event-fields

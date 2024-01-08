@@ -1,4 +1,4 @@
-from asyncord.client.reactions import ReactionResource
+from asyncord.client.reactions.resources import ReactionResource
 from tests.conftest import IntegrationTestData
 
 

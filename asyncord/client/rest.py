@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from asyncord.client.applications import ApplicationResource
-from asyncord.client.channels import ChannelResource
-from asyncord.client.guilds import GuildResource
-from asyncord.client.interactions import InteractionResource
+from asyncord.client.applications.resources import ApplicationResource
+from asyncord.client.channels.resources import ChannelResource
+from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.interactions.resources import InteractionResource
 from asyncord.client.ports import AsyncHttpClientPort
 from asyncord.client.resources import ClientResource
-from asyncord.client.users import UserResource
+from asyncord.client.users.resources import UserResource
 
 
 class RestClient(ClientResource):
@@ -27,10 +27,10 @@ class RestClient(ClientResource):
         return client
 
     def start(self):
-        self._http.start()
+        self._http_client.start()
 
     async def close(self):
-        await self._http.close()
+        await self._http_client.close()
 
     async def __aenter__(self) -> RestClient:
         self.start()

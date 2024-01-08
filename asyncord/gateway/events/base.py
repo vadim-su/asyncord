@@ -12,9 +12,8 @@ from typing import NamedTuple
 
 from pydantic import BaseModel, Field
 
-from asyncord.client.models.applications import ApplicationFlag
-from asyncord.client.models.guilds import UnavailableGuild
-from asyncord.client.models.users import User
+from asyncord.client.applications.models.responses import ApplicationFlag
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
 
@@ -65,6 +64,16 @@ class ReadyEventApplication(BaseModel):
     """the application's flags"""
 
 
+class UnavailableGuild(BaseModel):
+    """Unavailable guild object."""
+
+    id: Snowflake
+    """Guild ID"""
+
+    unavailable: bool
+    """True if this guild is unavailable due to an outage."""
+
+
 class ReadyEvent(GatewayEvent):
     """Dispatched when a client has successfully connected to the gateway.
 
@@ -78,7 +87,7 @@ class ReadyEvent(GatewayEvent):
     api_version: int = Field(alias='v')
     """Gateway protocol version."""
 
-    user: User
+    user: UserResponse
     """User object."""
 
     guilds: list[UnavailableGuild]

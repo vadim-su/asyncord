@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import pytest
 
-from asyncord.client.users import UserResource
+from asyncord.client.users.resources import UserResource
 from tests.conftest import IntegrationTestData
 
 

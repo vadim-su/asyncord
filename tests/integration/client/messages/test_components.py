@@ -2,16 +2,16 @@ import re
 
 import pytest
 
-from asyncord.client.messages import MessageResource
-from asyncord.client.models.messages import CreateMessageData
-from asyncord.client.models.components import (
-    Button,
+from asyncord.client.messages.models.requests.components import (
     ActionRow,
-    SelectMenu,
+    Button,
     ButtonStyle,
     ComponentType,
+    SelectMenu,
     SelectMenuOption,
 )
+from asyncord.client.messages.models.requests.messages import CreateMessageRequest
+from asyncord.client.messages.resources import MessageResource
 
 
 async def test_create_message_with_buttons(messages_res: MessageResource):
@@ -47,7 +47,7 @@ async def test_create_message_with_buttons(messages_res: MessageResource):
         ),
     ]
     message = await messages_res.create(
-        CreateMessageData(
+        CreateMessageRequest(
             content='Test message with buttons',
             components=components,
         ),
@@ -80,7 +80,7 @@ async def test_crate_message_with_some_top_level_components_not_allowed(
 
     exc_pattern = re.compile('.* components must be inside ActionRow')
     with pytest.raises(ValueError, match=exc_pattern):
-        CreateMessageData(components=[component])
+        CreateMessageRequest(components=[component])
 
 
 def test_dont_create_message_with_button_and_select_menu():
@@ -90,7 +90,7 @@ def test_dont_create_message_with_button_and_select_menu():
             components=[
                 Button(custom_id='custom_id'),
                 SelectMenu(
-                    custom_id='custom_id',
+                    custom_id='custom',
                     options=[SelectMenuOption(label='Option 1', value='option_1')],
                 ),
             ],

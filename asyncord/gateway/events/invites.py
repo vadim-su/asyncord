@@ -1,8 +1,8 @@
 import datetime
 
+from asyncord.client.guilds.resources import InviteTargetType
 from asyncord.client.models.applications import Application
-from asyncord.client.models.guilds import InviteTargetType
-from asyncord.client.models.users import User
+from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
@@ -25,7 +25,7 @@ class InviteCreateEvent(GatewayEvent):
     guild_id: Snowflake | None = None
     """Guild id of the invite."""
 
-    inviter: User
+    inviter: UserResponse
     """User who created the invite."""
 
     max_age: int
@@ -43,7 +43,7 @@ class InviteCreateEvent(GatewayEvent):
     target_type: InviteTargetType | None = None
     """Type of target for the voice channel invite."""
 
-    target_user: User | None = None
+    target_user: UserResponse | None = None
     """User whose stream to display for this invite."""
 
     # FIXME: There is should be a partial application object, but it is not documented

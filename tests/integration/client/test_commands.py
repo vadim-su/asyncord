@@ -1,17 +1,19 @@
 from __future__ import annotations
 
-from asyncord.client.commands import BaseCommandResource
-from asyncord.client.models.commands import (
+from asyncord.client.commands.models.common import (
     AppCommandOptionType,
+    ApplicationCommandType,
+)
+from asyncord.client.commands.models.requests import (
     ApplicationCommandOption,
     ApplicationCommandOptionChoice,
-    ApplicationCommandType,
-    CreateApplicationCommandData,
+    CreateApplicationCommandRequest,
 )
+from asyncord.client.commands.resources import CommandResource
 
 
-async def test_create_command(commands_res: BaseCommandResource):
-    command_data = CreateApplicationCommandData(
+async def test_create_command(commands_res: CommandResource):
+    command_data = CreateApplicationCommandRequest(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command',
         name_localizations={'en-US': 'test'},
@@ -48,6 +50,7 @@ async def test_create_command(commands_res: BaseCommandResource):
     )
 
     # check that the first option is a required integer
+    assert command_data.options
     assert command_data.options[0].type == AppCommandOptionType.INTEGER
 
     command = await commands_res.create(command_data)
@@ -57,8 +60,8 @@ async def test_create_command(commands_res: BaseCommandResource):
     await commands_res.delete(command.id)
 
 
-async def test_create_subcommand_group(commands_res: BaseCommandResource):
-    command_data = CreateApplicationCommandData(
+async def test_create_subcommand_group(commands_res: CommandResource):
+    command_data = CreateApplicationCommandRequest(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command-group',
         description='test command description',
@@ -93,11 +96,11 @@ async def test_create_subcommand_group(commands_res: BaseCommandResource):
     # await commands_res.delete(command.id)
 
 
-async def test_get_command_list(commands_res: BaseCommandResource):
+async def test_get_command_list(commands_res: CommandResource):
     assert await commands_res.get_list()
 
 
-async def test_get_command(commands_res: BaseCommandResource):
+async def test_get_command(commands_res: CommandResource):
     commands_list = await commands_res.get_list()
     command = await commands_res.get(commands_list[0].id)
 
@@ -106,12 +109,11 @@ async def test_get_command(commands_res: BaseCommandResource):
     assert commands_list[0].description == command.description
 
 
-async def test_convert_command_to_create_command(commands_res: BaseCommandResource):
+async def test_convert_command_to_create_command(commands_res: CommandResource):
     commands_list = await commands_res.get_list()
     command = await commands_res.get(commands_list[0].id)
 
-    command_data = CreateApplicationCommandData.from_command(command)
-    assert command_data.name == command.name
-    assert command_data.description == command.description
-    assert command_data.type == command.type
-    assert command_data.options == command.options
+    assert command.name == command.name
+    assert command.description == command.description
+    assert command.type == command.type
+    assert command.options == command.options

@@ -1,7 +1,7 @@
 import pytest
 
 from asyncord.client.http.errors import ClientError
-from asyncord.client.members import MemberResource
+from asyncord.client.members.resources import MemberResource
 from tests.conftest import IntegrationTestData
 
 
