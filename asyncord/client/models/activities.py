@@ -9,8 +9,12 @@ from __future__ import annotations
 import datetime
 import enum
 
+<<<<<<< HEAD
 from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field
+=======
+from pydantic import BaseModel, Field, field_validator
+>>>>>>> 328b5b1 (Add activity buttons validation)
 
 from asyncord.snowflake import Snowflake
 
@@ -278,3 +282,20 @@ class Activity(BaseModel):
 
     Maximum of 2 buttons.
     """
+
+    @field_validator('buttons', mode='before')
+    def validate_buttons(
+        cls,
+        buttons: list[ActivityButton] | list[str],
+    ) -> list[ActivityButton]:
+        """Validate buttons.
+
+        Sometimes discord api returns a list of strings instead of a list of buttons.
+        """
+        new_buttons = []
+        for button in buttons:
+            if isinstance(button, str):
+                button = ActivityButton(label=button, url=button)
+            new_buttons.append(button)
+        buttons = new_buttons
+        return buttons
