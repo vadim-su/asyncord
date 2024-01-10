@@ -90,7 +90,9 @@ class IteractionDeferredChannelMessageResponseRequest(BaseModel):
     data: IteractionCreateMessageData
 
 
+# TODO: possibly should inherit from BaseMessage
 class InteractionUpdateMessageData(BaseModel):
+
     """Interaction response data for UPDATE_MESSAGE.
 
     References:
@@ -128,6 +130,10 @@ class InteractionUpdateMessageData(BaseModel):
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files
     """
+
+    # TODO: Add model validator. (Not needed if we inherit from BaseMessage)
+    # Either at least one of all required
+    # Either at least one of component/content/embeds
 
 
 class InteractionDeferredUpdateMessageResponseRequest(BaseModel):
