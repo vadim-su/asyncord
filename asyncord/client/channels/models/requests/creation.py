@@ -77,13 +77,13 @@ class Tag(BaseModel):
     It allowed only for members with the MANAGE_THREADS permission.
     """
 
-    emoji_id: SnowflakeInputType
+    emoji_id: SnowflakeInputType | None = None
     """ID of a guild's custom emoji.
 
     At most one of emoji_id and emoji_name may be set.
     """
 
-    emoji_name: str
+    emoji_name: str | None = None
     """Unicode character of the emoji.
 
     At most one of emoji_id and emoji_name may be set.
