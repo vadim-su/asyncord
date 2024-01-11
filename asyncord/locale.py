@@ -3,11 +3,9 @@ from typing import Annotated
 
 from pydantic import Field
 
-from asyncord.fbenum import FallbackEnum
-
 
 @enum.unique
-class Locale(enum.StrEnum, FallbackEnum):
+class Locale(enum.StrEnum):
     """Represents a locale for a language.
 
     Reference:
