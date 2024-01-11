@@ -41,7 +41,7 @@ class Snowflake:
         internal_worker_id: int,
         internal_process_id: int,
         increment: int,
-    ) -> Self:
+    ) -> Snowflake:
         """Build snowflake from separate parameters.
 
         Args:

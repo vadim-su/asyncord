@@ -1,15 +1,19 @@
-from enum import StrEnum
+import enum
 from typing import Annotated
 
 from pydantic import Field
 
+from asyncord.fbenum import FallbackEnum
 
-class Locale(StrEnum):
+
+@enum.unique
+class Locale(enum.StrEnum, FallbackEnum):
     """Represents a locale for a language.
 
     Reference:
     https://discord.com/developers/docs/reference#locales
     """
+
     ID = 'id'
     DA = 'da'
     DE = 'de'
@@ -44,3 +48,4 @@ class Locale(StrEnum):
 
 
 type LocaleInputType = Annotated[str | Locale, Annotated[Locale, Field(min_length=2)]]
+"""Type of locale input."""
