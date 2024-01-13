@@ -292,10 +292,10 @@ class Activity(BaseModel):
 
         Sometimes discord api returns a list of strings instead of a list of buttons.
         """
-        new_buttons = []
+        validated_buttons = []
         for button in buttons:
             if isinstance(button, str):
                 button = ActivityButton(label=button, url=button)
-            new_buttons.append(button)
-        buttons = new_buttons
+            validated_buttons.append(button)
+        buttons = validated_buttons
         return buttons
