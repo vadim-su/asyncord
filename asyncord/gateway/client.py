@@ -65,7 +65,7 @@ class GatewayClient:
         self._ws_url = ws_url
         self._resume_url = None
 
-        self._allowed_events = (event.__event_name__ for event in allowed_events)
+        self._allowed_events = {event.__event_name__ for event in allowed_events}
 
         self._session_id = None
         self._last_seq_number = 0
