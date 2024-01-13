@@ -7,20 +7,20 @@ provide any other actions for interactions.
 from typing import Union
 
 from asyncord.client.interactions.models.requests import (
+    InteractionChannelMessageResponsRequest,
+    InteractionDeferredChannelMessageResponseRequest,
     InteractionDeferredUpdateMessageResponseRequest,
     InteractionPongResponseRequest,
     InteractionResponseRequestType,
     InteractionUpdateMessageResponseRequest,
-    IteractionChannelMessageResponsRequest,
-    IteractionDeferredChannelMessageResponseRequest,
 )
 from asyncord.client.resources import ClientSubresource
 from asyncord.typedefs import LikeSnowflake
 from asyncord.urls import REST_API_URL
 
 _INTERACTIONS_CAN_CONTAIN_FILES = Union[
-    IteractionChannelMessageResponsRequest,
-    IteractionDeferredChannelMessageResponseRequest,
+    InteractionChannelMessageResponsRequest,
+    InteractionDeferredChannelMessageResponseRequest,
     InteractionDeferredUpdateMessageResponseRequest,
     InteractionUpdateMessageResponseRequest,
 ]

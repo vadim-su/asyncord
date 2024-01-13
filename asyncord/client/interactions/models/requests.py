@@ -27,7 +27,7 @@ class InteractionPongResponseRequest(BaseModel):
     type: Literal[InteractionResponseType.PONG] = InteractionResponseType.PONG
 
 
-class IteractionCreateMessageData(BaseMessage):
+class InteractionCreateMessageData(BaseMessage):
     """Message response request data.
 
     References:
@@ -46,10 +46,10 @@ class IteractionCreateMessageData(BaseMessage):
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions object."""
 
-    flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
+    flags: Literal[MessageFlags.EPHEMERAL, MessageFlags.SUPPRESS_EMBEDS] | None = None
     """Flags to use when sending the message.
 
-    Only MessageFlags.SUPPRESS_EMBEDS can be set.
+    Only MessageFlags.SUPPRESS_EMBEDS and MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
     components: list[Component] | None = None
@@ -70,29 +70,28 @@ class IteractionCreateMessageData(BaseMessage):
     """
 
 
-class IteractionChannelMessageResponsRequest(BaseModel):
+class InteractionChannelMessageResponsRequest(BaseModel):
     """Interaction response request data for CHANNEL_MESSAGE_WITH_SOURCE."""
 
     type: Literal[InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE] = (
         InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
     )
 
-    data: IteractionCreateMessageData
+    data: InteractionCreateMessageData
 
 
-class IteractionDeferredChannelMessageResponseRequest(BaseModel):
+class InteractionDeferredChannelMessageResponseRequest(BaseModel):
     """Interaction response data for DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE."""
 
     type: Literal[InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE] = (
         InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
     )
 
-    data: IteractionCreateMessageData
+    data: InteractionCreateMessageData
 
 
 # TODO: possibly should inherit from BaseMessage
 class InteractionUpdateMessageData(BaseModel):
-
     """Interaction response data for UPDATE_MESSAGE.
 
     References:
@@ -234,8 +233,8 @@ class InteractionModalResponseRequest(BaseModel):
 
 type InteractionResponseRequestType = Union[
     InteractionPongResponseRequest,
-    IteractionChannelMessageResponsRequest,
-    IteractionDeferredChannelMessageResponseRequest,
+    InteractionChannelMessageResponsRequest,
+    InteractionDeferredChannelMessageResponseRequest,
     InteractionDeferredUpdateMessageResponseRequest,
     InteractionUpdateMessageResponseRequest,
     InteractionAutocompleteResponseRequest,
