@@ -45,7 +45,7 @@ class GatewayClient:
         token: str,
         session: aiohttp.ClientSession,
         intents: Intent = DEFAULT_INTENTS,
-        allowed_events: Sequence[str | type[GatewayEvent]] | None = None,
+        allowed_events: Sequence[type[GatewayEvent]] | None = None,
         ws_url: StrOrURL = GATEWAY_URL,
     ):
         """Initialize client.
@@ -65,7 +65,10 @@ class GatewayClient:
         self._ws_url = ws_url
         self._resume_url = None
 
-        self._allowed_events = {event.__event_name__ for event in allowed_events}
+        if allowed_events is not None:
+            self._allowed_events = {event.__event_name__ for event in allowed_events}
+        else:
+            self._allowed_events = None
 
         self._session_id = None
         self._last_seq_number = 0
