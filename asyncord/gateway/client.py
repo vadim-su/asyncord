@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from math import floor
-from typing import Any, cast
+from typing import Any, Sequence, cast
 
 import aiohttp
 from aiohttp import ClientWebSocketResponse, WSMsgType
@@ -45,6 +45,7 @@ class GatewayClient:
         token: str,
         session: aiohttp.ClientSession,
         intents: Intent = DEFAULT_INTENTS,
+        allowed_events: Sequence[type[GatewayEvent]] | None = None,
         ws_url: StrOrURL = GATEWAY_URL,
     ):
         """Initialize client.
@@ -63,6 +64,11 @@ class GatewayClient:
 
         self._ws_url = ws_url
         self._resume_url = None
+
+        if allowed_events is not None:
+            self._allowed_events = {event.__event_name__ for event in allowed_events}
+        else:
+            self._allowed_events = None
 
         self._session_id = None
         self._last_seq_number = 0
@@ -211,7 +217,12 @@ class GatewayClient:
 
         match msg.opcode:
             case GatewayEventOpcode.DISPATCH:
-                event_class = EVENT_MAP.get(cast(str, msg.event_name))
+                casted_event_name = cast(str, msg.event_name)
+                if self._allowed_events is not None:
+                    if casted_event_name not in self._allowed_events:
+                        logger.debug('Event %s not allowed', casted_event_name)
+                        return
+                event_class = EVENT_MAP.get(casted_event_name)
                 if event_class:
                     try:
                         event = event_class.model_validate(msg.msg_data)
