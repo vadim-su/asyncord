@@ -10,7 +10,7 @@ import datetime
 import enum
 
 from fbenum.adapter import FallbackAdapter
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 from asyncord.snowflake import Snowflake
 
@@ -225,7 +225,6 @@ class Activity(BaseModel):
     name: str
     """Activity's name."""
 
-    # TODO: Need to separate the type for input and output
     type: FallbackAdapter[ActivityType]
     """Activity type."""
 
@@ -279,19 +278,67 @@ class Activity(BaseModel):
     Maximum of 2 buttons.
     """
 
-    @field_validator('buttons', mode='before')
-    def validate_buttons(
-        cls,
-        buttons: list[ActivityButton] | list[str],
-    ) -> list[ActivityButton]:
-        """Validate buttons.
 
-        Sometimes discord api returns a list of strings instead of a list of buttons.
-        """
-        validated_buttons = []
-        for button in buttons:
-            if isinstance(button, str):
-                button = ActivityButton(label=button, url=button)
-            validated_buttons.append(button)
-        buttons = validated_buttons
-        return buttons
+class ActivityResponse(BaseModel):
+    """Represents a Discord activity.
+
+    Bots are only able to send name, type, and optionally url.
+
+    https://discord.com/developers/docs/topics/gateway-events#activity-object
+    """
+
+    name: str
+    """Activity's name."""
+
+    type: FallbackAdapter[ActivityType]
+    """Activity type."""
+
+    url: str | None = None
+    """Stream url.
+
+    Is validated when type is `ActivityType.STREAMING`.
+
+    Currently only supports Twitch and YouTube.
+    Only https://twitch.tv/ and https://youtube.com/ urls will work.
+    """
+
+    created_at: datetime.datetime | None = None
+    """Unix timestamp of when the activity was added to the user's session."""
+
+    timestamps: ActivityTimestamps | None = None
+    """Unix timestamps for start and/or end of the game."""
+
+    application_id: Snowflake | None = None
+    """Application id for the game."""
+
+    details: str | None = None
+    """What the player is currently doing."""
+
+    state: str | None = None
+    """User's current party status."""
+
+    emoji: ActivityEmoji | None = None
+    """Emoji data for custom statuses."""
+
+    party: ActivityParty | None = None
+    """Information for the current party of the player."""
+
+    assets: ActivityAssets | None = None
+    """Images for the presence and their hover texts."""
+
+    secrets: ActivitySecrets | None = None
+    """Secrets for Rich Presence joining and spectating."""
+
+    instance: bool | None = None
+    """Whether or not the activity is an instanced game session."""
+
+    flags: ActivityFlag | None = None
+    """Activity flags OR d together.
+
+    Describes what the payload includes."""
+
+    buttons: list[str] | None = None
+    """Custom buttons shown in the Rich Presence.
+
+    Maximum of 2 buttons.
+    """

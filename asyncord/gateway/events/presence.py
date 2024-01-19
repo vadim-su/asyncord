@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from asyncord.client.members.models.responses import MemberResponse
-from asyncord.client.models.activities import Activity
+from asyncord.client.models.activities import ActivityResponse
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
@@ -97,7 +97,7 @@ class PresenceUpdateEvent(GatewayEvent):
     status: str
     """Presence status."""
 
-    activities: list[Activity]
+    activities: list[ActivityResponse]
     """User's current activities."""
 
     client_status: ClientStatus
