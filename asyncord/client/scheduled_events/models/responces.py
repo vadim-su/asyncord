@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel
 
 from asyncord.client.members.models.responses import MemberResponse
@@ -60,13 +61,13 @@ class ScheduledEventResponse(BaseModel):
     `None` if event does not have a scheduled time to end.
     """
 
-    privacy_level: EventPrivacyLevel
+    privacy_level: FallbackAdapter[EventPrivacyLevel]
     """Privacy level of scheduled event."""
 
-    status: EventStatus
+    status: FallbackAdapter[EventStatus]
     """Status of scheduled event."""
 
-    entity_type: EventEntityType
+    entity_type: FallbackAdapter[EventEntityType]
     """Entity type of scheduled event."""
 
     entity_id: Snowflake | None

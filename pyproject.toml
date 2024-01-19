@@ -16,6 +16,7 @@ dependencies = [
     "pydantic>=2.4.2",
     "aiohttp<4",
     "filetype>=1.2.0",
+    "fbenum>=1.0.1",
 ]
 
 
@@ -31,7 +32,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py311"
+target-version = "py312"
 
 [tool.autopep8]
 max_line_length = 120

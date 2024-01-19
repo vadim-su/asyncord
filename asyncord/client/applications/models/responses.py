@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import AnyHttpUrl, BaseModel, Field
 
 from asyncord.client.applications.models.common import ApplicationCommandPermissionType, ApplicationFlag
@@ -176,7 +177,7 @@ class ApplicationOut(BaseModel):
     cover_image: str | None = None
     """the app's default rich presence invite cover image hash"""
 
-    flags: ApplicationFlag | None = None
+    flags: FallbackAdapter[ApplicationFlag] | None = None
     """the application's public flags"""
 
     approximate_guild_count: int | None = None
@@ -216,7 +217,7 @@ class ApplicationCommandPermissionOut(BaseModel):
 
     It can also be a permission constant (@everyone, @here...)"""
 
-    type: ApplicationCommandPermissionType
+    type: FallbackAdapter[ApplicationCommandPermissionType]
     """Type of the permission"""
 
     permission: bool

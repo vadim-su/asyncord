@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field, RootModel
 
 from asyncord.client.channels.models.common import ChannelType
@@ -56,12 +57,6 @@ class BaseInteraction(BaseModel):
     token: str
     """Continuation token for responding to the interaction."""
 
-    version: Literal[1] = 1
-    """Read-only property.
-
-    Always 1.
-    """
-
     message: dict | None = None
     """For components, the message they were attached to."""
 
@@ -91,7 +86,7 @@ class ApplicationCommandInteractionOption(BaseModel):
     name: str
     """Name of the parameter."""
 
-    type: AppCommandOptionType
+    type: FallbackAdapter[AppCommandOptionType]
     """Value of application command option type."""
 
     value: str | int | float | bool | None = None
@@ -154,7 +149,7 @@ class ApplicationCommandInteractionMessage(BaseModel):
     channel_id: Snowflake
     """ID of the channel the message was sent in."""
 
-    type: MessageType
+    type: FallbackAdapter[MessageType]
     """Message type."""
 
     author: UserResponse
@@ -207,7 +202,7 @@ class ApplicationCommandInterationChannel(BaseModel):
     name: str | None
     """Channel name (1-100 characters)"""
 
-    type: ChannelType
+    type: FallbackAdapter[ChannelType]
     """Type of channel."""
 
     permissions: PermissionFlag
@@ -269,7 +264,7 @@ class ApplicationCommandInteractionData(BaseModel):
     name: str
     """Name of the invoked command."""
 
-    type: ApplicationCommandType
+    type: FallbackAdapter[ApplicationCommandType]
     """Type of the invoked command."""
 
     resolved: ApplicationCommandResolvedData | None = None
@@ -326,7 +321,7 @@ class MessageComponentInteractionData(BaseModel):
     custom_id: str
     """Custom_id of the component."""
 
-    component_type: ComponentType
+    component_type: FallbackAdapter[ComponentType]
     """Type of the component."""
 
     values: list[str] | None = None
@@ -375,6 +370,17 @@ class ModalSubmitInteraction(BaseInteraction):
     """Modal submit data payload."""
 
 
+class FallbackInteraction(BaseInteraction, extra='allow'):
+    """Represent an unknown interaction.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
+    """
+
+    type: FallbackAdapter[InteractionType]
+    """Type of interaction."""
+
+
 Interaction = Annotated[
     PingInteraction
     | ApplicationCommandInteraction
@@ -382,7 +388,7 @@ Interaction = Annotated[
     | ApplicationCommandAutocompleteInteraction
     | ModalSubmitInteraction,
     Field(discriminator='type'),
-]
+] | FallbackInteraction
 
 
 class InteractionCreateEvent(GatewayEvent, RootModel[Interaction]):

@@ -6,6 +6,7 @@ https://discord.com/developers/docs/interactions/application-commands
 
 from __future__ import annotations
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel
 
 from asyncord.client.channels.models.common import ChannelType
@@ -39,7 +40,7 @@ class ApplicationCommandOptionOut(BaseModel):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: AppCommandOptionType
+    type: FallbackAdapter[AppCommandOptionType]
     """Type of option."""
 
     name: str
@@ -66,7 +67,7 @@ class ApplicationCommandOptionOut(BaseModel):
     options: list[ApplicationCommandOptionOut] | None = None
     """List of options for subcommand and subcommand group types."""
 
-    channel_types: list[ChannelType] | None = None
+    channel_types: list[FallbackAdapter[ChannelType]] | None = None
     """List of available channel types if the option type is a `CHANNEL`."""
 
     min_value: int | None = None
@@ -98,7 +99,7 @@ class ApplicationCommandResponse(BaseModel):
     id: Snowflake
     """Id of the command."""
 
-    type: ApplicationCommandType
+    type: FallbackAdapter[ApplicationCommandType]
     """Type of the command."""
 
     application_id: Snowflake

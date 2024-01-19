@@ -1,7 +1,8 @@
 import datetime
-from typing import Annotated, Any, Literal
+from typing import Any
 
-from pydantic import BaseModel, Field
+from fbenum.adapter import FallbackAdapter
+from pydantic import BaseModel
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.guilds.models.common import ExpireBehaviorOut, IntegrationType, InviteTargetType
@@ -114,7 +115,7 @@ class GuildResponse(BaseModel):
 
     features: list[str]
     """Allowed guild features.
-    
+
     Replaced by str because it often changes without any notifications.
     """
 
@@ -294,14 +295,14 @@ class InviteChannelOut(BaseModel):
     name: str
     """Channel name."""
 
-    type: ChannelType
+    type: FallbackAdapter[ChannelType]
     """Type of channel."""
 
 
 class InviteGuildOut(BaseModel):
     """Invite guild object.
 
-    Reference: 
+    Reference:
     https://discord.com/developers/docs/resources/guild#guild-object
     https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object
     """
@@ -367,7 +368,7 @@ class InviteResponse(BaseModel):
     inviter: UserResponse | None = None
     """user who created the invite"""
 
-    target_type: InviteTargetType | None = None
+    target_type: FallbackAdapter[InviteTargetType] | None = None
     """Type of target for this voice channel invite."""
 
     target_user: UserResponse | None = None
@@ -437,8 +438,8 @@ class IntegrationApplicationOut(BaseModel):
     """Bot associated with this application."""
 
 
-class GeneralIntegrationResponse(BaseModel):
-    """Inntegration object for all types of integrations except Dicscord.
+class IntegrationResponse(BaseModel):
+    """Inntegration object.
 
     Reference: https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
     """
@@ -449,25 +450,25 @@ class GeneralIntegrationResponse(BaseModel):
     name: str
     """Integration name."""
 
-    type: Literal[IntegrationType.TWITCH, IntegrationType.YOUTUBE]
+    type: FallbackAdapter[IntegrationType]
     """Integration type (twitch, youtube, or discord)."""
 
     enabled: bool
     """Is this integration enabled."""
 
-    syncing: bool
+    syncing: bool | None = None
     """Is this integration being synced."""
 
-    role_id: Snowflake
+    role_id: Snowflake | None = None
     """ID that this integration uses for "subscribers."""
 
-    enable_emoticons: bool
+    enable_emoticons: bool | None = None
     """Whether emoticons should be synced for this integration (twitch only currently)."""
 
-    expire_behavior: ExpireBehaviorOut
+    expire_behavior: FallbackAdapter[ExpireBehaviorOut] | None = None
     """Behavior of expiring subscribers."""
 
-    expire_grace_period: int
+    expire_grace_period: int | None = None
     """Grace period (in days) before expiring subscribers."""
 
     user: UserResponse
@@ -476,13 +477,13 @@ class GeneralIntegrationResponse(BaseModel):
     account: IntegrationAccountOut
     """Integration account information."""
 
-    synced_at: datetime.datetime
+    synced_at: datetime.datetime | None = None
     """When this integration was last synced."""
 
-    subscriber_count: int
+    subscriber_count: int | None = None
     """How many subscribers this integration has."""
 
-    revoked: bool
+    revoked: bool | None = None
     """Has this integration been revoked."""
 
     application: IntegrationApplicationOut | None = None
@@ -490,41 +491,3 @@ class GeneralIntegrationResponse(BaseModel):
 
     scopes: list[str] | None = None
     """Scopes the application has been authorized for."""
-
-
-class DiscordIntegrationResponse(BaseModel):
-    """Integration object for Discord integrations.
-
-    Reference:
-    https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
-    """
-
-    id: Snowflake
-    """Integration id."""
-
-    name: str
-    """Integration name."""
-
-    type: Literal[IntegrationType.DISCORD]
-    """Integration type (twitch, youtube, or discord)."""
-
-    enabled: bool
-    """Is this integration enabled"""
-
-    user: UserResponse | None = None
-    """User for this integration."""
-
-    account: IntegrationAccountOut
-    """Integration account information."""
-
-    application: IntegrationApplicationOut | None = None
-    """Bot OAuth2 application for discord integrations."""
-
-    scopes: list[str] | None = None
-    """Scopes the application has been authorized for."""
-
-
-IntegrationResponseType = Annotated[
-    GeneralIntegrationResponse | DiscordIntegrationResponse, Field(discriminator='type')
-]
-"""Integration object for all types of integrations."""

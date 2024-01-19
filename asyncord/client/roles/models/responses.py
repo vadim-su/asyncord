@@ -1,7 +1,7 @@
 """Role models for the client."""
 
 import enum
-import typing
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -31,10 +31,8 @@ class RoleTagsOut(BaseModel):
     integration_id: Snowflake | None = None
     """Id of the integration this role belongs to."""
 
-    premium_subscriber: typing.Any = None
+    premium_subscriber: Any = None
     """Whether this is the guild's premium subscriber role."""
-
-# enum and unique
 
 
 class RoleResponse(BaseModel):

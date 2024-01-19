@@ -159,7 +159,7 @@ class PermissionFlag(enum.IntFlag):
 
     CREATE_GUILD_EXPRESSIONS = 1 << 43
     """Allows for creating, deleting emojis, stickers, and soundboard sounds.
-    
+
     Not yet available to developers.
     """
 

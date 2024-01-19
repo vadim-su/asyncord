@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel
 
 from asyncord.client.users.models.responses import UserResponse
@@ -66,10 +67,10 @@ class Sticker(BaseModel):
     asset: str | None = None
     """Deprecated previously the sticker asset hash, now an empty string"""
 
-    type: StickerType
+    type: FallbackAdapter[StickerType]
     """type of sticker"""
 
-    format_type: StickerFormatType
+    format_type: FallbackAdapter[StickerFormatType]
     """type of sticker format"""
 
     available: bool | None = None

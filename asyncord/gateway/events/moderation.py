@@ -1,6 +1,8 @@
 """All auto moderation related events are currently only sent to bot users
 which have the MANAGE_GUILD permission.
 """
+from fbenum.adapter import FallbackAdapter
+
 from asyncord.client.models.automoderation import AutoModerationRule, RuleAction, TriggerType
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
@@ -42,7 +44,7 @@ class AutoModerationActionExecutionEvent(GatewayEvent):
     rule_id: Snowflake
     """Rule id which action belongs to."""
 
-    rule_trigger_type: TriggerType
+    rule_trigger_type: FallbackAdapter[TriggerType]
     """Trigger type of rule which was triggered."""
 
     user_id: Snowflake

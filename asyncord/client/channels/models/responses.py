@@ -9,6 +9,7 @@ from __future__ import annotations
 import datetime
 from typing import Annotated
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field
 
 from asyncord.client.channels.models.common import (
@@ -41,7 +42,7 @@ class OverwriteOut(BaseModel):
     Set corresponding type field.
     """
 
-    type: OverwriteType
+    type: FallbackAdapter[OverwriteType]
     """Type of overwrite."""
 
     allow: PermissionFlag
@@ -134,9 +135,9 @@ class ThreadMetadataOut(BaseModel):
     """
 
     create_timestamp: datetime.datetime | None = None
-    """Timestamp when the thread was created;
-    
-    only populated for threads created after 2022-01-09
+    """Timestamp when the thread was created.
+
+    Only populated for threads created after 2022-01-09.
     """
 
 
@@ -172,8 +173,8 @@ class ThreadMemberOut(BaseModel):
 
     member: MemberResponse | None = None
     """Additional information about the user
-    
-    The member field is only present when with_member is set to true 
+
+    The member field is only present when with_member is set to true
     when calling List Thread Members or Get Thread Member.
     """
 
@@ -188,7 +189,7 @@ class ChannelResponse(BaseModel):
     id: Snowflake
     """Channel id."""
 
-    type: ChannelType
+    type: FallbackAdapter[ChannelType]
     """Type of channel."""
 
     guild_id: Snowflake | None = None
@@ -268,7 +269,7 @@ class ChannelResponse(BaseModel):
     rtc_region: str | None = None
     """Voice region id for the voice channel, automatic when set to null."""
 
-    video_quality_mode: VideoQualityMode | None = None
+    video_quality_mode: FallbackAdapter[VideoQualityMode] | None = None
     """Camera video quality mode of the voice channel, 1 when not present."""
 
     message_count: int | None = None
@@ -297,9 +298,9 @@ class ChannelResponse(BaseModel):
     permissions: str | None = None
     """Computed permissions for the invoking user in the channel,
     including overwrites.
-     
-    Only included when part of the resolved data received 
-    on a slash command interaction. This does not include implicit permissions, 
+
+    Only included when part of the resolved data received
+    on a slash command interaction. This does not include implicit permissions,
     which may need to be checked separately
     """
 
@@ -328,18 +329,18 @@ class ChannelResponse(BaseModel):
 
     default_thread_rate_limit_per_user: int | None = None
     """Initial rate_limit_per_user to set on newly created threads in a channel.
-     
+
     This field is copied to the thread at creation time and does not live update.
     """
 
-    default_sort_order: ThreadSortOrder | None = None
+    default_sort_order: FallbackAdapter[ThreadSortOrder] | None = None
     """Default sort order type used to order posts in GUILD_FORUM channels.
-    
+
     Defaults to null, which indicates a preferred sort order hasn't been set by a channel admin
     """
 
-    default_forum_layout: DefaultForumLayoutType | None = None
-    """Default forum layout view used to display posts in GUILD_FORUM channels
-    
-    Defaults to 0, which indicates a layout view has not been set by a channel admin
+    default_forum_layout: FallbackAdapter[DefaultForumLayoutType] | None = None
+    """Default forum layout view used to display posts in GUILD_FORUM channels.
+
+    Defaults to 0, which indicates a layout view has not been set by a channel admin.
     """

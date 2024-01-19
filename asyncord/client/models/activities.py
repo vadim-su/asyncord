@@ -9,6 +9,7 @@ from __future__ import annotations
 import datetime
 import enum
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field
 
 from asyncord.snowflake import Snowflake
@@ -224,7 +225,8 @@ class Activity(BaseModel):
     name: str
     """Activity's name."""
 
-    type: ActivityType
+    # TODO: Need to separate the type for input and output
+    type: FallbackAdapter[ActivityType]
     """Activity type."""
 
     url: str | None = None
