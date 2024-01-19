@@ -9,8 +9,6 @@ class InteractionType(enum.IntEnum):
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
     """
 
-    # TODO: #16 move to interactions module (Now it is here because of circular imports)
-
     PING = 1
     """Ping interaction."""
 
@@ -68,6 +66,6 @@ class InteractionResponseType(enum.IntEnum):
 
     PREMIUM_REQUIRED = 10
     """Respond to an interaction with an upgrade button.
-    
+
     Only available for apps with monetization enabled.
     """

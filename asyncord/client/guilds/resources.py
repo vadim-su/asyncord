@@ -14,7 +14,7 @@ from asyncord.client.guilds.models.requests import CreateGuildRequest, UpdateWel
 from asyncord.client.guilds.models.responses import (
     GuildPreviewResponse,
     GuildResponse,
-    IntegrationResponseType,
+    IntegrationResponse,
     InviteResponse,
     PruneResponse,
     VoiceRegionResponse,
@@ -286,7 +286,7 @@ class GuildResource(ClientSubresource):
         resp = await self._http_client.get(url)
         return list_model(ChannelResponse).validate_python(resp.body)
 
-    async def get_integrations(self, guild_id: SnowflakeInputType) -> list[IntegrationResponseType]:
+    async def get_integrations(self, guild_id: SnowflakeInputType) -> list[IntegrationResponse]:
         """Get the integrations for a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#get-guild-integrations
@@ -299,7 +299,7 @@ class GuildResource(ClientSubresource):
         """
         url = self.guilds_url / str(guild_id) / 'integrations'
         resp = await self._http_client.get(url)
-        return list_model(IntegrationResponseType).validate_python(resp.body)
+        return list_model(IntegrationResponse).validate_python(resp.body)
 
     async def delete_integration(
         self,

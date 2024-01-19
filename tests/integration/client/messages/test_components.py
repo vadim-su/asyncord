@@ -6,6 +6,7 @@ from asyncord.client.messages.models.requests.components import (
     ActionRow,
     Button,
     ButtonStyle,
+    Component,
     ComponentType,
     SelectMenu,
     SelectMenuOption,
@@ -15,7 +16,7 @@ from asyncord.client.messages.resources import MessageResource
 
 
 async def test_create_message_with_buttons(messages_res: MessageResource):
-    components = [
+    components: list[Component] = [
         ActionRow(
             components=[
                 Button(

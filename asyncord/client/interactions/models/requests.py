@@ -92,6 +92,7 @@ class InteractionDeferredChannelMessageResponseRequest(BaseModel):
 
 # TODO: possibly should inherit from BaseMessage
 class InteractionUpdateMessageData(BaseModel):
+
     """Interaction response data for UPDATE_MESSAGE.
 
     References:

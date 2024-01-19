@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Annotated, Literal
 from typing import get_args as get_typing_args
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field
 
 from asyncord.client.channels.models.common import ChannelType
@@ -59,7 +60,7 @@ class ButtonOut(BaseComponentOut):
     Only `ComponentType.BUTTON` is allowed.
     """
 
-    style: ButtonStyle = ButtonStyle.PRIMARY
+    style: Annotated[ButtonStyle, FallbackAdapter()] = ButtonStyle.PRIMARY
     """Style of the button."""
 
     label: str | None = None
@@ -156,16 +157,16 @@ class SelectMenuOut(BaseComponentOut):
     Max 25 options.
     """
 
-    channel_types: list[ChannelType] = Field(default_factory=list)
-    """List of channel types to include in the channel select component"""
+    channel_types: list[FallbackAdapter[ChannelType]] = Field(default_factory=list)
+    """List of channel types to include in the channel select component."""
 
     placeholder: str | None = None
     """Placeholder text if nothing is selected; max 150 characters."""
 
     default_values: list[SelectDefaultValueOut] | None = None
-    """List of default values for auto-populated select menu components; 
-    
-    number of default values must be in the range defined by min_values and max_values.
+    """List of default values for auto-populated select menu components.
+
+    Number of default values must be in the range defined by min_values and max_values.
     """
 
     min_values: int
@@ -200,7 +201,7 @@ class TextInputOut(BaseComponentOut):
     Max 100 characters.
     """
 
-    style: TextInputStyle = TextInputStyle.SHORT
+    style: Annotated[TextInputStyle, FallbackAdapter()] = TextInputStyle.SHORT
     """Style of the text input."""
 
     label: str | None = None
@@ -250,15 +251,56 @@ class ActionRowOut(BaseComponentOut):
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
     """Type of the component."""
 
-    components: list[ComponentOut | TextInputOut]
+    components: _ConponentList
     """Components in the action row.
 
     Text input components are not allowed in action rows.
     """
 
 
-ComponentOut = Annotated[ActionRowOut | ButtonOut | SelectMenuOut, Field(discriminator='type')]
-"""Type of the component."""
+class FallbackComponentOut(BaseComponentOut, extra='allow'):
+    """Fallback component type.
 
-# Rebuild ActionRow model to add `components` field after Component type created.
+    This model is used when the type of the component is unknown.
+    """
+
+    type: FallbackAdapter[ComponentType]
+    """Type of the component."""
+
+    components: _ConponentList = Field(default_factory=list)
+    """Components in the action row.
+
+    Text input components are not allowed in action rows.
+    """
+
+
+ComponentOut = Annotated[
+    ActionRowOut
+    | ButtonOut
+    | SelectMenuOut,
+    Field(discriminator='type'),
+] | FallbackComponentOut
+"""Type of the component.
+
+Message Response can contain any of the component types, but not text input.
+"""
+
+_ConponentList = list[
+    Annotated[
+        ActionRowOut
+        | ButtonOut
+        | SelectMenuOut,
+        Field(discriminator='type'),
+    ]
+    | TextInputOut
+    | FallbackComponentOut
+]
+"""Type of the component list.
+
+Similar to `ComponentOut`, but can contain text input.
+"""
+
+
+# Rebuild ActionRow like models to add `components` field after Component type created.
 ActionRowOut.model_rebuild()
+FallbackComponentOut.model_rebuild()

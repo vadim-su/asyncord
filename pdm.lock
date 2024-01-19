@@ -4,8 +4,8 @@
 [metadata]
 groups = ["default", "dev", "linting", "testing"]
 strategy = ["cross_platform"]
-lock_version = "4.4"
-content_hash = "sha256:3df2bcf645ae45e0179033d02b6d1d1920461c6e4901c3ccaa639093a9689673"
+lock_version = "4.4.1"
+content_hash = "sha256:43c522ea514f2f614f5639026a0a8a06855c80cc6106b703d5ea64f9fe68c58c"
 
 [[package]]
 name = "aiohttp"
@@ -111,6 +111,19 @@ summary = "Distribution utilities"
 files = [
     {file = "distlib-0.3.8-py2.py3-none-any.whl", hash = "sha256:034db59a0b96f8ca18035f36290806a9a6e6bd9d1ff91e45a7f172eb17e51784"},
     {file = "distlib-0.3.8.tar.gz", hash = "sha256:1530ea13e350031b6312d8580ddb6b27a104275a31106523b8f123787f494f64"},
+]
+
+[[package]]
+name = "fbenum"
+version = "1.0.1"
+requires_python = ">=3.12"
+summary = "Library provides fallback enum functionality. Fully compatible with pydantic."
+dependencies = [
+    "pydantic-core>=2.14.6",
+]
+files = [
+    {file = "fbenum-1.0.1-py3-none-any.whl", hash = "sha256:5399582bfca2c8eb84b0836bade371f7f3408cbf23af4ec398fdc25ca98da434"},
+    {file = "fbenum-1.0.1.tar.gz", hash = "sha256:d2f2606dbd31318ff078a2e3cbf1bcecff6ea215d3f8ed2f626c6207dc5103ba"},
 ]
 
 [[package]]

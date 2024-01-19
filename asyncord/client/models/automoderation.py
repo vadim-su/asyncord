@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import enum
-from typing import Self
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
+from fbenum.adapter import FallbackAdapter
+from pydantic import BaseModel, Field
 
 from asyncord.snowflake import Snowflake
 
@@ -80,11 +80,11 @@ class TriggerMetadata(BaseModel):
 
     regex_patterns: list[str] = Field(max_length=10)
     """regular expression patterns which will be matched against content (Maximum of 10)
-    
+
     Associated with `TriggerType.KEYWORD`.
 
-    Only Rust flavored regex is currently supported, 
-    which can be tested in online editors such as Rustexp. 
+    Only Rust flavored regex is currently supported,
+    which can be tested in online editors such as Rustexp.
     Each regex pattern must be 260 characters or less.
     """
 
@@ -115,8 +115,8 @@ class TriggerMetadata(BaseModel):
     """
 
     mention_raid_protection_enabled: bool = False
-    """whether to automatically detect mention raids.
-    
+    """Whether to automatically detect mention raids.
+
     Associated with `TriggerType.MENTION_SPAM`.
     """
 
@@ -161,9 +161,9 @@ class RuleActionMetadata(BaseModel):
     """
 
     custom_message: str | None = Field(None, max_length=150)
-    """additional explanation that will be shown to members whenever their message is blocked
-    
-    maximum of 150 characters
+    """Additional explanation that will be shown to members whenever their message is blocked
+
+    Maximum of 150 characters
     """
 
 
@@ -178,26 +178,6 @@ class RuleAction(BaseModel):
 
     metadata: RuleActionMetadata | None = None
     """Action metadata."""
-
-    @model_validator(mode='after')
-    def validate_metadata(self) -> Self:
-        """Validate the metadata for the action."""
-        match self.type:
-            case RuleActionType.BLOCK_MESSAGE:
-                if self.metadata:
-                    raise ValueError('Metadata is not allowed for `RuleActionType.BLOCK_MESSAGE`')
-
-            case RuleActionType.SEND_ALERT_MESSAGE:
-                if not self.metadata or self.metadata.channel_id is None:
-                    raise ValueError(
-                        '`Metadata.channel_id` is required for `RuleActionType.SEND_ALERT_MESSAGE`',
-                    )
-
-            case RuleActionType.TIMEOUT:
-                if not self.metadata or self.metadata.duration_seconds is None:
-                    raise ValueError('`Metadata.duration_seconds` is required for `RuleActionType.TIMEOUT`')
-
-        return self
 
 
 class AutoModerationRule(BaseModel):
@@ -219,10 +199,10 @@ class AutoModerationRule(BaseModel):
     creator_id: Snowflake
     """ID of the user who created this rule."""
 
-    event_type: AutoModerationRuleEventType
+    event_type: FallbackAdapter[AutoModerationRuleEventType]
     """Rule event type."""
 
-    trigger_type: TriggerType
+    trigger_type: FallbackAdapter[TriggerType]
     """Rule trigger type."""
 
     trigger_metadata: TriggerMetadata
@@ -245,21 +225,3 @@ class AutoModerationRule(BaseModel):
 
     Maximum of 50.
     """
-
-    @field_validator('actions')
-    def check_actions(cls, actions: list[RuleAction], field_info: ValidationInfo) -> list[RuleAction]:
-        """Validate actions for the rule."""
-        trigger_type: TriggerType = field_info.data['trigger_type']
-
-        keyword_or_mention_spam = trigger_type in {
-            TriggerType.KEYWORD,
-            TriggerType.MENTION_SPAM,
-        }
-        for action in actions:
-            if action.type is RuleActionType.TIMEOUT and not keyword_or_mention_spam:
-                raise ValueError(
-                    'Timeout actions can only be used with `TriggerType.KEYWORD` '
-                    + 'and `TriggerType.MENTION_SPAM` triggers.',
-                )
-
-        return actions

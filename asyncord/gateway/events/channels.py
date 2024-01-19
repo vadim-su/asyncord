@@ -1,6 +1,8 @@
 import datetime
 from typing import Any
 
+from fbenum.adapter import FallbackAdapter
+
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.channels.models.responses import ChannelResponse, ThreadMemberOut
 from asyncord.client.members.models.responses import MemberResponse
@@ -33,7 +35,7 @@ class ChannelDeleteEvent(GatewayEvent):
     id: Snowflake
     """Channel id."""
 
-    type: ChannelType
+    type: FallbackAdapter[ChannelType]
     """Channel type."""
 
     guild_id: Snowflake

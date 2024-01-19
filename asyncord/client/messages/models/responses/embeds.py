@@ -1,5 +1,6 @@
 import datetime
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field
 
 from asyncord.client.messages.models.common import EmbedType
@@ -144,7 +145,7 @@ class EmbedOut(BaseModel):
     title: str | None = None
     """Title of the embed."""
 
-    type: EmbedType | None = None
+    type: FallbackAdapter[EmbedType] | None = None
     """Type of the embed.
 
     Always "rich" for webhook embeds.
@@ -173,7 +174,7 @@ class EmbedOut(BaseModel):
 
     video: EmbedVideoOut | None = None
     """Video information.
-    
+
     Bots can not use this field.
     Discord API will ignore it if provided.
     """
