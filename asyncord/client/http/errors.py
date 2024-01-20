@@ -5,6 +5,8 @@ from typing import Any, Mapping
 from aiohttp import ClientResponse
 from pydantic import BaseModel
 
+from asyncord.client.http.error_codes import ErrorCode
+
 
 class BaseDiscordError(Exception):
     """Base class for all Discord errors."""
@@ -181,7 +183,7 @@ class ServerError(DiscordHTTPError):
 class ErrorItem(BaseModel):
     """Represents an error item."""
 
-    code: int
+    code: str
     """Error code."""
 
     message: str
@@ -205,7 +207,7 @@ type ArrayErrorType = dict[int, ObjectErrorType]
 class RequestErrorBody(BaseModel):
     """Represents a body of a request error."""
 
-    code: int
+    code: ErrorCode
     """Error code."""
 
     message: str
