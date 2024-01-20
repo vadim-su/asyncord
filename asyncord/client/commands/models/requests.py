@@ -196,19 +196,19 @@ class ApplicationCommandOptionAttachment(BaseApplicationCommandOption):
     type: Literal[AppCommandOptionType.ATTACHMENT] = AppCommandOptionType.ATTACHMENT
 
 
-ApplicationCommandOption = Union(
-    ApplicationCommandOptionSubCommand |
-    ApplicationCommandOptionSubCommandGroup |
-    ApplicationCommandOptionString |
-    ApplicationCommandOptionInteger |
-    ApplicationCommandOptionBoolean |
-    ApplicationCommandOptionUser |
-    ApplicationCommandOptionChannel |
-    ApplicationCommandOptionRole |
-    ApplicationCommandOptionMentionable |
-    ApplicationCommandOptionNumber |
+type ApplicationCommandOption = Union[
+    ApplicationCommandOptionSubCommand,
+    ApplicationCommandOptionSubCommandGroup,
+    ApplicationCommandOptionString,
+    ApplicationCommandOptionInteger,
+    ApplicationCommandOptionBoolean,
+    ApplicationCommandOptionUser,
+    ApplicationCommandOptionChannel,
+    ApplicationCommandOptionRole,
+    ApplicationCommandOptionMentionable,
+    ApplicationCommandOptionNumber,
     ApplicationCommandOptionAttachment
-)
+]
 
 
 class CreateApplicationCommandRequest(BaseModel):
