@@ -78,24 +78,36 @@ class BaseApplicationCommandOption(BaseModel):
     """Indicates whether the option is required. Defaults to False."""
 
 
-class ApplicationCommandOptionSubCommand(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandSubCommandOption(BaseApplicationCommandOption):
+    """Represents a SUB_COMMAND type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.SUB_COMMAND] = AppCommandOptionType.SUB_COMMAND
 
     options: list[ApplicationCommandOption] | None = None
     """List of options for subcommand and subcommand group types."""
 
 
-class ApplicationCommandOptionSubCommandGroup(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandSubCommandGroupOption(BaseApplicationCommandOption):
+    """Represents a SUB_COMMAND_GROUP type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.SUB_COMMAND_GROUP] = AppCommandOptionType.SUB_COMMAND_GROUP
 
     options: list[ApplicationCommandOption] | None = None
     """List of options for subcommand and subcommand group types."""
 
 
-class ApplicationCommandOptionString(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandStringOption(BaseApplicationCommandOption):
+    """Represents a STRING type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.STRING] = AppCommandOptionType.STRING
 
     choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
@@ -105,20 +117,24 @@ class ApplicationCommandOptionString(BaseApplicationCommandOption):
     """
 
     min_length: int | None = Field(None, ge=0, le=6000)
-    """Minimum length for the option if the option type is `STRING`."""
+    """Minimum length for the option."""
 
     max_length: int | None = Field(None, ge=0, le=6000)
-    """Maximum length for the option if the option type is `STRING`."""
+    """Maximum length for the option."""
 
     autocomplete: bool | None = None
-    """Whether the option is a custom autocomplete option for `STRING`, `INTEGER`, or `NUMBER` types.
+    """Whether the option is a custom autocomplete option.
 
     Options using autocomplete are not confined to only use choices given by the application.
     """
 
 
-class ApplicationCommandOptionInteger(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandIntegerOption(BaseApplicationCommandOption):
+    """Represents an INTEGER type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.INTEGER] = AppCommandOptionType.INTEGER
 
     choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
@@ -128,48 +144,74 @@ class ApplicationCommandOptionInteger(BaseApplicationCommandOption):
     """
 
     min_value: int | None = None
-    """Minimum value for the option if the option type is `INTEGER` or `NUMBER`."""
+    """Minimum value for the option."""
 
     max_value: int | None = None
-    """Maximum value for the option if the option type is `INTEGER` or `NUMBER`."""
+    """Maximum value for the option."""
 
     autocomplete: bool | None = None
-    """Whether the option is a custom autocomplete option for `STRING`, `INTEGER`, or `NUMBER` types.
+    """Whether the option is a custom autocomplete option.
 
     Options using autocomplete are not confined to only use choices given by the application.
     """
 
 
-class ApplicationCommandOptionBoolean(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandBooleanOption(BaseApplicationCommandOption):
+    """Represents a BOOLEAN type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[AppCommandOptionType.BOOLEAN] = AppCommandOptionType.BOOLEAN
 
 
-class ApplicationCommandOptionUser(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandUserOption(BaseApplicationCommandOption):
+    """Represents a USER type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
+
     type: Literal[AppCommandOptionType.USER] = AppCommandOptionType.USER
 
 
-class ApplicationCommandOptionChannel(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandChannelOption(BaseApplicationCommandOption):
+    """Represents a CHANNEL type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.CHANNEL] = AppCommandOptionType.CHANNEL
 
     channel_types: list[ChannelType] | None = None
     """List of available channel types if the option type is a `CHANNEL`."""
 
 
-class ApplicationCommandOptionRole(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandRoleOption(BaseApplicationCommandOption):
+    """Represents a ROLE type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.ROLE] = AppCommandOptionType.ROLE
 
 
-class ApplicationCommandOptionMentionable(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandMentionableOption(BaseApplicationCommandOption):
+    """Represents a MENTIONABLE type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.MENTIONABLE] = AppCommandOptionType.MENTIONABLE
 
 
-class ApplicationCommandOptionNumber(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandNumberOption(BaseApplicationCommandOption):
+    """Represents a NUMBER type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.NUMBER] = AppCommandOptionType.NUMBER
 
     choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
@@ -179,36 +221,25 @@ class ApplicationCommandOptionNumber(BaseApplicationCommandOption):
     """
 
     min_value: int | None = None
-    """Minimum value for the option if the option type is `INTEGER` or `NUMBER`."""
+    """Minimum value for the option."""
 
     max_value: int | None = None
-    """Maximum value for the option if the option type is `INTEGER` or `NUMBER`."""
+    """Maximum value for the option."""
 
     autocomplete: bool | None = None
-    """Whether the option is a custom autocomplete option for `STRING`, `INTEGER`, or `NUMBER` types.
+    """Whether the option is a custom autocomplete option.
 
     Options using autocomplete are not confined to only use choices given by the application.
     """
 
 
-class ApplicationCommandOptionAttachment(BaseApplicationCommandOption):
-    """Represents an option for a Discord application command."""
+class ApplicationCommandAttachmentOption(BaseApplicationCommandOption):
+    """Represents an ATTACHMENT type option for a Discord application command.
+
+    Reference:
+    https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
+    """
     type: Literal[AppCommandOptionType.ATTACHMENT] = AppCommandOptionType.ATTACHMENT
-
-
-type ApplicationCommandOption = Union[
-    ApplicationCommandOptionSubCommand,
-    ApplicationCommandOptionSubCommandGroup,
-    ApplicationCommandOptionString,
-    ApplicationCommandOptionInteger,
-    ApplicationCommandOptionBoolean,
-    ApplicationCommandOptionUser,
-    ApplicationCommandOptionChannel,
-    ApplicationCommandOptionRole,
-    ApplicationCommandOptionMentionable,
-    ApplicationCommandOptionNumber,
-    ApplicationCommandOptionAttachment
-]
 
 
 class CreateApplicationCommandRequest(BaseModel):
@@ -272,3 +303,18 @@ class CreateApplicationCommandRequest(BaseModel):
         # Required options must be listed before optional options
         options.sort(key=lambda item: item.required, reverse=True)
         return options
+
+
+type ApplicationCommandOption = Union[
+    ApplicationCommandSubCommandOption,
+    ApplicationCommandSubCommandGroupOption,
+    ApplicationCommandStringOption,
+    ApplicationCommandIntegerOption,
+    ApplicationCommandBooleanOption,
+    ApplicationCommandUserOption,
+    ApplicationCommandChannelOption,
+    ApplicationCommandRoleOption,
+    ApplicationCommandMentionableOption,
+    ApplicationCommandNumberOption,
+    ApplicationCommandAttachmentOption
+]
