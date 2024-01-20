@@ -217,7 +217,7 @@ class ActivityButton(BaseModel):
 class Activity(BaseModel):
     """Represents a Discord activity.
 
-    Bots are only able to send name, type, and optionally url.
+    Bots are only able to send name, state, type, and optionally url.
 
     https://discord.com/developers/docs/topics/gateway-events#activity-object
     """
@@ -225,7 +225,7 @@ class Activity(BaseModel):
     name: str
     """Activity's name."""
 
-    type: FallbackAdapter[ActivityType]
+    type: ActivityType
     """Activity type."""
 
     url: str | None = None
@@ -281,8 +281,6 @@ class Activity(BaseModel):
 
 class ActivityResponse(BaseModel):
     """Represents a Discord activity.
-
-    Bots are only able to send name, type, and optionally url.
 
     https://discord.com/developers/docs/topics/gateway-events#activity-object
     """
