@@ -6,7 +6,7 @@ https://discord.com/developers/docs/interactions/application-commands
 
 from __future__ import annotations
 
-from typing import Annotated, Final
+from typing import Annotated, Final, Literal, Union
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
@@ -46,7 +46,7 @@ class ApplicationCommandOptionChoice(BaseModel):
     """
 
 
-class ApplicationCommandOption(BaseModel):
+class BaseApplicationCommandOption(BaseModel):
     """Represents an option for a Discord application command.
 
     Reference:
@@ -77,20 +77,32 @@ class ApplicationCommandOption(BaseModel):
     required: bool = False
     """Indicates whether the option is required. Defaults to False."""
 
-    choices: list[ApplicationCommandOptionChoice] | None = None
-    """List of choices for string and number types."""
+
+class ApplicationCommandOptionSubCommand(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.SUB_COMMAND] = AppCommandOptionType.SUB_COMMAND
 
     options: list[ApplicationCommandOption] | None = None
     """List of options for subcommand and subcommand group types."""
 
-    channel_types: list[ChannelType] | None = None
-    """List of available channel types if the option type is a `CHANNEL`."""
 
-    min_value: int | None = None
-    """Minimum value for the option if the option type is `INTEGER` or `NUMBER`."""
+class ApplicationCommandOptionSubCommandGroup(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.SUB_COMMAND_GROUP] = AppCommandOptionType.SUB_COMMAND_GROUP
 
-    max_value: int | None = None
-    """Maximum value for the option if the option type is `INTEGER` or `NUMBER`."""
+    options: list[ApplicationCommandOption] | None = None
+    """List of options for subcommand and subcommand group types."""
+
+
+class ApplicationCommandOptionString(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.STRING] = AppCommandOptionType.STRING
+
+    choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
+    """List of choices for string and number types.
+    
+    Max length is 25.
+    """
 
     min_length: int | None = Field(None, ge=0, le=6000)
     """Minimum length for the option if the option type is `STRING`."""
@@ -104,80 +116,99 @@ class ApplicationCommandOption(BaseModel):
     Options using autocomplete are not confined to only use choices given by the application.
     """
 
-    @field_validator('choices')
-    def validate_choices(
-        cls,
-        choices: list[ApplicationCommandOptionChoice] | None,
-        field_info: ValidationInfo,
-    ) -> list[ApplicationCommandOptionChoice] | None:
-        """Validate options."""
-        if choices is None:
-            return None
 
-        allowed_types = {
-            AppCommandOptionType.STRING,
-            AppCommandOptionType.INTEGER,
-            AppCommandOptionType.NUMBER,
-        }
+class ApplicationCommandOptionInteger(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.INTEGER] = AppCommandOptionType.INTEGER
 
-        if field_info.data['type'] not in allowed_types:
-            raise ValueError('Choices field can only be set for string and number types')
-        return choices
+    choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
+    """List of choices for string and number types.
+    
+    Max length is 25.
+    """
 
-    @field_validator('options')
-    def validate_options(
-        cls,
-        options: list[ApplicationCommandOption] | None,
-        field_info: ValidationInfo,
-    ) -> list[ApplicationCommandOption] | None:
-        """Validate options."""
-        if options is None:
-            return None
+    min_value: int | None = None
+    """Minimum value for the option if the option type is `INTEGER` or `NUMBER`."""
 
-        sub_command_types = {AppCommandOptionType.SUB_COMMAND, AppCommandOptionType.SUB_COMMAND_GROUP}
+    max_value: int | None = None
+    """Maximum value for the option if the option type is `INTEGER` or `NUMBER`."""
 
-        if field_info.data['type'] not in sub_command_types:
-            raise ValueError('Options are only allowed for subcommand and subcommand group types')
+    autocomplete: bool | None = None
+    """Whether the option is a custom autocomplete option for `STRING`, `INTEGER`, or `NUMBER` types.
 
-        # Required options must be listed before optional options
-        options.sort(key=lambda item: item.required, reverse=True)
-        return options
+    Options using autocomplete are not confined to only use choices given by the application.
+    """
 
-    @field_validator('channel_types')
-    def validate_channel_types(
-        cls, channel_types: list[ChannelType] | None, field_info: ValidationInfo,
-    ) -> list[ChannelType] | None:
-        """Validates the channel_types field."""
-        if channel_types is None:
-            return None
 
-        if field_info.data['type'] is not AppCommandOptionType.CHANNEL:
-            raise ValueError('Channel types field can only be set for channel type')
-        return channel_types
+class ApplicationCommandOptionBoolean(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.BOOLEAN] = AppCommandOptionType.BOOLEAN
 
-    @field_validator('min_value', 'max_value')
-    def validate_min_max_value(
-        cls, field_value: int | None, field_info: ValidationInfo,
-    ) -> int | None:
-        """Validates the min_value and max_value fields."""
-        if field_value is None:
-            return None
 
-        if field_info.data['type'] not in {AppCommandOptionType.INTEGER, AppCommandOptionType.NUMBER}:
-            raise ValueError('Min and max value fields can only be set for integer and number types')
-        return field_value
+class ApplicationCommandOptionUser(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.USER] = AppCommandOptionType.USER
 
-    @field_validator('min_length', 'max_length')
-    def validate_min_max_length(
-        cls, field_value: int | None, field_info: ValidationInfo,
-    ) -> int | None:
-        """Validates the min_length and max_length fields."""
-        if field_value is None:
-            return None
 
-        if field_info.data['type'] is not AppCommandOptionType.STRING:
-            raise ValueError('Min and max length fields can only be set for string type')
-        return field_value
+class ApplicationCommandOptionChannel(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.CHANNEL] = AppCommandOptionType.CHANNEL
+
+    channel_types: list[ChannelType] | None = None
+    """List of available channel types if the option type is a `CHANNEL`."""
+
+
+class ApplicationCommandOptionRole(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.ROLE] = AppCommandOptionType.ROLE
+
+
+class ApplicationCommandOptionMentionable(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.MENTIONABLE] = AppCommandOptionType.MENTIONABLE
+
+
+class ApplicationCommandOptionNumber(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.NUMBER] = AppCommandOptionType.NUMBER
+
+    choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
+    """List of choices for string and number types.
+    
+    Max length is 25.
+    """
+
+    min_value: int | None = None
+    """Minimum value for the option if the option type is `INTEGER` or `NUMBER`."""
+
+    max_value: int | None = None
+    """Maximum value for the option if the option type is `INTEGER` or `NUMBER`."""
+
+    autocomplete: bool | None = None
+    """Whether the option is a custom autocomplete option for `STRING`, `INTEGER`, or `NUMBER` types.
+
+    Options using autocomplete are not confined to only use choices given by the application.
+    """
+
+
+class ApplicationCommandOptionAttachment(BaseApplicationCommandOption):
+    """Represents an option for a Discord application command."""
+    type: Literal[AppCommandOptionType.ATTACHMENT] = AppCommandOptionType.ATTACHMENT
+
+
+ApplicationCommandOption = Union(
+    ApplicationCommandOptionSubCommand |
+    ApplicationCommandOptionSubCommandGroup |
+    ApplicationCommandOptionString |
+    ApplicationCommandOptionInteger |
+    ApplicationCommandOptionBoolean |
+    ApplicationCommandOptionUser |
+    ApplicationCommandOptionChannel |
+    ApplicationCommandOptionRole |
+    ApplicationCommandOptionMentionable |
+    ApplicationCommandOptionNumber |
+    ApplicationCommandOptionAttachment
+)
 
 
 class CreateApplicationCommandRequest(BaseModel):
