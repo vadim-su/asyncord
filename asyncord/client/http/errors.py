@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from aiohttp import ClientResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from asyncord.client.http.error_codes import ErrorCode
 
@@ -96,9 +96,19 @@ class ClientError(DiscordHTTPError):
             list[ErrorItem]: The errors.
         """
         if isinstance(errors, ErrorBlock):
-            return path + '\n'.join(f'\t-> {error.code}: {error.message}' for error in errors._errors)
+            return path + '\n'.join(f'\t-> {error.code}: {error.message}' for error in errors.errors)
 
-        return '\n'.join(self._format_errors(f'{path}.{key}', value) for key, value in errors.items())
+        error_item_str_list = []
+
+        for field_name, error in errors.items():
+            if path:
+                new_path = f'{path}.{field_name}'
+            else:
+                new_path = str(field_name)
+
+            error_item_str_list.append(self._format_errors(new_path, error))
+
+        return '\n'.join(error_item_str_list)
 
 
 class RateLimitError(DiscordHTTPError):
@@ -175,9 +185,19 @@ class ServerError(DiscordHTTPError):
             list[ErrorItem]: The errors.
         """
         if isinstance(errors, ErrorBlock):
-            return path + '\n'.join(f'\t-> {error.code}: {error.message}' for error in errors._errors)
+            return path + '\n'.join(f'\t-> {error.code}: {error.message}' for error in errors.errors)
 
-        return '\n'.join(self._format_errors(f'{path}.{key}', value) for key, value in errors.items())
+        error_item_str_list = []
+
+        for field_name, error in errors.items():
+            if path:
+                new_path = f'{path}.{field_name}'
+            else:
+                new_path = str(field_name)
+
+            error_item_str_list.append(self._format_errors(new_path, error))
+
+        return '\n'.join(error_item_str_list)
 
 
 class ErrorItem(BaseModel):
@@ -193,7 +213,7 @@ class ErrorItem(BaseModel):
 class ErrorBlock(BaseModel):
     """Represents an object error."""
 
-    _errors: list[ErrorItem]
+    errors: list[ErrorItem] = Field(alias='_errors')
     """List of errors."""
 
 
