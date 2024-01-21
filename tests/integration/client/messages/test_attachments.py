@@ -1,6 +1,12 @@
 from yarl import URL
 
-from asyncord.client.messages.models.requests.embeds import Embed, EmbedAuthor, EmbedFooter, EmbedImage, EmbedThumbnail
+from asyncord.client.messages.models.requests.embeds import (
+    Embed,
+    EmbedAuthor,
+    EmbedFooter,
+    EmbedImage,
+    EmbedThumbnail,
+)
 from asyncord.client.messages.models.requests.messages import (
     AttachmentData,
     CreateMessageRequest,

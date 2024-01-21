@@ -4,7 +4,7 @@ from typing import Any
 from fbenum.adapter import FallbackAdapter
 
 from asyncord.client.channels.models.common import ChannelType
-from asyncord.client.channels.models.responses import ChannelResponse, ThreadMemberOut
+from asyncord.client.channels.models.responses import ChannelResponse, ThreadMemberResponse
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
@@ -120,14 +120,14 @@ class ThreadListSyncEvent(GatewayEvent):
     """
 
 
-class ThreadMemberUpdateEvent(GatewayEvent, ThreadMemberOut):
+class ThreadMemberUpdateEvent(GatewayEvent, ThreadMemberResponse):
     """https://discord.com/developers/docs/topics/gateway-events#thread-member-update"""
 
     guild_id: Snowflake
     """Guild id."""
 
 
-class ThreadMemberUpdate(ThreadMemberOut):
+class ThreadMemberUpdate(ThreadMemberResponse):
     """https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields"""
 
     member: MemberResponse

@@ -11,6 +11,7 @@ from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.resources import ClientSubresource
+from asyncord.client.threads.resources import ThreadResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import LikeSnowflake
 from asyncord.urls import REST_API_URL
@@ -37,6 +38,17 @@ class ChannelResource(ClientSubresource):
             Resource for managing messages.
         """
         return MessageResource(self, channel_id)
+
+    def threads(self, channel_id: LikeSnowflake) -> ThreadResource:
+        """Get the thread resource for the channel.
+
+        Args:
+            channel_id: Channel id.
+
+        Returns:
+            Resource for managing threads.
+        """
+        return ThreadResource(self, channel_id)
 
     async def get(self, channel_id: LikeSnowflake) -> ChannelResponse:
         """Get a channel by id.

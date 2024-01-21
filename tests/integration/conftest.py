@@ -14,6 +14,10 @@ from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
+from asyncord.client.threads.models.common import ThreadType
+from asyncord.client.threads.models.requests import CreateThreadRequest
+from asyncord.client.threads.models.responses import ThreadResponse
+from asyncord.client.threads.resources import ThreadResource
 from asyncord.client.users.resources import UserResource
 from asyncord.gateway.client import GatewayClient
 from tests.conftest import IntegrationTestData
@@ -35,16 +39,16 @@ async def gateway(client: RestClient, token: str) -> AsyncGenerator[GatewayClien
 
 
 @pytest.fixture()
-async def channels_res(client: RestClient) -> ChannelResource:
+async def channel_res(client: RestClient) -> ChannelResource:
     return client.channels
 
 
 @pytest.fixture()
 async def messages_res(
-    channels_res: ChannelResource,
+    channel_res: ChannelResource,
     integration_data: IntegrationTestData,
 ) -> MessageResource:
-    return channels_res.messages(integration_data.channel_id)
+    return channel_res.messages(integration_data.channel_id)
 
 
 @pytest.fixture()
@@ -95,6 +99,14 @@ async def commands_res(
 
 
 @pytest.fixture()
+async def thread_res(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> ThreadResource:
+    return channel_res.threads(integration_data.channel_id)
+
+
+@pytest.fixture()
 async def ban_managment(
     client: RestClient,
     integration_data: IntegrationTestData
@@ -109,3 +121,15 @@ async def message(messages_res: MessageResource) -> AsyncGenerator[MessageRespon
     )
     yield message
     await messages_res.delete(message.id)
+
+
+@pytest.fixture()
+async def thread(thread_res: ThreadResource) -> AsyncGenerator[ThreadResponse, None]:
+    thread = await thread_res.create_thread(
+        thread_data=CreateThreadRequest(  # type: ignore
+            name='test',
+            type=ThreadType.GUILD_PUBLIC_THREAD,
+        ),
+    )
+    yield thread
+    await thread_res.delete(thread.id)

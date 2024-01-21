@@ -7,7 +7,7 @@ from fbenum.adapter import FallbackAdapter
 from pydantic import AnyHttpUrl, BaseModel
 
 from asyncord.client.channels.models.common import ChannelType
-from asyncord.client.channels.models.responses import ChannelResponse, ThreadMetadataOut
+from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.interactions.models.common import InteractionType
 from asyncord.client.members.models.common import GuildMemberFlags
 from asyncord.client.members.models.responses import MemberResponse
@@ -17,6 +17,7 @@ from asyncord.client.messages.models.responses.embeds import EmbedOut
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import StickerFormatType
 from asyncord.client.roles.models.responses import RoleResponse
+from asyncord.client.threads.models.responses import ThreadMetadataOut
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.color import Color
 from asyncord.snowflake import Snowflake
