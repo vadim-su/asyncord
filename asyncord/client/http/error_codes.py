@@ -4,6 +4,7 @@ import enum
 from fbenum.enum import FallbackEnum
 
 
+@enum.unique
 class ErrorCode(enum.IntEnum, FallbackEnum):
     """"Error codes returned by Discord API.
 

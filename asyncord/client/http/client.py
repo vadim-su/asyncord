@@ -283,6 +283,16 @@ class AsyncHttpClient:
                 )
 
             error_body = errors.RequestErrorBody.model_validate(body)
+
+            if status == HTTPStatus.NOT_FOUND:
+                raise errors.NotFoundError(
+                    message=body.get('message', 'Unknown'),
+                    payload=payload,
+                    headers=headers,
+                    resp=resp,
+                    body=error_body,
+                )
+
             if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
                 raise errors.ClientError(
                     message=error_body.message,

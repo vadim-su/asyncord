@@ -111,6 +111,10 @@ class ClientError(DiscordHTTPError):
         return '\n'.join(error_item_str_list)
 
 
+class NotFoundError(ClientError):
+    """Error raised when status code 404 occurs."""
+
+
 class RateLimitError(DiscordHTTPError):
     """Error raised when the client encounters a rate limit.
 
