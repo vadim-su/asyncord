@@ -65,17 +65,11 @@ class Tag(BaseModel):
     https://discord.com/developers/docs/resources/channel#forum-tag-object
     """
 
-    id: SnowflakeInputType
-    """ID of the tag."""
-
     name: str
     """Name of the tag (0-20 characters)."""
 
-    moderated: bool
-    """Tag can only be added to or removed from threads.
-
-    It allowed only for members with the MANAGE_THREADS permission.
-    """
+    moderated: bool = False
+    """Tag can be added to or removed from threads by a member with the MANAGE_THREADS permission."""
 
     emoji_id: SnowflakeInputType | None = None
     """ID of a guild's custom emoji.
@@ -303,7 +297,7 @@ class CreateVoiceChannelRequest(BaseCreateChannel):
 
     rtc_region: str | None = None
     """Region for the voice channel.
-    
+
     Automatic when set to None.
     """
 
@@ -347,7 +341,7 @@ class CreateStageChannelRequest(BaseCreateChannel):
 
     rtc_region: str | None = None
     """Region for the voice channel.
-    
+
     Automatic when set to None.
     """
 

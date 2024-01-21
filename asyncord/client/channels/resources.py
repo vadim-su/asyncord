@@ -76,12 +76,13 @@ class ChannelResource(ClientSubresource):
         else:
             headers = {}
 
+        # We want to send this field to the api, but exclude_unset will remove it
+        # if it's not set (or Default). So we set it to itself to make sure it's set.
         channel_data.type = channel_data.type  # type: ignore
 
         payload = channel_data.model_dump(mode='json', exclude_unset=True)
-
         resp = await self._http_client.post(url, payload, headers=headers)
-        return ChannelResponse(**resp.body)
+        return ChannelResponse.model_validate(resp.body)
 
     async def update(
         self,
