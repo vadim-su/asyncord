@@ -1,9 +1,10 @@
 """Gateway message models."""
 
 import enum
-from typing import Any
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from fbenum.adapter import FallbackAdapter
+from pydantic import BaseModel, Field, TypeAdapter
 
 
 @enum.unique
@@ -30,8 +31,8 @@ class GatewayCommandOpcode(enum.IntEnum):
 
 
 @enum.unique
-class GatewayEventOpcode(enum.IntEnum):
-    """Gateway event opcodes."""
+class GatewayMessageOpcode(enum.IntEnum):
+    """Gateway message opcodes."""
 
     DISPATCH = 0
     """An event was dispatched."""
@@ -40,7 +41,7 @@ class GatewayEventOpcode(enum.IntEnum):
     """You should attempt to reconnect and resume immediately."""
 
     INVALID_SESSION = 9
-    """The session has been invalidated. You should reconnect and identify / resume accordingly."""
+    """The session has been invalidated. You should reconnect."""
 
     HELLO = 10
     """Sent immediately after connecting, contains the heartbeat_interval to use."""
@@ -49,25 +50,90 @@ class GatewayEventOpcode(enum.IntEnum):
     """Sent in response to receiving a heartbeat to acknowledge that it has been received."""
 
 
-class GatewayMessage(BaseModel):
-    """General gateway message."""
+class BaseGatewayMessage(BaseModel):
+    """Base gateway message model."""
 
-    opcode: GatewayEventOpcode = Field(alias='op')
-    msg_data: Any = Field(alias='d')
-    sequence_number: int | None = Field(alias='s')
-    event_name: str | None = Field(alias='t')
+    opcode: GatewayMessageOpcode = Field(alias='op')
+    """Message opcode."""
+
+    data: Any = Field(alias='d')
+    """Message data."""
+
     trace: Any = Field(default=None, alias='_trace')
+    """Message trace information."""
 
-    @field_validator('event_name', 'sequence_number')
-    def validate_values_are_not_none(
-        cls, validating_value: str | int | None, field_info: ValidationInfo,
-    ) -> str | int | None:
-        """Ensure that event name and sequence number are set correctly."""
-        if field_info.data['opcode'] == GatewayEventOpcode.DISPATCH:
-            if validating_value is None:
-                raise ValueError('Event name and sequence number must be set')
 
-        elif validating_value is not None:
-            raise ValueError('Event name and sequence number must be None')
+class DispatchMessage(BaseGatewayMessage):
+    """Dispatch message model."""
 
-        return validating_value
+    opcode: Literal[GatewayMessageOpcode.DISPATCH] = Field(GatewayMessageOpcode.DISPATCH, alias='op')
+    """Message opcode."""
+
+    data: Any = Field(alias='d')
+    """Message data.
+
+    We do not parse this data before we were dispatching it to the event handler.
+    If user didn't register an event handler for this event, we will not parse it.
+    """
+
+    sequence_number: int = Field(alias='s')
+    """Sequence number of the message.
+
+    This is used for resuming sessions and heartbeats.
+    """
+
+    event_name: str = Field(alias='t')
+    """Name of the event.
+
+    This is used to determine which event handler to call and also used for data validation.
+    """
+
+
+class HelloMessageData(BaseModel):
+    """Hello message data."""
+
+    heartbeat_interval: int = Field(alias='heartbeat_interval')
+    """Interval (in milliseconds) the client should heartbeat with."""
+
+
+class HelloMessage(BaseGatewayMessage):
+    """Hello message model."""
+
+    opcode: Literal[GatewayMessageOpcode.HELLO] = Field(GatewayMessageOpcode.HELLO, alias='op')
+    """Message opcode."""
+
+    data: HelloMessageData = Field(alias='d')
+    """Hello message data."""
+
+
+class InvalidSessionMessage(BaseGatewayMessage):
+    """Invalid session message model."""
+
+    opcode: Literal[GatewayMessageOpcode.INVALID_SESSION] = Field(GatewayMessageOpcode.INVALID_SESSION, alias='op')
+    """Message opcode."""
+
+    data: bool = Field(alias='d')
+    """Whether the session can be resumed."""
+
+
+class DatalessMessage(BaseGatewayMessage):
+    """Other gateway messages that do not have data."""
+
+
+class FallbackGatewayMessage(BaseGatewayMessage):
+    """Gateway message model."""
+
+    opcode: Annotated[GatewayMessageOpcode, FallbackAdapter] = Field(alias='op')
+    data: Any = Field(alias='d')
+
+
+# fmt: off
+type GatewayMessageType = Annotated[
+    DispatchMessage | HelloMessage | InvalidSessionMessage,
+    Field(discriminator='opcode'),
+] | DatalessMessage | FallbackGatewayMessage
+"""Gateway message type."""
+# fmt: on
+
+GatewayMessageAdapter: TypeAdapter[GatewayMessageType] = TypeAdapter(GatewayMessageType)
+"""Gateway message type adapter."""

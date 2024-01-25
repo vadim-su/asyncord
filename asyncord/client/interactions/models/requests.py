@@ -73,9 +73,9 @@ class InteractionCreateMessageData(BaseMessage):
 class InteractionChannelMessageResponsRequest(BaseModel):
     """Interaction response request data for CHANNEL_MESSAGE_WITH_SOURCE."""
 
-    type: Literal[InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE] = (
+    type: Literal[
         InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
-    )
+    ] = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
 
     data: InteractionCreateMessageData
 
@@ -83,16 +83,15 @@ class InteractionChannelMessageResponsRequest(BaseModel):
 class InteractionDeferredChannelMessageResponseRequest(BaseModel):
     """Interaction response data for DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE."""
 
-    type: Literal[InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE] = (
+    type: Literal[
         InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
-    )
+    ] = InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
 
     data: InteractionCreateMessageData
 
 
 # TODO: possibly should inherit from BaseMessage
 class InteractionUpdateMessageData(BaseModel):
-
     """Interaction response data for UPDATE_MESSAGE.
 
     References:
@@ -139,9 +138,9 @@ class InteractionUpdateMessageData(BaseModel):
 class InteractionDeferredUpdateMessageResponseRequest(BaseModel):
     """Interaction response request data for DEFERRED_UPDATE_MESSAGE."""
 
-    type: Literal[InteractionResponseType.DEFERRED_UPDATE_MESSAGE] = (
-        InteractionResponseType.DEFERRED_UPDATE_MESSAGE
-    )
+    type: Literal[
+        InteractionResponseType.DEFERRED_UPDATE_MESSAGE,  # fmt: off
+    ] = InteractionResponseType.DEFERRED_UPDATE_MESSAGE
 
     data: InteractionUpdateMessageData
 
@@ -149,9 +148,9 @@ class InteractionDeferredUpdateMessageResponseRequest(BaseModel):
 class InteractionUpdateMessageResponseRequest(BaseModel):
     """Interaction response request data for UPDATE_MESSAGE."""
 
-    type: Literal[InteractionResponseType.UPDATE_MESSAGE] = (
-        InteractionResponseType.UPDATE_MESSAGE
-    )
+    type: Literal[
+        InteractionResponseType.UPDATE_MESSAGE,  # fmt: off
+    ] = InteractionResponseType.UPDATE_MESSAGE
 
     data: InteractionUpdateMessageData
 
@@ -163,16 +162,16 @@ class InteractionAutocompleteResultData(BaseModel):
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
     """
 
-    choices: list[ApplicationCommandOptionChoice] = Field(min_length=1, max_length=25)
+    choices: list[ApplicationCommandOptionChoice] = Field(max_length=25)
     """List of autocomplete choices."""
 
 
 class InteractionAutocompleteResponseRequest(BaseModel):
     """Autocomplete response request data."""
 
-    type: Literal[InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT] = (
+    type: Literal[
         InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
-    )
+    ] = InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
 
     data: InteractionAutocompleteResultData
 
@@ -204,7 +203,8 @@ class InteractionModalData(BaseModel):
 
     @field_validator('components')
     def validate_components(
-        cls, components: list[ActionRow] | list[TextInput],
+        cls,
+        components: list[ActionRow] | list[TextInput],
     ) -> list[ActionRow] | list[TextInput]:
         """Validate the components.
 
@@ -232,7 +232,7 @@ class InteractionModalResponseRequest(BaseModel):
     data: InteractionModalData
 
 
-type InteractionResponseRequestType = Union[
+type InteractionResponseRequestType = Union[  # noqa: UP007
     InteractionPongResponseRequest,
     InteractionChannelMessageResponsRequest,
     InteractionDeferredChannelMessageResponseRequest,

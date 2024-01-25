@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from contextlib import AbstractAsyncContextManager
 from typing import TYPE_CHECKING, BinaryIO, Protocol
 
 from asyncord.typedefs import StrOrURL
@@ -33,7 +32,7 @@ class Response(Protocol):
     body: Any
 
 
-class AsyncHttpClientPort(AbstractAsyncContextManager, Protocol):
+class AsyncHttpClientPort(Protocol):
     """Interface for the async HTTP client."""
 
     async def get(  # noqa: D102
@@ -73,16 +72,10 @@ class AsyncHttpClientPort(AbstractAsyncContextManager, Protocol):
     async def delete(  # noqa: D102
         self,
         url: StrOrURL,
-        payload: Any | None = None,
+        payload: Any | None = None,  # noqa: ANN401
         headers: Mapping[str, str] | None = None,
     ) -> Response:
         ...
 
     def set_headers(self, headers: Mapping[str, str]) -> None:  # noqa: D102
-        ...
-
-    def start(self) -> None:  # noqa: D102
-        ...
-
-    async def close(self) -> None:  # noqa: D102
         ...

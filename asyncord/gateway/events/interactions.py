@@ -1,4 +1,5 @@
 """This module contains models for interaction events."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -8,13 +9,14 @@ from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field, RootModel
 
 from asyncord.client.channels.models.common import ChannelType
+from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.commands.models.common import AppCommandOptionType, ApplicationCommandType
 from asyncord.client.interactions.models.common import InteractionType
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.messages.models.common import ComponentType, MessageFlags, MessageType
 from asyncord.client.messages.models.responses.components import ActionRowOut
 from asyncord.client.messages.models.responses.embeds import EmbedOut
-from asyncord.client.messages.models.responses.messages import AttachmentOut
+from asyncord.client.messages.models.responses.messages import AttachmentOut, MessageResponse
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.users.models.responses import UserResponse
@@ -42,7 +44,7 @@ class BaseInteraction(BaseModel):
     guild_id: Snowflake | None = None
     """Guild that the interaction was sent from."""
 
-    channel: dict | None = None
+    channel: ChannelResponse | None = None
     """Channel that the interaction was sent from."""
 
     channel_id: Snowflake | None = None
@@ -57,7 +59,7 @@ class BaseInteraction(BaseModel):
     token: str
     """Continuation token for responding to the interaction."""
 
-    message: dict | None = None
+    message: MessageResponse | None = None
     """For components, the message they were attached to."""
 
     app_permissions: str | None = None
@@ -381,6 +383,7 @@ class FallbackInteraction(BaseInteraction, extra='allow'):
     """Type of interaction."""
 
 
+# fmt: off
 Interaction = Annotated[
     PingInteraction
     | ApplicationCommandInteraction
@@ -389,6 +392,8 @@ Interaction = Annotated[
     | ModalSubmitInteraction,
     Field(discriminator='type'),
 ] | FallbackInteraction
+"""Interaction type."""
+# fmt: on
 
 
 class InteractionCreateEvent(GatewayEvent, RootModel[Interaction]):
