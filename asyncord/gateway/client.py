@@ -23,7 +23,7 @@ from asyncord.gateway.events.base import GatewayEvent, HelloEvent, ReadyEvent
 from asyncord.gateway.events.event_map import EVENT_MAP
 from asyncord.gateway.hearbeat import Heartbeat
 from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
-from asyncord.gateway.message import GatewayCommandOpcode, GatewayEventOpcode, GatewayMessage
+from asyncord.gateway.messages.message import GatewayCommandOpcode, GatewayMessageAdapter, GatewayMessageOpcode
 from asyncord.typedefs import StrOrURL
 from asyncord.urls import GATEWAY_URL
 
@@ -54,6 +54,7 @@ class GatewayClient:
             token: Token to use for authentication.
             session: Session to use for requests.
             intents: Intents to use for the client.
+            allowed_events: Events to allow.
             ws_url: URL to connect to. Defaults to the Discord Gateway URL.
         """
         self.token = token
@@ -85,35 +86,27 @@ class GatewayClient:
             else:
                 logger.info('Connected to gateway')
 
-            for _ in range(5, 0, -1):
-                try:
-                    await self._ws_loop(ws)
-                    break
+            try:
+                await self._ws_loop(ws)
+            except (
+                aiohttp.ClientConnectorError,
+                errors.HeartbeatAckTimeoutError,
+                errors.InvalidSessionError,
+            ) as err:
+                logger.error(err)
+                await asyncio.sleep(5)
 
-                except (
-                    aiohttp.ClientConnectorError,
-                    errors.HeartbeatAckTimeoutError,
-                    errors.InvalidSessionError,
-                ) as err:
-                    logger.error(err)
-                    await asyncio.sleep(5)
+            except errors.NecessaryReconnectError:
+                logger.info('Reconnect is necessary')
 
-                except errors.NecessaryReconnectError:
-                    logger.info('Reconnect is necessary')
+            except asyncio.CancelledError:
+                logger.info('Gateway stopping')
+                await self.stop()
+                logger.info('Gateway stopped')
 
-                except asyncio.CancelledError:
-                    logger.info('Gateway stopping')
-                    await self.stop()
-                    logger.info('Gateway stopped')
-                    break
-
-                except Exception as err:
-                    logger.exception('Unhandled exception in gateway loop: %s', err)
-                    raise
-
-            else:
-                logger.exception('Could not connect to the gateway at %s', self.url)
-                raise RuntimeError('Could not connect to the gateway at %s', self.url)
+            except Exception as err:
+                logger.exception('Unhandled exception in gateway loop: %s', err)
+                raise
 
     async def stop(self) -> None:
         """Stop the gateway client."""
@@ -177,7 +170,7 @@ class GatewayClient:
             match msg.type:
                 case WSMsgType.TEXT:
                     body = msg.json()
-                    gw_message = GatewayMessage.model_validate(body)
+                    gw_message = GatewayMessageAdapter.model_validate(body)
                     await self._handle_message(gw_message)
 
                 case WSMsgType.CLOSE | WSMsgType.CLOSING | WSMsgType.CLOSED:
@@ -201,7 +194,7 @@ class GatewayClient:
             raise RuntimeError('Client is not connected')
         await self.ws.send_json({'op': op, 'd': command_data})
 
-    async def _handle_message(self, msg: GatewayMessage) -> None:
+    async def _handle_message(self, msg: GatewayMessageAdapter) -> None:
         """Handle a message from the gateway.
 
         This method is responsible for dispatching events to the registered handlers.
@@ -216,7 +209,7 @@ class GatewayClient:
         self._last_seq_number = max(self._last_seq_number, msg.sequence_number or 0)
 
         match msg.opcode:
-            case GatewayEventOpcode.DISPATCH:
+            case GatewayMessageOpcode.DISPATCH:
                 casted_event_name = cast(str, msg.event_name)
                 if self._allowed_events is not None:
                     if casted_event_name not in self._allowed_events:
@@ -225,7 +218,7 @@ class GatewayClient:
                 event_class = EVENT_MAP.get(casted_event_name)
                 if event_class:
                     try:
-                        event = event_class.model_validate(msg.msg_data)
+                        event = event_class.model_validate(msg.data)
                     except ValidationError as err:
                         logger.exception(err)
                         return
@@ -237,20 +230,20 @@ class GatewayClient:
                 elif logger.isEnabledFor(logging.DEBUG):
                     logger.warning("Event '%s' unhandled", msg.event_name)
 
-            case GatewayEventOpcode.INVALID_SESSION:
+            case GatewayMessageOpcode.INVALID_SESSION:
                 session_id = cast(str, self._session_id)
                 self._session_id = None
                 self._last_seq_number = 0
                 raise errors.InvalidSessionError(session_id)
 
-            case GatewayEventOpcode.HELLO:
-                event = HelloEvent.model_validate(msg.msg_data)
+            case GatewayMessageOpcode.HELLO:
+                event = HelloEvent.model_validate(msg.data)
                 await self._hello(event)
 
-            case GatewayEventOpcode.HEARTBEAT_ACK:
+            case GatewayMessageOpcode.HEARTBEAT_ACK:
                 await self._heartbeat.ack()
 
-            case GatewayEventOpcode.RECONNECT:
+            case GatewayMessageOpcode.RECONNECT:
                 self._session_id = None
                 self._last_seq_number = 0
                 raise errors.NecessaryReconnectError

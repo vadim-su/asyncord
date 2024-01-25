@@ -1,6 +1,5 @@
 from typing import AsyncGenerator
 
-import aiohttp
 import pytest
 
 from asyncord.client.bans.resources import BanResource
@@ -19,23 +18,12 @@ from asyncord.client.threads.models.requests import CreateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.client.users.resources import UserResource
-from asyncord.gateway.client import GatewayClient
 from tests.conftest import IntegrationTestData
 
 
 @pytest.fixture()
 async def client(token: str) -> RestClient:
     return RestClient(token)
-
-
-@pytest.fixture()
-async def gateway(client: RestClient, token: str) -> AsyncGenerator[GatewayClient, None]:
-    async with aiohttp.ClientSession() as session:
-        gw = GatewayClient(token, session=session)
-        client = RestClient(token)
-        client._http_client._session = session  # type: ignore
-        gw.dispatcher.add_argument('client', client)
-        yield gw
 
 
 @pytest.fixture()
