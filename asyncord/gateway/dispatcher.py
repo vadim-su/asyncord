@@ -53,7 +53,7 @@ class EventDispatcher:
 
     def add_handler(
         self,
-        event_type: type[EVENT_T] | EventHandlerType[GatewayEvent],
+        event_type: type[EVENT_T] | EventHandlerType[EVENT_T],
         event_handler: EventHandlerType[EVENT_T] | None = None,
     ) -> None:
         """Add a handler for a specific event type.
@@ -88,7 +88,6 @@ class EventDispatcher:
                 'Event handler must be Callable if the event type is not specified',
             )
 
-        event_type = cast(type[EVENT_T], event_type)
         self._update_args_cache(event_handler)
         self._handlers[event_type].append(event_handler)
 

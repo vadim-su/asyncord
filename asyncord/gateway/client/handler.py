@@ -1,7 +1,7 @@
 import logging
 
+from pydantic_core import Url
 from rich.pretty import pretty_repr
-from yarl import URL
 
 from asyncord.gateway.client.commander import GatewayCommander
 from asyncord.gateway.client.conn_data import ConnectionData
@@ -16,7 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 class GatewayMessageHandler:
-    def __init__(self, conn_data: ConnectionData, intents: Intent, commands: GatewayCommander, dispatcher: EventDispatcher):
+    def __init__(
+        self,
+        conn_data: ConnectionData,
+        intents: Intent,
+        commands: GatewayCommander,
+        dispatcher: EventDispatcher,
+    ):
         self.conn_data = conn_data
         self.intents = intents
         self.commands = commands
@@ -68,21 +74,29 @@ class GatewayMessageHandler:
     async def _handle_reconnect(self, _: DatalessMessage) -> bool:
         return True
 
-    async def _handle_invalid_session(self, message: GatewayMessageType) -> bool:
+    async def _handle_invalid_session(self, _: GatewayMessageType) -> bool:
+        """Handle the invalid session event.
+
+        Can be caused by a bad session ID or a session timeout or something else
+        with concurrent connections.
+        Also called if the seq number isn't changed between READY and RESUMED.
+        """
         self.conn_data.session_id = None
         self.conn_data.seq = 0
         return True
 
     async def _handle_hello(self, message: HelloEvent) -> bool:
         if self.conn_data.should_resume:
+            logger.info('Resuming session %s', self.conn_data.session_id)
             # if should_resume, then all necessary data is present
             await self.commands.resume(ResumeCommand(
-                token=self.conn_data.token,   # type: ignore
+                token=self.conn_data.token,
                 session_id=self.conn_data.session_id,  # type: ignore
-                seq=self.conn_data.seq,   # type: ignore
+                seq=self.conn_data.seq,
             ))
 
         else:
+            logger.info('Starting new session')
             await self.commands.identify(IdentifyCommand(
                 token=self.conn_data.token,
                 intents=self.intents,
@@ -96,7 +110,7 @@ class GatewayMessageHandler:
         Store the session ID and resume URL to resume the session later.
         """
         self.conn_data.session_id = message.session_id
-        self.conn_data.resume_url = URL(message.resume_gateway_url)
+        self.conn_data.resume_url = Url(message.resume_gateway_url)
         return False
 
     async def _handle_heartbeat_ack(self, _: DatalessMessage) -> None:

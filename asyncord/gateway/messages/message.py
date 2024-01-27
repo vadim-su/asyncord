@@ -117,7 +117,7 @@ class FallbackGatewayMessage(BaseGatewayMessage):
 
 type GatewayMessageType = Annotated[
     DispatchMessage | HelloMessage,
-    Field(discriminator='op')
+    Field(discriminator='opcode')
 ] | DatalessMessage | FallbackGatewayMessage
 """Gateway message type."""
 

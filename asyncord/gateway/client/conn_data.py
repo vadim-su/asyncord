@@ -1,5 +1,4 @@
-from pydantic import BaseModel
-from yarl import URL
+from pydantic import AnyUrl, BaseModel
 
 
 class ConnectionData(BaseModel):
@@ -8,7 +7,7 @@ class ConnectionData(BaseModel):
     token: str
     """Token used to connect to the gateway."""
 
-    resume_url: URL | None = None
+    resume_url: AnyUrl | None = None
     """URL used to resume a previous session."""
 
     session_id: str | None = None

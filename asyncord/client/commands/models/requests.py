@@ -194,7 +194,10 @@ class CreateApplicationCommandRequest(BaseModel):
     """
 
     type: ApplicationCommandType = ApplicationCommandType.CHAT_INPUT
-    """Type of the command. Defaults to `ApplicationCommandType.CHAT_INPUT`."""
+    """Type of the command.
+
+    Defaults to `ApplicationCommandType.CHAT_INPUT`.
+    """
 
     name_localizations: dict[LocaleInputType, _NameAnnotation] | None = None
     """Dictionary of language codes to localized names. Defaults to None."""

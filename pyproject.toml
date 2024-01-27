@@ -159,4 +159,9 @@ mypy-init-return = true
 [tool.pdm.dev-dependencies]
 dev = ["pre-commit>=3.3.2"]
 linting = ["autopep8>=2.0.2", "ruff>=0.0.269"]
-testing = ["pytest>=7.3.1", "pytest-asyncio>=0.19.0", "pytest-pretty>=1.2.0"]
+testing = [
+    "pytest>=7.3.1",
+    "pytest-asyncio>=0.19.0",
+    "pytest-pretty>=1.2.0",
+    "pytest-mock>=3.12.0",
+]
