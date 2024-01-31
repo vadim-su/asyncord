@@ -1,0 +1,1 @@
+::: asyncord.client.bans.resources

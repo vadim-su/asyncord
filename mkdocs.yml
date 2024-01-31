@@ -1,0 +1,83 @@
+site_name: Asyncord
+
+# nav:
+#   - "Getting Started": index.md
+#   - "Docs": docs.md
+#   - "Examples": examples.md
+
+theme:
+  name: material
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - announce.dismiss
+    # - navigation.custom
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+
+  palette: 
+
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - 'Get Started':
+    - 'Welcome to Asyncord': get_start/main.md
+    - 'Why use Asyncord': get_start/why_asyncord.md
+  - Docs:
+    - 'RestClient':
+      - 'RestClient': async_docs/rest/docs.md
+      - 'Resources':
+      # Resources are copying asyncord/client/<Name>/resource.py
+        - 'User': async_docs/rest/resources/users.md
+        - 'Guild': async_docs/rest/resources/guilds.md
+        - 'Channel': async_docs/rest/resources/channels.md
+        - 'Message': async_docs/rest/resources/messages.md
+        - 'Reaction': async_docs/rest/resources/reactions.md
+        - 'Ban': async_docs/rest/resources/bans.md
+        - 'Interaction': async_docs/rest/resources/interactions.md
+        - 'Command': async_docs/rest/resources/commands.md
+        - 'Member': async_docs/rest/resources/members.md
+        - 'Role': async_docs/rest/resources/roles.md
+        - 'Schedule events': async_docs/rest/resources/scheduled_events.md
+        - 'Application': async_docs/rest/resources/applications.md
+      - 'Models':
+        - 'User': async_docs/rest/models/users.md
+        - 'Guild': async_docs/rest/models/guilds.md
+        - 'Channel': async_docs/rest/models/channels.md
+        - 'Message': async_docs/rest/models/messages.md
+        - 'Reaction': async_docs/rest/models/reactions.md
+        - 'Ban': async_docs/rest/models/bans.md
+        - 'Interaction': async_docs/rest/models/interactions.md
+        - 'Command': async_docs/rest/models/commands.md
+        - 'Member': async_docs/rest/models/members.md
+        - 'Role': async_docs/rest/models/roles.md
+        - 'Scheduled events': async_docs/rest/models/scheduled_events.md
+        - 'Application': async_docs/rest/models/applications.md
+    
+
+    - 'GateWayClient':
+      - 'Description': async_docs/gw/docs.md
+  - Examples:
+    - 'MOV': examples/mov.md
+  - GitHub: https://github.com/vadim-su/asyncord
+  
+
+plugins:
+  - search
+  - mkdocstrings
