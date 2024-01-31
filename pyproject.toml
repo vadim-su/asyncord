@@ -17,6 +17,9 @@ dependencies = [
     "aiohttp<4",
     "filetype>=1.2.0",
     "fbenum>=1.0.1",
+    "mkdocs-material>=9.5.4",
+    "mkdocstrings>=0.24.0",
+    "mkdocstrings-python>=1.8.0",
 ]
 
 [tool.pdm]

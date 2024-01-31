@@ -1,0 +1,1 @@
+::: asyncord.client.guilds.resources
