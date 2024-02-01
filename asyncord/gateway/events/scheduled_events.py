@@ -1,6 +1,6 @@
 """This module contains models related to scheduled events in a guild."""
 
-from asyncord.client.scheduled_events.models.responces import ScheduledEventResponse
+from asyncord.client.scheduled_events.models.responses import ScheduledEventResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 

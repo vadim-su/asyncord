@@ -8,7 +8,7 @@ from __future__ import annotations
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import ClientResource, ClientSubresource
 from asyncord.client.scheduled_events.models.requests import CreateScheduledEventRequest, UpdateScheduledEventRequest
-from asyncord.client.scheduled_events.models.responces import ScheduledEventResponse, ScheduledEventUserResponse
+from asyncord.client.scheduled_events.models.responses import ScheduledEventResponse, ScheduledEventUserResponse
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL

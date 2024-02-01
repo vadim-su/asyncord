@@ -9,7 +9,7 @@ from asyncord.client.guilds.models.common import ExpireBehaviorOut, IntegrationT
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
 from asyncord.client.roles.models.responses import RoleResponse
-from asyncord.client.scheduled_events.models.responces import ScheduledEventResponse
+from asyncord.client.scheduled_events.models.responses import ScheduledEventResponse
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 

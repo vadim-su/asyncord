@@ -12,7 +12,7 @@ from asyncord.client.scheduled_events.models.requests import (
     EventEntityMetadata,
     UpdateScheduledEventRequest,
 )
-from asyncord.client.scheduled_events.models.responces import ScheduledEventResponse
+from asyncord.client.scheduled_events.models.responses import ScheduledEventResponse
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
 from tests.conftest import IntegrationTestData
 
