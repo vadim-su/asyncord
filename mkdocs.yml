@@ -47,6 +47,7 @@ nav:
         - 'User': async_docs/rest/resources/users.md
         - 'Guild': async_docs/rest/resources/guilds.md
         - 'Channel': async_docs/rest/resources/channels.md
+        - 'Thread': async_docs/rest/resources/threads.md
         - 'Message': async_docs/rest/resources/messages.md
         - 'Reaction': async_docs/rest/resources/reactions.md
         - 'Ban': async_docs/rest/resources/bans.md
@@ -60,6 +61,7 @@ nav:
         - 'User': async_docs/rest/models/users.md
         - 'Guild': async_docs/rest/models/guilds.md
         - 'Channel': async_docs/rest/models/channels.md
+        - 'Thread': async_docs/rest/models/threads.md
         - 'Message': async_docs/rest/models/messages.md
         - 'Reaction': async_docs/rest/models/reactions.md
         - 'Ban': async_docs/rest/models/bans.md
