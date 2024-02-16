@@ -1,1 +1,2 @@
-::: asyncord.client.interactions.models
+::: asyncord.client.interactions.models.common
+::: asyncord.client.interactions.models.requests

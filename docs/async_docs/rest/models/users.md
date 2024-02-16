@@ -1,1 +1,1 @@
-::: asyncord.client.users.models
+::: asyncord.client.users.models.responses
