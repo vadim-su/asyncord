@@ -33,18 +33,6 @@ class GatewayEvent(BaseModel):
         return event_name.upper()
 
 
-class HelloEvent(GatewayEvent):
-    """Sent on connection to the websocket.
-
-    Defines the heartbeat interval that an app should heartbeat to.
-
-    https://discord.com/developers/docs/topics/gateway-events#hello
-    """
-
-    heartbeat_interval: int
-    """Interval (in milliseconds) the client should heartbeat with."""
-
-
 class Shard(NamedTuple):
     """Shard information associated with this session."""
     shard_id: int

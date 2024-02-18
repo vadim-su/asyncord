@@ -186,11 +186,6 @@ class AsyncHttpClient:
         """
         self._headers = headers
 
-    def start(self) -> None:
-        """Initialize the client."""
-        asyncio.get_running_loop()  # Ensure we are running in an event loop
-        self._session = aiohttp.ClientSession()
-
     async def close(self) -> None:
         """Close the client."""
         if self._session:

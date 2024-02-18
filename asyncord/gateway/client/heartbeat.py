@@ -1,89 +1,155 @@
+from __future__ import annotations
+
 import asyncio
 import datetime
 import logging
 import random
-from typing import Protocol
+import threading
+from typing import TYPE_CHECKING, ClassVar
 
-from asyncord.gateway.client.commander import GatewayCommander
-
-
-class HeartbeatProto(Protocol):
-    """Protocol for a heartbeat."""
-
-    async def run(self) -> None:
-        """Run the heartbeat."""
-
-    async def stop(self) -> None:
-        """Stop the heartbeat."""
-
-    async def handle_heartbeat_ack(self, interval: int) -> None:
-        """Handle a heartbeat ack."""
+if TYPE_CHECKING:
+    from asyncord.gateway.client.client import ConnectionData, GatewayClient
 
 
-class Heartbeat(HeartbeatProto):
-    """Heartbeat implementation."""
+logger = logging.getLogger(__name__)
 
-    def __init__(self, commander: GatewayCommander) -> None:
+
+class Heartbeat:
+    """Heartbeat for the gateway."""
+
+    def __init__(
+        self,
+        client: GatewayClient,
+        conn_data: ConnectionData,
+        _loop: asyncio.AbstractEventLoop | None = None,
+    ):
         """Initialize the heartbeat."""
-        self.commander = commander
-        self._task: asyncio.Task | None = None
+        self.client = client
+        self.conn_data = conn_data
+
+        self._loop = _loop or asyncio.get_event_loop()
+        self._interval = datetime.timedelta(seconds=0)
+        self._task = None
         self._ack_event = asyncio.Event()
-        self._interval = 0
-        self._last_ack = None
 
-    def run(self) -> None:
-        """Start the heartbeat task."""
-        self._task = asyncio.create_task(self._run())
-        logging.debug("Heartbeat task started.")
-
-    async def stop(self) -> None:
-        """Stop the heartbeat task."""
-        if self._task:
-            self._task.cancel()
-            try:
-                await self._task
-            except asyncio.CancelledError:
-                logging.debug("Heartbeat task cancelled.")
-            self._task = None
-
-    async def handle_heartbeat_ack(self, interval: int) -> None:
-        """Handle a heartbeat acknowledgement.
-
-        Update the heartbeat interval and set the acknowledgement event.
-        """
-        self._interval = interval
-        self._last_ack = datetime.datetime.now(datetime.UTC)
+    async def handle_heartbeat_ack(self) -> None:
+        """Handle a heartbeat ack."""
         self._ack_event.set()
-        logging.debug(f"Heartbeat acknowledgement handled. Interval set to {interval}.")
+
+    def run(self, interval: int) -> None:
+        """Run the heartbeat."""
+        self.stop()
+        self._interval = datetime.timedelta(milliseconds=interval)
+        self._task = asyncio.run_coroutine_threadsafe(self._run(self._interval), self._loop)
+
+    def stop(self) -> None:
+        """Stop the heartbeat."""
+        if not self._task:
+            return
+
+        self._task.cancel()
+        self._task = None
+        self._cleanup()
 
     def __repr__(self) -> str:
         """Return the representation of the heartbeat."""
         return f'<Heartbeat interval={self._interval}>'
 
-    async def _run(self) -> None:
-        """Run the heartbeat task.
+    @property
+    def is_running(self) -> bool:
+        """Whether the heartbeat is running."""
+        return self._task is not None
 
-        This method is run in a separate task and handles sending heartbeats
-        and waiting for acknowledgements.
+    def _cleanup(self) -> None:
+        """Cleanup the heartbeat."""
+        self._ack_event.clear()
+        self._interval = datetime.timedelta(seconds=0)
+
+    async def _run(self, interval: datetime.timedelta) -> None:
+        """Run the heartbeat.
+
+        Args:
+            interval: Interval to send heartbeats at.
         """
-        self._last_ack = datetime.datetime.now(datetime.UTC)
-
         while self._task:
-            await asyncio.sleep(self._jittered_sleep_duration)
-            await self.commander.heartbeat()
+            last_ack = datetime.datetime.now(datetime.UTC)
+            sleep_duration = self._jittered_sleep_duration
+            logger.debug(f'Heartbeat interval: {interval.total_seconds()}')
+            await asyncio.sleep(sleep_duration)
 
-            elapsed_time = datetime.datetime.now(datetime.UTC) - self._last_ack
-            wait_duration = elapsed_time - datetime.timedelta(seconds=self._interval)
-
-            await asyncio.wait_for(self._ack_event.wait(), timeout=wait_duration.seconds)
             self._ack_event.clear()
+            now = datetime.datetime.now(datetime.UTC)
+            keep_interval = interval - (now - last_ack)
+
+            logger.debug(f'Keep interval: {keep_interval.total_seconds()}')
+            try:
+                await asyncio.wait_for(self._wait_heartbeat_ack(), timeout=keep_interval.total_seconds())
+                logger.debug('Heartbeat ack received.')
+            except asyncio.TimeoutError:
+                self.client.reconnect()
+                self._task = None
+                break
+
+    async def _wait_heartbeat_ack(self) -> None:
+        """Wait for a heartbeat ack."""
+        for _ in range(100):
+            await self.client.send_heartbeat(seq=self.conn_data.seq)
+            logger.debug('Heartbeat sent.')
+            try:
+                await asyncio.wait_for(self._ack_event.wait(), timeout=5)
+                return
+            except asyncio.TimeoutError:
+                pass
+            logger.warning('Heartbeat ack not received.')
+
+        logger.error('Heartbeat ack not received after 100 attempts. Looks weird.')
 
     @property
-    def _jittered_sleep_duration(self) -> int:
+    def _jittered_sleep_duration(self) -> float:
         """Get the jittered sleep duration.
 
         The sleep duration is the heartbeat interval multiplied by a random
-        factor between 0.25 and 0.95.
+        factor between 0.3 and 0.90.
         """
         jitter = random.uniform(0.3, 0.9)
-        return int(self._interval * jitter)
+        return self._interval.total_seconds() * jitter
+
+
+class HeartbeatFactory:
+    """Factory for creating heartbeats."""
+
+    HEARTBEAT_CLASS: ClassVar[type[Heartbeat]] = Heartbeat
+    """Heartbeat class to create."""
+
+    def __init__(self) -> None:
+        """Initialize the factory."""
+        self.loop = asyncio.new_event_loop()
+        self.thread = threading.Thread(target=self._heartbeat_worker, daemon=True)
+
+    def create(self, client: GatewayClient, conn_data: ConnectionData):
+        """Create a heartbeat."""
+        return Heartbeat(client=client, conn_data=conn_data, _loop=self.loop)
+
+    def start(self) -> None:
+        """Start the heartbeat."""
+        self.thread.start()
+
+    def stop(self) -> None:
+        """Stop the heartbeat."""
+        if not self.thread.is_alive():
+            return
+        self.loop.call_soon_threadsafe(self.loop.stop)
+        try:
+            self.thread.join()
+        except KeyboardInterrupt:
+            logger.info('Heartbeat thread interrupted.')
+
+    @property
+    def is_running(self) -> bool:
+        """Whether the heartbeat is running."""
+        return self.thread.is_alive()
+
+    def _heartbeat_worker(self) -> None:
+        """Run the heartbeat."""
+        asyncio.set_event_loop(self.loop)
+        self.loop.run_forever()
