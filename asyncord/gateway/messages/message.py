@@ -104,6 +104,16 @@ class HelloMessage(BaseGatewayMessage):
     """Hello message data."""
 
 
+class InvalidSessionMessage(BaseGatewayMessage):
+    """Invalid session message model."""
+
+    opcode: Literal[GatewayMessageOpcode.INVALID_SESSION] = Field(GatewayMessageOpcode.INVALID_SESSION, alias='op')
+    """Message opcode."""
+
+    data: bool = Field(alias='d')
+    """Whether the session can be resumed."""
+
+
 class DatalessMessage(BaseGatewayMessage):
     """Other gateway messages that do not have data."""
 
@@ -116,7 +126,7 @@ class FallbackGatewayMessage(BaseGatewayMessage):
 
 
 type GatewayMessageType = Annotated[
-    DispatchMessage | HelloMessage,
+    DispatchMessage | HelloMessage | InvalidSessionMessage,
     Field(discriminator='opcode')
 ] | DatalessMessage | FallbackGatewayMessage
 """Gateway message type."""

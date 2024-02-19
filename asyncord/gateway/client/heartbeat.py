@@ -74,7 +74,6 @@ class Heartbeat:
         while self._task:
             last_ack = datetime.datetime.now(datetime.UTC)
             sleep_duration = self._jittered_sleep_duration
-            logger.debug(f'Heartbeat interval: {interval.total_seconds()}')
             await asyncio.sleep(sleep_duration)
 
             self._ack_event.clear()
