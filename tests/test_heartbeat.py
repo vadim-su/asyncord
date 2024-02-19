@@ -1,66 +1,71 @@
 import asyncio
-import datetime
-from unittest.mock import AsyncMock, MagicMock
+import threading
+from unittest.mock import Mock
 
-import pytest
-from pytest_mock import MockerFixture
-
-from asyncord.gateway.client.heartbeat import Heartbeat
+from asyncord.gateway.client.client import ConnectionData, GatewayClient
+from asyncord.gateway.client.heartbeat import Heartbeat, HeartbeatFactory
 
 
-@pytest.fixture
-def heartbeat():
-    return Heartbeat(MagicMock())
+def test_heartbeat_factory_initialization():
+    factory = HeartbeatFactory()
+    assert isinstance(factory.loop, asyncio.AbstractEventLoop)
+    assert isinstance(factory.thread, threading.Thread)
 
 
-async def test_heartbeat_run(heartbeat: Heartbeat):
-    heartbeat._run = AsyncMock()
-    heartbeat.run()
-    assert heartbeat._task is not None
-    heartbeat._run.assert_called_once()
+def test_heartbeat_factory_create():
+    factory = HeartbeatFactory()
+    client = Mock(spec=GatewayClient)
+    conn_data = Mock(spec=ConnectionData)
+    heartbeat = factory.create(client, conn_data)
+    assert isinstance(heartbeat, Heartbeat)
+    assert heartbeat.client == client
+    assert heartbeat.conn_data == conn_data
+    assert heartbeat._loop == factory.loop
 
 
-async def test_heartbeat_stop(heartbeat: Heartbeat):
-    heartbeat._task = asyncio.create_task(asyncio.sleep(0.1))
-    await heartbeat.stop()
-    assert heartbeat._task is None
+def test_heartbeat_factory_start():
+    factory = HeartbeatFactory()
+    factory.start()
+    assert factory.is_running
+    assert factory.thread.is_alive()
 
 
-async def test_handle_heartbeat_ack(heartbeat: Heartbeat):
-    interval = 10
-    await heartbeat.handle_heartbeat_ack(interval)
-    assert heartbeat._interval == interval
-    assert heartbeat._ack_event.is_set()
+def test_heartbeat_factory_stop():
+    factory = HeartbeatFactory()
+    factory.start()
+    print(factory.thread.is_alive())
+    factory.stop()
+    print(factory.thread.is_alive())
+    assert not factory.is_running
+    assert not factory.thread.is_alive()
 
 
-def test_repr(heartbeat: Heartbeat):
-    heartbeat._interval = 10
-    assert repr(heartbeat) == '<Heartbeat interval=10>'
+def test_multiple_heartbeats_same_thread():
+    factory = HeartbeatFactory()
+    session = Mock(spec=GatewayClient)
+    conn_data = Mock(spec=ConnectionData)
+    heartbeat1 = factory.create(session, conn_data)
+    heartbeat2 = factory.create(session, conn_data)
+    assert heartbeat1._loop == heartbeat2._loop
 
 
-async def test_run(heartbeat: Heartbeat, mocker: MockerFixture):
-    heartbeat._interval = 1
-    heartbeat._last_ack = datetime.datetime.now(datetime.UTC)
-    heartbeat.commander.heartbeat = AsyncMock()
-
-    async def task_side_effect():
-        await asyncio.sleep(0.1)
-        heartbeat._task = None
-
-    heartbeat._task = asyncio.create_task(task_side_effect())
-
-    mocker.patch.object(heartbeat._ack_event, 'wait', new_callable=AsyncMock)
-    mocker.patch.object(heartbeat._ack_event, 'clear')
-
-    await asyncio.gather(heartbeat._run(), heartbeat._task)
-
-    heartbeat.commander.heartbeat.assert_called()
-    heartbeat._ack_event.wait.assert_called()
-    heartbeat._ack_event.clear.assert_called()
+def test_multiple_heartbeats():
+    factory = HeartbeatFactory()
+    session = Mock(spec=GatewayClient)
+    conn_data = Mock(spec=ConnectionData)
+    heartbeat1 = factory.create(session, conn_data)
+    heartbeat2 = factory.create(session, conn_data)
+    assert heartbeat1 != heartbeat2
 
 
-def test_sleep_duration(heartbeat: Heartbeat):
-    heartbeat._interval = 10
-    for _ in range(1000):
-        # try 1000 times to make sure the jitter is working correctly
-        assert 3 <= heartbeat._jittered_sleep_duration <= 9
+def test_heartbeat_continues_after_one_stops():
+    factory = HeartbeatFactory()
+    session = Mock(spec=GatewayClient)
+    conn_data = Mock(spec=ConnectionData)
+    heartbeat1 = factory.create(session, conn_data)
+    heartbeat2 = factory.create(session, conn_data)
+    heartbeat1.run(10)
+    heartbeat2.run(10)
+    heartbeat1.stop()
+    assert not heartbeat1.is_running
+    assert heartbeat2.is_running
