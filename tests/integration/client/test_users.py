@@ -1,7 +1,6 @@
-from http import HTTPStatus
-
 import pytest
 
+from asyncord.client.users.models.requests import UpdateUserRequest
 from asyncord.client.users.resources import UserResource
 from tests.conftest import IntegrationTestData
 
@@ -18,13 +17,19 @@ async def test_get_user(users_res: UserResource):
 
 
 @pytest.mark.limited
-async def test_change_current_user_nickname(users_res: UserResource):
-    new_nickname = 'Cucaracha'
-    resp = await users_res.update_user(new_nickname)
-    assert resp.status == HTTPStatus.OK
-    assert resp.body['username'] == new_nickname
-    # reset the nickname because i like Cucaryamba
-    resp = await users_res.update_user('Cucaryamba')
+async def test_update_current_user(users_res: UserResource):
+    with open('tests/data/test_avatar.png', 'rb') as f:
+        avatar_data = f.read()
+
+    with open('tests/data/test_banner.gif', 'rb') as f:
+        banner_data = f.read()
+
+    user_data = UpdateUserRequest(
+        username='Cucaryamba',
+        avatar=avatar_data,
+        banner=banner_data,
+    )
+    assert await users_res.update_user(user_data)
 
 
 async def test_get_guilds(users_res: UserResource):
