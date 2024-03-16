@@ -46,8 +46,7 @@ class Base64Image:
         if isinstance(image_data, str):
             if not image_data.startswith('data:image/'):
                 exc = ValueError('Icon must be a base64 encoded image')
-                exc.add_note(
-                    "If you're trying to use a file path, use `from_file` instead")
+                exc.add_note("If you're trying to use a file path, use `from_file` instead")
                 raise exc
             return cls(image_data)
 
@@ -59,7 +58,9 @@ class Base64Image:
                     raise ValueError('Icon must be a valid image')
 
             encoded_image = base64.b64encode(image_data).decode()
-            return cls(f'data:image/{image_type};base64, {encoded_image}')
+            return cls(f'data:{image_type.mime};base64, {encoded_image}')
+
+        raise ValueError('Invalid image data type')
 
     @classmethod
     def from_file(cls, file_path: str | Path) -> Self:
@@ -100,7 +101,9 @@ class Base64Image:
 
     @classmethod
     def __get_pydantic_core_schema__(
-        cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
+        cls,
+        _source: type[BaseModel],
+        _handler: Callable[[Any], CoreSchema],
     ) -> CoreSchema:
         """Pydantic auxiliary method to get schema.
 
@@ -111,11 +114,13 @@ class Base64Image:
         Returns:
             Pydantic core schema.
         """
+        # fmt: off
         schema = core_schema.union_schema([
             core_schema.bytes_schema(),
             core_schema.str_schema(),
             core_schema.is_instance_schema(cls),
         ])
+        # fmt: on
 
         return core_schema.no_info_after_validator_function(
             function=cls.validate,
