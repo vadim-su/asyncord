@@ -5,6 +5,7 @@ from __future__ import annotations
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.resources import ClientSubresource
+from asyncord.client.users.models.requests import UpdateUserRequest
 from asyncord.client.users.models.responses import UserGuildResponse, UserResponse
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
@@ -43,15 +44,15 @@ class UserResource(ClientSubresource):
         resp = await self._http_client.get(url)
         return UserResponse.model_validate(resp.body)
 
-    async def update_user(self, username: str) -> UserResponse:
+    async def update_user(self, user_update_data: UpdateUserRequest) -> UserResponse:
         """Update the current user.
 
         Args:
-            username: New username.
+            user_update_data: Update user request model.
 
         Reference: https://discord.com/developers/docs/resources/user#modify-current-user
         """
-        payload = {'username': username}
+        payload = user_update_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.patch(self.current_user_url, payload)
         return UserResponse.model_validate(resp.body)
 
@@ -67,7 +68,7 @@ class UserResource(ClientSubresource):
         number of guilds a non-bot user can join. Therefore, pagination is not needed
         for integrations that need to get a list of the users' guilds.
 
-        Reference: 
+        Reference:
         https://discord.com/developers/docs/resources/user#get-current-user-guilds
 
         Args:
