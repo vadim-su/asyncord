@@ -50,7 +50,7 @@ class AttachedFile(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
     """Pydantic config.# type: ignore
-    
+
     Arbitrary types are allowed because of the `content` field can be BinaryIO
     and other unsupported pydantic types.
     """
@@ -123,7 +123,7 @@ class AttachmentData(BaseModel):
 
     description: str | None = Field(None, max_length=1024)
     """Description for the file.
-    
+
     Max 1024 characters.
     """
 
@@ -158,7 +158,7 @@ class AttachmentData(BaseModel):
 
     waveform: str | None = None
     """base64 encoded bytearray representing a sampled waveform.
-    
+
     Currently for voice messages
     """
 
@@ -465,6 +465,13 @@ class CreateMessageRequest(BaseMessage):
     """The flags to use when sending the message.
 
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
+    """
+
+    enforce_nonce: bool = True
+    """Ensures a nonce is unique.
+
+    Returns an existing message with the same nonce and author instead of creating a new one.
+    I set it to True because it will be default behavior in the near future.
     """
 
 
