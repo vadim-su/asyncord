@@ -1,9 +1,16 @@
+"""Gateway client for the Discord API.
+
+Contains the GatewayClient class which is used to connect to the Discord gateway.
+Also contains some useful types and classes for the gateway client.
+"""
+
 from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Mapping
 from types import MappingProxyType
-from typing import Any, Mapping, Protocol
+from typing import Any, Protocol
 
 import aiohttp
 from pydantic import BaseModel
@@ -15,7 +22,7 @@ from asyncord.gateway.client.heartbeat import Heartbeat
 from asyncord.gateway.commands import IdentifyCommand, PresenceUpdateData, ResumeCommand
 from asyncord.gateway.dispatcher import EventDispatcher
 from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
-from asyncord.gateway.messages.message import (
+from asyncord.gateway.message import (
     DatalessMessage,
     GatewayCommandOpcode,
     GatewayMessageAdapter,
@@ -29,7 +36,12 @@ logger = logging.getLogger(__name__)
 
 
 class GatewayClient:
-    def __init__(
+    """Client used to connect to the Discord gateway.
+
+    It's main entity used to connect to the Discord gateway and send/proccess messages.
+    """
+
+    def __init__(  # noqa: PLR0913
         self,
         token: str,
         session: aiohttp.ClientSession,
@@ -39,6 +51,17 @@ class GatewayClient:
         dispatcher: EventDispatcher | None = None,
         name: str | None = None,
     ):
+        """Initialize the gateway client.
+
+        Args:
+            token: Token used to connect to the gateway.
+            session: Client session used to connect to the gateway.
+            conn_data: Data used to connect or resume to the gateway.
+            intents: Intents to use for the client.
+            heartbeat_class: Class used to create the heartbeat for the client.
+            dispatcher: Event dispatcher used to dispatch events.
+            name: Name of the client.
+        """
         self.token = token
         self.session = session
         self.conn_data = conn_data or ConnectionData(token=token)
@@ -56,6 +79,7 @@ class GatewayClient:
 
         self._ws = None
         self._need_restart = asyncio.Event()
+        # fmt: off
         self._opcode_handlers: Mapping[GatewayMessageOpcode, opcode_handlers.OpcodeHandler] = MappingProxyType({
             GatewayMessageOpcode.DISPATCH: opcode_handlers.DispatchHandler(self, self.logger),
             GatewayMessageOpcode.RECONNECT: opcode_handlers.ReconnectHandler(self, self.logger),
@@ -63,6 +87,7 @@ class GatewayClient:
             GatewayMessageOpcode.HELLO: opcode_handlers.HelloHandler(self, self.logger),
             GatewayMessageOpcode.HEARTBEAT_ACK: opcode_handlers.HeartbeatAckHandler(self, self.logger),
         })
+        # fmt: on
 
     async def connect(self) -> None:
         """Connect to the gateway."""
@@ -85,12 +110,12 @@ class GatewayClient:
         await self._ws.close()
         self.logger.info('Gateway client closed')
 
-    async def send_command(self, opcode: GatewayCommandOpcode, data: Any) -> None:
+    async def send_command(self, opcode: GatewayCommandOpcode, data: Any) -> None:  # noqa: ANN401
         """Send a command to the gateway.
 
         Args:
-            op: Opcode of the command.
-            command_data: Command data to send.
+            opcode: Opcode of the command.
+            data: Data to send to the gateway.
 
         Raises:
             RuntimeError: If the client is not connected.
@@ -168,11 +193,13 @@ class GatewayClient:
         while self.is_started and not self._need_restart.is_set():
             msg_task = asyncio.create_task(self._get_message(ws), name='GatewayClient._get_message')
             need_restart_task = asyncio.create_task(
-                self._need_restart.wait(), name='GatewayClient._need_restart.wait',
+                self._need_restart.wait(),
+                name='GatewayClient._need_restart.wait',
             )
 
             done, _ = await asyncio.wait(
-                {msg_task, need_restart_task}, return_when=asyncio.FIRST_COMPLETED,
+                {msg_task, need_restart_task},
+                return_when=asyncio.FIRST_COMPLETED,
             )
 
             if need_restart_task in done:
@@ -188,16 +215,16 @@ class GatewayClient:
 
     async def _get_message(self, ws: aiohttp.ClientWebSocketResponse) -> GatewayMessageType | None:
         """Get a message from the websocket."""
-
         msg = await ws.receive()
         if msg.type is aiohttp.WSMsgType.TEXT:
             data = msg.json()
             return GatewayMessageAdapter.validate_python(data)
-        elif msg.type in {aiohttp.WSMsgType.CLOSE, aiohttp.WSMsgType.CLOSING, aiohttp.WSMsgType.CLOSED}:
+
+        if msg.type in {aiohttp.WSMsgType.CLOSE, aiohttp.WSMsgType.CLOSING, aiohttp.WSMsgType.CLOSED}:
             raise errors.ConnectionClosed
-        else:
-            self.logger.warning('Unhandled message type: %s', msg.type)
-            return None
+
+        self.logger.warning('Unhandled message type: %s', msg.type)
+        return None
 
     async def _handle_message(self, message: GatewayMessageType) -> None:
         self.logger.info('Got message:\n%s', pretty_repr(message))

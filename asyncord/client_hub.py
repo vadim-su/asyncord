@@ -1,6 +1,9 @@
+"""This module contains the client hub to process multiple clients."""
+
+# TODO: Add example usage of the client hub.
 import asyncio
 import logging
-from typing import NamedTuple, Self
+from typing import NamedTuple
 
 import aiohttp
 
@@ -47,15 +50,19 @@ class ClientGroup(NamedTuple):
 
 
 class ClientHub:
-    def __init__(self):
+    """Hub to process multiple clients."""
+
+    def __init__(self) -> None:
+        """Initialize hub to process multiple clients."""
         self.session: aiohttp.ClientSession
         self.heartbeat_factory = HeartbeatFactory()
         self.client_groups: dict[str, ClientGroup] = {}
 
     def create_clients(self, group_name: str, token: str) -> ClientGroup:
+        """Create a set of clients to interact with Discord."""
         http_client = AsyncHttpClient(
             session=self.session,
-            headers={"Authorization": f"Bot {token}"},
+            headers={'Authorization': f'Bot {token}'},
         )
         rest_client = RestClient(token=token, http_client=http_client)
 
@@ -83,24 +90,22 @@ class ClientHub:
         return client_set
 
     async def run(self) -> None:
-        tasks = [
-            client.connect()
-            for client in self.client_groups.values()
-        ]
+        """Run client hub to process multiple clients.
+
+        When the hub is running, it will connect to the Discord clients and process the events.
+        """
+        logger.info(':satellite: Connecting to Discord', extra={'markup': True})
+        tasks = [client.connect() for client in self.client_groups.values()]
         try:
             await asyncio.gather(*tasks)
         except (KeyboardInterrupt, asyncio.CancelledError):
             logger.info('Shutting down...')
             await asyncio.gather(*tasks, return_exceptions=True)
 
-    async def __aenter__(self) -> Self:
-        self.session = aiohttp.ClientSession()
-        self.heartbeat_factory.start()
-        return self
-
-    async def __aexit__(self, _exc_type, _exc, _tb) -> None:
+    async def __aexit__(self, _exc_type, _exc, _tb) -> None:  # noqa: ANN001
+        """Exit the context manager."""
         for client in self.client_groups.values():
             await client.close()
         self.heartbeat_factory.stop()
         await self.session.close()
-        logger.info('Shutdown complete :wave:', extra={'markup': True})
+        logger.info(':wave: Shutdown complete', extra={'markup': True})

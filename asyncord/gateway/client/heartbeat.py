@@ -1,3 +1,9 @@
+"""This module contains the heartbeat for the gateway client.
+
+The heartbeat is used to keep the connection alive with the gateway and automatically
+reconnect if the connection is lost.
+"""
+
 from __future__ import annotations
 
 import asyncio
@@ -80,11 +86,11 @@ class Heartbeat:
             now = datetime.datetime.now(datetime.UTC)
             keep_interval = interval - (now - last_ack)
 
-            logger.debug(f'Keep interval: {keep_interval.total_seconds()}')
+            logger.debug('Keep interval: %i', keep_interval.total_seconds())
             try:
                 await asyncio.wait_for(self._wait_heartbeat_ack(), timeout=keep_interval.total_seconds())
                 logger.debug('Heartbeat ack received.')
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 self.client.reconnect()
                 self._task = None
                 break
@@ -97,7 +103,7 @@ class Heartbeat:
             try:
                 await asyncio.wait_for(self._ack_event.wait(), timeout=5)
                 return
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
             logger.warning('Heartbeat ack not received.')
 
@@ -110,7 +116,7 @@ class Heartbeat:
         The sleep duration is the heartbeat interval multiplied by a random
         factor between 0.3 and 0.90.
         """
-        jitter = random.uniform(0.3, 0.9)
+        jitter = random.uniform(0.3, 0.9)  # noqa: S311  # It's okay to use random here.
         return self._interval.total_seconds() * jitter
 
 
@@ -125,9 +131,9 @@ class HeartbeatFactory:
         self.loop = asyncio.new_event_loop()
         self.thread = threading.Thread(target=self._heartbeat_worker, daemon=True)
 
-    def create(self, client: GatewayClient, conn_data: ConnectionData):
+    def create(self, client: GatewayClient, conn_data: ConnectionData) -> Heartbeat:
         """Create a heartbeat."""
-        return Heartbeat(client=client, conn_data=conn_data, _loop=self.loop)
+        return self.HEARTBEAT_CLASS(client=client, conn_data=conn_data, _loop=self.loop)
 
     def start(self) -> None:
         """Start the heartbeat."""

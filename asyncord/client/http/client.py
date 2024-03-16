@@ -7,7 +7,7 @@ import json
 import logging
 from collections.abc import Mapping, Sequence
 from http import HTTPStatus
-from types import MappingProxyType, TracebackType
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, BinaryIO, NamedTuple
 
 import aiohttp
@@ -20,7 +20,6 @@ from asyncord.typedefs import Payload, StrOrURL
 
 if TYPE_CHECKING:
     from contextlib import AbstractAsyncContextManager
-    from typing import Self
 
 
 MAX_NEXT_RETRY_SEC = 10
@@ -186,26 +185,6 @@ class AsyncHttpClient:
         """
         self._headers = headers
 
-    async def close(self) -> None:
-        """Close the client."""
-        if self._session:
-            await self._session.close()
-
-    async def __aenter__(self) -> Self:
-        """Initialize the client when used as a context manager.
-
-        Returns:
-            Initialized client.
-        """
-        self.start()
-        return self
-
-    async def __aexit__(
-        self, _exc_type: type[BaseException] | None, _exc: BaseException | None, _tb: TracebackType | None,
-    ) -> None:
-        """Close the client when used as a context manager."""
-        await self.close()
-
     async def _request(  # noqa: PLR0913
         self,
         method: HttpMethod,
@@ -256,7 +235,7 @@ class AsyncHttpClient:
             if status == HTTPStatus.TOO_MANY_REQUESTS:
                 # FIXME: It's a simple hack for now. Potentially 'endless' recursion
                 ratelimit = RateLimitBody.model_validate(body)
-                logger.warning(f'Rate limited: {ratelimit.message} (retry after {ratelimit.retry_after})')
+                logger.warning('Rate limited: %s (retry after %s)', ratelimit.message, ratelimit.retry_after)
 
                 if ratelimit.retry_after > MAX_NEXT_RETRY_SEC:
                     raise errors.RateLimitError(
@@ -322,7 +301,7 @@ class AsyncHttpClient:
                 return await resp.json()
             except json.JSONDecodeError:
                 body = await resp.text()
-                logger.warning(f'Failed to decode JSON body: {body}')
+                logger.warning('Failed to decode JSON body: %s', body)
                 if body:
                     return body
                 return {}
@@ -333,7 +312,7 @@ class AsyncHttpClient:
         self,
         method: HttpMethod,
         url: StrOrURL,
-        payload: Any | None = None,
+        payload: Any | None = None,  # noqa: ANN401
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> AbstractAsyncContextManager[ClientResponse]:
