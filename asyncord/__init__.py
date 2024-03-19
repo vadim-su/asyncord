@@ -16,9 +16,9 @@ from asyncord.logger import setup_logging
 
 # Set package metadata
 package_metadata = metadata.metadata(__package__)
-__version__ = package_metadata['version']
-__url__ = package_metadata['project-url']
-__author__ = package_metadata['author']
+__version__ = package_metadata.get('version')
+__url__ = package_metadata.get('project-url')
+__author__ = package_metadata.get('author')
 
 
 # Setup logging
