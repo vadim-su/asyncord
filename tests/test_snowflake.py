@@ -21,7 +21,7 @@ def snowflake(raw_snowflake: int) -> Snowflake:
 
 def test_timestamp(snowflake: Snowflake) -> None:
     """Test that the timestamp is correct."""
-    assert snowflake.timestamp == datetime(2016, 4, 30, 11, 18, 25, 796000, tzinfo=datetime.UTC)
+    assert snowflake.timestamp == datetime.datetime(2016, 4, 30, 11, 18, 25, 796000, tzinfo=datetime.UTC)
 
 
 def test_internal_worker_id(snowflake: Snowflake) -> None:
@@ -58,7 +58,7 @@ def test_str_convertation(snowflake: Snowflake, raw_snowflake: int) -> None:
 
 def test_build_from_raw_values() -> None:
     """Test that snowflake can be built from raw values."""
-    timestamp = datetime.now(tz=datetime.UTC)
+    timestamp = datetime.datetime.now(tz=datetime.UTC)
     snowflake = Snowflake.build(
         timestamp=timestamp,
         internal_worker_id=4,
@@ -80,7 +80,7 @@ def test_snowflake_as_part_of_model(raw_snowflake: int, snowflake_type: type) ->
 
     model = Model(id=snowflake_type(raw_snowflake))
     assert model.id == raw_snowflake
-    assert model.id.timestamp == datetime(2016, 4, 30, 11, 18, 25, 796000, tzinfo=datetime.UTC)
+    assert model.id.timestamp == datetime.datetime(2016, 4, 30, 11, 18, 25, 796000, tzinfo=datetime.UTC)
     assert model.id.internal_worker_id == 1
     assert model.id.internal_process_id == 0
     assert model.id.increment == 7
