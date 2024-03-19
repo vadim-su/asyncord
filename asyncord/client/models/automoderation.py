@@ -173,6 +173,7 @@ class RuleAction(BaseModel):
     Reference:
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-auto-moderation-action-structure
     """
+
     type: RuleActionType
     """Type of action."""
 

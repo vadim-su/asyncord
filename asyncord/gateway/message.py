@@ -127,13 +127,15 @@ class FallbackGatewayMessage(BaseGatewayMessage):
     data: Any = Field(alias='d')
 
 
-# fmt: off
-type GatewayMessageType = Annotated[
-    DispatchMessage | HelloMessage | InvalidSessionMessage,
-    Field(discriminator='opcode'),
-] | DatalessMessage | FallbackGatewayMessage
+type GatewayMessageType = (
+    Annotated[
+        DispatchMessage | HelloMessage | InvalidSessionMessage,
+        Field(discriminator='opcode'),
+    ]
+    | DatalessMessage
+    | FallbackGatewayMessage
+)
 """Gateway message type."""
-# fmt: on
 
 GatewayMessageAdapter: TypeAdapter[GatewayMessageType] = TypeAdapter(GatewayMessageType)
 """Gateway message type adapter."""

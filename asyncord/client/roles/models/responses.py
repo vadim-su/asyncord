@@ -12,7 +12,7 @@ from asyncord.snowflake import Snowflake
 
 @enum.unique
 class RoleFlag(enum.IntFlag):
-    """Role Flags
+    """Role flags.
 
     Reference:
     https://discord.com/developers/docs/topics/permissions#role-object-role-flags

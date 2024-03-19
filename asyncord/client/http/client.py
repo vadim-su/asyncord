@@ -187,6 +187,7 @@ class AsyncHttpClient:
 
     async def _request(  # noqa: PLR0913
         self,
+        *,
         method: HttpMethod,
         url: StrOrURL,
         payload: Payload | None = None,
@@ -284,8 +285,9 @@ class AsyncHttpClient:
                 body=error_body,
             )
 
-    async def _extract_body(self, resp: ClientResponse) -> dict[str, Any] | str:
-        """Extract the body.
+    @classmethod
+    async def _extract_body(cls, resp: ClientResponse) -> dict[str, Any] | str:
+        """Extract the body from the response.
 
         Args:
             resp: Request response.
@@ -310,6 +312,7 @@ class AsyncHttpClient:
 
     def _make_raw_request(  # noqa: PLR0913
         self,
+        *,
         method: HttpMethod,
         url: StrOrURL,
         payload: Any | None = None,  # noqa: ANN401

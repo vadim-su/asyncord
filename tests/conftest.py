@@ -10,6 +10,8 @@ INTEGRATION_TEST_DIR: Final[Path] = Path(__file__).parent / 'integration'
 
 @dataclass
 class IntegrationTestData:
+    """Data to perform integration tests."""
+
     token: str
     channel_id: str
     voice_channel_id: str
@@ -26,6 +28,7 @@ class IntegrationTestData:
 
 @pytest.fixture(scope='session')
 def integration_data() -> IntegrationTestData:
+    """Get data to perform integration tests."""
     token = os.environ.get('ASYNCORD_TEST_TOKEN')
     if token is None:
         raise RuntimeError('ASYNCORD_TEST_TOKEN env variable is not set')
@@ -46,25 +49,34 @@ def integration_data() -> IntegrationTestData:
 
 
 @pytest.fixture(scope='session')
-def token(integration_data: IntegrationTestData):
+def token(integration_data: IntegrationTestData) -> str:
+    """Get token to perform integration tests."""
     return integration_data.token
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """Add custom options to pytest."""
     parser.addoption(
-        '--run-limited', action='store_true', default=False, help='run limited tests',
+        '--run-limited',
+        action='store_true',
+        default=False,
+        help='run limited tests',
     )
     parser.addoption(
-        '--disable-integration', action='store_true', default=False, help='disable integration tests',
+        '--disable-integration',
+        action='store_true',
+        default=False,
+        help='disable integration tests',
     )
 
 
-def pytest_configure(config):
+def pytest_configure(config: pytest.Config) -> None:
+    """Add custom markers to some tests."""
     config.addinivalue_line('markers', 'limited: mark test as api limited')
     config.addinivalue_line('markers', 'integration: mark test as integration')
 
 
-def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]):
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     """Mark integration tests and skip others if needed."""
     # Mark integration tests first
     for item in items:

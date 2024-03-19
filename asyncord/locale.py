@@ -1,3 +1,5 @@
+"""This module contains the `Locale` enum and `LocaleInputType` type."""
+
 import enum
 from typing import Annotated
 

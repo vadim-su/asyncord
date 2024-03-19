@@ -18,7 +18,7 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class ThreadResource(ClientSubresource):
+class ThreadResource(ClientSubresource):  # noqa: PLR0904
     """Resource to interact with threads.
 
     Attributes:
@@ -31,7 +31,7 @@ class ThreadResource(ClientSubresource):
     channels_url = REST_API_URL / 'channels'
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource,  channel_id: SnowflakeInputType) -> None:
+    def __init__(self, parent: ClientResource, channel_id: SnowflakeInputType) -> None:
         """Initialize the thread resource."""
         super().__init__(parent)
         self.channel_id = channel_id
@@ -176,6 +176,7 @@ class ThreadResource(ClientSubresource):
             headers = {}
 
         payload = thread_data.model_dump(mode='json', exclude_unset=True)
+        # fmt: off
         resp = await self._http_client.post(
             url=self.threads_url,
             payload=payload,
@@ -185,6 +186,7 @@ class ThreadResource(ClientSubresource):
             ],
             headers=headers,
         )
+        # fmt: on
         return ThreadResponse.model_validate(resp.body)
 
     async def delete(self, thread_id: SnowflakeInputType, reason: str | None = None) -> None:
@@ -232,9 +234,9 @@ class ThreadResource(ClientSubresource):
         await self._http_client.delete(url)
 
     async def remove_member(
-            self,
-            thread_id: SnowflakeInputType,
-            user_id: SnowflakeInputType,
+        self,
+        thread_id: SnowflakeInputType,
+        user_id: SnowflakeInputType,
     ) -> None:
         """Remove a member from a thread.
 

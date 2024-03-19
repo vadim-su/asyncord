@@ -164,7 +164,7 @@ class UserResponse(BaseModel):
     avatar_decoration: str | None = None
     """User's avatar decoration hash.
 
-    Reference: 
+    Reference:
     https://discord.com/developers/docs/reference#image-formatting
     """
 
@@ -190,5 +190,5 @@ class UserGuildResponse(BaseModel):
     permissions: str | None = None
     """Total permissions for the user in the guild (excludes overwrites)."""
 
-    features:  list[str] = Field(default_factory=list)
+    features: list[str] = Field(default_factory=list)
     """Strings enabled guild features."""

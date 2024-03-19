@@ -17,6 +17,7 @@ class MemberResource(ClientSubresource):
     Attributes:
         guilds_url: URL for the guilds resource.
     """
+
     guilds_url = REST_API_URL / 'guilds'
 
     def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):

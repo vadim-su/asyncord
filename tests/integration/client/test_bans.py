@@ -10,8 +10,12 @@ from tests.conftest import IntegrationTestData
 @pytest.mark.skip(reason='Dangerous operation. Needs manual control.')
 async def test_ban_managment(
     ban_managment: BanResource,
-    integration_data: IntegrationTestData
-):
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test the ban managment.
+
+    This test is skipped by default because I have not enough friends to test this.
+    """
     with pytest.raises(ClientError, match=r'\(\d*\) Unknown Ban'):
         await ban_managment.get(integration_data.user_to_ban)
 
@@ -36,6 +40,7 @@ async def test_ban_managment(
     assert not await ban_managment.get_list()
 
 
-async def test_get_ban_list(ban_managment: BanResource):
+async def test_get_ban_list(ban_managment: BanResource) -> None:
+    """Test the get ban list method."""
     bans = await ban_managment.get_list()
     assert isinstance(bans, list)

@@ -4,7 +4,7 @@ Reference:
 https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 """
 
-from typing import Literal, Union, cast
+from typing import Literal, cast
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -73,9 +73,11 @@ class InteractionCreateMessageData(BaseMessage):
 class InteractionChannelMessageResponsRequest(BaseModel):
     """Interaction response request data for CHANNEL_MESSAGE_WITH_SOURCE."""
 
+    # fmt: off
     type: Literal[
-        InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+        InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     ] = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+    # fmt: on
 
     data: InteractionCreateMessageData
 
@@ -83,9 +85,11 @@ class InteractionChannelMessageResponsRequest(BaseModel):
 class InteractionDeferredChannelMessageResponseRequest(BaseModel):
     """Interaction response data for DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE."""
 
+    # fmt: off
     type: Literal[
-        InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+        InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
     ] = InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+    # fmt: on
 
     data: InteractionCreateMessageData
 
@@ -138,9 +142,11 @@ class InteractionUpdateMessageData(BaseModel):
 class InteractionDeferredUpdateMessageResponseRequest(BaseModel):
     """Interaction response request data for DEFERRED_UPDATE_MESSAGE."""
 
+    # fmt: off
     type: Literal[
-        InteractionResponseType.DEFERRED_UPDATE_MESSAGE,  # fmt: off
+        InteractionResponseType.DEFERRED_UPDATE_MESSAGE,
     ] = InteractionResponseType.DEFERRED_UPDATE_MESSAGE
+    # fmt: on
 
     data: InteractionUpdateMessageData
 
@@ -148,9 +154,11 @@ class InteractionDeferredUpdateMessageResponseRequest(BaseModel):
 class InteractionUpdateMessageResponseRequest(BaseModel):
     """Interaction response request data for UPDATE_MESSAGE."""
 
+    # fmt: off
     type: Literal[
-        InteractionResponseType.UPDATE_MESSAGE,  # fmt: off
+        InteractionResponseType.UPDATE_MESSAGE,
     ] = InteractionResponseType.UPDATE_MESSAGE
+    # fmt: on
 
     data: InteractionUpdateMessageData
 
@@ -169,9 +177,11 @@ class InteractionAutocompleteResultData(BaseModel):
 class InteractionAutocompleteResponseRequest(BaseModel):
     """Autocomplete response request data."""
 
+    # fmt: off
     type: Literal[
-        InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
+        InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
     ] = InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
+    # fmt: on
 
     data: InteractionAutocompleteResultData
 
@@ -232,13 +242,13 @@ class InteractionModalResponseRequest(BaseModel):
     data: InteractionModalData
 
 
-type InteractionResponseRequestType = Union[  # noqa: UP007
-    InteractionPongResponseRequest,
-    InteractionChannelMessageResponsRequest,
-    InteractionDeferredChannelMessageResponseRequest,
-    InteractionDeferredUpdateMessageResponseRequest,
-    InteractionUpdateMessageResponseRequest,
-    InteractionAutocompleteResponseRequest,
-    InteractionModalResponseRequest,
-]
+type InteractionResponseRequestType = (
+    InteractionPongResponseRequest
+    | InteractionChannelMessageResponsRequest
+    | InteractionDeferredChannelMessageResponseRequest
+    | InteractionDeferredUpdateMessageResponseRequest
+    | InteractionUpdateMessageResponseRequest
+    | InteractionAutocompleteResponseRequest
+    | InteractionModalResponseRequest
+)
 """Collection of all interaction response data models."""

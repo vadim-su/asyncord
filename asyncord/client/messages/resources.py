@@ -86,6 +86,8 @@ class MessageResource(ClientSubresource):
         """
         url = self.messages_url
         payload = message_data.model_dump(mode='json', exclude_unset=True)
+
+        # fmt: off
         resp = await self._http_client.post(
             url=url,
             payload=payload,
@@ -94,6 +96,7 @@ class MessageResource(ClientSubresource):
                 for file in message_data.files
             ],
         )
+        # fmt: on
 
         return MessageResponse.model_validate(resp.body)
 
@@ -109,6 +112,8 @@ class MessageResource(ClientSubresource):
         """
         url = self.messages_url / str(message_id)
         payload = message_data.model_dump(mode='json', exclude_unset=True)
+
+        # fmt: off
         resp = await self._http_client.patch(
             url=url,
             payload=payload,
@@ -117,6 +122,8 @@ class MessageResource(ClientSubresource):
                 for file in message_data.files
             ],
         )
+        # fmt: on
+
         return MessageResponse(**resp.body)
 
     async def delete(self, message_id: LikeSnowflake, reason: str | None = None) -> None:

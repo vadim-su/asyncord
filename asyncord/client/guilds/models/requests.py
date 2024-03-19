@@ -1,3 +1,5 @@
+"""Request models for guilds."""
+
 from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInputType
@@ -13,7 +15,7 @@ class CreateGuildRequest(BaseModel):
     Endpoint for which this model is used can only be used by bots
     in less than 10 guilds
 
-    Reference: 
+    Reference:
     https://discord.com/developers/docs/resources/guild#create-guild
     """
 
@@ -105,7 +107,7 @@ class UpdateWelcomeScreenRequest(BaseModel):
 
     welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_length=5)
     """Channels shown in the welcome screen.
-    
+
     Up to 5 channels can be specified.
     """
 

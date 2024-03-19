@@ -1,3 +1,5 @@
+"""Models for embeds in message responses."""
+
 import datetime
 
 from fbenum.adapter import FallbackAdapter

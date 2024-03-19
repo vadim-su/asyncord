@@ -9,6 +9,7 @@ Example:
         client = asyncord.RestClient('<YOUR_TOKEN_IS_HERE>')
         print(client.ping())
 """
+
 from importlib import metadata
 
 from asyncord.logger import setup_logging

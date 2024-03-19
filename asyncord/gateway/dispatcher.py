@@ -41,9 +41,12 @@ class EventDispatcher:
         self._args: dict[str, Any] = {}
         self._cached_args: dict[EventHandlerType, dict[str, Any]] = {}
 
+    # fmt: off
     @overload
     def add_handler(
-        self, event_type: type[EVENT_T], event_handler: EventHandlerType[EVENT_T],
+        self,
+        event_type: type[EVENT_T],
+        event_handler: EventHandlerType[EVENT_T],
     ) -> None:
         ...
 
@@ -51,6 +54,7 @@ class EventDispatcher:
     def add_handler(self, event_type: EventHandlerType[EVENT_T]) -> None:
         ...
 
+    # fmt: on
     def add_handler(
         self,
         event_type: type[EVENT_T] | EventHandlerType[EVENT_T],
@@ -123,12 +127,15 @@ class EventDispatcher:
         Args:
             event_handler: Event handler to update.
         """
-        arg_names = event_handler.__code__.co_varnames[1: event_handler.__code__.co_argcount]
+        arg_names = event_handler.__code__.co_varnames[1 : event_handler.__code__.co_argcount]
+
+        # fmt: off
         self._cached_args[event_handler] = {
             arg_name: self._args[arg_name]
             for arg_name in arg_names
             if arg_name in self._args
         }
+        # fmt: on
 
 
 type _HandlersMutMapping[EVENT_T: GatewayEvent] = MutableMapping[

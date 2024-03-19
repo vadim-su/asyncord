@@ -1,3 +1,5 @@
+"""This module contains models for thread responses."""
+
 import datetime
 
 from fbenum.adapter import FallbackAdapter

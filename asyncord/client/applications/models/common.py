@@ -1,3 +1,5 @@
+"""This module contains the common models for the applications resources."""
+
 import enum
 
 

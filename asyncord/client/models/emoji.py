@@ -1,3 +1,5 @@
+"""This module contains the Emoji model."""
+
 from pydantic import BaseModel
 
 from asyncord.client.users.models.responses import UserResponse
@@ -36,6 +38,6 @@ class Emoji(BaseModel):
 
     available: bool | None = None
     """Whether this emoji can be used.
-    
+
     May be false due to loss of Server Boosts.
     """

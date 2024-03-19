@@ -1,3 +1,5 @@
+"""This module contains the response model for a member of a guild."""
+
 import datetime
 
 from pydantic import BaseModel
@@ -10,7 +12,7 @@ from asyncord.snowflake import Snowflake
 class MemberResponse(BaseModel):
     """Represents a member of a guild.
 
-    Reference: 
+    Reference:
     https://discord.com/developers/docs/resources/guild#guild-member-object
     """
 

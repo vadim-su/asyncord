@@ -1,3 +1,5 @@
+"""Common models for threads."""
+
 import enum
 
 

@@ -43,6 +43,7 @@ class GatewayClient:
 
     def __init__(  # noqa: PLR0913
         self,
+        *,
         token: str,
         session: aiohttp.ClientSession,
         conn_data: ConnectionData | None = None,
@@ -79,7 +80,6 @@ class GatewayClient:
 
         self._ws = None
         self._need_restart = asyncio.Event()
-        # fmt: off
         self._opcode_handlers: Mapping[GatewayMessageOpcode, opcode_handlers.OpcodeHandler] = MappingProxyType({
             GatewayMessageOpcode.DISPATCH: opcode_handlers.DispatchHandler(self, self.logger),
             GatewayMessageOpcode.RECONNECT: opcode_handlers.ReconnectHandler(self, self.logger),
@@ -87,7 +87,6 @@ class GatewayClient:
             GatewayMessageOpcode.HELLO: opcode_handlers.HelloHandler(self, self.logger),
             GatewayMessageOpcode.HEARTBEAT_ACK: opcode_handlers.HeartbeatAckHandler(self, self.logger),
         })
-        # fmt: on
 
     async def connect(self) -> None:
         """Connect to the gateway."""
@@ -176,7 +175,7 @@ class GatewayClient:
                 self._ws = ws
                 try:
                     await self._ws_recv_loop(ws)
-                except errors.ConnectionClosed as err:
+                except errors.ConnectionClosedError as err:
                     # if the connection is closed, then the client should try to reconnect
                     # if the client is still started
                     # we can get here if the connection is closed by the user too
@@ -221,7 +220,7 @@ class GatewayClient:
             return GatewayMessageAdapter.validate_python(data)
 
         if msg.type in {aiohttp.WSMsgType.CLOSE, aiohttp.WSMsgType.CLOSING, aiohttp.WSMsgType.CLOSED}:
-            raise errors.ConnectionClosed
+            raise errors.ConnectionClosedError
 
         self.logger.warning('Unhandled message type: %s', msg.type)
         return None

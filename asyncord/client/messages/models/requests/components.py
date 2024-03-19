@@ -16,6 +16,10 @@ from asyncord.client.messages.models.common import ButtonStyle, ComponentType, S
 from asyncord.snowflake import SnowflakeInputType
 
 SELECT_COMPONENT_TYPE_LIST = get_typing_args(SelectComponentType)
+"""List of select component types."""
+
+MAX_BUTTONS_IN_ACTION_ROW = 5
+"""Maximum number of buttons in an action row."""
 
 
 class BaseComponent(BaseModel):
@@ -51,7 +55,7 @@ class ComponentEmoji(BaseModel):
     """Whether the emoji is animated."""
 
     @model_validator(mode='after')
-    def name_or_id_required(self):
+    def name_or_id_required(self) -> Self:
         """Check that `name` or `id` is set."""
         if not self.name and not self.id:
             raise ValueError('At least one of `name` or `id` must be provided')
@@ -160,6 +164,7 @@ class SelectDefaultValue(BaseModel):
     Reference:
     https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
     """
+
     id: SnowflakeInputType
     """ID of a user, role, or channel"""
 
@@ -201,9 +206,9 @@ class SelectMenu(BaseComponent):
     """Placeholder text if nothing is selected; max 150 characters."""
 
     default_values: list[SelectDefaultValue] | None = None
-    """List of default values for auto-populated select menu components; 
-    
-    number of default values must be in the range defined by min_values and max_values.
+    """List of default values for auto-populated select menu components.
+
+    Number of default values must be in the range defined by min_values and max_values.
     """
 
     min_values: int = Field(1, ge=0, le=25)
@@ -217,7 +222,9 @@ class SelectMenu(BaseComponent):
 
     @field_validator('options')
     def validate_options(
-        cls, options: list[SelectMenuOption], field_info: ValidationInfo,
+        cls,
+        options: list[SelectMenuOption],
+        field_info: ValidationInfo,
     ) -> list[SelectMenuOption]:
         """Check that `options` is set for `SelectComponentType.STRING_SELECT`."""
         menu_type = field_info.data['type']
@@ -232,7 +239,9 @@ class SelectMenu(BaseComponent):
 
     @field_validator('channel_types')
     def validate_channel_types(
-        cls, channel_types: list[ChannelType], field_info: ValidationInfo,
+        cls,
+        channel_types: list[ChannelType],
+        field_info: ValidationInfo,
     ) -> list[ChannelType]:
         """Check that `channel_types` is set for `SelectComponentType.CHANNEL_SELECT`."""
         menu_type = field_info.data['type']
@@ -245,7 +254,9 @@ class SelectMenu(BaseComponent):
 
     @field_validator('default_values')
     def validate_default_values(
-        cls, default_values: list[SelectDefaultValue] | None, field_info: ValidationInfo,
+        cls,
+        default_values: list[SelectDefaultValue] | None,
+        field_info: ValidationInfo,
     ) -> list[SelectDefaultValue] | None:
         """Check that `default_values` is set for `SelectComponentType.STRING_SELECT`."""
         if not default_values:
@@ -389,7 +400,7 @@ class ActionRow(BaseComponent):
             raise ValueError('ActionRow can contain only one select menu')
 
         # Check if there are more than 5 BUTTON components
-        if component_types.count(ComponentType.BUTTON) > 5:
+        if component_types.count(ComponentType.BUTTON) > MAX_BUTTONS_IN_ACTION_ROW:
             raise ValueError('ActionRow can contain up to 5 buttons')
 
         # Check if TextInputInput is mixed with other components

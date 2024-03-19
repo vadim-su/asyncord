@@ -15,7 +15,8 @@ from asyncord.client.messages.models.requests.messages import CreateMessageReque
 from asyncord.client.messages.resources import MessageResource
 
 
-async def test_create_message_with_buttons(messages_res: MessageResource):
+async def test_create_message_with_buttons(messages_res: MessageResource) -> None:
+    """Test creating a message with buttons."""
     components: list[Component] = [
         ActionRow(
             components=[
@@ -61,17 +62,21 @@ async def test_create_message_with_buttons(messages_res: MessageResource):
         await messages_res.delete(message.id)
 
 
-@pytest.mark.parametrize('component_type', [
-    ComponentType.BUTTON,
-    ComponentType.STRING_SELECT,
-    ComponentType.USER_SELECT,
-    ComponentType.ROLE_SELECT,
-    ComponentType.MENTIONABLE_SELECT,
-    ComponentType.CHANNEL_SELECT,
-])
+@pytest.mark.parametrize(
+    'component_type',
+    [
+        ComponentType.BUTTON,
+        ComponentType.STRING_SELECT,
+        ComponentType.USER_SELECT,
+        ComponentType.ROLE_SELECT,
+        ComponentType.MENTIONABLE_SELECT,
+        ComponentType.CHANNEL_SELECT,
+    ],
+)
 async def test_crate_message_with_some_top_level_components_not_allowed(
     component_type: ComponentType,
-):
+) -> None:
+    """Test that top level components are not allowed in CreateMessageRequest."""
     component = {'type': component_type, 'custom_id': 'custom_id'}
     if component_type is ComponentType.STRING_SELECT:
         component['options'] = [
@@ -84,7 +89,8 @@ async def test_crate_message_with_some_top_level_components_not_allowed(
         CreateMessageRequest(components=[component])
 
 
-def test_dont_create_message_with_button_and_select_menu():
+def test_dont_create_message_with_button_and_select_menu() -> None:
+    """Test that an ActionRow containing a select menu cannot also contain buttons."""
     exc_text = 'ActionRow containing a select menu cannot also contain buttons'
     with pytest.raises(ValueError, match=exc_text):
         ActionRow(

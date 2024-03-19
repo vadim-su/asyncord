@@ -4,7 +4,7 @@ Reference:
 https://discord.com/developers/docs/resources/channel
 """
 
-from typing import Literal, Union
+from typing import Literal
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
@@ -91,7 +91,7 @@ class UpdateChannelRequest(BaseUpdateChannel):
 
     rtc_region: str | None = None
     """Region for the voice channel.
-    
+
     Automatic when set to None.
     """
 
@@ -297,7 +297,7 @@ class UpdateVoiceChannelRequest(BaseUpdateChannel):
 
     rate_limit_per_user: int | None = None
     """Amount of seconds a user has to wait before sending another message.
-    
+
     Should be between 0 and 21600. Bots, as well as users with the permission
     manage_messages or manage_channel, are unaffected.
     """
@@ -322,7 +322,7 @@ class UpdateVoiceChannelRequest(BaseUpdateChannel):
 
     rtc_region: str | None = None
     """Region for the voice channel.
-    
+
     Automatic when set to None.
     """
 
@@ -356,7 +356,7 @@ class UpdateStageChannelReuqest(BaseUpdateChannel):
 
     rtc_region: str | None = None
     """Region for the voice channel.
-    
+
     Automatic when set to None.
     """
 
@@ -364,15 +364,15 @@ class UpdateStageChannelReuqest(BaseUpdateChannel):
     """Camera video quality mode of the voice channel."""
 
 
-type UpdateChannelRequestType = Union[
-    UpdateGuildCategoryRequest,
-    UpdateChannelRequest,
-    UpdatGroupDMChannelRequest,
-    UpdateTextChannelRequest,
-    UpdateAnoncementChannelRequest,
-    UpdateForumChannelRequest,
-    UpdateMediaChannelRequest,
-    UpdateVoiceChannelRequest,
-    UpdateStageChannelReuqest,
-]
+type UpdateChannelRequestType = (
+    UpdateGuildCategoryRequest
+    | UpdateChannelRequest
+    | UpdatGroupDMChannelRequest
+    | UpdateTextChannelRequest
+    | UpdateAnoncementChannelRequest
+    | UpdateForumChannelRequest
+    | UpdateMediaChannelRequest
+    | UpdateVoiceChannelRequest
+    | UpdateStageChannelReuqest
+)
 """Type of data to update a channel with."""

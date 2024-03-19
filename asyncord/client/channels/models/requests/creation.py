@@ -4,7 +4,7 @@ Reference:
 https://discord.com/developers/docs/resources/channel
 """
 
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -349,13 +349,13 @@ class CreateStageChannelRequest(BaseCreateChannel):
     """Camera video quality mode of the voice channel."""
 
 
-type CreateChannelRequestType = Union[
-    CreateCategoryChannelRequest,
-    CreateTextChannelRequest,
-    CreateAnoncementChannelRequest,
-    CreateForumChannelRequest,
-    CreateMediaChannelRequest,
-    CreateVoiceChannelRequest,
-    CreateStageChannelRequest,
-]
+type CreateChannelRequestType = (
+    CreateCategoryChannelRequest
+    | CreateTextChannelRequest
+    | CreateAnoncementChannelRequest
+    | CreateForumChannelRequest
+    | CreateMediaChannelRequest
+    | CreateVoiceChannelRequest
+    | CreateStageChannelRequest
+)
 """Type of data to create a channel with."""

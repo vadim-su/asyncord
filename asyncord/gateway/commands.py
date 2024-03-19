@@ -1,4 +1,4 @@
-# from __future__ import annotations
+"""This module contains the models for the commands sent to the gateway."""
 
 import enum
 import platform
@@ -16,7 +16,7 @@ class IdentifyConnectionProperties(BaseModel):
     https://discord.com/developers/docs/topics/gateway-events#identify-identify-connection-properties
     """
 
-    os: str = f'{platform.system()} {platform.node()} {platform.release()}'  # noqa: WPS221
+    os: str = f'{platform.system()} {platform.node()} {platform.release()}'
     """Operating system of the bot."""
 
     browser: str = f'asyncord-{__version__}'
@@ -50,7 +50,11 @@ class StatusType(enum.StrEnum):
 
 
 class PresenceUpdateData(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway-events#update-presence-gateway-presence-update-structure"""
+    """Presence update data.
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#update-presence-gateway-presence-update-structure
+    """
 
     since: int | None = None
     """Unix time (in milliseconds) of when the client went idle.
@@ -71,6 +75,7 @@ class PresenceUpdateData(BaseModel):
 class ResumeCommand(BaseModel):
     """Resume a connection to the gateway.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#resume-resume-structure
     """
 
@@ -87,6 +92,7 @@ class ResumeCommand(BaseModel):
 class IdentifyCommand(BaseModel):
     """Identify a connection to the gateway.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#identify-identify-structure
     """
 

@@ -1,3 +1,5 @@
+"""This module contains common enumerations for the scheduled events models."""
+
 import enum
 
 

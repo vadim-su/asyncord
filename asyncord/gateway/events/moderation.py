@@ -1,6 +1,8 @@
-"""All auto moderation related events are currently only sent to bot users
-which have the MANAGE_GUILD permission.
+"""This module contains moderation events for the gateway.
+
+All auto moderation related events are currently only sent to bot users which have the MANAGE_GUILD permission.
 """
+
 from fbenum.adapter import FallbackAdapter
 
 from asyncord.client.models.automoderation import AutoModerationRule, RuleAction, TriggerType

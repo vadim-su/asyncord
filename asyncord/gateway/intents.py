@@ -12,6 +12,7 @@ class Intent(IntFlag):
     You can get more information about intent values and related events by the link:
     https://discord.com/developers/docs/topics/gateway#gateway-intents
     """
+
     GUILDS = 1 << 0
     GUILD_MEMBERS = 1 << 1
     GUILD_BANS = 1 << 2

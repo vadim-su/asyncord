@@ -1,3 +1,4 @@
+"""This module contains application events for the gateway."""
 
 from asyncord.client.applications.models.responses import GuildApplicationCommandPermissionsOut
 from asyncord.gateway.events.base import GatewayEvent

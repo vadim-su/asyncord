@@ -1,3 +1,5 @@
+"""This module contains models for thread requests."""
+
 from typing import Literal
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator

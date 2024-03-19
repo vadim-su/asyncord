@@ -12,21 +12,22 @@ from tests.conftest import IntegrationTestData
 
 
 @pytest.mark.parametrize(
-    'around,before,after,limit',
+    ('around', 'before', 'after', 'limit'),
     [
         ('message_id', None, None, 3),
         (None, 'message_id', None, 1),
         (None, None, 'message_id', 1),
     ],
 )
-async def test_get_channel_messages(
+async def test_get_channel_messages(  # noqa: PLR0913, PLR0917
     messages_res: MessageResource,
     integration_data: IntegrationTestData,
     around: LikeSnowflake | Literal['message_id'],
     before: LikeSnowflake | Literal['message_id'],
     after: LikeSnowflake | Literal['message_id'],
     limit: int,
-):
+) -> None:
+    """Test getting messages from a channel."""
     if around:
         around = integration_data.message_id
     if before:
@@ -35,25 +36,36 @@ async def test_get_channel_messages(
         after = integration_data.message_id
 
     messages = await messages_res.get(
-        around=around, before=before, after=after, limit=limit,
+        around=around,
+        before=before,
+        after=after,
+        limit=limit,
     )
     assert len(messages) == limit
     if around:
         assert messages[1].id == around
 
 
-async def test_create_and_delete_simple_message(messages_res: MessageResource):
+async def test_create_and_delete_simple_message(messages_res: MessageResource) -> None:
+    """Test creating and deleting a message."""
     message = await messages_res.create(CreateMessageRequest(content='test'))
     assert message.content == 'test'
     await messages_res.delete(message.id)
 
 
-async def test_update_message(message: MessageResponse, messages_res: MessageResource):
+async def test_update_message(
+    message: MessageResponse,
+    messages_res: MessageResource,
+) -> None:
+    """Test updating a message."""
+    # fmt: off
     random_content = ''.join([
         random.choice(string.ascii_letters)
         for _ in range(10)
     ])
+    # fmt: on
     updated_message = await messages_res.update(
-        message.id, UpdateMessageRequest(content=random_content),
+        message.id,
+        UpdateMessageRequest(content=random_content),
     )
     assert updated_message.content == random_content

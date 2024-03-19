@@ -1,5 +1,5 @@
 import datetime
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import pytest
 
@@ -19,6 +19,7 @@ from tests.conftest import IntegrationTestData
 
 @pytest.fixture()
 async def event(events_res: ScheduledEventsResource) -> AsyncGenerator[ScheduledEventResponse, None]:
+    """Fixture that creates a scheduled event and deletes it after the test."""
     creation_data = CreateScheduledEventRequest(
         entity_type=EventEntityType.EXTERNAL,
         name='Test Event',
@@ -38,7 +39,8 @@ async def test_create_event(
     events_res: ScheduledEventsResource,
     integration_data: IntegrationTestData,
     event_type: EventEntityType,
-):
+) -> None:
+    """Test creating a scheduled event."""
     if event_type is EventEntityType.EXTERNAL:
         creation_data = CreateScheduledEventRequest(
             entity_type=event_type,
@@ -63,7 +65,11 @@ async def test_create_event(
     await events_res.delete(event.id)
 
 
-async def test_get_event(events_res: ScheduledEventsResource, event: ScheduledEventResponse):
+async def test_get_event(
+    events_res: ScheduledEventsResource,
+    event: ScheduledEventResponse,
+) -> None:
+    """Test getting a scheduled event."""
     getted_event = await events_res.get(event.id)
     assert isinstance(getted_event, ScheduledEventResponse)
     assert getted_event.id == event.id
@@ -73,18 +79,33 @@ async def test_get_event(events_res: ScheduledEventsResource, event: ScheduledEv
     assert getted_event.entity_type == event.entity_type
 
 
-async def test_get_event_list(events_res: ScheduledEventsResource, event: ScheduledEventResponse):
+async def test_get_event_list(
+    events_res: ScheduledEventsResource,
+    event: ScheduledEventResponse,
+) -> None:
+    """Test getting a list of scheduled events."""
     event_list = await events_res.get_list()
     assert isinstance(event_list, list)
     assert len(event_list) >= 1
     assert isinstance(event_list[0], ScheduledEventResponse)
 
 
-async def test_update_event(events_res: ScheduledEventsResource, event: ScheduledEventResponse):
-    updated_event = await events_res.update(event.id, UpdateScheduledEventRequest(name='Updated Event'))
+async def test_update_event(
+    events_res: ScheduledEventsResource,
+    event: ScheduledEventResponse,
+) -> None:
+    """Test updating a scheduled event."""
+    updated_event = await events_res.update(
+        event_id=event.id,
+        event_data=UpdateScheduledEventRequest(name='Updated Event'),
+    )
     assert updated_event.name == 'Updated Event'
 
 
-async def test_get_event_users(events_res: ScheduledEventsResource, event: ScheduledEventResponse):
+async def test_get_event_users(
+    events_res: ScheduledEventsResource,
+    event: ScheduledEventResponse,
+) -> None:
+    """Test getting a list of users who have signed up for a scheduled event."""
     users = await events_res.get_event_users(event.id)
     assert isinstance(users, list)

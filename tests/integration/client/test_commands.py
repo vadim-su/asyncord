@@ -15,7 +15,8 @@ from asyncord.client.commands.models.requests import (
 from asyncord.client.commands.resources import CommandResource
 
 
-async def test_create_command(commands_res: CommandResource):
+async def test_create_command(commands_res: CommandResource) -> None:
+    """Test creating a command."""
     command_data = CreateApplicationCommandRequest(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command',
@@ -46,9 +47,9 @@ async def test_create_command(commands_res: CommandResource):
                     ApplicationCommandOptionChoice(
                         name='test-choice-2',
                         value='test-value-2',
-                    )
+                    ),
                 ],
-            )
+            ),
         ],
     )
 
@@ -63,7 +64,8 @@ async def test_create_command(commands_res: CommandResource):
     await commands_res.delete(command.id)
 
 
-async def test_create_subcommand_group(commands_res: CommandResource):
+async def test_create_subcommand_group(commands_res: CommandResource) -> None:
+    """Test creating a subcommand group."""
     command_data = CreateApplicationCommandRequest(
         type=ApplicationCommandType.CHAT_INPUT,
         name='test-command-group',
@@ -96,14 +98,16 @@ async def test_create_subcommand_group(commands_res: CommandResource):
 
     assert command.name == 'test-command-group'
     assert command.description == 'test command description'
-    # await commands_res.delete(command.id)
+    await commands_res.delete(command.id)
 
 
-async def test_get_command_list(commands_res: CommandResource):
+async def test_get_command_list(commands_res: CommandResource) -> None:
+    """Test getting a list of commands."""
     assert await commands_res.get_list()
 
 
-async def test_get_command(commands_res: CommandResource):
+async def test_get_command(commands_res: CommandResource) -> None:
+    """Test getting a command."""
     commands_list = await commands_res.get_list()
     command = await commands_res.get(commands_list[0].id)
 
@@ -112,7 +116,8 @@ async def test_get_command(commands_res: CommandResource):
     assert commands_list[0].description == command.description
 
 
-async def test_convert_command_to_create_command(commands_res: CommandResource):
+async def test_convert_command_to_create_command(commands_res: CommandResource) -> None:
+    """Test converting a command to a create command request."""
     commands_list = await commands_res.get_list()
     command = await commands_res.get(commands_list[0].id)
 

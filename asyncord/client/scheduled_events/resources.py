@@ -3,6 +3,7 @@
 Reference:
 https://discord.com/developers/docs/resources/guild-scheduled-event
 """
+
 from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
@@ -56,7 +57,11 @@ class ScheduledEventsResource(ClientSubresource):
         resp = await self._http_client.get(url)
         return list_model(ScheduledEventResponse).validate_python(resp.body)
 
-    async def create(self, event_data: CreateScheduledEventRequest, reason: str | None = None) -> ScheduledEventResponse:
+    async def create(
+        self,
+        event_data: CreateScheduledEventRequest,
+        reason: str | None = None,
+    ) -> ScheduledEventResponse:
         """Create a scheduled event.
 
         Args:
@@ -75,7 +80,11 @@ class ScheduledEventsResource(ClientSubresource):
         resp = await self._http_client.post(self.events_url, payload=paylod, headers=headers)
         return ScheduledEventResponse.model_validate(resp.body)
 
-    async def update(self, event_id: SnowflakeInputType, event_data: UpdateScheduledEventRequest) -> ScheduledEventResponse:
+    async def update(
+        self,
+        event_id: SnowflakeInputType,
+        event_data: UpdateScheduledEventRequest,
+    ) -> ScheduledEventResponse:
         """Update a scheduled event.
 
         Args:

@@ -123,6 +123,7 @@ class SelectDefaultValueOut(BaseModel):
     Reference:
     https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
     """
+
     id: Snowflake
     """ID of a user, role, or channel"""
 
@@ -274,12 +275,13 @@ class FallbackComponentOut(BaseComponentOut, extra='allow'):
     """
 
 
-ComponentOut = Annotated[
-    ActionRowOut
-    | ButtonOut
-    | SelectMenuOut,
-    Field(discriminator='type'),
-] | FallbackComponentOut
+ComponentOut = (
+    Annotated[
+        ActionRowOut | ButtonOut | SelectMenuOut,
+        Field(discriminator='type'),
+    ]
+    | FallbackComponentOut
+)
 """Type of the component.
 
 Message Response can contain any of the component types, but not text input.
@@ -287,9 +289,7 @@ Message Response can contain any of the component types, but not text input.
 
 _ConponentList = list[
     Annotated[
-        ActionRowOut
-        | ButtonOut
-        | SelectMenuOut,
+        ActionRowOut | ButtonOut | SelectMenuOut,
         Field(discriminator='type'),
     ]
     | TextInputOut

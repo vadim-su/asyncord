@@ -54,16 +54,11 @@ line-length = 120
 indent-width = 4
 target-version = "py312"
 
-extend-exclude = [
-    "tests",
-    ".git",
-    ".vscode",
-    ".devcontainer",
-    ".github",
-    ".venv",
-]
+extend-exclude = [".git", ".vscode", ".devcontainer", ".github", ".venv"]
+
 
 [tool.ruff.lint]
+preview = true
 select = [
     # Pyflakes
     "F",
@@ -134,7 +129,7 @@ ignore = [
     "ANN102",
     # Package dosctring check
     "D104",
-    # Checks for string literals that are explicitly concatenated (using the + operator).
+    # Checks for string literals that are explicitly concatenated (using `+` operator)
     'ISC003',
     # Private member accessed
     'SLF001',
@@ -152,6 +147,19 @@ ignore = [
     "SIM102",
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    # Allow missing module docstring
+    "D100",
+    # Allow asserts in tests
+    "S101",
+    # Allow pseudorandom number generator in tests. We do not make any cryptographic operations in tests
+    "S311",
+    # Checks for iterations over set literals is wrong. Set fits better than list on iteration by values
+    "PLC0208",
+    # We allow some magic values in the tests. It's acceptable
+    "PLR2004",
+]
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"
@@ -169,6 +177,9 @@ convention = "google"
 [tool.ruff.lint.flake8-annotations]
 mypy-init-return = true
 
+[tool.ruff.lint.pylint]
+allow-dunder-method-names = ["__get_pydantic_core_schema__"]
+
 [tool.ruff.format]
-# Like Black, use double quotes for strings.
+preview = true
 quote-style = "single"

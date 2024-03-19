@@ -114,13 +114,11 @@ class Base64Image:
         Returns:
             Pydantic core schema.
         """
-        # fmt: off
         schema = core_schema.union_schema([
             core_schema.bytes_schema(),
             core_schema.str_schema(),
             core_schema.is_instance_schema(cls),
         ])
-        # fmt: on
 
         return core_schema.no_info_after_validator_function(
             function=cls.validate,
@@ -134,6 +132,10 @@ class Base64Image:
             return self.image_data == other.image_data
 
         return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        """Return the hash value of the image data."""
+        return hash(self.image_data)
 
     def __str__(self) -> str:
         """Return image data."""

@@ -1,3 +1,5 @@
+"""This module contains the base URLs for the Discord API and Gateway."""
+
 from __future__ import annotations
 
 from typing import Final

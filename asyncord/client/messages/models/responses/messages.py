@@ -1,3 +1,5 @@
+"""Message response models."""
+
 from __future__ import annotations
 
 import datetime
@@ -251,6 +253,7 @@ class ReactionCountDetailsOut(BaseModel):
     The reaction count details object contains a breakdown of normal and
     super reaction counts for the associated emoji.
     """
+
     burst: int
     """Count of super reactions"""
 
@@ -331,6 +334,7 @@ class ResolvedChannelOut(BaseModel):
     Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
     """
+
     id: Snowflake
     """Channel id."""
 

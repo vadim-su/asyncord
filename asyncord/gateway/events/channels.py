@@ -1,3 +1,5 @@
+"""This module contains the channel events for the gateway."""
+
 import datetime
 from typing import Any
 
@@ -72,6 +74,7 @@ class ThreadCreateEvent(GatewayEvent, ChannelResponse):
 
     https://discord.com/developers/docs/topics/gateway-events#thread-create
     """
+
     # FIXME: read the docs and add the missing thread member object
 
     newly_created: bool
@@ -121,14 +124,22 @@ class ThreadListSyncEvent(GatewayEvent):
 
 
 class ThreadMemberUpdateEvent(GatewayEvent, ThreadMemberResponse):
-    """https://discord.com/developers/docs/topics/gateway-events#thread-member-update"""
+    """Sent when a thread member is updated.
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#thread-member-update
+    """
 
     guild_id: Snowflake
     """Guild id."""
 
 
 class ThreadMemberUpdate(ThreadMemberResponse):
-    """https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields"""
+    """Sent when a thread member is updated.
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields
+    """
 
     member: MemberResponse
     """Member object."""
@@ -138,7 +149,11 @@ class ThreadMemberUpdate(ThreadMemberResponse):
 
 
 class ThreadMembersUpdateEvent(GatewayEvent):
-    """https://discord.com/developers/docs/topics/gateway-events#thread-members-update"""
+    """Sent when the thread member object for the current user is updated.
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#thread-members-update
+    """
 
     id: Snowflake
     """the id of the thread"""

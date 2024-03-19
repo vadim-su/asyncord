@@ -3,6 +3,7 @@
 These endpoints are for managing channels. Classic CRUD operations and related
 endpoints like message creation.
 """
+
 from __future__ import annotations
 
 from asyncord.client.channels.models.requests.creation import CreateChannelRequestType

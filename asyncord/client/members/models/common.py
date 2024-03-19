@@ -1,3 +1,5 @@
+"""This module contains common models for members."""
+
 import enum
 
 

@@ -1,3 +1,5 @@
+"""This module contains the models for guild related gateway events."""
+
 from datetime import datetime
 from typing import Any
 

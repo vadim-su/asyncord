@@ -22,7 +22,7 @@ class GatewayEvent(BaseModel):
 
     @classmethod
     @property
-    def __event_name__(cls) -> str:
+    def __event_name__(cls) -> str:  # noqa: PLW3201
         """Name of the event.
 
         Used for identifying the event.
@@ -35,6 +35,7 @@ class GatewayEvent(BaseModel):
 
 class Shard(NamedTuple):
     """Shard information associated with this session."""
+
     shard_id: int
     num_shards: int
 

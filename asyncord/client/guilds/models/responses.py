@@ -1,3 +1,5 @@
+"""Response models for guilds."""
+
 import datetime
 from typing import Any
 
@@ -53,6 +55,7 @@ class GuildResponse(BaseModel):
     Reference:
     https://discord.com/developers/docs/resources/guild#guild-object
     """
+
     id: Snowflake
     """Guild ID."""
 
@@ -409,6 +412,7 @@ class IntegrationAccountOut(BaseModel):
 
     Reference: https://discord.com/developers/docs/resources/guild#integration-account-object
     """
+
     id: str
     """ID of the account."""
 

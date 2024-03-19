@@ -4,13 +4,15 @@ from pydantic import BaseModel
 from asyncord.client.models.permissions import PermissionFlag
 
 
-def test_permission_flag_name_and_value():
+def test_permission_flag_name_and_value() -> None:
+    """Test that PermissionFlag has correct name and value."""
     flag = PermissionFlag.CREATE_INSTANT_INVITE
     assert flag.value == 1
     assert flag.name == 'CREATE_INSTANT_INVITE'
 
 
-def test_permission_flag_bitwise_operation():
+def test_permission_flag_bitwise_operation() -> None:
+    """Test that PermissionFlag can be used in bitwise operations."""
     flag1 = PermissionFlag.CREATE_INSTANT_INVITE
     flag2 = PermissionFlag.KICK_MEMBERS
     combined_flags = flag1 | flag2
@@ -18,7 +20,8 @@ def test_permission_flag_bitwise_operation():
     assert combined_flags & flag2
 
 
-def test_permission_flags_name_and_value():
+def test_permission_flags_name_and_value() -> None:
+    """Test that PermissionFlag has correct name and value."""
     flag1 = PermissionFlag.CREATE_INSTANT_INVITE
     flag2 = PermissionFlag.KICK_MEMBERS
     combined_flags = flag1 | flag2
@@ -33,16 +36,20 @@ def test_permission_flags_name_and_value():
     assert combined_flags.name == 'CREATE_INSTANT_INVITE|KICK_MEMBERS'
 
 
-def test_permission_flag_convertation():
+def test_permission_flag_convertation() -> None:
+    """Test that PermissionFlag can be converted to int and str."""
     flag = PermissionFlag.CREATE_INSTANT_INVITE | PermissionFlag.KICK_MEMBERS
     assert int(flag) == 2**0 + 2**1
     assert str(flag) == str(2**0 + 2**1)
 
 
 @pytest.mark.parametrize('permission_type', [PermissionFlag, int, str])
-def test_permission_flag_as_part_of_model(permission_type: type):
+def test_permission_flag_as_part_of_model(permission_type: type) -> None:
+    """Test that PermissionFlag can be used as part of pydantic model."""
+
     class TestModel(BaseModel):
         flag: PermissionFlag
+
     flag = PermissionFlag.CREATE_INSTANT_INVITE | PermissionFlag.KICK_MEMBERS
     model = TestModel(flag=permission_type(flag))
 

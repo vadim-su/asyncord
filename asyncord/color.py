@@ -1,4 +1,9 @@
-from typing import Annotated, Any, Callable, Final, NamedTuple, Self
+"""Module that provides a color class for discord."""
+
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Annotated, Any, Final, NamedTuple, Self
 
 from pydantic import BaseModel
 from pydantic_core import CoreSchema, core_schema
@@ -18,7 +23,7 @@ class RGB(NamedTuple):
 
     def __repr__(self) -> str:
         """Return a string representation of the RGB object."""
-        return f"RGB({self.red}, {self.green}, {self.blue})"
+        return f'RGB({self.red}, {self.green}, {self.blue})'
 
 
 class Color:
@@ -39,13 +44,13 @@ class Color:
             case int():
                 return cls(value)
             case str():
-                return cls(int(value.lstrip("#"), 16))
+                return cls(int(value.lstrip('#'), 16))
             case RGB():
                 return cls((value.red << 16) + (value.green << 8) + value.blue)
             case red, green, blue if isinstance(red, int) and isinstance(green, int) and isinstance(blue, int):
                 return cls((red << 16) + (green << 8) + blue)
 
-        raise ValueError("Invalid value type")
+        raise ValueError('Invalid value type')
 
     def to_rgb(self) -> RGB:
         """Return the red, green, and blue values of the color."""
@@ -61,7 +66,9 @@ class Color:
 
     @classmethod
     def __get_pydantic_core_schema__(
-        cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
+        cls,
+        _source: type[BaseModel],
+        _handler: Callable[[Any], CoreSchema],
     ) -> CoreSchema:
         """Pydantic auxiliary method to get schema.
 
@@ -77,7 +84,9 @@ class Color:
             core_schema.str_schema(),
             core_schema.is_instance_schema(RGB),
             core_schema.tuple_positional_schema([
-                core_schema.int_schema(), core_schema.int_schema(), core_schema.int_schema(),
+                core_schema.int_schema(),
+                core_schema.int_schema(),
+                core_schema.int_schema(),
             ]),
             core_schema.is_instance_schema(cls),
         ])
@@ -93,9 +102,9 @@ class Color:
 
     def __repr__(self) -> str:
         """Return a string representation of the color object."""
-        return f"Color({self.to_hex()})"
+        return f'Color({self.to_hex()})'
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Color) -> bool:
         """Compare two colors for equality."""
         if not isinstance(other, Color):
             return False
@@ -125,8 +134,14 @@ class Color:
         if isinstance(value, int | str | RGB):
             return cls.build(value)
 
-        if isinstance(value, tuple) and len(value) == 3 and all(isinstance(v, int) for v in value):
+        # fmt: off
+        if (
+            isinstance(value, tuple)
+            and len(value) == 3  # noqa: PLR2004
+            and all(isinstance(v, int) for v in value)
+        ):
             return cls.build(value)
+        # fmt: on
 
         if isinstance(value, cls):
             return value

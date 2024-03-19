@@ -1,4 +1,4 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import pytest
 
@@ -6,6 +6,7 @@ from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.members.resources import MemberResource
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
@@ -23,11 +24,13 @@ from tests.conftest import IntegrationTestData
 
 @pytest.fixture()
 async def client(token: str) -> RestClient:
+    """Get a rest client."""
     return RestClient(token)
 
 
 @pytest.fixture()
 async def channel_res(client: RestClient) -> ChannelResource:
+    """Get channels resource for the client."""
     return client.channels
 
 
@@ -36,24 +39,28 @@ async def messages_res(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
 ) -> MessageResource:
+    """Get messages resource for the channel."""
     return channel_res.messages(integration_data.channel_id)
 
 
 @pytest.fixture()
 async def guilds_res(client: RestClient) -> GuildResource:
+    """Get guilds resource for the client."""
     return client.guilds
 
 
 @pytest.fixture()
 async def users_res(client: RestClient) -> UserResource:
+    """Get users resource for the client."""
     return client.users
 
 
 @pytest.fixture()
 async def members_res(
     guilds_res: GuildResource,
-    integration_data: IntegrationTestData
-):
+    integration_data: IntegrationTestData,
+) -> MemberResource:
+    """Get members resource for the guild."""
     return guilds_res.members(integration_data.guild_id)
 
 
@@ -62,19 +69,25 @@ async def roles_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
 ) -> RoleResource:
+    """Get roles resource for the guild."""
     return guilds_res.roles(integration_data.guild_id)
 
 
 @pytest.fixture()
 async def events_res(
     guilds_res: GuildResource,
-    integration_data: IntegrationTestData
+    integration_data: IntegrationTestData,
 ) -> ScheduledEventsResource:
+    """Get events resource for the guild."""
     return guilds_res.events(integration_data.guild_id)
 
 
 @pytest.fixture()
-async def reactions_res(message: MessageResponse, messages_res: MessageResource) -> ReactionResource:
+async def reactions_res(
+    message: MessageResponse,
+    messages_res: MessageResource,
+) -> ReactionResource:
+    """Get reactions resource for the message."""
     return messages_res.reactions(message.id)
 
 
@@ -83,6 +96,7 @@ async def commands_res(
     client: RestClient,
     integration_data: IntegrationTestData,
 ) -> CommandResource:
+    """Get commands resource for the application."""
     return client.applications.commands(integration_data.app_id)
 
 
@@ -91,19 +105,22 @@ async def thread_res(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
 ) -> ThreadResource:
+    """Get threads resource for the channel."""
     return channel_res.threads(integration_data.channel_id)
 
 
 @pytest.fixture()
 async def ban_managment(
     client: RestClient,
-    integration_data: IntegrationTestData
+    integration_data: IntegrationTestData,
 ) -> BanResource:
+    """Get ban management resource for the guild."""
     return client.guilds.ban_managment(integration_data.guild_id)
 
 
 @pytest.fixture()
 async def message(messages_res: MessageResource) -> AsyncGenerator[MessageResponse, None]:
+    """Fixture that creates a message and deletes it after the test."""
     message = await messages_res.create(
         CreateMessageRequest(content='test'),
     )
@@ -113,6 +130,7 @@ async def message(messages_res: MessageResource) -> AsyncGenerator[MessageRespon
 
 @pytest.fixture()
 async def thread(thread_res: ThreadResource) -> AsyncGenerator[ThreadResponse, None]:
+    """Fixture that creates a thread and deletes it after the test."""
     thread = await thread_res.create_thread(
         thread_data=CreateThreadRequest(  # type: ignore
             name='test',

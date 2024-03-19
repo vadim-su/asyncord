@@ -1,3 +1,5 @@
+"""Common models for guilds."""
+
 import enum
 
 

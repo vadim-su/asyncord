@@ -1,3 +1,5 @@
+"""Models for scheduled events requests."""
+
 import datetime
 from typing import Self
 

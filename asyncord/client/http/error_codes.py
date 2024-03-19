@@ -1,4 +1,5 @@
 """List of error codes returned by Discord API."""
+
 import enum
 
 from fbenum.enum import FallbackEnum
@@ -6,7 +7,7 @@ from fbenum.enum import FallbackEnum
 
 @enum.unique
 class ErrorCode(enum.IntEnum, FallbackEnum):
-    """"Error codes returned by Discord API.
+    """Error codes returned by Discord API.
 
     Reference:
     https://discord.com/developers/docs/topics/opcodes-and-status-codes#json-json-error-codes

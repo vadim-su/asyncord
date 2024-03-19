@@ -1,3 +1,5 @@
+"""This module contains models for embeds in message requests."""
+
 import datetime
 
 from pydantic import BaseModel, Field
@@ -176,7 +178,7 @@ class Embed(BaseModel):
 
     video: EmbedVideo | None = None
     """Video information.
-    
+
     Bots can not use this field.
     Discord API will ignore it if provided.
     """

@@ -4,8 +4,6 @@ Currently, the only action is to send a response to an interaction. Discord don'
 provide any other actions for interactions.
 """
 
-from typing import Union
-
 from asyncord.client.interactions.models.requests import (
     InteractionChannelMessageResponsRequest,
     InteractionDeferredChannelMessageResponseRequest,
@@ -18,12 +16,13 @@ from asyncord.client.resources import ClientSubresource
 from asyncord.typedefs import LikeSnowflake
 from asyncord.urls import REST_API_URL
 
-_INTERACTIONS_CAN_CONTAIN_FILES = Union[
-    InteractionChannelMessageResponsRequest,
-    InteractionDeferredChannelMessageResponseRequest,
-    InteractionDeferredUpdateMessageResponseRequest,
-    InteractionUpdateMessageResponseRequest,
-]
+_INTERACTIONS_CAN_CONTAIN_FILES = (
+    InteractionChannelMessageResponsRequest
+    | InteractionDeferredChannelMessageResponseRequest
+    | InteractionDeferredUpdateMessageResponseRequest
+    | InteractionUpdateMessageResponseRequest
+)
+"""Interaction response types that can contain files."""
 
 
 class InteractionResource(ClientSubresource):
@@ -48,10 +47,12 @@ class InteractionResource(ClientSubresource):
         payload = interaction_response.model_dump(mode='json')
 
         if isinstance(interaction_response, _INTERACTIONS_CAN_CONTAIN_FILES):
+            # fmt: off
             files = [
                 (file.filename, file.content_type, file.content)
                 for file in interaction_response.data.files
             ]
+            # fmt: on
         else:
             files = None
 

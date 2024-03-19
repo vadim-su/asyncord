@@ -1,3 +1,5 @@
+"""Common models for messages."""
+
 import enum
 from typing import Literal
 

@@ -1,4 +1,5 @@
-# pyright: reportSelfClsParameterName=false
+"""Module containing HTTP headers constants."""
+
 from __future__ import annotations
 
 import enum

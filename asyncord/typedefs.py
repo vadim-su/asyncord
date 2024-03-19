@@ -16,6 +16,7 @@ Payload = NewType('Payload', Any)
 # Fix for pydanitc and pylance. Pylance doesn't correctly infer the type
 # of the list_model function.
 if TYPE_CHECKING:
+
     def list_model[ListItemType](type_: type[ListItemType]) -> TypeAdapter[list[ListItemType]]:
         """Return a type adapter for a list of a specific type.
 
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
         """
         return TypeAdapter(list[type_])
 else:
+
     @lru_cache
     def list_model[ListItemType](type_: type[ListItemType]) -> TypeAdapter[list[ListItemType]]:
         """Return a type adapter for a list of a specific type."""

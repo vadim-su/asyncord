@@ -177,7 +177,9 @@ class PermissionFlag(enum.IntFlag):
 
     @classmethod
     def __get_pydantic_core_schema__(
-        cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
+        cls,
+        _source: type[BaseModel],
+        _handler: Callable[[Any], CoreSchema],
     ) -> CoreSchema:
         """Pydantic auxiliary method to get schema.
 

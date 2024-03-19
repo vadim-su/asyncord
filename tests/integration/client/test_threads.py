@@ -19,40 +19,58 @@ from tests.conftest import IntegrationTestData
 TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.jpg']
 
 
-async def test_get_thread(thread_res: ThreadResource, thread: ThreadResponse):
+async def test_get_thread(
+    thread_res: ThreadResource,
+    thread: ThreadResponse,
+) -> None:
+    """Test getting a thread."""
     thread = await thread_res.get(thread_id=thread.id)
     assert isinstance(thread, ThreadResponse)
 
 
-async def test_get_active_threads(thread_res: ThreadResource, integration_data: IntegrationTestData):
+async def test_get_active_threads(
+    thread_res: ThreadResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting active threads."""
     active_threads = await thread_res.get_active_threads(guild_id=integration_data.guild_id)
     assert isinstance(active_threads, ThreadsResponse)
 
 
-async def test_get_archived_threads(thread_res: ThreadResource):
+async def test_get_archived_threads(thread_res: ThreadResource) -> None:
+    """Test getting archived threads."""
     archived_threads = await thread_res.get_archived_threads()
     assert isinstance(archived_threads, ThreadsResponse)
     assert archived_threads.threads
     assert archived_threads.threads[0].thread_metadata.archived
 
 
-async def test_get_private_archived_threads(thread_res: ThreadResource):
+async def test_get_private_archived_threads(thread_res: ThreadResource) -> None:
+    """Test getting private archived threads."""
     archived_threads = await thread_res.get_archived_threads(private=True)
     assert isinstance(archived_threads, ThreadsResponse)
     assert archived_threads.threads
     assert archived_threads.threads[0].thread_metadata.archived
 
 
-async def test_get_joined_private_archived_threads(thread_res: ThreadResource):
+async def test_get_joined_private_archived_threads(thread_res: ThreadResource) -> None:
+    """Test getting joined private archived threads."""
     archived_threads = await thread_res.get_joined_private_archive_threads()
     assert isinstance(archived_threads, ThreadsResponse)
 
 
-@pytest.mark.parametrize('thread_type', [
-    ThreadType.GUILD_PUBLIC_THREAD,
-    ThreadType.GUILD_PRIVATE_THREAD,
-])
-async def test_create_delete_thread(thread_res: ThreadResource, thread_type: ThreadType):
+@pytest.mark.parametrize(
+    'thread_type',
+    [
+        ThreadType.GUILD_PUBLIC_THREAD,
+        ThreadType.GUILD_PRIVATE_THREAD,
+    ],
+)
+async def test_create_delete_thread(
+    thread_res: ThreadResource,
+    thread_type: ThreadType,
+) -> None:
+    """Test creating and deleting a thread."""
     thread = await thread_res.create_thread(
         thread_data=CreateThreadRequest(  # type: ignore
             name='test',
@@ -68,7 +86,11 @@ async def test_create_delete_thread(thread_res: ThreadResource, thread_type: Thr
     await thread_res.delete(thread_id=thread.id)
 
 
-async def test_create_delete_thread_from_message(thread_res: ThreadResource, message: MessageResponse):
+async def test_create_delete_thread_from_message(
+    thread_res: ThreadResource,
+    message: MessageResponse,
+) -> None:
+    """Test creating and deleting a thread from a message."""
     thread = await thread_res.create_thread_from_message(
         message_id=message.id,
         thread_data=CreateThreadFromMessageRequest(  # type: ignore
@@ -84,7 +106,8 @@ async def test_create_delete_thread_from_message(thread_res: ThreadResource, mes
     await thread_res.delete(thread_id=thread.id)
 
 
-async def test_leave_rejoin_and_members_thread(thread_res: ThreadResource, thread: ThreadResponse):
+async def test_leave_rejoin_and_members_thread(thread_res: ThreadResource, thread: ThreadResponse) -> None:
+    """Test leaving and rejoining a thread."""
     members = await thread_res.get_members(thread_id=thread.id)
     assert len(members) == thread.member_count
 
@@ -99,7 +122,8 @@ async def test_leave_rejoin_and_members_thread(thread_res: ThreadResource, threa
     assert len(members) == thread.member_count
 
 
-async def test_remove_add_and_get_thread_member(thread_res: ThreadResource, thread: ThreadResponse):
+async def test_remove_add_and_get_thread_member(thread_res: ThreadResource, thread: ThreadResponse) -> None:
+    """Test removing and adding a thread member."""
     member = await thread_res.get_member(
         thread_id=thread.id,
         user_id=thread.owner_id,
@@ -128,7 +152,8 @@ async def test_post_to_forum_channel(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
     with_files: bool,
-):
+) -> None:
+    """Test posting to a forum channel."""
     channel = await channel_res.create_channel(
         guild_id=integration_data.guild_id,
         channel_data=CreateForumChannelRequest(  # type: ignore
@@ -164,11 +189,15 @@ async def test_post_to_forum_channel(
     assert thread.name == 'test thread'
     assert thread.type is ThreadType.GUILD_PUBLIC_THREAD
     assert not thread.thread_metadata.archived
-    assert len(thread.applied_tags) == 1    # type: ignore
+    assert len(thread.applied_tags) == 1  # type: ignore
     assert thread.applied_tags[0] == tag_id  # type: ignore
 
 
-async def test_archive_unarchive_thread(thread_res: ThreadResource, thread: ThreadResponse):
+async def test_archive_unarchive_thread(
+    thread_res: ThreadResource,
+    thread: ThreadResponse,
+) -> None:
+    """Test archiving and unarchiving a thread."""
     assert not thread.thread_metadata.archived
 
     thread = await thread_res.archive(thread_id=thread.id)
@@ -178,7 +207,8 @@ async def test_archive_unarchive_thread(thread_res: ThreadResource, thread: Thre
     assert not thread.thread_metadata.archived
 
 
-async def test_lock_unlock_thread(thread_res: ThreadResource, thread: ThreadResponse):
+async def test_lock_unlock_thread(thread_res: ThreadResource, thread: ThreadResponse) -> None:
+    """Test locking and unlocking a thread."""
     assert not thread.thread_metadata.locked
 
     thread = await thread_res.lock(thread_id=thread.id)
@@ -188,7 +218,8 @@ async def test_lock_unlock_thread(thread_res: ThreadResource, thread: ThreadResp
     assert not thread.thread_metadata.locked
 
 
-async def test_update_thread(thread_res: ThreadResource, thread: ThreadResponse):
+async def test_update_thread(thread_res: ThreadResource, thread: ThreadResponse) -> None:
+    """Test updating a thread."""
     thread = await thread_res.update(
         thread_id=thread.id,
         thread_data=UpdateThreadRequest(  # type: ignore
@@ -203,7 +234,8 @@ async def test_update_thread(thread_res: ThreadResource, thread: ThreadResponse)
     assert thread.thread_metadata.locked
 
 
-async def test_send_message(thread_res: ThreadResource, thread: ThreadResponse):
+async def test_send_message(thread_res: ThreadResource, thread: ThreadResponse) -> None:
+    """Test sending a message to a thread."""
     message_res = thread_res.messages(thread_id=thread.id)
     message = await message_res.create(
         message_data=ThreadMessage(  # type: ignore

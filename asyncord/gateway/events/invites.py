@@ -1,7 +1,9 @@
-import datetime
+"""Events related to invites."""
 
-from asyncord.client.guilds.resources import InviteTargetType
-from asyncord.client.models.applications import Application
+import datetime
+from typing import Any
+
+from asyncord.client.guilds.models.common import InviteTargetType
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
@@ -10,6 +12,7 @@ from asyncord.snowflake import Snowflake
 class InviteCreateEvent(GatewayEvent):
     """Sent when a new invite to a channel is created.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#invite-create
     """
 
@@ -46,8 +49,8 @@ class InviteCreateEvent(GatewayEvent):
     target_user: UserResponse | None = None
     """User whose stream to display for this invite."""
 
-    # FIXME: There is should be a partial application object, but it is not documented
-    target_application: Application | None = None
+    # TODO: There is should be a partial application object, but it is not documented
+    target_application: dict[str, Any] | None = None
     """Embedded application to open for this voice channel embedded application invite."""
 
     temporary: bool
@@ -67,6 +70,7 @@ class InviteCreateEvent(GatewayEvent):
 class InviteDeleteEvent(GatewayEvent):
     """Sent when an invite is deleted.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#invite-delete
     """
 

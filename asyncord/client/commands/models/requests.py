@@ -6,7 +6,7 @@ https://discord.com/developers/docs/interactions/application-commands
 
 from __future__ import annotations
 
-from typing import Annotated, Final, Literal, Union
+from typing import Annotated, Final, Literal
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
@@ -84,6 +84,7 @@ class ApplicationCommandSubCommandOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.SUB_COMMAND] = AppCommandOptionType.SUB_COMMAND
 
     options: list[ApplicationCommandOption] | None = None
@@ -96,6 +97,7 @@ class ApplicationCommandSubCommandGroupOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.SUB_COMMAND_GROUP] = AppCommandOptionType.SUB_COMMAND_GROUP
 
     options: list[ApplicationCommandOption] | None = None
@@ -108,11 +110,12 @@ class ApplicationCommandStringOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.STRING] = AppCommandOptionType.STRING
 
     choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
     """List of choices for string and number types.
-    
+
     Max length is 25.
     """
 
@@ -135,11 +138,12 @@ class ApplicationCommandIntegerOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.INTEGER] = AppCommandOptionType.INTEGER
 
     choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
     """List of choices for string and number types.
-    
+
     Max length is 25.
     """
 
@@ -182,6 +186,7 @@ class ApplicationCommandChannelOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.CHANNEL] = AppCommandOptionType.CHANNEL
 
     channel_types: list[ChannelType] | None = None
@@ -194,6 +199,7 @@ class ApplicationCommandRoleOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.ROLE] = AppCommandOptionType.ROLE
 
 
@@ -203,6 +209,7 @@ class ApplicationCommandMentionableOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.MENTIONABLE] = AppCommandOptionType.MENTIONABLE
 
 
@@ -212,11 +219,12 @@ class ApplicationCommandNumberOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.NUMBER] = AppCommandOptionType.NUMBER
 
     choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
     """List of choices for string and number types.
-    
+
     Max length is 25.
     """
 
@@ -239,6 +247,7 @@ class ApplicationCommandAttachmentOption(BaseApplicationCommandOption):
     Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
+
     type: Literal[AppCommandOptionType.ATTACHMENT] = AppCommandOptionType.ATTACHMENT
 
 
@@ -294,7 +303,9 @@ class CreateApplicationCommandRequest(BaseModel):
 
     @field_validator('options')
     def validate_options(
-        cls, options: list[ApplicationCommandOption] | None, field_info: ValidationInfo,
+        cls,
+        options: list[ApplicationCommandOption] | None,
+        field_info: ValidationInfo,
     ) -> list[ApplicationCommandOption] | None:
         """Validate options."""
         if options is None:
@@ -308,16 +319,16 @@ class CreateApplicationCommandRequest(BaseModel):
         return options
 
 
-type ApplicationCommandOption = Union[
-    ApplicationCommandSubCommandOption,
-    ApplicationCommandSubCommandGroupOption,
-    ApplicationCommandStringOption,
-    ApplicationCommandIntegerOption,
-    ApplicationCommandBooleanOption,
-    ApplicationCommandUserOption,
-    ApplicationCommandChannelOption,
-    ApplicationCommandRoleOption,
-    ApplicationCommandMentionableOption,
-    ApplicationCommandNumberOption,
-    ApplicationCommandAttachmentOption
-]
+type ApplicationCommandOption = (
+    ApplicationCommandSubCommandOption
+    | ApplicationCommandSubCommandGroupOption
+    | ApplicationCommandStringOption
+    | ApplicationCommandIntegerOption
+    | ApplicationCommandBooleanOption
+    | ApplicationCommandUserOption
+    | ApplicationCommandChannelOption
+    | ApplicationCommandRoleOption
+    | ApplicationCommandMentionableOption
+    | ApplicationCommandNumberOption
+    | ApplicationCommandAttachmentOption
+)

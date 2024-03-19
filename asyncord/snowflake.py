@@ -1,4 +1,5 @@
 """A set of auxiliary entities for working with Snowflake."""
+
 from __future__ import annotations
 
 import datetime
@@ -56,12 +57,14 @@ class Snowflake:
         if isinstance(timestamp, datetime.datetime):
             timestamp = int(timestamp.timestamp() * 1000)
 
+        # fmt: off
         raw_snowflake = (
             (timestamp - DISCORD_EPOCH) << 22
             | internal_worker_id << 17
             | internal_process_id << 12
             | increment
         )
+        # fmt: on
         return Snowflake(raw_snowflake)
 
     @property
@@ -147,7 +150,9 @@ class Snowflake:
 
     @classmethod
     def __get_pydantic_core_schema__(
-        cls, _source: type[BaseModel], _handler: Callable[[Any], CoreSchema],
+        cls,
+        _source: type[BaseModel],
+        _handler: Callable[[Any], CoreSchema],
     ) -> CoreSchema:
         """Pydantic auxiliary method to get schema.
 

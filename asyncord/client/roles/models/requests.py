@@ -1,3 +1,5 @@
+"""Models for role requests."""
+
 from pydantic import BaseModel
 
 from asyncord.base64_image import Base64ImageInputType
@@ -72,14 +74,14 @@ class UpdateRoleRequest(BaseModel):
 
     icon: str | None = None
     """Role's icon image.
-    
+
     If the guild has the ROLE_ICONS feature.
     Defaults to False.
     """
 
     unicode_emoji: str | None = None
     """Role's unicode emoji as a standard emoji.
-    
+
     If the guild has the ROLE_ICONS feature.
     Defaults to False.
     """

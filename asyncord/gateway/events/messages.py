@@ -1,3 +1,5 @@
+"""This module contains the models for the message events."""
+
 from __future__ import annotations
 
 import datetime
@@ -61,6 +63,8 @@ class MessageMember(BaseModel):
 
 
 class MentionUser(BaseModel):
+    """Mentioned user object."""
+
     id: Snowflake
     """The user's id."""
 

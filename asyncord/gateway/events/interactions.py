@@ -383,17 +383,18 @@ class FallbackInteraction(BaseInteraction, extra='allow'):
     """Type of interaction."""
 
 
-# fmt: off
-Interaction = Annotated[
-    PingInteraction
-    | ApplicationCommandInteraction
-    | MessageComponentInteraction
-    | ApplicationCommandAutocompleteInteraction
-    | ModalSubmitInteraction,
-    Field(discriminator='type'),
-] | FallbackInteraction
+Interaction = (
+    Annotated[
+        PingInteraction
+        | ApplicationCommandInteraction
+        | MessageComponentInteraction
+        | ApplicationCommandAutocompleteInteraction
+        | ModalSubmitInteraction,
+        Field(discriminator='type'),
+    ]
+    | FallbackInteraction
+)
 """Interaction type."""
-# fmt: on
 
 
 class InteractionCreateEvent(GatewayEvent, RootModel[Interaction]):

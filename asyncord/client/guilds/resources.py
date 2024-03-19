@@ -196,6 +196,7 @@ class GuildResource(ClientSubresource):
     # TODO: #15 Replace args with a dataclass
     async def begin_prune(  # noqa: PLR0913
         self,
+        *,
         guild_id: SnowflakeInputType,
         days: int | None = None,
         compute_prune_count: bool | None = None,

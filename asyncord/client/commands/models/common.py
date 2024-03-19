@@ -4,7 +4,6 @@ Reference:
 https://discord.com/developers/docs/interactions/application-commands
 """
 
-
 import enum
 
 
