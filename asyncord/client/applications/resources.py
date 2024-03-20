@@ -2,7 +2,7 @@
 
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.resources import ClientSubresource
-from asyncord.typedefs import LikeSnowflake
+from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
 
 
@@ -15,7 +15,7 @@ class ApplicationResource(ClientSubresource):
 
     apps_url = REST_API_URL / 'applications'
 
-    def commands(self, app_id: LikeSnowflake) -> CommandResource:
+    def commands(self, app_id: SnowflakeInputType) -> CommandResource:
         """Get the commands resource for an application.
 
         Args:

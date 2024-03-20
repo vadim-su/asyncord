@@ -6,10 +6,7 @@ from typing import TYPE_CHECKING, Any, NewType
 from pydantic import TypeAdapter
 from yarl import URL
 
-from asyncord.snowflake import Snowflake
-
 StrOrURL = str | URL
-LikeSnowflake = Snowflake | int | str
 Payload = NewType('Payload', Any)
 
 

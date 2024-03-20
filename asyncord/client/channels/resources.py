@@ -14,7 +14,6 @@ from asyncord.client.messages.resources import MessageResource
 from asyncord.client.resources import ClientSubresource
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.snowflake import SnowflakeInputType
-from asyncord.typedefs import LikeSnowflake
 from asyncord.urls import REST_API_URL
 
 
@@ -29,7 +28,7 @@ class ChannelResource(ClientSubresource):
 
     channels_url = REST_API_URL / 'channels'
 
-    def messages(self, channel_id: LikeSnowflake) -> MessageResource:
+    def messages(self, channel_id: SnowflakeInputType) -> MessageResource:
         """Get the message resource for the channel.
 
         Args:
@@ -40,7 +39,7 @@ class ChannelResource(ClientSubresource):
         """
         return MessageResource(self, channel_id)
 
-    def threads(self, channel_id: LikeSnowflake) -> ThreadResource:
+    def threads(self, channel_id: SnowflakeInputType) -> ThreadResource:
         """Get the thread resource for the channel.
 
         Args:
@@ -51,7 +50,7 @@ class ChannelResource(ClientSubresource):
         """
         return ThreadResource(self, channel_id)
 
-    async def get(self, channel_id: LikeSnowflake) -> ChannelResponse:
+    async def get(self, channel_id: SnowflakeInputType) -> ChannelResponse:
         """Get a channel by id.
 
         Args:
@@ -66,7 +65,7 @@ class ChannelResource(ClientSubresource):
 
     async def create_channel(
         self,
-        guild_id: LikeSnowflake,
+        guild_id: SnowflakeInputType,
         channel_data: CreateChannelRequestType,
         reason: str | None = None,
     ) -> ChannelResponse:
@@ -125,7 +124,7 @@ class ChannelResource(ClientSubresource):
         resp = await self._http_client.patch(url, payload, headers=headers)
         return ChannelResponse.model_validate(resp.body)
 
-    async def delete(self, channel_id: LikeSnowflake, reason: str | None = None) -> None:
+    async def delete(self, channel_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Delete a channel, or close a private message.
 
         Deleting a guild channel cannot be undone. Use this with caution,
