@@ -13,7 +13,7 @@ from asyncord.client.interactions.models.requests import (
     InteractionUpdateMessageResponseRequest,
 )
 from asyncord.client.resources import ClientSubresource
-from asyncord.typedefs import LikeSnowflake
+from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
 
 _INTERACTIONS_CAN_CONTAIN_FILES = (
@@ -32,7 +32,7 @@ class InteractionResource(ClientSubresource):
 
     async def send_response(
         self,
-        interaction_id: LikeSnowflake,
+        interaction_id: SnowflakeInputType,
         interaction_token: str,
         interaction_response: InteractionResponseRequestType,
     ) -> None:
@@ -58,7 +58,7 @@ class InteractionResource(ClientSubresource):
 
         await self._http_client.post(url=url, payload=payload, files=files)
 
-    async def send_pong(self, interaction_id: LikeSnowflake, interaction_token: str) -> None:
+    async def send_pong(self, interaction_id: SnowflakeInputType, interaction_token: str) -> None:
         """Send a pong response to an interaction.
 
         Args:
