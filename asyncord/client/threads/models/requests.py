@@ -76,7 +76,7 @@ class ThreadMessage(BaseMessage):
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions for the message."""
 
-    components: list[Component] | None = None
+    components: list[Component] | Component | None = None
     """Components to include with the message."""
 
     sticker_ids: list[SnowflakeInputType] | None = None

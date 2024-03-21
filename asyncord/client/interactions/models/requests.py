@@ -4,7 +4,7 @@ Reference:
 https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 """
 
-from typing import Literal, cast
+from typing import Annotated, Literal, cast
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -52,7 +52,7 @@ class InteractionCreateMessageData(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS and MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: list[Component] | None = None
+    components: list[Component] | Component | None = None
     """List of components."""
 
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)
@@ -94,8 +94,7 @@ class InteractionDeferredChannelMessageResponseRequest(BaseModel):
     data: InteractionCreateMessageData
 
 
-# TODO: possibly should inherit from BaseMessage
-class InteractionUpdateMessageData(BaseModel):
+class InteractionUpdateMessageData(BaseMessage):
     """Interaction response data for UPDATE_MESSAGE.
 
     References:
@@ -117,7 +116,7 @@ class InteractionUpdateMessageData(BaseModel):
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: list[Component] | None = None
+    components: list[Component] | Component | None = None
     """List of components."""
 
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)
@@ -133,10 +132,6 @@ class InteractionUpdateMessageData(BaseModel):
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files
     """
-
-    # TODO: Add model validator. (Not needed if we inherit from BaseMessage)
-    # Either at least one of all required
-    # Either at least one of component/content/embeds
 
 
 class InteractionDeferredUpdateMessageResponseRequest(BaseModel):
@@ -205,10 +200,11 @@ class InteractionModalData(BaseModel):
     Max 45 characters.
     """
 
-    components: list[ActionRow] | list[TextInput] = Field(min_length=1, max_length=5)
+    components: Annotated[list[ActionRow] | list[TextInput], Field(min_length=1, max_length=5)] | TextInput
     """Components that make up the modal.
 
-    Should be between 1 and 5 (inclusive). Only TextInput components are allowed.
+    Should be between 1 and 5 (inclusive). Only `TextInput` or `ActionRow` with
+    `TextInput` are allowed.
     """
 
     @field_validator('components')
@@ -220,6 +216,9 @@ class InteractionModalData(BaseModel):
 
         Components should be wrapped in an ActionRow. If it is not, wrap it in one.
         """
+        if not isinstance(components, list):
+            components = [components]
+
         if isinstance(components[0], TextInput):
             # If the first component is a TextInput
             # (pydantic garuntees that all components are the same type), wrap it in an ActionRow.

@@ -6,6 +6,7 @@ https://discord.com/developers/docs/interactions/message-components#message-comp
 
 from __future__ import annotations
 
+from collections import Counter
 from typing import Annotated, Any, Literal, Self
 from typing import get_args as get_typing_args
 
@@ -377,7 +378,7 @@ class ActionRow(BaseComponent):
     https://discord.com/developers/docs/interactions/message-components#action-rows
     """
 
-    def __init__(self, components: list[Component | TextInput]) -> None:
+    def __init__(self, components: list[Component | TextInput] | Component | TextInput) -> None:
         """Create a new action row.
 
         This constructor helps to avoid us to add extra indentation in the code.
@@ -414,35 +415,42 @@ class ActionRow(BaseComponent):
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
     """Type of the component."""
 
-    components: list[Component | TextInput]
+    components: Annotated[list[Component | TextInput], Field(min_length=1, max_length=5)] | Component | TextInput
     """Components in the action row.
 
     Text input components are not allowed in action rows.
     """
 
     @field_validator('components')
-    def validate_components(cls, components: list[Component | TextInput]) -> list[Component | TextInput]:
-        """Check ActionRow components."""
-        component_types = [component.type for component in components]
-        component_types_set = set(component_types)
+    def validate_components(
+        cls,
+        components: list[Component | TextInput] | Component | TextInput,
+    ) -> list[Component | TextInput]:
+        """Validate the components in the action row."""
+        if not isinstance(components, list):
+            components = [components]
+
+        component_counts = Counter(component.type for component in components)
 
         # Calculate the count of select components
-        select_component_count = len(component_types_set.intersection(SELECT_COMPONENT_TYPE_LIST))
+        # fmt: off
+        select_component_count = sum(
+            count
+            for component, count in component_counts.items()
+            if component in SELECT_COMPONENT_TYPE_LIST
+        )
+        # fmt: on
 
         # Check if BUTTON and any select component are in the same set
-        if ComponentType.BUTTON in component_types_set and select_component_count:
+        if component_counts[ComponentType.BUTTON] and select_component_count:
             raise ValueError('ActionRow containing a select menu cannot also contain buttons')
 
         # Check if there are more than one select components
         if select_component_count > 1:
             raise ValueError('ActionRow can contain only one select menu')
 
-        # Check if there are more than 5 BUTTON components
-        if component_types.count(ComponentType.BUTTON) > MAX_BUTTONS_IN_ACTION_ROW:
-            raise ValueError('ActionRow can contain up to 5 buttons')
-
         # Check if TextInputInput is mixed with other components
-        if TextInput in component_types_set and len(component_types) != component_types.count(TextInput):
+        if component_counts[TextInput] and len(components) != component_counts[TextInput]:
             raise ValueError('Text input components cannot be mixed with other components')
 
         return components

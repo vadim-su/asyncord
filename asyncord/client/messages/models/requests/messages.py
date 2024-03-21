@@ -16,12 +16,14 @@ from pydantic import AnyHttpUrl, BaseModel, Field, field_validator, model_valida
 
 from asyncord.client.messages.models.common import AllowedMentionType, AttachmentFlags, MessageFlags
 from asyncord.client.messages.models.requests.components import (
-    SELECT_COMPONENT_TYPE_LIST,
+    ActionRow,
     Component,
-    ComponentType,
 )
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.snowflake import SnowflakeInputType
+
+MAX_COMPONENTS = 5
+"""Maximum number of components in a message."""
 
 MAX_EMBED_TEXT_LENGTH = 6000
 """Maximum length of the embed text."""
@@ -311,7 +313,7 @@ class BaseMessage(BaseModel):
             components: Components to validate.
 
         Raises:
-            ValueError: If components have more than 5 action rows.
+            ValueError: If components have more than 5 action rows or are not wrapped in an ActionRow.
 
         Returns:
             Validated components.
@@ -319,22 +321,21 @@ class BaseMessage(BaseModel):
         if not components:
             return components
 
-        action_row_count = 0
+        if not isinstance(components, list):
+            components = [components]
 
-        for component in components:
-            match component.type:
-                case ComponentType.ACTION_ROW:
-                    action_row_count += 1
-                case ComponentType.BUTTON:
-                    raise ValueError('Button components must be inside ActionRow')
-                case _ if component.type in SELECT_COMPONENT_TYPE_LIST:
-                    raise ValueError('Select components must be inside ActionRow')
+        if len(components) > MAX_COMPONENTS:
+            raise ValueError('Components must have 5 or fewer action rows')
 
-        # allow 5 action rows per message
-        if action_row_count > 5:  # noqa: PLR2004
-            raise ValueError('ActionRow components must be less than 5')
+        if all(isinstance(component, ActionRow) for component in components):
+            return components
 
-        return components
+        if all(not isinstance(component, ActionRow) for component in components):
+            return [ActionRow(components=components)]
+
+        raise ValueError(
+            "All components must be wrapped on an ActionRow or don't wrap them at all",
+        )
 
     @classmethod
     def _embed_text_length(cls, embed: Embed) -> int:
@@ -437,7 +438,7 @@ class CreateMessageRequest(BaseMessage):
     message_reference: MessageReference | None = None
     """Reference data sent with crossposted messages."""
 
-    components: list[Component] | None = None
+    components: list[Component] | Component | None = None
     """Components to include with the message."""
 
     sticker_ids: list[SnowflakeInputType] | None = None
@@ -493,7 +494,7 @@ class UpdateMessageRequest(BaseMessage):
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions for the message."""
 
-    components: list[Component] | None = None
+    components: list[Component] | Component | None = None
     """Components to include with the message."""
 
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)
