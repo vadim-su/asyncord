@@ -176,6 +176,21 @@ class PermissionFlag(enum.IntFlag):
     """Allows sending voice messages."""
 
     @classmethod
+    def _numeric_repr_(cls, value: int) -> str:  # noqa: PLW3201
+        """Get unknown permission flag representation.
+
+        It calls when Flag class found unknown value in the flags and returns
+        the string representation of the value.
+
+        Example:
+            <PermissionFlag.CREATE_INSTANT_INVITE|...|SEND_VOICE_MESSAGES|UNKNOWN(422212465065984): 562949953421311>
+
+        Args:
+            value: Value of the flag to represent.
+        """
+        return f'UNKNOWN({value!r})'
+
+    @classmethod
     def __get_pydantic_core_schema__(
         cls,
         _source: type[BaseModel],
