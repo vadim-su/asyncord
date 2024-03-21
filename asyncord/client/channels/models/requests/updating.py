@@ -364,6 +364,26 @@ class UpdateStageChannelReuqest(BaseUpdateChannel):
     """Camera video quality mode of the voice channel."""
 
 
+class UpdateChannelPermissionsRequest(BaseModel):
+    """Data to update a channel's permissions with.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#edit-channel-permissions
+    """
+
+    allow: str | None = None
+    """The bitwise value of all allowed permissions."""
+
+    deny: str | None = None
+    """The bitwise value of all disallowed permissions."""
+
+    type: Literal[0, 1] | None = None
+    """Type of the permission overwrite.
+
+    0 for role, 1 for member.
+    """
+
+
 type UpdateChannelRequestType = (
     UpdateGuildCategoryRequest
     | UpdateChannelRequest

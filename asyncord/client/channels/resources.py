@@ -7,7 +7,10 @@ endpoints like message creation.
 from __future__ import annotations
 
 from asyncord.client.channels.models.requests.creation import CreateChannelRequestType
-from asyncord.client.channels.models.requests.updating import UpdateChannelRequestType
+from asyncord.client.channels.models.requests.updating import (
+    UpdateChannelPermissionsRequest,
+    UpdateChannelRequestType,
+)
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
@@ -148,3 +151,38 @@ class ChannelResource(ClientSubresource):
             headers = {}
 
         await self._http_client.delete(url, headers=headers)
+
+    async def update_permissions(
+        self,
+        channel_id: SnowflakeInputType,
+        overwrite_id: SnowflakeInputType,
+        permission_data: UpdateChannelPermissionsRequest,
+        reason: str | None = None,
+    ) -> None:
+        """Edit the channel permission overwrites for a user or role in a channel.
+
+        Only usable for guild channels. Requires the MANAGE_ROLES permission.
+        Only permissions your bot has in the guild or parent channel (if applicable)
+        can be allowed/denied (unless your bot has a MANAGE_ROLES overwrite in the channel).
+        Returns a 204 empty response on success.
+
+        Args:
+            channel_id: Channel id.
+            overwrite_id: Role or user id.
+            permission_data: The data to update the permissions with.
+            reason: Reason for updating the permissions.
+        """
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        payload = permission_data.model_dump(mode='json', exclude_unset=True)
+
+        url = self.channels_url / str(channel_id) / 'permissions' / str(overwrite_id)
+
+        await self._http_client.put(
+            url,
+            payload,
+            headers=headers,
+        )
