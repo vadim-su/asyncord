@@ -12,7 +12,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Annotated, Any, BinaryIO, Literal
 
-from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import AnyHttpUrl, BaseModel, Field, field_validator, model_validator
 
 from asyncord.client.messages.models.common import AllowedMentionType, AttachmentFlags, MessageFlags
 from asyncord.client.messages.models.requests.components import (
@@ -32,8 +32,11 @@ _FilePathType = str | Path
 _AttachedFileInputType = Annotated[_FilePathType | _AttachmentContentType, _AttachmentContentType]
 
 
-class AttachedFile(BaseModel):
+class AttachedFile(BaseModel, arbitrary_types_allowed=True):
     """Attached file.
+
+    Arbitrary types are allowed because of the `content` field can be BinaryIO
+    and other unsupported pydantic types.
 
     Reference:
     https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
@@ -47,13 +50,6 @@ class AttachedFile(BaseModel):
 
     content: _AttachedFileInputType
     """File content."""
-
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    """Pydantic config.# type: ignore
-
-    Arbitrary types are allowed because of the `content` field can be BinaryIO
-    and other unsupported pydantic types.
-    """
 
     @model_validator(mode='before')
     def validate_file_info(cls, values: dict[str, Any]) -> dict[str, Any]:
@@ -154,12 +150,12 @@ class AttachmentData(BaseModel):
     """
 
     duration_secs: float | None = None
-    """Duration of the audio file (currently for voice messages)"""
+    """Duration of the audio file (currently for voice messages)."""
 
     waveform: str | None = None
     """base64 encoded bytearray representing a sampled waveform.
 
-    Currently for voice messages
+    Currently for voice messages.
     """
 
     flags: AttachmentFlags | None = None
