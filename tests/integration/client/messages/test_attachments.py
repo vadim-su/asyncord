@@ -154,7 +154,7 @@ async def test_replace_attachment(message: MessageResponse, messages_res: Messag
             message.id,
             UpdateMessageRequest(
                 embeds=[embed],
-                Attachments=[AttachmentData(filename=f'{test_filename}')],
+                attachments=[AttachmentData(filename=f'{test_filename}')],
                 files=[(f'{TEST_FILE_NAMES[0]}', file.read())],
             ),
         )
