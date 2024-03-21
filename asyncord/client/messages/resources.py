@@ -141,3 +141,24 @@ class MessageResource(ClientSubresource):
             headers = {}
 
         await self._http_client.delete(url, headers=headers)
+
+    async def bulk_delete(
+        self,
+        message_ids: list[LikeSnowflake],
+        reason: str | None = None,
+    ) -> None:
+        """Delete multiple messages.
+
+        Args:
+            message_ids: List of message ids to delete.
+            reason: Reason for deleting the messages.
+        """
+        url = self.messages_url / 'bulk-delete'
+        payload = {'messages': [str(message_id) for message_id in message_ids]}
+
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        await self._http_client.post(url, payload, headers=headers)
