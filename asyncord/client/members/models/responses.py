@@ -5,6 +5,7 @@ import datetime
 from pydantic import BaseModel
 
 from asyncord.client.members.models.common import GuildMemberFlags
+from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
@@ -46,7 +47,7 @@ class MemberResponse(BaseModel):
     pending: bool | None = None
     """Whether the user has not yet passed the guild's Membership Screening requirements."""
 
-    permissions: str | None = None
+    permissions: PermissionFlag | None = None
     """Total permissions of the member in the channel, including overwrites.
 
     Returned when in the interaction object.
