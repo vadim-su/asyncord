@@ -14,7 +14,6 @@ from typing import Any, Protocol
 
 import aiohttp
 from pydantic import BaseModel
-from rich.pretty import pretty_repr
 from yarl import URL
 
 from asyncord.gateway.client import errors, opcode_handlers
@@ -226,7 +225,10 @@ class GatewayClient:
         return None
 
     async def _handle_message(self, message: GatewayMessageType) -> None:
-        self.logger.info('Got message:\n%s', pretty_repr(message))
+        if message.opcode is GatewayMessageOpcode.DISPATCH:
+            self.logger.info('Dispatching event: %s', message.event_name)
+        else:
+            self.logger.info('Received message: %s', message.opcode.name)
 
         opcode = message.opcode
         handler = self._opcode_handlers.get(opcode)
