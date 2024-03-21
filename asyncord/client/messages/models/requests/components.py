@@ -208,6 +208,10 @@ class SelectMenu(BaseComponent):
     default_values: list[SelectDefaultValue] | None = None
     """List of default values for auto-populated select menu components.
 
+    It means that you can set default values for 'user', 'role', 'channel' select menu components.
+    If you need to set default values for 'string' select menu component,
+    you can use `default` field in `SelectMenuOption`.
+
     Number of default values must be in the range defined by min_values and max_values.
     """
 
@@ -372,6 +376,40 @@ class ActionRow(BaseComponent):
     Reference:
     https://discord.com/developers/docs/interactions/message-components#action-rows
     """
+
+    def __init__(self, components: list[Component | TextInput]) -> None:
+        """Create a new action row.
+
+        This constructor helps to avoid us to add extra indentation in the code.
+        By default `components` is a required field (it's a base behavior of pydantic),
+        so we can't create an action row without components:
+        ```py
+        ActionRow(
+            components=[
+                Button(
+                    style=ButtonStyle.SUCCESS,
+                    label='Button',
+                    custom_id=f'button',
+                ),
+            ],
+        )
+        ```
+        But after this change we can create an action row without components:
+        ```py
+        ActionRow([
+            Button(
+                style=ButtonStyle.SUCCESS,
+                label='Button',
+                custom_id=f'button',
+            ),
+        ])
+        ```
+        That makes the code more readable and clean.
+
+        Args:
+            components: Components in the action row.
+        """
+        super().__init__(components=components)
 
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
     """Type of the component."""
