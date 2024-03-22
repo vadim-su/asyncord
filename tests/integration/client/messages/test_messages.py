@@ -7,7 +7,7 @@ import pytest
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest, UpdateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
-from asyncord.typedefs import LikeSnowflake
+from asyncord.snowflake import SnowflakeInputType
 from tests.conftest import IntegrationTestData
 
 
@@ -22,9 +22,9 @@ from tests.conftest import IntegrationTestData
 async def test_get_channel_messages(  # noqa: PLR0913, PLR0917
     messages_res: MessageResource,
     integration_data: IntegrationTestData,
-    around: LikeSnowflake | Literal['message_id'],
-    before: LikeSnowflake | Literal['message_id'],
-    after: LikeSnowflake | Literal['message_id'],
+    around: SnowflakeInputType | Literal['message_id'],
+    before: SnowflakeInputType | Literal['message_id'],
+    after: SnowflakeInputType | Literal['message_id'],
     limit: int,
 ) -> None:
     """Test getting messages from a channel."""
