@@ -46,5 +46,5 @@ def test_base64_image_error_in_models() -> None:
     class TestModel(BaseModel):
         image: Base64ImageInputType
 
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError, match='Icon must be a base64 encoded image'):
         TestModel(image='not a base64 image')

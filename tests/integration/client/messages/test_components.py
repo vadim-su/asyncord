@@ -144,19 +144,19 @@ def test_wrap_component_to_list_in_action_row() -> None:
 
 def test_components_cannot_be_empty() -> None:
     """Test that components cannot be empty."""
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError, match='List should have at least 1 item'):
         ActionRow(components=[])
 
 
 def test_action_row_can_have_max_5_components() -> None:
     """Test that an ActionRow can have a maximum of 5 components."""
-    # fmt: off
-    components = [
-        ActionRow(components=[
-            Button(custom_id=f'button_{i}'),
-        ])
-        for i in range(6)
-    ]
     # fmt: on
-    with pytest.raises(ValueError, match='ActionRow must have 5 or fewer components'):
-        CreateMessageRequest(components=components)
+    with pytest.raises(ValueError, match='List should have at most 5'):
+        # fmt: off
+        ActionRow(
+            components=[
+                Button(custom_id=f'button_{i}')
+                for i in range(6)
+            ],
+        )
+        # fmt: on

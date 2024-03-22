@@ -111,5 +111,5 @@ def test_color_error_in_models() -> None:
     class TestModel(BaseModel):
         color: ColorInput
 
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError, match='invalid literal'):
         TestModel(color='not a color')

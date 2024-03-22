@@ -51,9 +51,7 @@ async def test_cteate_message_with_attachments(
     )
     assert not message.content
     assert len(message.attachments) == 2
-
     assert {attach.filename for attach in message.attachments} == {f'new_{filename}' for filename in TEST_FILE_NAMES}
-
     assert {attach.description for attach in message.attachments} == {f'test_{i}' for i in range(len(TEST_FILE_NAMES))}
 
     await messages_res.delete(message.id)
@@ -154,7 +152,6 @@ async def test_replace_attachment(message: MessageResponse, messages_res: Messag
             message.id,
             UpdateMessageRequest(
                 embeds=[embed],
-                attachments=[AttachmentData(filename=f'{test_filename}')],
                 files=[(f'{TEST_FILE_NAMES[0]}', file.read())],
             ),
         )
@@ -164,10 +161,11 @@ async def test_replace_attachment(message: MessageResponse, messages_res: Messag
         updated_message = await messages_res.update(
             message.id,
             UpdateMessageRequest(
-                attachments=[AttachmentData(id=0)],
+                attachments=[AttachmentData(id=0, description='test description')],
                 files=[(f'{TEST_FILE_NAMES[1]}', file.read())],
             ),
         )
 
     assert len(updated_message.attachments) == 1
     assert updated_message.attachments[0].id != message.attachments[0].id
+    assert updated_message.attachments[0].description == 'test description'
