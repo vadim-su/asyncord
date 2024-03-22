@@ -6,7 +6,6 @@ import aiohttp
 
 from asyncord.client.http.client import AsyncHttpClient
 from asyncord.client.http.headers import AUTHORIZATION
-from asyncord.client.ports import AsyncHttpClientPort
 
 
 class ClientResource:
@@ -16,7 +15,7 @@ class ClientResource:
         self,
         token: str,
         session: aiohttp.ClientSession | None = None,
-        http_client: AsyncHttpClientPort | None = None,
+        http_client: AsyncHttpClient | None = None,
     ) -> None:
         """Initialize the resource.
 
@@ -29,7 +28,7 @@ class ClientResource:
         if http_client:
             self._http_client = http_client
         else:
-            self._http_client: AsyncHttpClientPort = AsyncHttpClient(
+            self._http_client: AsyncHttpClient = AsyncHttpClient(
                 session=session,
                 headers={AUTHORIZATION: f'Bot {token}'},
             )
