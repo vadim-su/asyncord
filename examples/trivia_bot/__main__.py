@@ -3,7 +3,7 @@ import aiohttp  # noqa
 from asyncord.client.rest import RestClient
 from asyncord.gateway.client.client import GatewayClient
 from asyncord.gateway.events.base import ReadyEvent
-from examples.trivia_bot.commands import WeatherCommand
+from examples.trivia_bot.commands import PollCommand
 
 API_TOKEN = ''
 APP_ID = ''
@@ -26,7 +26,7 @@ async def main() -> None:
             gateway: GatewayClient,
             client: RestClient,
         ) -> None:
-            await WeatherCommand().register(gateway, client, APP_ID)
+            await PollCommand().register(gateway, client, APP_ID)
 
         gw.dispatcher.add_handler(on_ready)
         await gw.connect()
