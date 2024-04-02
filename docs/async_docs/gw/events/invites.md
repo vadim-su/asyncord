@@ -1,0 +1,1 @@
+::: asyncord.gateway.events.invites
