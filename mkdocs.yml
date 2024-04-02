@@ -75,6 +75,20 @@ nav:
 
     - 'GateWayClient':
       - 'Description': async_docs/gw/docs.md
+      - 'Event Dispatcher': async_docs/gw/dispatcher.md
+      - 'Heartbeat': async_docs/gw/heartbeat.md
+      - 'Events': 
+        - 'Base': async_docs/gw/events/base.md
+        - 'Application': async_docs/gw/events/application.md
+        - 'Channels': async_docs/gw/events/channels.md
+        - 'Guilds': async_docs/gw/events/guilds.md
+        - 'Interactions': async_docs/gw/events/interactions.md
+        - 'Invites': async_docs/gw/events/invites.md
+        - 'Messages': async_docs/gw/events/messages.md
+        - 'Moderation': async_docs/gw/events/moderation.md
+        - 'Presence': async_docs/gw/events/presence.md
+        - 'Scheduled events': async_docs/gw/events/scheduled_events.md
+
   - Examples:
     - 'MOV': examples/mov.md
   - GitHub: https://github.com/vadim-su/asyncord
