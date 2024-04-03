@@ -16,7 +16,6 @@ You can inherit from the ChatCommand class and implement the command method to c
 Interactions should be answered by the bot within 3 seconds, unless detered. 
 
 
-
 ::: examples.weather_embed.commands
 
 ## Models for 3rd party API in this example
