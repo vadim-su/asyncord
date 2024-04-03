@@ -139,7 +139,7 @@ class MessageResource(ClientSubresource):
 
     async def bulk_delete(
         self,
-        message_ids: list[LikeSnowflake],
+        message_ids: list[SnowflakeInputType],
         reason: str | None = None,
     ) -> None:
         """Delete multiple messages.
