@@ -39,7 +39,7 @@ class PollCommand:
 
     def __init__(self) -> None:
         """Initialize the command."""
-        self.answers = {}
+        self.answers = []
 
     async def register(
         self,
@@ -55,7 +55,7 @@ class PollCommand:
         return command
 
     async def command(self, interaction: InteractionCreateEvent, client: RestClient) -> None:
-        """Get the weather of a city."""
+        """Responds to the command interaction event, sending a simple poll."""
         if interaction.root.type != InteractionType.APPLICATION_COMMAND:
             return None
         if interaction.root.data.name != self.__command__.name:
@@ -127,7 +127,7 @@ class PollCommand:
         style: ButtonStyle = ButtonStyle.PRIMARY,
         update: bool = False,
     ) -> InteractionCreateMessageData:
-        """Construct the action row."""
+        """Construct the message data."""
         components = cls._construct_buttons(
             button_names,
             question_type,
@@ -160,7 +160,7 @@ class PollCommand:
         question_type: str,
         style: ButtonStyle = ButtonStyle.PRIMARY,
     ) -> list[Button]:
-        """Construct the action row."""
+        """Construct buttons for action row."""
         components = []
         for button in buttons:
             components.append(

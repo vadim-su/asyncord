@@ -37,7 +37,7 @@ theme:
 
 nav:
   - 'Get Started':
-    - 'Welcome to Asyncord': get_start/main.md
+    - 'Welcome to Asyncord': index.md
     - 'Why use Asyncord': get_start/why_asyncord.md
   - Docs:
     - 'RestClient':
@@ -90,7 +90,9 @@ nav:
         - 'Scheduled events': async_docs/gw/events/scheduled_events.md
 
   - Examples:
-    - 'MOV': examples/mov.md
+    - 'Buttons': examples/buttons.md
+    - 'Embeds': examples/embeds.md
+    - 'Reactions': examples/reactions.md
   - GitHub: https://github.com/vadim-su/asyncord
   
 
