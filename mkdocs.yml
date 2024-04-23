@@ -40,6 +40,7 @@ nav:
     - 'Welcome to Asyncord': index.md
     - 'Why use Asyncord': get_start/why_asyncord.md
   - Docs:
+    - 'ClientHub': async_docs/client_hub.md
     - 'RestClient':
       - 'RestClient': async_docs/rest/docs.md
       - 'Resources':
