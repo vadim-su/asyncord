@@ -102,6 +102,11 @@ class ClientHub:
             logger.info('Shutting down...')
             await asyncio.gather(*tasks, return_exceptions=True)
 
+    async def __aenter__(self) -> 'ClientHub':
+        """Enter the context manager."""
+        self.session = aiohttp.ClientSession()
+        return self
+
     async def __aexit__(self, _exc_type, _exc, _tb) -> None:  # noqa: ANN001
         """Exit the context manager."""
         for client in self.client_groups.values():
