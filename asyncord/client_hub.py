@@ -105,6 +105,7 @@ class ClientHub:
     async def __aenter__(self) -> 'ClientHub':
         """Enter the context manager."""
         self.session = aiohttp.ClientSession()
+        self.heartbeat_factory.start()
         return self
 
     async def __aexit__(self, _exc_type, _exc, _tb) -> None:  # noqa: ANN001
