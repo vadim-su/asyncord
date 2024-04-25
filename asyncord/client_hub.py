@@ -52,9 +52,9 @@ class ClientGroup(NamedTuple):
 class ClientHub:
     """Hub to process multiple clients."""
 
-    def __init__(self) -> None:
+    def __init__(self, session: aiohttp.ClientSession = None) -> None:
         """Initialize hub to process multiple clients."""
-        self.session: aiohttp.ClientSession
+        self.session: aiohttp.ClientSession = session
         self.heartbeat_factory = HeartbeatFactory()
         self.client_groups: dict[str, ClientGroup] = {}
 
@@ -104,7 +104,8 @@ class ClientHub:
 
     async def __aenter__(self) -> 'ClientHub':
         """Enter the context manager."""
-        self.session = aiohttp.ClientSession()
+        if self.session is None:
+            self.session = aiohttp.ClientSession()
         self.heartbeat_factory.start()
         return self
 
