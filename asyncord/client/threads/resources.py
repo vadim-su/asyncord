@@ -113,8 +113,8 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
         if limit is not None:
             params['limit'] = limit
 
-        url = self.channels_url / str(self.channel_id)
-        url /= 'users/@me/threads/archived/private' % params
+        private_url_part = 'users/@me/threads/archived/private'
+        url = self.channels_url / str(self.channel_id) / private_url_part % params
 
         resp = await self._http_client.get(url)
         return ThreadsResponse.model_validate(resp.body)
