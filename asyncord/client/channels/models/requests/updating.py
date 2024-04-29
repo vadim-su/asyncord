@@ -191,7 +191,7 @@ class UpdateTextChannelRequest(BaseUpdateChannel):
     """
 
 
-class UpdateAnoncementChannelRequest(BaseUpdateChannel):
+class UpdateAnnouncementChannelRequest(BaseUpdateChannel):
     """Data to update an announcement channel with."""
 
     type: Literal[ChannelType.GUILD_ANNOUNCEMENT] | None = None
@@ -389,7 +389,7 @@ type UpdateChannelRequestType = (
     | UpdateChannelRequest
     | UpdatGroupDMChannelRequest
     | UpdateTextChannelRequest
-    | UpdateAnoncementChannelRequest
+    | UpdateAnnouncementChannelRequest
     | UpdateForumChannelRequest
     | UpdateMediaChannelRequest
     | UpdateVoiceChannelRequest
