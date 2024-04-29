@@ -54,7 +54,14 @@ line-length = 120
 indent-width = 4
 target-version = "py312"
 
-extend-exclude = [".git", ".vscode", ".devcontainer", ".github", ".venv"]
+extend-exclude = [
+    ".git",
+    ".vscode",
+    ".devcontainer",
+    ".github",
+    ".venv",
+    "tests",
+]
 
 
 [tool.ruff.lint]
