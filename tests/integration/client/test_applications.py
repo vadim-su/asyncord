@@ -3,7 +3,10 @@ from __future__ import annotations
 import pytest
 
 from asyncord.client.applications.resources import ApplicationResource
-from asyncord.client.applications.models.requests import UpdateApplicationRequest
+from asyncord.client.applications.models.requests import (
+    UpdateApplicationRequest,
+    UpdateApplicationRoleConnectionMetadataRequest,
+)
 from asyncord.client.http.errors import ClientError
 from tests.conftest import IntegrationTestData
 
@@ -26,8 +29,6 @@ async def test_update_application(
     assert app.description == 'This is a test description.'
 
 
-
-
 async def get_application(
     app_managment: ApplicationResource,
     integration_data: IntegrationTestData,
@@ -36,3 +37,15 @@ async def get_application(
     app = await app_managment.get_application()
 
     assert app.id == integration_data.app_id
+
+
+async def get_application_role_metadata(
+    app_managment: ApplicationResource,
+    integration_data: IntegrationTestData,
+) -> None: 
+    """Test get application role connection metadata."""
+    metadata_records = await app_managment.get_application_role_connection_metadata_records(
+        integration_data.app_id
+    )
+
+    assert metadata_records

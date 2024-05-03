@@ -2,11 +2,15 @@
 
 from enum import IntEnum, StrEnum
 
-from pydantic import BaseModel, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from asyncord.base64_image import Base64ImageInputType
-from asyncord.client.applications.models.common import ApplicationFlag
+from asyncord.client.applications.models.common import (
+    ApplicationFlag,
+    ApplicationRoleConnectionMetadataType,
+)
 from asyncord.client.models.permissions import PermissionFlag
+from asyncord.locale import LocaleInputType
 
 
 class OauthScopes(StrEnum):
@@ -271,3 +275,60 @@ class UpdateApplicationRequest(BaseModel):
             }:
                 raise ValueError('Invalid flag.')
         return tags
+
+
+class UpdateApplicationRoleConnectionMetadataRequest(BaseModel):
+    """Application role connection metadata object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata-object-application-role-connection-metadata-structure.
+    """
+
+    type: ApplicationRoleConnectionMetadataType
+    """Type of metadata value."""
+
+    key: str
+    """Dictionary key for the metadata field.
+
+    Must be a - z, 0 - 9, or _ characters;
+    1 - 50 characters.
+    """
+
+    name: str = Field(None, min_length=1, max_length=100)
+    """Name of the metadata field.
+
+    (1 - 100 characters).
+    """
+
+    name_localizations: dict[LocaleInputType, str] | None = None
+    """Translations of the name."""
+
+    description: str = Field(None, min_length=1, max_length=200)
+    """Description of the metadata field.
+
+    (1 - 200 characters).
+    """
+    description_localizations: dict[LocaleInputType, str] | None = None
+    """Translations of the description."""
+
+    @field_validator('key')
+    @classmethod
+    def validate_key(
+        cls,
+        key: str,
+        field_info: ValidationInfo,
+    ) -> list[str] | None:
+        """Ensures that the length of key is 1 - 50 characters.
+
+        And a - z, 0 - 9, or _ characters.
+        """
+        max_length = 50
+        allowed_symbols = set('abcdefghijklmnopqrstuvwxyz0123456789_')
+
+        if not 1 <= len(key) <= max_length:
+            raise ValueError('Key length must be between 1 and 50 characters.')
+
+        if not set(key).issubset(allowed_symbols):
+            raise ValueError('Key must contain only a - z, 0 - 9, or _ characters.')
+
+        return key

@@ -52,3 +52,60 @@ class ApplicationFlag(enum.IntFlag):
     GATEWAY_MESSAGE_CONTENT = 1 << 18
     GATEWAY_MESSAGE_CONTENT_LIMITED = 1 << 19
     APPLICATION_COMMAND_BADGE = 1 << 23
+
+
+@enum.unique
+class ApplicationRoleConnectionMetadataType(enum.IntEnum):
+    """Discord application role connection metadata type.
+
+    Reference:
+    https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata-object-application-role-connection-metadata-type
+    """
+
+    INTEGER_LESS_THAN_OR_EQUAL = 1
+    """Metadata value(integer) is less than or equal to the guild's configured value.
+
+    (integer).
+    """
+
+    INTEGER_GREATER_THAN_OR_EQUAL = 2
+    """Metadata value (integer) is greater than or equal
+
+    to the guild's configured value (integer).
+    """
+
+    INTEGER_EQUAL = 3
+    """Metadata value (integer) is equal
+
+    to the guild's configured value (integer).
+    """
+
+    INTEGER_NOT_EQUAL = 4
+    """Metadata value (integer) is not equal
+
+    to the guild's configured value (integer).
+    """
+
+    DATETIME_LESS_THAN_OR_EQUAL = 5
+    """Metadata value (ISO8601 string) is less than or equal
+
+    to the guild's configured value (integer; days before current date).
+    """
+
+    DATETIME_GREATER_THAN_OR_EQUAL = 6
+    """Metadata value (ISO8601 string) is greater than or equal
+
+    to the guild's configured value (integer; days before current date).
+    """
+
+    BOOLEAN_EQUAL = 7
+    """Metadata value (integer) is equal
+
+    to the guild's configured value (integer; 1).
+    """
+
+    BOOLEAN_NOT_EQUAL = 8
+    """Metadata value (integer) is not equal
+
+    to the guild's configured value (integer; 1).
+    """

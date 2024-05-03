@@ -11,9 +11,14 @@ from typing import Any
 from fbenum.adapter import FallbackAdapter
 from pydantic import AnyHttpUrl, BaseModel, Field
 
-from asyncord.client.applications.models.common import ApplicationCommandPermissionType, ApplicationFlag
+from asyncord.client.applications.models.common import (
+    ApplicationCommandPermissionType,
+    ApplicationFlag,
+    ApplicationRoleConnectionMetadataType,
+)
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.users.models.responses import UserFlags
+from asyncord.locale import LocaleInputType
 from asyncord.snowflake import Snowflake
 
 
@@ -248,3 +253,38 @@ class GuildApplicationCommandPermissionsOut(BaseModel):
 
     Maximum of 100.
     """
+
+
+class ApplicationRoleConnectionMetadataOut(BaseModel):
+    """Application role connection metadata object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata-object-application-role-connection-metadata-structure.
+    """
+
+    type: ApplicationRoleConnectionMetadataType
+    """Type of metadata value."""
+
+    key: str
+    """Dictionary key for the metadata field.
+
+    Must be a - z, 0 - 9, or _ characters;
+    1 - 50 characters.
+    """
+
+    name: str
+    """Name of the metadata field.
+
+    (1 - 100 characters).
+    """
+
+    name_localizations: dict[LocaleInputType, str] | None = None
+    """Translations of the name."""
+
+    description: str
+    """Description of the metadata field.
+
+    (1 - 200 characters).
+    """
+    description_localizations: dict[LocaleInputType, str] | None = None
+    """Translations of the description."""
