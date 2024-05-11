@@ -92,3 +92,10 @@ async def test_get_integrations(
 ) -> None:
     """Test getting the integrations."""
     assert await guilds_res.get_integrations(integration_data.guild_id)
+
+async def test_get_audit_log(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None: 
+    """Test getting the audit log."""
+    assert await guilds_res.get_audit_log(integration_data.guild_id)

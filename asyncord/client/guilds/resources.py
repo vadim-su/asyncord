@@ -12,6 +12,7 @@ from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.guilds.models.common import MFALevel
 from asyncord.client.guilds.models.requests import CreateGuildRequest, UpdateWelcomeScreenRequest
 from asyncord.client.guilds.models.responses import (
+    AuditLogResponse,
     GuildPreviewResponse,
     GuildResponse,
     IntegrationResponse,
@@ -30,7 +31,7 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class GuildResource(ClientSubresource):
+class GuildResource(ClientSubresource):  # noqa: PLR0904
     """Representaion of the guilds resource.
 
     Attributes:
@@ -423,3 +424,42 @@ class GuildResource(ClientSubresource):
         if suppress is not None:
             payload['suppress'] = suppress
         await self._http_client.patch(url, payload)
+
+    async def get_audit_log(  # noqa: PLR0913, PLR0917
+        self,
+        guild_id: SnowflakeInputType,
+        user_id: SnowflakeInputType | None = None,
+        action_type: int | None = None,
+        before: SnowflakeInputType | None = None,
+        after: SnowflakeInputType | None = None,
+        limit: int | None = None,
+    ) -> AuditLogResponse:
+        """Get the audit log for a guild.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/audit-log#get-guild-audit-log
+
+        Args:
+            guild_id: ID of the guild to get the audit log for.
+            user_id: ID of the user to filter the log by.
+            action_type: Type of action to filter the log by.
+            before: ID of the entry to get entries before.
+            after: ID of the entry to get entries after.
+            limit: Number of entries to get.
+        """
+        query_params = {}
+        if user_id is not None:
+            query_params['user_id'] = user_id
+        if action_type is not None:
+            query_params['action_type'] = action_type
+        if before is not None:
+            query_params['before'] = before
+        if after is not None:
+            query_params['after'] = after
+        if limit is not None:
+            query_params['limit'] = limit
+
+        url = self.guilds_url / str(guild_id) / 'audit-logs' % query_params
+
+        resp = await self._http_client.get(url)
+        return AuditLogResponse.model_validate(resp.body)
