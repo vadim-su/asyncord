@@ -1,10 +1,14 @@
 """Request models for guilds."""
 
-from pydantic import BaseModel, Field
+from typing import Self
+
+from fbenum.adapter import FallbackAdapter
+from pydantic import BaseModel, Field, model_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.channels.models.requests.creation import CreateChannelRequestType
 from asyncord.client.guilds.models.common import DefaultMessageNotificationLevel, ExplicitContentFilterLevel
+from asyncord.client.models.automoderation import AutoModerationRuleEventType, RuleAction, TriggerMetadata, TriggerType
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.snowflake import SnowflakeInputType
 
@@ -113,3 +117,103 @@ class UpdateWelcomeScreenRequest(BaseModel):
 
     description: str | None = None
     """Server description shown in the welcome screen."""
+
+
+class CreateAutoModerationRuleRequest(BaseModel):
+    """Data for creating an auto moderation rule.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule-json-params
+    """
+
+    name: str
+    """Name of the rule."""
+
+    event_type: AutoModerationRuleEventType
+    """Rule event type."""
+
+    trigger_type: TriggerType
+    """Rule trigger type."""
+
+    trigger_metadata: TriggerMetadata | None = None
+    """Rule trigger metadata.
+
+    Required, but can be omited based on trigger type.
+    """
+
+    actions: list[RuleAction]
+    """Actions which will execute when the rule is triggered."""
+
+    enabled: bool | None = None
+    """Whether the rule is enabled.
+
+    False by default.
+    """
+
+    exempt_roles: list[SnowflakeInputType] | None = Field(None, max_length=20)
+    """Role ids that should not be affected by the rule.
+
+    Maximum of 20.
+    """
+
+    exempt_channels: list[SnowflakeInputType] | None = Field(None, max_length=50)
+    """Channel ids that should not be affected by the rule.
+
+    Maximum of 50.
+    """
+
+    @model_validator(mode='after')
+    def validate_trigger_metadata(self) -> Self:
+        """Validate trigger metadata based on trigger type."""
+        if self.trigger_type == TriggerType.KEYWORD and not (
+            self.trigger_metadata.keyword_filter or self.trigger_metadata.regex_patterns
+        ):
+            raise ValueError('Keyword filter or regex patterns are required for keyword trigger type.')
+
+        if self.trigger_type == TriggerType.KEYWORD_PRESET and not self.trigger_metadata.presets:
+            raise ValueError('Keyword preset is required for keyword preset trigger type.')
+
+        return self
+
+
+class UpdateAutoModerationRuleRequest(BaseModel):
+    """Data for updating an auto moderation rule.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule-json-params
+    """
+
+    name: str
+    """Name of the rule."""
+
+    event_type: FallbackAdapter[AutoModerationRuleEventType]
+    """Rule event type."""
+
+    trigger_metadata: TriggerMetadata | None = None
+    """Rule trigger metadata.
+
+    Required, but can be omited based on trigger type.
+    Reference:
+    https://canary.discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
+    """
+
+    actions: list[RuleAction]
+    """Actions which will execute when the rule is triggered."""
+
+    enabled: bool
+    """Whether the rule is enabled.
+
+    False by default.
+    """
+
+    exempt_roles: list[SnowflakeInputType] = Field(max_length=20)
+    """Role ids that should not be affected by the rule.
+
+    Maximum of 20.
+    """
+
+    exempt_channels: list[SnowflakeInputType] = Field(max_length=50)
+    """Channel ids that should not be affected by the rule.
+
+    Maximum of 50.
+    """

@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.responses import ApplicationCommandResponse
 from asyncord.client.guilds.models.common import AuditLogEvents, ExpireBehaviorOut, IntegrationType, InviteTargetType
+from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
 from asyncord.client.roles.models.responses import RoleResponse
@@ -669,8 +670,7 @@ class AuditLogResponse(BaseModel):
     audit_log_entries: list[AuditLogEntryOut]
     """List of audit log entries, sorted from most to least recent."""
 
-    # TODO: When automoderion model is created, replace dict with AutoModerationRuleResponse
-    auto_moderation_rules: list[dict]
+    auto_moderation_rules: list[AutoModerationRule]
     """List of auto moderation rules referenced in the audit log."""
 
     guild_scheduled_events: list[ScheduledEventResponse]

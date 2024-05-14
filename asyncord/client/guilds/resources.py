@@ -10,7 +10,12 @@ import datetime
 from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.guilds.models.common import MFALevel
-from asyncord.client.guilds.models.requests import CreateGuildRequest, UpdateWelcomeScreenRequest
+from asyncord.client.guilds.models.requests import (
+    CreateAutoModerationRuleRequest,
+    CreateGuildRequest,
+    UpdateAutoModerationRuleRequest,
+    UpdateWelcomeScreenRequest,
+)
 from asyncord.client.guilds.models.responses import (
     AuditLogResponse,
     GuildPreviewResponse,
@@ -23,6 +28,7 @@ from asyncord.client.guilds.models.responses import (
 )
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.members.resources import MemberResource
+from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.resources import ClientSubresource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
@@ -463,3 +469,81 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
 
         resp = await self._http_client.get(url)
         return AuditLogResponse.model_validate(resp.body)
+
+    async def get_list_auto_moderation_rules(
+        self,
+        guild_id: SnowflakeInputType,
+    ) -> list[AutoModerationRule]:
+        """Get a list of all rules currently configured for the guild.
+
+        Args:
+            guild_id: ID of the guild to get the rules for.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#list-auto-moderation-rules-for-guild
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules'
+        resp = await self._http_client.get(url)
+        return list_model(AutoModerationRule).validate_python(resp.body)
+
+    async def get_auto_moderation_rule(
+        self,
+        guild_id: SnowflakeInputType,
+        rule_id: SnowflakeInputType,
+    ) -> AutoModerationRule:
+        """Get a single rule.
+
+        Args:
+            guild_id: ID of the guild to get the rule for.
+            rule_id: ID of the rule to get.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#get-auto-moderation-rule
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
+        resp = await self._http_client.get(url)
+        return AutoModerationRule.model_validate(resp.body)
+
+    async def create_auto_moderation_rule(
+        self,
+        guild_id: SnowflakeInputType,
+        rule: CreateAutoModerationRuleRequest,
+    ) -> AutoModerationRule:
+        """Create a new rule. Returns an auto moderation rule on success.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules'
+        payload = rule.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.post(url, payload)
+        return AutoModerationRule.model_validate(resp.body)
+
+    async def update_auto_moderation_rule(
+        self,
+        guild_id: SnowflakeInputType,
+        rule_id: SnowflakeInputType,
+        rule: UpdateAutoModerationRuleRequest,
+    ) -> AutoModerationRule:
+        """Update an existing rule. Returns an auto moderation rule on success.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
+        payload = rule.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.patch(url, payload)
+        return AutoModerationRule.model_validate(resp.body)
+
+    async def delete_auto_moderation_rule(
+        self,
+        guild_id: SnowflakeInputType,
+        rule_id: SnowflakeInputType,
+    ) -> None:
+        """Delete a rule.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#delete-auto-moderation-rule
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
+        await self._http_client.delete(url)

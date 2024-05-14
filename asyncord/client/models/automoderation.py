@@ -65,7 +65,7 @@ class TriggerMetadata(BaseModel):
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
     """
 
-    keyword_filter: list[str]
+    keyword_filter: list[str] | None = None
     """Substrings which will be searched for in content.
 
     Associated with `TriggerType.KEYWORD`.
@@ -78,7 +78,7 @@ class TriggerMetadata(BaseModel):
     [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
     """
 
-    regex_patterns: list[str] = Field(max_length=10)
+    regex_patterns: list[str] | None = Field(None, max_length=10)
     """regular expression patterns which will be matched against content (Maximum of 10)
 
     Associated with `TriggerType.KEYWORD`.
@@ -88,16 +88,18 @@ class TriggerMetadata(BaseModel):
     Each regex pattern must be 260 characters or less.
     """
 
-    presets: int
+    presets: int | None = None
     """Internally pre-defined wordsets which will be searched for in content.
 
     Associated with `TriggerType.KEYWORD_PRESET`.
     """
 
-    allow_list: list[str]
+    allow_list: list[str] | None = Field(None, max_length=1000)
     """Substrings which will be exempt from triggering the preset trigger type.
 
-    Associated with `TriggerType.KEYWORD_PRESET`.
+    Associated with `TriggerType.KEYWORD` and `TriggerType.KEYWORD_PRESET`.
+
+    Maximum of 100/1000 for `TriggerType.KEYWORD`/`TriggerType.KEYWORD_PRESET`.
 
     A keyword can be a phrase which contains multiple words. Wildcard symbols
     (not available to allow lists) can be used to customize how each keyword
@@ -107,14 +109,14 @@ class TriggerMetadata(BaseModel):
     [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
     """
 
-    mention_total_limit: int = Field(le=50)
+    mention_total_limit: int | None = Field(None, le=50)
     """Total number of mentions(role & user) allowed per message.
 
     Maximum of 50.
     Associated with `TriggerType.MENTION_SPAM`.
     """
 
-    mention_raid_protection_enabled: bool = False
+    mention_raid_protection_enabled: bool | None = None
     """Whether to automatically detect mention raids.
 
     Associated with `TriggerType.MENTION_SPAM`.
