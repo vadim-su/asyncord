@@ -116,7 +116,7 @@ async def test_create_get_delete_auto_moderation_rule(
             event_type=AutoModerationRuleEventType.MESSAGE_SEND,
             trigger_type=TriggerType.KEYWORD,
             trigger_metadata=TriggerMetadata(
-                keyword_filter='A very bad word'
+                keyword_filter=['A very bad word']
             ),
             actions=[RuleAction(
                 type=RuleActionType.BLOCK_MESSAGE
