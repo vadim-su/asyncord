@@ -10,8 +10,14 @@ import datetime
 from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.guilds.models.common import MFALevel
-from asyncord.client.guilds.models.requests import CreateGuildRequest, UpdateWelcomeScreenRequest
+from asyncord.client.guilds.models.requests import (
+    CreateAutoModerationRuleRequest,
+    CreateGuildRequest,
+    UpdateAutoModerationRuleRequest,
+    UpdateWelcomeScreenRequest,
+)
 from asyncord.client.guilds.models.responses import (
+    AuditLogResponse,
     GuildPreviewResponse,
     GuildResponse,
     IntegrationResponse,
@@ -22,6 +28,7 @@ from asyncord.client.guilds.models.responses import (
 )
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.members.resources import MemberResource
+from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.resources import ClientSubresource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
@@ -30,7 +37,7 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class GuildResource(ClientSubresource):
+class GuildResource(ClientSubresource):  # noqa: PLR0904
     """Representaion of the guilds resource.
 
     Attributes:
@@ -423,3 +430,120 @@ class GuildResource(ClientSubresource):
         if suppress is not None:
             payload['suppress'] = suppress
         await self._http_client.patch(url, payload)
+
+    async def get_audit_log(  # noqa: PLR0913, PLR0917
+        self,
+        guild_id: SnowflakeInputType,
+        user_id: SnowflakeInputType | None = None,
+        action_type: int | None = None,
+        before: SnowflakeInputType | None = None,
+        after: SnowflakeInputType | None = None,
+        limit: int | None = None,
+    ) -> AuditLogResponse:
+        """Get the audit log for a guild.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/audit-log#get-guild-audit-log
+
+        Args:
+            guild_id: ID of the guild to get the audit log for.
+            user_id: ID of the user to filter the log by.
+            action_type: Type of action to filter the log by.
+            before: ID of the entry to get entries before.
+            after: ID of the entry to get entries after.
+            limit: Number of entries to get.
+        """
+        query_params = {}
+        if user_id is not None:
+            query_params['user_id'] = user_id
+        if action_type is not None:
+            query_params['action_type'] = action_type
+        if before is not None:
+            query_params['before'] = before
+        if after is not None:
+            query_params['after'] = after
+        if limit is not None:
+            query_params['limit'] = limit
+
+        url = self.guilds_url / str(guild_id) / 'audit-logs' % query_params
+
+        resp = await self._http_client.get(url)
+        return AuditLogResponse.model_validate(resp.body)
+
+    async def get_list_auto_moderation_rules(
+        self,
+        guild_id: SnowflakeInputType,
+    ) -> list[AutoModerationRule]:
+        """Get a list of all rules currently configured for the guild.
+
+        Args:
+            guild_id: ID of the guild to get the rules for.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#list-auto-moderation-rules-for-guild
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules'
+        resp = await self._http_client.get(url)
+        return list_model(AutoModerationRule).validate_python(resp.body)
+
+    async def get_auto_moderation_rule(
+        self,
+        guild_id: SnowflakeInputType,
+        rule_id: SnowflakeInputType,
+    ) -> AutoModerationRule:
+        """Get a single rule.
+
+        Args:
+            guild_id: ID of the guild to get the rule for.
+            rule_id: ID of the rule to get.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#get-auto-moderation-rule
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
+        resp = await self._http_client.get(url)
+        return AutoModerationRule.model_validate(resp.body)
+
+    async def create_auto_moderation_rule(
+        self,
+        guild_id: SnowflakeInputType,
+        rule: CreateAutoModerationRuleRequest,
+    ) -> AutoModerationRule:
+        """Create a new rule. Returns an auto moderation rule on success.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules'
+        payload = rule.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.post(url, payload)
+        return AutoModerationRule.model_validate(resp.body)
+
+    async def update_auto_moderation_rule(
+        self,
+        guild_id: SnowflakeInputType,
+        rule_id: SnowflakeInputType,
+        rule: UpdateAutoModerationRuleRequest,
+    ) -> AutoModerationRule:
+        """Update an existing rule. Returns an auto moderation rule on success.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
+        payload = rule.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.patch(url, payload)
+        return AutoModerationRule.model_validate(resp.body)
+
+    async def delete_auto_moderation_rule(
+        self,
+        guild_id: SnowflakeInputType,
+        rule_id: SnowflakeInputType,
+    ) -> None:
+        """Delete a rule.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/auto-moderation#delete-auto-moderation-rule
+        """
+        url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
+        await self._http_client.delete(url)

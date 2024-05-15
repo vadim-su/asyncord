@@ -5,6 +5,8 @@ import pytest
 from asyncord.client.guilds.models.requests import CreateGuildRequest
 from asyncord.client.guilds.resources import GuildResource
 from asyncord.client.users.resources import UserResource
+from asyncord.client.guilds.models.requests import CreateAutoModerationRuleRequest
+from asyncord.client.models.automoderation import AutoModerationRuleEventType, TriggerType, TriggerMetadata, RuleAction, RuleActionType
 from tests.conftest import IntegrationTestData
 
 
@@ -92,3 +94,58 @@ async def test_get_integrations(
 ) -> None:
     """Test getting the integrations."""
     assert await guilds_res.get_integrations(integration_data.guild_id)
+
+
+async def test_get_audit_log(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None: 
+    """Test getting the audit log."""
+    assert await guilds_res.get_audit_log(integration_data.guild_id)
+
+
+async def test_create_get_delete_auto_moderation_rule(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test creating an auto moderation rule."""
+    rule = await guilds_res.create_auto_moderation_rule(
+        integration_data.guild_id,
+        CreateAutoModerationRuleRequest(
+            name='Test Rule',
+            event_type=AutoModerationRuleEventType.MESSAGE_SEND,
+            trigger_type=TriggerType.KEYWORD,
+            trigger_metadata=TriggerMetadata(
+                keyword_filter=['A very bad word']
+            ),
+            actions=[RuleAction(
+                type=RuleActionType.BLOCK_MESSAGE
+            )],
+            enabled=True,
+        )
+    )
+
+    assert rule
+
+    rule_response = await guilds_res.get_auto_moderation_rule(
+        integration_data.guild_id,
+        rule.id
+    )
+
+    assert rule.name == rule_response.name
+
+    await guilds_res.delete_auto_moderation_rule(
+        integration_data.guild_id,
+        rule.id
+    )
+
+
+async def test_get_list_auto_moderation_rules(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting the auto moderation rules."""
+    assert await guilds_res.get_list_auto_moderation_rules(
+        integration_data.guild_id
+        )
+    

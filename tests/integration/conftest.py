@@ -3,6 +3,7 @@ from collections.abc import AsyncGenerator
 import pytest
 
 from asyncord.client.bans.resources import BanResource
+from asyncord.client.applications.resources import ApplicationResource
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.guilds.resources import GuildResource
@@ -26,6 +27,13 @@ from tests.conftest import IntegrationTestData
 async def client(token: str) -> RestClient:
     """Get a rest client."""
     return RestClient(token)
+
+@pytest.fixture()
+async def applications_res(
+    client: RestClient,
+) -> ApplicationResource:
+    """Get applications resource for the client."""
+    return client.applications
 
 
 @pytest.fixture()
@@ -98,6 +106,7 @@ async def commands_res(
 ) -> CommandResource:
     """Get commands resource for the application."""
     return client.applications.commands(integration_data.app_id)
+
 
 
 @pytest.fixture()

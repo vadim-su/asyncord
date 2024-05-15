@@ -6,11 +6,16 @@ import datetime
 
 from pydantic import BaseModel
 
+from asyncord.client.members.models.common import GuildMemberFlags
 from asyncord.snowflake import SnowflakeInputType
 
 
 class UpdateMemberRequest(BaseModel):
-    """Represents data to update a member."""
+    """Represents data to update a member.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#modify-guild-member-json-params
+    """
 
     nick: str | None = None
     """User's nickname."""
@@ -39,4 +44,11 @@ class UpdateMemberRequest(BaseModel):
     Up to 28 days in the future. Set to None to remove timeout.
     Will throw a 403 error if the user has the ADMINISTRATOR permission
     or is the owner of the guild MODERATE_MEMBERS.
+    """
+
+    flags: GuildMemberFlags | None = None
+    """Guild member flags represented as a bit set.
+
+    The bot should have MANAGE_GUILD or MANAGE_ROLES or
+    (MODERATE_MEMBERS and KICK_MEMBERS and BAN_MEMBERS) permissions.
     """
