@@ -52,9 +52,9 @@ class ClientGroup(NamedTuple):
 class ClientHub:
     """Hub to process multiple clients."""
 
-    def __init__(self) -> None:
+    def __init__(self, session: aiohttp.ClientSession = None) -> None:
         """Initialize hub to process multiple clients."""
-        self.session: aiohttp.ClientSession
+        self.session: aiohttp.ClientSession = session
         self.heartbeat_factory = HeartbeatFactory()
         self.client_groups: dict[str, ClientGroup] = {}
 
@@ -101,6 +101,13 @@ class ClientHub:
         except (KeyboardInterrupt, asyncio.CancelledError):
             logger.info('Shutting down...')
             await asyncio.gather(*tasks, return_exceptions=True)
+
+    async def __aenter__(self) -> 'ClientHub':
+        """Enter the context manager."""
+        if self.session is None:
+            self.session = aiohttp.ClientSession()
+        self.heartbeat_factory.start()
+        return self
 
     async def __aexit__(self, _exc_type, _exc, _tb) -> None:  # noqa: ANN001
         """Exit the context manager."""
