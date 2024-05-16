@@ -289,4 +289,6 @@ class ChannelResource(ClientSubresource):
         """
         url = self.channels_url / str(channel_id) / 'typing'
 
-        await self._http_client.post(url)
+        payload = {}
+
+        await self._http_client.post(url, payload)
