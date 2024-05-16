@@ -69,3 +69,14 @@ async def test_update_message(
         UpdateMessageRequest(content=random_content),
     )
     assert updated_message.content == random_content
+
+async def test_pin_get_unpin_message(
+    message: MessageResponse,
+    messages_res: MessageResource,
+) -> None:
+    """Test pinning, getting and unpinning a message."""
+    await messages_res.pin_message(message.id)
+    assert await messages_res.get_pinned_messages(message.id)
+    await messages_res.unpin_message(message.id)
+    pins = await messages_res.get_pinned_messages(message.id)
+    assert len(pins) == 0
