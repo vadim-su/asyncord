@@ -290,17 +290,3 @@ class ChannelResource(ClientSubresource):
         url = self.channels_url / str(channel_id) / 'typing'
 
         await self._http_client.post(url)
-
-    async def group_dm_remove_recipient(
-        self,
-        channel_id: SnowflakeInputType,
-        user_id: SnowflakeInputType,
-    ) -> None:
-        """Removes a recipient from a Group DM.
-
-        Reference:
-        https://canary.discord.com/developers/docs/resources/channel#group-dm-remove-recipient
-        """
-        url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
-
-        await self._http_client.delete(url)
