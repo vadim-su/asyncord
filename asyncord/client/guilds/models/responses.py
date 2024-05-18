@@ -635,19 +635,19 @@ class AuditLogEntryOut(BaseModel):
     https://canary.discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-entry-structure
     """
 
-    target_id: str
+    target_id: str | None = None
     """ID of the affected entity(webhook, user, role, etc.)."""
 
     changes: list[AuditLogChangeOut] | None = None
     """Changes made to the target_id."""
 
-    user_id: Snowflake
+    user_id: Snowflake | None = None
     """User or app that made the changes."""
 
-    id: Snowflake
+    id: Snowflake | None = None
     """ID of the entry."""
 
-    action_type: FallbackAdapter[AuditLogEvents]
+    action_type: FallbackAdapter[AuditLogEvents] | None = None
     """Type of action that occurred."""
 
     options: OptionalAuditLogEntryInfoOut | None = None
@@ -664,27 +664,27 @@ class AuditLogResponse(BaseModel):
     https://canary.discord.com/developers/docs/resources/audit-log#audit-log-object-audit-log-structure
     """
 
-    application_commands: list[ApplicationCommandResponse]
+    application_commands: list[ApplicationCommandResponse] | None = None
     """List of application commands referenced in the audit log."""
 
-    audit_log_entries: list[AuditLogEntryOut]
+    audit_log_entries: list[AuditLogEntryOut] | None = None
     """List of audit log entries, sorted from most to least recent."""
 
-    auto_moderation_rules: list[AutoModerationRule]
+    auto_moderation_rules: list[AutoModerationRule] | None = None
     """List of auto moderation rules referenced in the audit log."""
 
-    guild_scheduled_events: list[ScheduledEventResponse]
+    guild_scheduled_events: list[ScheduledEventResponse] | None = None
     """List of guild scheduled events referenced in the audit log."""
 
-    integrations: list[AuditLogIntegrationOut]
+    integrations: list[AuditLogIntegrationOut] | None = None
     """List of partial integration objects."""
 
-    threads: list[ThreadResponse]
+    threads: list[ThreadResponse] | None = None
     """List of threads referenced in the audit log."""
 
-    users: list[UserResponse]
+    users: list[UserResponse] | None = None
     """List of users referenced in the audit log."""
 
     # TODO: When webhook model is created, replace dict with WebhookResponse
-    webhooks: list[dict]
+    webhooks: list[dict] | None = None
     """List of webhooks referenced in the audit log."""
