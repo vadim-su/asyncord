@@ -12,9 +12,7 @@ TEST_EMOJI  = {'name' : 'test_emoji', 'path' : 'test_emoji.png'}
 
 
 async def test_crete_get_modify_delete_guild_emoji(
-    self,
     emoji_res: EmojiResource,
-    integration_data: IntegrationTestData,
 ) -> None:
     """Test create, get and delete guild emoji."""
     with open(f'asyncord/tests/data/{TEST_EMOJI['path']}', 'rb') as f:
