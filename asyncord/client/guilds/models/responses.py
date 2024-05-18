@@ -551,27 +551,27 @@ class OptionalAuditLogEntryInfoOut(BaseModel):
     https://canary.discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info
     """
 
-    application_id: Snowflake
+    application_id: Snowflake | None = None
     """ID of the app whose permissions were targeted.
 
     APPLICATION_COMMAND_PERMISSION_UPDATE.
         """
 
-    auto_moderation_rule_name: str
+    auto_moderation_rule_name: str | None = None
     """Name of the Auto Moderation rule that was triggered.
 
     AUTO_MODERATION_BLOCK_MESSAGE & AUTO_MODERATION_FLAG_TO_CHANNEL
         & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
         """
 
-    auto_moderation_rule_trigger_type: str
+    auto_moderation_rule_trigger_type: str | None = None
     """Trigger type of the Auto Moderation rule that was triggered.
 
     AUTO_MODERATION_BLOCK_MESSAGE & AUTO_MODERATION_FLAG_TO_CHANNEL
         & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
         """
 
-    channel_id: Snowflake
+    channel_id: Snowflake | None = None
     """Channel in which the entities were targeted.
 
     MEMBER_MOVE & MESSAGE_PIN & MESSAGE_UNPIN & MESSAGE_DELETE
@@ -580,48 +580,48 @@ class OptionalAuditLogEntryInfoOut(BaseModel):
         & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
         """
 
-    count: str
+    count: str | None = None
     """Number of entities that were targeted.
 
     MESSAGE_DELETE & MESSAGE_BULK_DELETE & MEMBER_DISCONNECT & MEMBER_MOVE.
         """
 
-    delete_member_days: str
+    delete_member_days: str | None = None
     """Number of days after which inactive members were kicked.
 
     MEMBER_PRUNE.
         """
 
-    id: Snowflake
+    id: Snowflake | None = None
     """ID of the overwritten entity.
 
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
         """
 
-    members_removed: str
+    members_removed: str | None = None
     """Number of members removed by the prune.
 
     MEMBER_PRUNE.
         """
 
-    message_id: Snowflake
+    message_id: Snowflake | None = None
     """ID of the message that was targeted.
 
     MESSAGE_PIN & MESSAGE_UNPIN.
         """
 
-    role_name: str
+    role_name: str | None = None
     """Name of the role if type is '0' (not present if type is '1').
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
         """
 
-    type: str
+    type: str | None = None
     """Type of overwritten entity - role('0') or member('1').
 
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
         """
 
-    integration_type: str
+    integration_type: str | None = None
     """The type of integration which performed the action.
 
     MEMBER_KICK & MEMBER_ROLE_UPDATE.

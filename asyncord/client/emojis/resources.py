@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from asyncord.base64_image import Base64ImageInputType
+from asyncord.client.emojis.models.requests import CreateEmojiRequest, UpdateEmojiRequest
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.resources import ClientResource, ClientSubresource
@@ -57,17 +57,13 @@ class EmojiResource(ClientSubresource):
 
     async def create_guild_emoji(
         self,
-        name: str,
-        image: Base64ImageInputType,
-        roles: list[SnowflakeInputType] | None = None,
+        emoji_data: CreateEmojiRequest,
         reason: str | None = None,
     ) -> Emoji:
         """Create a new emoji for the guild.
 
         Args:
-            name: Name of the emoji.
-            image: Image data.
-            roles: Roles to limit the emoji to.
+            emoji_data: Data for the new emoji.
             reason: Reason for creating the emoji.
 
         Reference:
@@ -78,27 +74,21 @@ class EmojiResource(ClientSubresource):
         else:
             headers = {}
 
-        data = {
-            'name': name,
-            'image': image,
-            'roles': roles if roles else [],
-        }
-        resp = await self._http_client.post(self.emojis_url, data=data, headers=headers)
+        payload = emoji_data.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.post(self.emojis_url, payload=payload, headers=headers)
         return Emoji.model_validate(resp.body)
 
     async def update_guild_emoji(
         self,
         emoji_id: SnowflakeInputType,
-        name: str | None = None,
-        roles: list[SnowflakeInputType] | None = None,
+        emoji_data: UpdateEmojiRequest,
         reason: str | None = None,
     ) -> Emoji:
         """Update the given emoji.
 
         Args:
             emoji_id: ID of the emoji to update.
-            name: New name for the emoji.
-            roles: New roles for the emoji.
+            emoji_data: New data for the emoji.
             reason: Reason for updating the emoji.
 
         Reference:
@@ -109,12 +99,9 @@ class EmojiResource(ClientSubresource):
         else:
             headers = {}
 
-        data = {
-            'name': name,
-            'roles': roles if roles else [],
-        }
+        payload = emoji_data.model_dump(mode='json', exclude_unset=True)
         url = self.emojis_url / str(emoji_id)
-        resp = await self._http_client.patch(url, data=data, headers=headers)
+        resp = await self._http_client.patch(url, payload=payload, headers=headers)
         return Emoji.model_validate(resp.body)
 
     async def delete_guild_emoji(

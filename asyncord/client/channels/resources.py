@@ -233,6 +233,7 @@ class ChannelResource(ClientSubresource):
         self,
         channel_id: SnowflakeInputType,
         invite_request: ChannelInviteRequest | None = None,
+        reason: str | None = None,
     ) -> InviteResponse:
         """Create a new invite for a channel.
 
@@ -242,18 +243,24 @@ class ChannelResource(ClientSubresource):
         Args:
             channel_id: Channel id.
             invite_request: Data for creating the invite.
+            reason: Reason for creating the invite.
 
         Returns:
             Created invite.
         """
         url = self.channels_url / str(channel_id) / 'invites'
 
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
         payload = {}
 
         if invite_request:
-            payload = invite_request.model_dump(mode='json', exclude_unset=True)
+            payload = invite_request.model_dump(mode='json', exclude_unset=True, headers=headers)
 
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return InviteResponse.model_validate(resp.body)
 
     # TODO: Add webhook models once they are implemented.
