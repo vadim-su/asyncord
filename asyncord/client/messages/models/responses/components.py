@@ -27,8 +27,8 @@ class ComponentEmojiOut(BaseModel):
     """Emoji to be displayed on the button.
 
     At least one of `name` or `id` must be provided.
-    Name is used for unicode emojies,
-    Id is a snowflake of custom emojies.
+    Name is used for unicode emojis,
+    Id is a snowflake of custom emojis.
     """
 
     name: str | None = None

@@ -16,6 +16,7 @@ from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
 from asyncord.client.threads.models.common import ThreadType
+from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.threads.models.requests import CreateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.client.threads.resources import ThreadResource
@@ -79,6 +80,15 @@ async def roles_res(
 ) -> RoleResource:
     """Get roles resource for the guild."""
     return guilds_res.roles(integration_data.guild_id)
+
+@pytest.fixture()
+async def emoji_res(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> ScheduledEventsResource:
+    """Get emoji resource for the guild."""
+    return guilds_res.emojis(integration_data.guild_id)
+
 
 
 @pytest.fixture()

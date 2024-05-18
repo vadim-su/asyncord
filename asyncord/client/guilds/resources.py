@@ -9,6 +9,7 @@ import datetime
 
 from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.responses import ChannelResponse
+from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.guilds.models.common import MFALevel
 from asyncord.client.guilds.models.requests import (
     CreateAutoModerationRuleRequest,
@@ -89,6 +90,17 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Events subresource for the guild.
         """
         return ScheduledEventsResource(self, guild_id)
+
+    def emojis(self, guild_id: SnowflakeInputType) -> EmojiResource:
+        """Get the emojis subresource for a guild.
+
+        Args:
+            guild_id: ID of the guild to get the emojis subresource for.
+
+        Returns:
+            Emojis subresource for the guild.
+        """
+        return EmojiResource(self, guild_id)
 
     async def get(self, guild_id: SnowflakeInputType, with_counts: bool = False) -> GuildResponse:
         """Get a guild.
