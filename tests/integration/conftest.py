@@ -118,6 +118,7 @@ async def commands_res(
     return client.applications.commands(integration_data.app_id)
 
 
+
 @pytest.fixture()
 async def thread_res(
     channel_res: ChannelResource,
