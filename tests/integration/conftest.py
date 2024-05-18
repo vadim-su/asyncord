@@ -81,14 +81,14 @@ async def roles_res(
     """Get roles resource for the guild."""
     return guilds_res.roles(integration_data.guild_id)
 
+
 @pytest.fixture()
 async def emoji_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
-) -> ScheduledEventsResource:
+) -> EmojiResource:
     """Get emoji resource for the guild."""
     return guilds_res.emojis(integration_data.guild_id)
-
 
 
 @pytest.fixture()
@@ -116,7 +116,6 @@ async def commands_res(
 ) -> CommandResource:
     """Get commands resource for the application."""
     return client.applications.commands(integration_data.app_id)
-
 
 
 @pytest.fixture()
