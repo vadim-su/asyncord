@@ -198,6 +198,7 @@ class MessageResource(ClientSubresource):
         self,
         channel_id: SnowflakeInputType,
         message_id: SnowflakeInputType,
+        reason: str | None = None,
     ) -> None:
         """Pin a message in a channel.
 
@@ -208,13 +209,19 @@ class MessageResource(ClientSubresource):
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
 
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
         payload = {}
-        await self._http_client.put(url, payload)
+        await self._http_client.put(url, payload=payload, headers=headers)
 
     async def unpin_message(
         self,
         channel_id: SnowflakeInputType,
         message_id: SnowflakeInputType,
+        reason: str | None = None,
     ) -> None:
         """Unpin a message in a channel.
 
@@ -222,4 +229,9 @@ class MessageResource(ClientSubresource):
         https://canary.discord.com/developers/docs/resources/channel#unpin-message
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
-        await self._http_client.delete(url)
+
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+        await self._http_client.delete(url, headers=headers)
