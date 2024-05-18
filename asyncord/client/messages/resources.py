@@ -207,7 +207,9 @@ class MessageResource(ClientSubresource):
         https://canary.discord.com/developers/docs/resources/channel#pin-message
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
-        await self._http_client.put(url)
+
+        payload = {}
+        await self._http_client.put(url, payload)
 
     async def unpin_message(
         self,
