@@ -60,7 +60,6 @@ extend-exclude = [
     ".devcontainer",
     ".github",
     ".venv",
-    "tests",
 ]
 
 
