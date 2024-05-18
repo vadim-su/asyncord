@@ -371,13 +371,13 @@ class AsyncHttpClient:
 
         if files:
             data = aiohttp.FormData()
-            if payload:
+            if payload is not None:
                 data.add_field('payload_json', json.dumps(payload), content_type=JSON_CONTENT_TYPE)
 
             for index, (file_name, content_type, file_data) in enumerate(files):
                 data.add_field(f'files[{index}]', file_data, filename=file_name, content_type=content_type)
 
-        elif payload:
+        elif payload is not None:
             data = aiohttp.JsonPayload(payload)
 
         if self._session:
