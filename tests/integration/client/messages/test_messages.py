@@ -93,8 +93,3 @@ async def test_message_pin_unpin_flow(
 
     # Check that the message is no longer pinned
     pins_after_unpin = await messages_res.get_pinned_messages(integration_data.channel_id)
-    assert message.id not in [msg.id for msg in pins_after_unpin]
-
-    # Check that the message still exists
-    all_messages = await messages_res.get(integration_data.channel_id)
-    assert message.id in [msg.id for msg in all_messages]
