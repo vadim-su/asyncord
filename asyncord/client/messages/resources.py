@@ -31,7 +31,6 @@ class MessageResource(ClientSubresource):
         """Get the reactions resource for a message.
 
         Args:
-            channel_id: ID of the channel.
             message_id: ID of the message.
 
         Returns:

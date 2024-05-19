@@ -151,7 +151,7 @@ class GatewayClient:
         """Resume a previous session.
 
         Args:
-            command_data(ResumeCommand): Data to send to the gateway.
+            command_data: Data to send to the gateway.
         """
         payload = command_data.model_dump(mode='json')
         await self.send_command(GatewayCommandOpcode.RESUME, payload)

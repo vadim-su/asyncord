@@ -142,7 +142,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         Reference: https://discord.com/developers/docs/resources/guild#create-guild
 
         Args:
-            guild_data(CreateGuildData): The data for the guild to create.
+            guild_data: The data for the guild to create.
 
         Returns:
             The created guild.
