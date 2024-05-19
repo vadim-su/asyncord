@@ -6,17 +6,22 @@ endpoints like message creation.
 
 from __future__ import annotations
 
-from asyncord.client.channels.models.requests.creation import CreateChannelRequestType
+from asyncord.client.channels.models.requests.creation import (
+    ChannelInviteRequest,
+    CreateChannelRequestType,
+)
 from asyncord.client.channels.models.requests.updating import (
     UpdateChannelPermissionsRequest,
     UpdateChannelRequestType,
 )
 from asyncord.client.channels.models.responses import ChannelResponse
+from asyncord.client.guilds.models.responses import InviteResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.resources import ClientSubresource
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.snowflake import SnowflakeInputType
+from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
@@ -185,3 +190,109 @@ class ChannelResource(ClientSubresource):
             payload,
             headers=headers,
         )
+
+    async def delete_permission(
+        self,
+        channel_id: SnowflakeInputType,
+        overwrite_id: SnowflakeInputType,
+        reason: str | None = None,
+    ) -> None:
+        """Delete a channel permission overwrite for a user or role in a channel.
+
+        Args:
+            channel_id: Channel id.
+            overwrite_id: Role or user id.
+            reason: Reason for deleting the permission.
+        """
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        url = self.channels_url / str(channel_id) / 'permissions' / str(overwrite_id)
+
+        await self._http_client.delete(url, headers=headers)
+
+    async def get_channel_invites(self, channel_id: SnowflakeInputType) -> list[InviteResponse]:
+        """Get the invites for a channel.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#get-channel-invites
+
+        Args:
+            channel_id: Channel id.
+
+        Returns:
+            List of invites for the channel.
+        """
+        url = self.channels_url / str(channel_id) / 'invites'
+        resp = await self._http_client.get(url)
+        return list_model(InviteResponse).validate_python(resp.body)
+
+    async def create_channel_invite(
+        self,
+        channel_id: SnowflakeInputType,
+        invite_request: ChannelInviteRequest | None = None,
+        reason: str | None = None,
+    ) -> InviteResponse:
+        """Create a new invite for a channel.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#create-channel-invite
+
+        Args:
+            channel_id: Channel id.
+            invite_request: Data for creating the invite.
+            reason: Reason for creating the invite.
+
+        Returns:
+            Created invite.
+        """
+        url = self.channels_url / str(channel_id) / 'invites'
+
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        payload = {}
+
+        if invite_request:
+            payload = invite_request.model_dump(mode='json', exclude_unset=True, headers=headers)
+
+        resp = await self._http_client.post(url=url, payload=payload)
+        return InviteResponse.model_validate(resp.body)
+
+    # TODO: Add webhook models once they are implemented.
+    async def follow_announcement_channel(
+        self,
+        channel_id: SnowflakeInputType,
+        webhook_channel_id: SnowflakeInputType,
+    ) -> dict:
+        """Follow an Announcement channel to send messages to a target channel.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#follow-announcement-channel
+        """
+        url = self.channels_url / str(channel_id) / 'followers'
+
+        payload = {
+            'webhook_channel_id': str(webhook_channel_id),
+        }
+
+        resp = await self._http_client.post(url, payload)
+        return resp.body
+
+    async def trigger_typing_indicator(self, channel_id: SnowflakeInputType) -> None:
+        """Post a typing indicator for the specified channel.
+
+        Expires after 10 seconds.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#trigger-typing-indicator
+        """
+        url = self.channels_url / str(channel_id) / 'typing'
+
+        payload = {}
+
+        await self._http_client.post(url, payload)

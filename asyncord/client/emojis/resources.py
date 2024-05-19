@@ -1,0 +1,128 @@
+"""Emojis resource for the client."""
+
+from __future__ import annotations
+
+from asyncord.client.emojis.models.requests import CreateEmojiRequest, UpdateEmojiRequest
+from asyncord.client.http.headers import AUDIT_LOG_REASON
+from asyncord.client.models.emoji import Emoji
+from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.snowflake import SnowflakeInputType
+from asyncord.typedefs import list_model
+from asyncord.urls import REST_API_URL
+
+
+class EmojiResource(ClientSubresource):
+    """Resource to perform actions on guild emojis.
+
+    Attributes:
+        guilds_url: URL for the guilds resource.
+    """
+
+    guilds_url = REST_API_URL / 'guilds'
+
+    def __init__(
+        self,
+        parent: ClientResource,
+        guild_id: SnowflakeInputType,
+    ):
+        """Create a new emojis resource."""
+        super().__init__(parent)
+        self.guild_id = guild_id
+        self.emojis_url = self.guilds_url / str(self.guild_id) / 'emojis'
+
+    async def get_guild_emoji(
+        self,
+        emoji_id: SnowflakeInputType,
+    ) -> Emoji:
+        """Returns an emoji object for the given guild.
+
+        Args:
+            emoji_id: ID of the emoji to get.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/emoji#get-guild-emoji
+        """
+        url = self.emojis_url / str(emoji_id)
+        resp = await self._http_client.get(url)
+        return Emoji.model_validate(resp.body)
+
+    async def get_guild_emojis(self) -> list[Emoji]:
+        """Returns a list of emoji objects for the given guild.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/emoji#list-guild-emojis
+        """
+        resp = await self._http_client.get(self.emojis_url)
+        return list_model(Emoji).validate_python(resp.body)
+
+    async def create_guild_emoji(
+        self,
+        emoji_data: CreateEmojiRequest,
+        reason: str | None = None,
+    ) -> Emoji:
+        """Create a new emoji for the guild.
+
+        Args:
+            emoji_data: Data for the new emoji.
+            reason: Reason for creating the emoji.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/emoji#create-guild-emoji
+        """
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        payload = emoji_data.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.post(self.emojis_url, payload=payload, headers=headers)
+        return Emoji.model_validate(resp.body)
+
+    async def update_guild_emoji(
+        self,
+        emoji_id: SnowflakeInputType,
+        emoji_data: UpdateEmojiRequest,
+        reason: str | None = None,
+    ) -> Emoji:
+        """Update the given emoji.
+
+        Args:
+            emoji_id: ID of the emoji to update.
+            emoji_data: New data for the emoji.
+            reason: Reason for updating the emoji.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/emoji#modify-guild-emoji
+        """
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        payload = emoji_data.model_dump(mode='json', exclude_unset=True)
+        url = self.emojis_url / str(emoji_id)
+        resp = await self._http_client.patch(url, payload=payload, headers=headers)
+        return Emoji.model_validate(resp.body)
+
+    async def delete_guild_emoji(
+        self,
+        emoji_id: SnowflakeInputType,
+        reason: str | None = None,
+    ) -> None:
+        """Delete the given emoji.
+
+        Args:
+            emoji_id: ID of the emoji to delete.
+            reason: Reason for deleting the emoji.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/emoji#delete-guild-emoji
+        """
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        url = self.emojis_url / str(emoji_id)
+
+        await self._http_client.delete(url, headers=headers)

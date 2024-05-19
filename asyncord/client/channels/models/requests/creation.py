@@ -4,7 +4,8 @@ Reference:
 https://discord.com/developers/docs/resources/channel
 """
 
-from typing import Any, Literal
+import logging
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -17,7 +18,10 @@ from asyncord.client.channels.models.common import (
     ThreadSortOrder,
     VideoQualityMode,
 )
+from asyncord.client.guilds.models.common import InviteTargetType
 from asyncord.snowflake import SnowflakeInputType
+
+logger = logging.getLogger(__name__)
 
 
 class DefaultReaction(BaseModel):
@@ -347,6 +351,64 @@ class CreateStageChannelRequest(BaseCreateChannel):
 
     video_quality_mode: VideoQualityMode | None = None
     """Camera video quality mode of the voice channel."""
+
+
+class ChannelInviteRequest(BaseModel):
+    """Data to create channel invite.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/channel#create-channel-invite-json-params
+    """
+
+    max_age: int | None = Field(None, max=604800)
+    """Duration of invite in seconds before expiry, or 0 for never."""
+
+    max_uses: int | None = Field(None, ge=0, le=100)
+    """Max number of uses or 0 for unlimited."""
+
+    temporary: bool | None = None
+    """Whether this invite only grants temporary membership."""
+
+    unique: bool | None = None
+    """If true, don't try to reuse a similar invite.
+
+    (useful for creating many unique one time use invites).
+    """
+
+    target_type: InviteTargetType | None = None
+    """The type of a target for this voic channel invite."""
+
+    target_user_id: SnowflakeInputType | None = None
+    """Id of the user whose stream to display for this invite.
+
+    Required if target_type is 1.
+    """
+
+    target_application_id: SnowflakeInputType | None = None
+    """Id of the embedded application to open for this invite.
+
+    Required if target_type is 2.
+    """
+
+    @model_validator(mode='after')
+    def validate_target_type(self) -> Self:
+        """If target_type is set.
+
+        Then target_user_id and target_application_id must be set accordingly.
+        """
+        match self.target_type:
+            case InviteTargetType.STREAM:
+                if not self.target_user_id:
+                    raise ValueError('target_user_id must be set if target_type is STREAM')
+
+            case InviteTargetType.EMBEDDED_APPLICATION:
+                if not self.target_application_id:
+                    raise ValueError('target_application_id must be set if target_type is EMBEDDED_APPLICATION')
+
+            case _:
+                logger.warning('target_type possibly is not processed.')
+
+        return self
 
 
 type CreateChannelRequestType = (

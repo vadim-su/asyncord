@@ -157,3 +157,76 @@ class MessageResource(ClientSubresource):
             headers = {}
 
         await self._http_client.post(url, payload, headers=headers)
+
+    # FIXME: Not clear from documentation,
+    #   to which channels the message is going to be crossposted.
+    async def crosspost_message(self, message_id: SnowflakeInputType) -> MessageResponse:
+        """Crosspost a message in an Announcement channel to all channels following it.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#crosspost-message
+
+        Args:
+            message_id: Id of the message to crosspost.
+
+        Returns:
+            Crossposted message object.
+        """
+        url = self.messages_url / str(message_id) / 'crosspost'
+
+        resp = await self._http_client.post(url)
+        return MessageResponse.model_validate(resp.body)
+
+    async def get_pinned_messages(self, channel_id: SnowflakeInputType) -> list[MessageResponse]:
+        """Get all pinned messages in a channel.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#get-pinned-messages
+        """
+        url = self.channels_url / str(channel_id) / 'pins'
+
+        resp = await self._http_client.get(url)
+        return list_model(MessageResponse).validate_python(resp.body)
+
+    async def pin_message(
+        self,
+        channel_id: SnowflakeInputType,
+        message_id: SnowflakeInputType,
+        reason: str | None = None,
+    ) -> None:
+        """Pin a message in a channel.
+
+        The max pinned messages is 50!
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#pin-message
+        """
+        url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
+
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        payload = {}
+        await self._http_client.put(url, payload=payload, headers=headers)
+
+    async def unpin_message(
+        self,
+        channel_id: SnowflakeInputType,
+        message_id: SnowflakeInputType,
+        reason: str | None = None,
+    ) -> None:
+        """Unpin a message in a channel.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#unpin-message
+        """
+        url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
+
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        await self._http_client.delete(url, headers=headers)

@@ -551,77 +551,77 @@ class OptionalAuditLogEntryInfoOut(BaseModel):
     https://canary.discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info
     """
 
-    application_id: Snowflake
+    application_id: Snowflake | None = None
     """ID of the app whose permissions were targeted.
 
     APPLICATION_COMMAND_PERMISSION_UPDATE.
         """
 
-    auto_moderation_rule_name: str
+    auto_moderation_rule_name: str | None = None
     """Name of the Auto Moderation rule that was triggered.
 
     AUTO_MODERATION_BLOCK_MESSAGE & AUTO_MODERATION_FLAG_TO_CHANNEL
         & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
         """
 
-    auto_moderation_rule_trigger_type: str
+    auto_moderation_rule_trigger_type: str | None = None
     """Trigger type of the Auto Moderation rule that was triggered.
 
     AUTO_MODERATION_BLOCK_MESSAGE & AUTO_MODERATION_FLAG_TO_CHANNEL
         & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
         """
 
-    channel_id: Snowflake
+    channel_id: Snowflake | None = None
     """Channel in which the entities were targeted.
 
     MEMBER_MOVE & MESSAGE_PIN & MESSAGE_UNPIN & MESSAGE_DELETE
-        & STAGE_INSTANCE_CREATE & STAGE_INSTANCE_UPDATE & STAGE_INSTANCE_DELETE
-        & AUTO_MODERATION_BLOCK_MESSAGE & AUTO_MODERATION_FLAG_TO_CHANNEL
-        & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
-        """
+    & STAGE_INSTANCE_CREATE & STAGE_INSTANCE_UPDATE & STAGE_INSTANCE_DELETE
+    & AUTO_MODERATION_BLOCK_MESSAGE & AUTO_MODERATION_FLAG_TO_CHANNEL
+    & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
+    """
 
-    count: str
+    count: str | None = None
     """Number of entities that were targeted.
 
     MESSAGE_DELETE & MESSAGE_BULK_DELETE & MEMBER_DISCONNECT & MEMBER_MOVE.
-        """
+    """
 
-    delete_member_days: str
+    delete_member_days: str | None = None
     """Number of days after which inactive members were kicked.
 
     MEMBER_PRUNE.
-        """
+    """
 
-    id: Snowflake
+    id: Snowflake | None = None
     """ID of the overwritten entity.
 
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
-        """
+    """
 
-    members_removed: str
+    members_removed: str | None = None
     """Number of members removed by the prune.
 
     MEMBER_PRUNE.
-        """
+    """
 
-    message_id: Snowflake
+    message_id: Snowflake | None = None
     """ID of the message that was targeted.
 
     MESSAGE_PIN & MESSAGE_UNPIN.
-        """
+    """
 
-    role_name: str
+    role_name: str | None = None
     """Name of the role if type is '0' (not present if type is '1').
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
-        """
+    """
 
-    type: str
+    type: str | None = None
     """Type of overwritten entity - role('0') or member('1').
 
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
-        """
+    """
 
-    integration_type: str
+    integration_type: str | None = None
     """The type of integration which performed the action.
 
     MEMBER_KICK & MEMBER_ROLE_UPDATE.
@@ -635,19 +635,19 @@ class AuditLogEntryOut(BaseModel):
     https://canary.discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-entry-structure
     """
 
-    target_id: str
+    target_id: str | None = None
     """ID of the affected entity(webhook, user, role, etc.)."""
 
     changes: list[AuditLogChangeOut] | None = None
     """Changes made to the target_id."""
 
-    user_id: Snowflake
+    user_id: Snowflake | None = None
     """User or app that made the changes."""
 
-    id: Snowflake
+    id: Snowflake | None = None
     """ID of the entry."""
 
-    action_type: FallbackAdapter[AuditLogEvents]
+    action_type: FallbackAdapter[AuditLogEvents] | None = None
     """Type of action that occurred."""
 
     options: OptionalAuditLogEntryInfoOut | None = None
@@ -664,27 +664,27 @@ class AuditLogResponse(BaseModel):
     https://canary.discord.com/developers/docs/resources/audit-log#audit-log-object-audit-log-structure
     """
 
-    application_commands: list[ApplicationCommandResponse]
+    application_commands: list[ApplicationCommandResponse] | None = None
     """List of application commands referenced in the audit log."""
 
-    audit_log_entries: list[AuditLogEntryOut]
+    audit_log_entries: list[AuditLogEntryOut] | None = None
     """List of audit log entries, sorted from most to least recent."""
 
-    auto_moderation_rules: list[AutoModerationRule]
+    auto_moderation_rules: list[AutoModerationRule] | None = None
     """List of auto moderation rules referenced in the audit log."""
 
-    guild_scheduled_events: list[ScheduledEventResponse]
+    guild_scheduled_events: list[ScheduledEventResponse] | None = None
     """List of guild scheduled events referenced in the audit log."""
 
-    integrations: list[AuditLogIntegrationOut]
+    integrations: list[AuditLogIntegrationOut] | None = None
     """List of partial integration objects."""
 
-    threads: list[ThreadResponse]
+    threads: list[ThreadResponse] | None = None
     """List of threads referenced in the audit log."""
 
-    users: list[UserResponse]
+    users: list[UserResponse] | None = None
     """List of users referenced in the audit log."""
 
     # TODO: When webhook model is created, replace dict with WebhookResponse
-    webhooks: list[dict]
+    webhooks: list[dict] | None = None
     """List of webhooks referenced in the audit log."""

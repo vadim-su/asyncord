@@ -154,3 +154,41 @@ class UserResource(ClientSubresource):
         payload = {'recipient_ids': user_ids}
         resp = await self._http_client.post(url, payload)
         return ChannelResponse.model_validate(resp.body)
+
+    async def add_group_dm_recipient(
+        self,
+        channel_id: SnowflakeInputType,
+        user_id: SnowflakeInputType,
+        access_token: str,
+        nick: str,
+    ) -> None:
+        """Adds a recipient to a Group DM.
+
+        Args:
+            channel_id: Channel ID of the Group DM.
+            user_id: User ID to add.
+            access_token: Access token of the user to add.
+            nick: Nickname of the user to add.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#group-dm-add-recipient
+        """
+        url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
+
+        payload = {'access_token': access_token, 'nick': nick}
+
+        await self._http_client.put(url, payload)
+
+    async def remove_group_dm_recipient(
+        self,
+        channel_id: SnowflakeInputType,
+        user_id: SnowflakeInputType,
+    ) -> None:
+        """Removes a recipient from a Group DM.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/channel#group-dm-remove-recipient
+        """
+        url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
+
+        await self._http_client.delete(url)
