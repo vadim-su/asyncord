@@ -1,1 +1,0 @@
-::: asyncord.gateway.events.scheduled_events

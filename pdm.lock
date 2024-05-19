@@ -5,7 +5,7 @@
 groups = ["default", "dev", "linting", "testing", "docs"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:2ce432967b9860c4e061ca113577408cc465bfe8181b7fe503e987ad6ae4bef1"
+content_hash = "sha256:e2178899d051bbddfca7f9eb8a7337284847464ba82047c6de82d16491bba04e"
 
 [[package]]
 name = "aiohttp"
@@ -465,6 +465,21 @@ dependencies = [
 files = [
     {file = "mkdocstrings_python-1.10.2-py3-none-any.whl", hash = "sha256:e8e596b37f45c09b67bec253e035fe18988af5bbbbf44e0ccd711742eed750e5"},
     {file = "mkdocstrings_python-1.10.2.tar.gz", hash = "sha256:38a4fd41953defb458a107033440c229c7e9f98f35a24e84d888789c97da5a63"},
+]
+
+[[package]]
+name = "mkdocstrings"
+version = "0.25.1"
+extras = ["python"]
+requires_python = ">=3.8"
+summary = "Automatic documentation from sources, for MkDocs."
+dependencies = [
+    "mkdocstrings-python>=0.5.2",
+    "mkdocstrings==0.25.1",
+]
+files = [
+    {file = "mkdocstrings-0.25.1-py3-none-any.whl", hash = "sha256:da01fcc2670ad61888e8fe5b60afe9fee5781017d67431996832d63e887c2e51"},
+    {file = "mkdocstrings-0.25.1.tar.gz", hash = "sha256:c3a2515f31577f311a9ee58d089e4c51fc6046dbd9e9b4c3de4c3194667fe9bf"},
 ]
 
 [[package]]

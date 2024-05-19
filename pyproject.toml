@@ -32,7 +32,7 @@ testing = [
 ]
 docs = [
     "mkdocs-material>=9.5.23",
-    "mkdocstrings>=0.25.1",
+    "mkdocstrings[python]>=0.25.1",
     "mkdocstrings-python>=1.10.2",
 ]
 
@@ -40,14 +40,15 @@ docs = [
 requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
 
+[tool.pdm.scripts]
+docs = "mkdocs serve -f docs/mkdocs.yml"
+build-docs = "mkdocs build -f docs/mkdocs.yml"
+
 [tool.pytest.ini_options]
 minversion = "6.2"
 addopts = "-ra"
 asyncio_mode = "auto"
 testpaths = ["tests"]
-
-[tool.autopep8]
-max_line_length = 120
 
 [tool.isort]
 line_length = 110
@@ -196,5 +197,3 @@ allow-dunder-method-names = ["__get_pydantic_core_schema__"]
 [tool.ruff.format]
 preview = true
 quote-style = "single"
-
-[tool.pdm]

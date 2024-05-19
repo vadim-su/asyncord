@@ -1,1 +1,0 @@
-::: asyncord.gateway.client.client.GatewayClient

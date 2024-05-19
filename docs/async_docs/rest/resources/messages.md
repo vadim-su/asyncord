@@ -1,1 +1,0 @@
-::: asyncord.client.messages.resources

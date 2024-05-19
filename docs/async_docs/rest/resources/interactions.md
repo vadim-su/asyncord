@@ -1,1 +1,0 @@
-::: asyncord.client.interactions.resources

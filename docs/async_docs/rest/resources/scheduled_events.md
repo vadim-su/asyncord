@@ -1,1 +1,0 @@
-::: asyncord.client.scheduled_events.resources
