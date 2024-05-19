@@ -5,7 +5,7 @@
 groups = ["default", "dev", "linting", "testing", "docs"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:e2178899d051bbddfca7f9eb8a7337284847464ba82047c6de82d16491bba04e"
+content_hash = "sha256:3a4bb1b6569841637d0c550731d51fb3d7ae0b2fcd072da618c9701097204545"
 
 [[package]]
 name = "aiohttp"

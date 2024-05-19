@@ -33,7 +33,6 @@ testing = [
 docs = [
     "mkdocs-material>=9.5.23",
     "mkdocstrings[python]>=0.25.1",
-    "mkdocstrings-python>=1.10.2",
 ]
 
 [build-system]

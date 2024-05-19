@@ -34,7 +34,19 @@ theme:
 
 nav:
   - Overview: index.md
+  - Reference:
+    - Asyncord: reference/index.md
+    - Client: reference/client/index.md
+    - Gateway: reference/gateway/index.md
+    - Resources: reference/client/resources/index.md
+    - Applications: reference/client/resources/applications.md
 
 plugins:
   - search
-  - mkdocstrings
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [..]
+          options:
+            show_source: false
