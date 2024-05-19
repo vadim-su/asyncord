@@ -71,24 +71,30 @@ async def test_update_message(
     assert updated_message.content == random_content
 
 
-async def test_pin_get_unpin_message(
+async def test_message_pin_unpin_flow(
     message: MessageResponse,
     integration_data: IntegrationTestData,
     messages_res: MessageResource,
 ) -> None:
-    """Test pinning, getting and unpinning a message."""
-    await messages_res.pin_message(
-        integration_data.channel_id,
-        message.id
-        )
-    assert await messages_res.get_pinned_messages(
-        integration_data.channel_id
-    )
-    await messages_res.unpin_message(
-        integration_data.channel_id,
-        message.id
-    )
-    pins = await messages_res.get_pinned_messages(
-        integration_data.channel_id
-    )
-    assert len(pins) == 0  # noqa: PLR0913
+    """Test the flow of pinning, getting, and unpinning a message."""
+    # Check initial state
+    initial_pins = await messages_res.get_pinned_messages(integration_data.channel_id)
+    assert message.id not in [msg.id for msg in initial_pins]
+
+    # Pin the message
+    await messages_res.pin_message(integration_data.channel_id, message.id)
+
+    # Check that the message is pinned
+    pins_after_pin = await messages_res.get_pinned_messages(integration_data.channel_id)
+    assert message.id in [msg.id for msg in pins_after_pin]
+
+    # Unpin the message
+    await messages_res.unpin_message(integration_data.channel_id, message.id)
+
+    # Check that the message is no longer pinned
+    pins_after_unpin = await messages_res.get_pinned_messages(integration_data.channel_id)
+    assert message.id not in [msg.id for msg in pins_after_unpin]
+
+    # Check that the message still exists
+    all_messages = await messages_res.get_messages(integration_data.channel_id)
+    assert message.id in [msg.id for msg in all_messages]

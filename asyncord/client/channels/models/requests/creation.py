@@ -4,6 +4,7 @@ Reference:
 https://discord.com/developers/docs/resources/channel
 """
 
+import logging
 from typing import Any, Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
@@ -19,6 +20,8 @@ from asyncord.client.channels.models.common import (
 )
 from asyncord.client.guilds.models.common import InviteTargetType
 from asyncord.snowflake import SnowflakeInputType
+
+logger = logging.getLogger(__name__)
 
 
 class DefaultReaction(BaseModel):
@@ -393,13 +396,19 @@ class ChannelInviteRequest(BaseModel):
 
         Then target_user_id and target_application_id must be set accordingly.
         """
-        if self.target_type == InviteTargetType.STREAM:
-            if not self.target_user_id:
-                raise ValueError('target_user_id must be set if target_type is STREAM.')
+        match self.target_type:
+            case InviteTargetType.STREAM:
+                if not self.target_user_id:
+                    raise ValueError('target_user_id must be set if target_type is STREAM')
 
-        if self.target_type == InviteTargetType.EMBEDDED_APPLICATION:
-            if not self.target_application_id:
-                raise ValueError('target_application_id must be set if target_type is EMBEDDED_APPLICATION.')
+            case InviteTargetType.EMBEDDED_APPLICATION:
+                if not self.target_application_id:
+                    raise ValueError('target_application_id must be set if target_type is EMBEDDED_APPLICATION')
+
+            case _:
+                logger.warning('target_type possibly is not processed.')
+
+        return self
 
 
 type CreateChannelRequestType = (

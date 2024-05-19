@@ -575,51 +575,51 @@ class OptionalAuditLogEntryInfoOut(BaseModel):
     """Channel in which the entities were targeted.
 
     MEMBER_MOVE & MESSAGE_PIN & MESSAGE_UNPIN & MESSAGE_DELETE
-        & STAGE_INSTANCE_CREATE & STAGE_INSTANCE_UPDATE & STAGE_INSTANCE_DELETE
-        & AUTO_MODERATION_BLOCK_MESSAGE & AUTO_MODERATION_FLAG_TO_CHANNEL
-        & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
-        """
+    & STAGE_INSTANCE_CREATE & STAGE_INSTANCE_UPDATE & STAGE_INSTANCE_DELETE
+    & AUTO_MODERATION_BLOCK_MESSAGE & AUTO_MODERATION_FLAG_TO_CHANNEL
+    & AUTO_MODERATION_USER_COMMUNICATION_DISABLED.
+    """
 
     count: str | None = None
     """Number of entities that were targeted.
 
     MESSAGE_DELETE & MESSAGE_BULK_DELETE & MEMBER_DISCONNECT & MEMBER_MOVE.
-        """
+    """
 
     delete_member_days: str | None = None
     """Number of days after which inactive members were kicked.
 
     MEMBER_PRUNE.
-        """
+    """
 
     id: Snowflake | None = None
     """ID of the overwritten entity.
 
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
-        """
+    """
 
     members_removed: str | None = None
     """Number of members removed by the prune.
 
     MEMBER_PRUNE.
-        """
+    """
 
     message_id: Snowflake | None = None
     """ID of the message that was targeted.
 
     MESSAGE_PIN & MESSAGE_UNPIN.
-        """
+    """
 
     role_name: str | None = None
     """Name of the role if type is '0' (not present if type is '1').
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
-        """
+    """
 
     type: str | None = None
     """Type of overwritten entity - role('0') or member('1').
 
     CHANNEL_OVERWRITE_CREATE & CHANNEL_OVERWRITE_UPDATE & CHANNEL_OVERWRITE_DELETE.
-        """
+    """
 
     integration_type: str | None = None
     """The type of integration which performed the action.

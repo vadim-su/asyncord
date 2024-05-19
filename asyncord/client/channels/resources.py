@@ -6,7 +6,10 @@ endpoints like message creation.
 
 from __future__ import annotations
 
-from asyncord.client.channels.models.requests.creation import ChannelInviteRequest, CreateChannelRequestType
+from asyncord.client.channels.models.requests.creation import (
+    ChannelInviteRequest,
+    CreateChannelRequestType,
+)
 from asyncord.client.channels.models.requests.updating import (
     UpdateChannelPermissionsRequest,
     UpdateChannelRequestType,
@@ -210,10 +213,7 @@ class ChannelResource(ClientSubresource):
 
         await self._http_client.delete(url, headers=headers)
 
-    async def get_channel_invites(
-        self,
-        channel_id: SnowflakeInputType,
-    ) -> list[InviteResponse]:
+    async def get_channel_invites(self, channel_id: SnowflakeInputType) -> list[InviteResponse]:
         """Get the invites for a channel.
 
         Reference:
@@ -283,10 +283,7 @@ class ChannelResource(ClientSubresource):
         resp = await self._http_client.post(url, payload)
         return resp.body
 
-    async def trigger_typing_indicator(
-        self,
-        channel_id: SnowflakeInputType,
-    ) -> None:
+    async def trigger_typing_indicator(self, channel_id: SnowflakeInputType) -> None:
         """Post a typing indicator for the specified channel.
 
         Expires after 10 seconds.

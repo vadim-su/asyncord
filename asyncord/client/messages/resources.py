@@ -158,12 +158,9 @@ class MessageResource(ClientSubresource):
 
         await self._http_client.post(url, payload, headers=headers)
 
-    # TODO: Not clear from documentation,
-    #  to which channels the message is going to be crossposted.
-    async def crosspost_message(
-        self,
-        message_id: SnowflakeInputType,
-    ) -> MessageResponse:
+    # FIXME: Not clear from documentation,
+    #   to which channels the message is going to be crossposted.
+    async def crosspost_message(self, message_id: SnowflakeInputType) -> MessageResponse:
         """Crosspost a message in an Announcement channel to all channels following it.
 
         Reference:
@@ -180,10 +177,7 @@ class MessageResource(ClientSubresource):
         resp = await self._http_client.post(url)
         return MessageResponse.model_validate(resp.body)
 
-    async def get_pinned_messages(
-        self,
-        channel_id: SnowflakeInputType,
-    ) -> list[MessageResponse]:
+    async def get_pinned_messages(self, channel_id: SnowflakeInputType) -> list[MessageResponse]:
         """Get all pinned messages in a channel.
 
         Reference:
@@ -234,4 +228,5 @@ class MessageResource(ClientSubresource):
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
+
         await self._http_client.delete(url, headers=headers)
