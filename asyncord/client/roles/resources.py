@@ -37,19 +37,29 @@ class RoleResource(ClientSubresource):
         resp = await self._http_client.get(self.roles_url)
         return list_model(RoleResponse).validate_python(resp.body)
 
-    async def create(self, role_data: CreateRoleRequest) -> RoleResponse:
+    async def create(
+        self,
+        role_data: CreateRoleRequest,
+        reason: str | None = None,
+    ) -> RoleResponse:
         """Create a new role in a guild.
 
         Reference: https://discord.com/developers/docs/resources/guild#create-guild-role
 
         Args:
             role_data: Data for the role to create.
+            reason: Reason for creating the role.
 
         Returns:
             Created role.
         """
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
         payload = role_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(self.roles_url, payload)
+        resp = await self._http_client.post(self.roles_url, payload, headers=headers)
         return RoleResponse.model_validate(resp.body)
 
     async def change_role_positions(self, role_positions: list[RolePositionRequest]) -> list[RoleResponse]:

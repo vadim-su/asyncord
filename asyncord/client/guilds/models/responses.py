@@ -688,3 +688,100 @@ class AuditLogResponse(BaseModel):
     # TODO: When webhook model is created, replace dict with WebhookResponse
     webhooks: list[dict] | None = None
     """List of webhooks referenced in the audit log."""
+
+
+class WidgetSettingsResponse(BaseModel):
+    """Widget settings object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-settings-object
+    """
+
+    enabled: bool
+    """Whether the widget is enabled."""
+
+    channel_id: Snowflake | None
+    """Widget channel id."""
+
+
+class WidgetUserResponse(BaseModel):
+    """Partial user object for Widget object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-object-example-guild-widget
+    """
+
+    id: Snowflake
+    """Id of the user. Anonymized!"""
+
+    username: str
+    """Username of the user."""
+
+    discriminator: str
+    """Discriminator of the user. Anonymized!"""
+
+    avatar: str | None
+    """Avatar hash of the user. Anonymized!"""
+
+    status: str
+    """Status of the user."""
+
+    avatar_url: str
+    """Avatar url of the user."""
+
+
+class WidgetChannelResponse(BaseModel):
+    """Partial channel object for Widget response.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-object-example-guild-widget
+    """
+
+    id: Snowflake
+    """Channel id."""
+
+    name: str
+    """Channel name."""
+
+    position: int
+    """Channel position."""
+
+
+class WidgetResponse(BaseModel):
+    """Widget object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-object
+    """
+
+    id: Snowflake
+    """Guild id."""
+
+    name: str
+    """Guild name."""
+
+    instant_invite: str | None
+    """Instant Invite for the guilds cpecified widget invite channel."""
+
+    channels: list[WidgetChannelResponse]
+    """Voice and stage channels which are accessible by everyone."""
+
+    members: list[WidgetUserResponse]
+    """Special Widget user objects that includes users presense."""
+
+    presence_count: int
+    """Number of online members in this guid."""
+
+
+class VanityUrlInviteResponse(BaseModel):
+    """Vanity URL invite object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#get-guild-vanity-url-example-partial-invite-object
+    """
+
+    code: str
+    """Vanity URL code."""
+
+    uses: int
+    """Number of times this invite has been used."""

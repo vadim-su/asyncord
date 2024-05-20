@@ -10,12 +10,13 @@ import datetime
 from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.emojis.resources import EmojiResource
-from asyncord.client.guilds.models.common import MFALevel
+from asyncord.client.guilds.models.common import MFALevel, WidgetStyleOptions
 from asyncord.client.guilds.models.requests import (
     CreateAutoModerationRuleRequest,
     CreateGuildRequest,
     UpdateAutoModerationRuleRequest,
     UpdateWelcomeScreenRequest,
+    UpdateWidgetSettingsRequest,
 )
 from asyncord.client.guilds.models.responses import (
     AuditLogResponse,
@@ -24,8 +25,11 @@ from asyncord.client.guilds.models.responses import (
     IntegrationResponse,
     InviteResponse,
     PruneResponse,
+    VanityUrlInviteResponse,
     VoiceRegionResponse,
     WelcomeScreenResponse,
+    WidgetResponse,
+    WidgetSettingsResponse,
 )
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.members.resources import MemberResource
@@ -345,6 +349,79 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
 
         await self._http_client.delete(url, headers=headers)
 
+    async def get_widget(
+        self,
+        guild_id: SnowflakeInputType,
+    ) -> WidgetResponse:
+        """Get the widget for a guild."""
+        url = self.guilds_url / str(guild_id) / 'widget.json'
+        resp = await self._http_client.get(url)
+        return WidgetResponse.model_validate(resp.body)
+
+    async def get_widget_settings(
+        self,
+        guild_id: SnowflakeInputType,
+    ) -> WidgetSettingsResponse:
+        """Get the widget settings for a guild.
+
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-widget-settings
+
+        Args:
+            guild_id: ID of the guild to get the widget for.
+        """
+        url = self.guilds_url / str(guild_id) / 'widget'
+        resp = await self._http_client.get(url)
+        return WidgetSettingsResponse.model_validate(resp.body)
+
+    async def update_widget(
+        self,
+        guild_id: SnowflakeInputType,
+        widget_data: UpdateWidgetSettingsRequest,
+        reason: str | None = None,
+    ) -> WidgetSettingsResponse:
+        """Update the widget for a guild.
+
+        Reference:
+        https://discord.com/developers/docs/resources/guild#modify-guild-widget
+
+        Args:
+            guild_id: ID of the guild to update the widget for.
+            widget_data: Data to update the widget with.
+            reason: Reason for updating the widget.
+        """
+        url = self.guilds_url / str(guild_id) / 'widget'
+
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        payload = widget_data.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.patch(url, payload, headers=headers)
+        return WidgetSettingsResponse.model_validate(resp.body)
+
+    async def get_widget_image(
+        self,
+        guild_id: SnowflakeInputType,
+        style: WidgetStyleOptions = None,
+    ) -> bytes:
+        """Get the widget image for a guild.
+
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-widget-image
+
+        Args:
+            guild_id: ID of the guild to get the widget image for.
+            style: Style of the widget image.
+        """
+        url = self.guilds_url / str(guild_id) / 'widget.png'
+        if style is not None:
+            url %= {'style': style}
+
+        resp = await self._http_client.get(url)
+        return resp.body
+
     async def get_welcome_screen(self, guild_id: SnowflakeInputType) -> WelcomeScreenResponse:
         """Get the welcome screen for a guild.
 
@@ -559,3 +636,19 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
         await self._http_client.delete(url)
+
+    async def get_vanity_url(
+        self,
+        guild_id: SnowflakeInputType,
+    ) -> VanityUrlInviteResponse:
+        """Returns a partial invite for guilds with that feature.
+
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-vanity-url
+
+        Args:
+            guild_id: ID of the guild to get the vanity url for.
+        """
+        url = self.guilds_url / str(guild_id) / 'vanity-url'
+        resp = await self._http_client.get(url)
+        return VanityUrlInviteResponse.model_validate(resp.body)

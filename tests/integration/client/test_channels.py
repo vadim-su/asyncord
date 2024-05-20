@@ -11,7 +11,7 @@ from asyncord.client.channels.models.requests.creation import (
     CreateTextChannelRequest,
     CreateVoiceChannelRequest,
 )
-from asyncord.client.channels.models.requests.updating import UpdateTextChannelRequest
+from asyncord.client.channels.models.requests.updating import UpdateChannelPositionRequest, UpdateTextChannelRequest
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.http.errors import ClientError
 from tests.conftest import IntegrationTestData
@@ -117,6 +117,7 @@ async def test_get_channel(
     assert channel.guild_id == integration_data.guild_id
     assert channel.type is ChannelType.GUILD_TEXT
 
+
 async def test_create_channel_invite(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
@@ -124,6 +125,7 @@ async def test_create_channel_invite(
     """Test creating channel invite."""
     invite = await channel_res.create_channel_invite(integration_data.channel_id)
     assert invite.code
+
 
 async def test_get_channel_invites(
     channel_res: ChannelResource,
@@ -133,6 +135,7 @@ async def test_get_channel_invites(
     invites = await channel_res.get_channel_invites(integration_data.channel_id)
     assert isinstance(invites, list)
 
+
 async def test_trigger_typping_indicator(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
@@ -141,6 +144,38 @@ async def test_trigger_typping_indicator(
     await channel_res.trigger_typing_indicator(integration_data.channel_id)
 
 
+@pytest.mark.limited()
+async def test_update_channel_position(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test updating channel position."""
+    channel = await channel_res.get(integration_data.channel_id)
+    position = channel.position
+
+    await channel_res.update_channel_position(
+        integration_data.guild_id,
+        [
+            UpdateChannelPositionRequest(
+                id=integration_data.channel_id,
+                position=channel.position + 1,
+            ),
+        ],
+    )
+
+    updated_channel = await channel_res.get(integration_data.channel_id)
+
+    assert channel.position == updated_channel.position - 1
+
+    await channel_res.update_channel_position(
+        integration_data.guild_id,
+        [
+            UpdateChannelPositionRequest(
+                id=integration_data.channel_id,
+                position=position,
+            ),
+        ],
+    )
 
 
 @pytest.mark.limited()
@@ -163,4 +198,3 @@ async def test_update_channel(
         UpdateTextChannelRequest(name=preserved_name),  # type: ignore
     )
     assert channel.name == preserved_name
-

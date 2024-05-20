@@ -217,3 +217,17 @@ class UpdateAutoModerationRuleRequest(BaseModel):
 
     Maximum of 50.
     """
+
+
+class UpdateWidgetSettingsRequest(BaseModel):
+    """Data for updating widget settings.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-settings-object-guild-widget-settings-structure
+    """
+
+    enabled: bool | None = None
+    """Whether the widget is enabled."""
+
+    channel_id: SnowflakeInputType | None = None
+    """Widget channel id."""

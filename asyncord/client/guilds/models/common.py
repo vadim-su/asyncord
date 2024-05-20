@@ -379,3 +379,40 @@ class AuditLogEvents(enum.IntEnum):
 
     CREATOR_MONETIZATION_TERMS_ACCEPTED = 151
     """Creator monetization terms were accepted."""
+
+
+@enum.unique
+class WidgetStyleOptions(enum.StrEnum):
+    """Widget style options."""
+
+    SHIELD = 'shield'
+    """Shield style widget.
+
+    With Discord icon and guild members online count.
+    """
+
+    BANNER_1 = 'banner1'
+    """Large image with guild icon, name and online count.
+
+    "POWERED BY DISCORD" as the footer of the widget.
+    """
+
+    BANNER_2 = 'banner2'
+    """Smaller widget style.
+
+    With guild icon, name and online count. Split on the right with Discord logo.
+    """
+
+    BANNER_3 = 'banner3'
+    """Large image.
+
+    With guild icon, name and online count.
+    In the footer, Discord logo on the left and "Chat Now" on the right.
+    """
+
+    BANNER_4 = 'banner4'
+    """Large Discord logo at the top of the widget.
+
+    Guild icon, name and online count in the middle portion of the widget.
+    And a "JOIN MY SERVER" button at the bottom.
+    """

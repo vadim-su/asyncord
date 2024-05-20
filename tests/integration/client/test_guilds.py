@@ -2,11 +2,20 @@ import random
 
 import pytest
 
-from asyncord.client.guilds.models.requests import CreateGuildRequest
+from asyncord.client.guilds.models.requests import (
+    CreateAutoModerationRuleRequest,
+    CreateGuildRequest,
+    UpdateWidgetSettingsRequest,
+)
 from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.models.automoderation import (
+    AutoModerationRuleEventType,
+    RuleAction,
+    RuleActionType,
+    TriggerMetadata,
+    TriggerType,
+)
 from asyncord.client.users.resources import UserResource
-from asyncord.client.guilds.models.requests import CreateAutoModerationRuleRequest
-from asyncord.client.models.automoderation import AutoModerationRuleEventType, TriggerType, TriggerMetadata, RuleAction, RuleActionType
 from tests.conftest import IntegrationTestData
 
 
@@ -99,7 +108,7 @@ async def test_get_integrations(
 async def test_get_audit_log(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
-) -> None: 
+) -> None:
     """Test getting the audit log."""
     assert await guilds_res.get_audit_log(integration_data.guild_id)
 
@@ -116,27 +125,29 @@ async def test_create_get_delete_auto_moderation_rule(
             event_type=AutoModerationRuleEventType.MESSAGE_SEND,
             trigger_type=TriggerType.KEYWORD,
             trigger_metadata=TriggerMetadata(
-                keyword_filter=['A very bad word']
+                keyword_filter=['A very bad word'],
             ),
-            actions=[RuleAction(
-                type=RuleActionType.BLOCK_MESSAGE
-            )],
+            actions=[
+                RuleAction(
+                    type=RuleActionType.BLOCK_MESSAGE,
+                ),
+            ],
             enabled=True,
-        )
+        ),
     )
 
     assert rule
 
     rule_response = await guilds_res.get_auto_moderation_rule(
         integration_data.guild_id,
-        rule.id
+        rule.id,
     )
 
     assert rule.name == rule_response.name
 
     await guilds_res.delete_auto_moderation_rule(
         integration_data.guild_id,
-        rule.id
+        rule.id,
     )
 
 
@@ -146,6 +157,37 @@ async def test_get_list_auto_moderation_rules(
 ) -> None:
     """Test getting the auto moderation rules."""
     assert await guilds_res.get_list_auto_moderation_rules(
-        integration_data.guild_id
-        )
-    
+        integration_data.guild_id,
+    )
+
+
+async def test_get_update_widget(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting and updating the widget."""
+    settings = await guilds_res.get_widget_settings(integration_data.guild_id)
+    assert settings
+
+    updated_widget_settings = await guilds_res.update_widget(
+        integration_data.guild_id,
+        widget_data=UpdateWidgetSettingsRequest(
+            enabled=True,
+        ),
+    )
+
+    assert updated_widget_settings.enabled
+
+    widget = await guilds_res.get_widget(integration_data.guild_id)
+    assert widget
+
+    widget_bytes = await guilds_res.get_widget_image(integration_data.guild_id)
+    assert widget_bytes is not None
+
+
+async def test_get_vanity_url(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting the vanity url."""
+    assert await guilds_res.get_vanity_url(integration_data.guild_id)
