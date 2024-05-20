@@ -185,6 +185,7 @@ async def test_get_update_widget(
     assert widget_bytes is not None
 
 
+@pytest.mark.skip('Requires more rights than test bot has.')
 async def test_get_vanity_url(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
