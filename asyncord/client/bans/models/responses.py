@@ -3,6 +3,7 @@
 from pydantic import BaseModel
 
 from asyncord.client.users.models.responses import UserResponse
+from asyncord.snowflake import SnowflakeInputType
 
 
 class BanResponse(BaseModel):
@@ -17,3 +18,17 @@ class BanResponse(BaseModel):
 
     user: UserResponse
     """User that was banned."""
+
+
+class BulkBanResponse(BaseModel):
+    """Bulk ban object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#bulk-guild-ban-bulk-ban-response
+    """
+
+    banned_users: list[SnowflakeInputType] | None
+    """List of user ids, that were successfully banned."""
+
+    failed_users: list[SnowflakeInputType] | None
+    """List of user ids, that were not banned."""

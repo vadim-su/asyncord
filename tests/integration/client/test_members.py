@@ -67,10 +67,12 @@ async def test_add_and_remove_role(
 
 
 @pytest.mark.skip(reason='Dangerous operation. Needs manual control.')
-async def test_kick(members_res: MemberResource) -> None:
+async def test_kick(
+    members_res: MemberResource,
+    integration_data: IntegrationTestData,
+) -> None:
     """Test kicking a member."""
-    # FIXME: Replace Verum ID by a test user ID from the config
-    verum_user_id = '559629484442255370'
+    verum_user_id = integration_data.user_to_ban
     member = await members_res.get(verum_user_id)
     assert member.user
     await members_res.kick(verum_user_id, 'test')

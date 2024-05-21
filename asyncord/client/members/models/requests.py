@@ -52,3 +52,26 @@ class UpdateMemberRequest(BaseModel):
     The bot should have MANAGE_GUILD or MANAGE_ROLES or
     (MODERATE_MEMBERS and KICK_MEMBERS and BAN_MEMBERS) permissions.
     """
+
+
+class AddMemberRequest(BaseModel):
+    """Represents data to add a member to a guild.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#add-guild-member-json-params
+    """
+
+    access_token: str
+    """Access token for the user."""
+
+    nick: str | None = None
+    """Value to set user's nickname to."""
+
+    roles: list[SnowflakeInputType] | None = None
+    """List of role ids the member is assigned."""
+
+    mute: bool | None = None
+    """Whether the user is muted in voice channels."""
+
+    deaf: bool | None = None
+    """Whether the user is deafened in voice channels."""

@@ -8,7 +8,14 @@ from pydantic import BaseModel
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.responses import ApplicationCommandResponse
-from asyncord.client.guilds.models.common import AuditLogEvents, ExpireBehaviorOut, IntegrationType, InviteTargetType
+from asyncord.client.guilds.models.common import (
+    AuditLogEvents,
+    ExpireBehaviorOut,
+    IntegrationType,
+    InviteTargetType,
+    OnboardingMode,
+    OnboardingPromptType,
+)
 from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
@@ -688,3 +695,183 @@ class AuditLogResponse(BaseModel):
     # TODO: When webhook model is created, replace dict with WebhookResponse
     webhooks: list[dict] | None = None
     """List of webhooks referenced in the audit log."""
+
+
+class WidgetSettingsResponse(BaseModel):
+    """Widget settings object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-settings-object
+    """
+
+    enabled: bool
+    """Whether the widget is enabled."""
+
+    channel_id: Snowflake | None
+    """Widget channel id."""
+
+
+class WidgetUserResponse(BaseModel):
+    """Partial user object for Widget object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-object-example-guild-widget
+    """
+
+    id: Snowflake
+    """Id of the user. Anonymized!"""
+
+    username: str
+    """Username of the user."""
+
+    discriminator: str
+    """Discriminator of the user. Anonymized!"""
+
+    avatar: str | None
+    """Avatar hash of the user. Anonymized!"""
+
+    status: str
+    """Status of the user."""
+
+    avatar_url: str
+    """Avatar url of the user."""
+
+
+class WidgetChannelResponse(BaseModel):
+    """Partial channel object for Widget response.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-object-example-guild-widget
+    """
+
+    id: Snowflake
+    """Channel id."""
+
+    name: str
+    """Channel name."""
+
+    position: int
+    """Channel position."""
+
+
+class WidgetResponse(BaseModel):
+    """Widget object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-object
+    """
+
+    id: Snowflake
+    """Guild id."""
+
+    name: str
+    """Guild name."""
+
+    instant_invite: str | None
+    """Instant Invite for the guilds cpecified widget invite channel."""
+
+    channels: list[WidgetChannelResponse]
+    """Voice and stage channels which are accessible by everyone."""
+
+    members: list[WidgetUserResponse]
+    """Special Widget user objects that includes users presense."""
+
+    presence_count: int
+    """Number of online members in this guid."""
+
+
+class VanityUrlInviteResponse(BaseModel):
+    """Vanity URL invite object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#get-guild-vanity-url-example-partial-invite-object
+    """
+
+    code: str
+    """Vanity URL code."""
+
+    uses: int
+    """Number of times this invite has been used."""
+
+
+class OnboardingPromptOptionOut(BaseModel):
+    """Onboarding Prompt Option object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure
+    """
+
+    id: Snowflake
+    """Id of the prompt option."""
+
+    channel_ids: list[Snowflake]
+    """Id for channels a member is added to when the option is selected."""
+
+    role_ids: list[Snowflake]
+    """Id for roles assigned to a member when the option is selected."""
+
+    emoji: Emoji | None = None
+    """Emoji of the option."""
+
+    title: str
+    """Title of the option."""
+
+    description: str | None = None
+    """Description of the option."""
+
+
+class OnboardingPromptOut(BaseModel):
+    """Onboarding Prompt object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
+    """
+
+    id: Snowflake
+    """ID of the prompt."""
+    type: FallbackAdapter[OnboardingPromptType]
+    """Type of prompt."""
+
+    options: list[OnboardingPromptOptionOut]
+    """Options available within the prompt."""
+
+    title: str
+    """Title of the prompt."""
+
+    single_select: bool
+    """Indicates whether users are limited to selecting one option for the prompt."""
+
+    required: bool
+    """Indicates whether the prompt is required.
+
+    Before a user completes the onboarding flow.
+    """
+
+    in_boarding: bool
+    """Indicates whether the prompt is present in the onboarding flow.
+
+    If false, the prompt will only appear in the Channels & Roles tab.
+    """
+
+
+class OnboardingResponse(BaseModel):
+    """Onboarding object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-guild-onboarding-structure
+    """
+
+    guild_id: Snowflake
+    """ID of the guild this onboarding is part of."""
+
+    prompts: list[OnboardingPromptOut]
+    """Prompts shown during onboarding and in customize community."""
+
+    default_channel_ids: list[Snowflake]
+    """Channel IDs that members get opted into automatically."""
+
+    enabled: bool
+    """Whether onboarding is enabled in the guild."""
+
+    mode: FallbackAdapter[OnboardingMode]
+    """Current mode of onboarding."""

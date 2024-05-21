@@ -12,6 +12,7 @@ from asyncord.client.channels.models.requests.creation import (
 )
 from asyncord.client.channels.models.requests.updating import (
     UpdateChannelPermissionsRequest,
+    UpdateChannelPositionRequest,
     UpdateChannelRequestType,
 )
 from asyncord.client.channels.models.responses import ChannelResponse
@@ -131,6 +132,26 @@ class ChannelResource(ClientSubresource):
 
         resp = await self._http_client.patch(url, payload, headers=headers)
         return ChannelResponse.model_validate(resp.body)
+
+    async def update_channel_position(
+        self,
+        guild_id: SnowflakeInputType,
+        position_data: list[UpdateChannelPositionRequest],
+    ) -> None:
+        """Update the positions of a set of channel objects.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#modify-guild-channel-positions
+
+        Args:
+            guild_id: Guild id.
+            position_data: The data to update the channel positions with.
+        """
+        url = REST_API_URL / 'guilds' / str(guild_id) / 'channels'
+
+        payload = [position.model_dump(mode='json', exclude_unset=True) for position in position_data]
+
+        await self._http_client.patch(url, payload)
 
     async def delete(self, channel_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Delete a channel, or close a private message.

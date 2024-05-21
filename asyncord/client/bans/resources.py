@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from asyncord.client.bans.models.responses import BanResponse
+from asyncord.client.bans.models.responses import BanResponse, BulkBanResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import ClientResource, ClientSubresource
 from asyncord.snowflake import SnowflakeInputType
@@ -26,7 +26,14 @@ class BanResource(ClientSubresource):
         self.bans_url = self.guilds_url / str(self.guild_id) / 'bans'
 
     async def get(self, user_id: SnowflakeInputType) -> BanResponse:
-        """Get a ban object for a user."""
+        """Get a ban object for a user.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#get-guild-ban
+
+        Args:
+            user_id: ID of the user to get the ban object for.
+        """
         url = self.bans_url / str(user_id)
         resp = await self._http_client.get(url)
         return BanResponse.model_validate(resp.body)
@@ -38,6 +45,9 @@ class BanResource(ClientSubresource):
         after: SnowflakeInputType | None = None,
     ) -> list[BanResponse]:
         """List bans of a guild.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#get-guild-bans
 
         Args:
             limit: Number of bans to return. Defaults to None.
@@ -67,6 +77,9 @@ class BanResource(ClientSubresource):
     ) -> None:
         """Ban a user from a guild.
 
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#create-guild-ban
+
         Args:
             user_id: ID of a user to ban.
             delete_message_days: Number of days to delete messages for.
@@ -90,6 +103,9 @@ class BanResource(ClientSubresource):
     async def unban(self, user_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Unban a user from a guild.
 
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#remove-guild-ban
+
         Args:
             user_id: ID of the user to unban.
             reason: Reason for unbanning the user. Defaults to None.
@@ -100,3 +116,42 @@ class BanResource(ClientSubresource):
             headers = {}
         url = self.bans_url / str(user_id)
         await self._http_client.delete(url, headers=headers)
+
+    async def bulk_ban(
+        self,
+        user_ids: list[SnowflakeInputType],
+        delete_message_seconds: int | None = None,
+        reason: str | None = None,
+    ) -> BulkBanResponse:
+        """Ban up to 200 users from a guild.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#create-guild-ban
+
+        Args:
+            user_ids: List of user IDs to ban.
+            delete_message_seconds: number of seconds to delete messages for.
+                between 0 and 604800 (7 days). Defaults to 0.
+            reason: Reason for banning the users. Defaults to None.
+        """
+        url = self.bans_url
+
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        payload = {}
+        payload['user_ids'] = user_ids
+
+        if delete_message_seconds is not None:
+            payload['delete_message_seconds'] = delete_message_seconds
+        else:
+            payload = None
+
+        resp = await self._http_client.post(
+            url,
+            payload,
+            headers=headers,
+        )
+        return BulkBanResponse.model_validate(resp.body)

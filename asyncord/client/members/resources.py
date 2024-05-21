@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.members.models.requests import UpdateMemberRequest
+from asyncord.client.members.models.requests import AddMemberRequest, UpdateMemberRequest
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.resources import ClientResource, ClientSubresource
 from asyncord.snowflake import SnowflakeInputType
@@ -187,3 +187,28 @@ class MemberResource(ClientSubresource):
         else:
             headers = {}
         await self._http_client.delete(url, headers=headers)
+
+    # Fixme: Possibly need to add a test.
+    # Needs users oauth2 token.
+    async def add_guild_member(
+        self,
+        user_id: SnowflakeInputType,
+        add_member_data: AddMemberRequest,
+    ) -> MemberResponse | None:
+        """Adds a user to guild.
+
+        Requires oauth2 access token for the user.
+
+        Args:
+            user_id: ID of the user to add to the guild.
+            add_member_data: Data to add the member with.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#add-guild-member
+        """
+        url = self.members_url / str(user_id)
+        resp = await self._http_client.put(url)
+
+        if resp.status == 201:  # noqa: PLR2004
+            return MemberResponse.model_validate(resp.body)
+        return None

@@ -39,6 +39,12 @@ async def test_ban_managment(
     await ban_managment.unban(integration_data.user_to_ban)
     assert not await ban_managment.get_list()
 
+    # test bulk ban and then unban
+    await ban_managment.bulk_ban([integration_data.user_to_ban])
+    bans = await ban_managment.get_list()
+    assert len(bans) == 1
+    await ban_managment.unban(integration_data.user_to_ban)
+
 
 async def test_get_ban_list(ban_managment: BanResource) -> None:
     """Test the get ban list method."""
