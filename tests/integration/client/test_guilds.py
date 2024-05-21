@@ -185,6 +185,15 @@ async def test_get_update_widget(
     assert widget_bytes is not None
 
 
+async def test_get_onboarding(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting and updating the onboarding."""
+    onboarding = await guilds_res.get_onboarding(integration_data.guild_id)
+    assert onboarding
+
+
 @pytest.mark.skip('Requires more rights than test bot has.')
 async def test_get_vanity_url(
     guilds_res: GuildResource,

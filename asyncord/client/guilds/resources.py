@@ -15,6 +15,7 @@ from asyncord.client.guilds.models.requests import (
     CreateAutoModerationRuleRequest,
     CreateGuildRequest,
     UpdateAutoModerationRuleRequest,
+    UpdateOnboardingRequest,
     UpdateWelcomeScreenRequest,
     UpdateWidgetSettingsRequest,
 )
@@ -24,6 +25,7 @@ from asyncord.client.guilds.models.responses import (
     GuildResponse,
     IntegrationResponse,
     InviteResponse,
+    OnboardingResponse,
     PruneResponse,
     VanityUrlInviteResponse,
     VoiceRegionResponse,
@@ -421,6 +423,49 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
 
         resp = await self._http_client.get(url)
         return resp.body
+
+    async def get_onboarding(
+        self,
+        guild_id: SnowflakeInputType,
+    ) -> OnboardingResponse:
+        """Get onboarding object for a guild.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#get-guild-onboarding
+
+        Args:
+            guild_id: ID of the guild to get the welcome screen for.
+        """
+        url = self.guilds_url / str(guild_id) / 'onboarding'
+        resp = await self._http_client.get(url)
+        return OnboardingResponse.model_validate(resp.body)
+
+    async def update_onboarding(
+        self,
+        guild_id: SnowflakeInputType,
+        onboarding_data: UpdateOnboardingRequest,
+        reason: str | None = None,
+    ) -> OnboardingResponse:
+        """Update the onboarding object for a guild.
+
+        Reference:
+        https://canary.discord.com/developers/docs/resources/guild#modify-guild-onboarding
+
+        Args:
+            guild_id: ID of the guild to update the onboarding for.
+            onboarding_data: Onboarding data to update.
+            reason: Reason for updating the onboarding.
+        """
+        url = self.guilds_url / str(guild_id) / 'onboarding'
+
+        if reason is not None:
+            headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
+
+        payload = onboarding_data.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.put(url, payload, headers=headers)
+        return OnboardingResponse.model_validate(resp.body)
 
     async def get_welcome_screen(self, guild_id: SnowflakeInputType) -> WelcomeScreenResponse:
         """Get the welcome screen for a guild.

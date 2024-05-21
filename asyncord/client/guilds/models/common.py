@@ -416,3 +416,31 @@ class WidgetStyleOptions(enum.StrEnum):
     Guild icon, name and online count in the middle portion of the widget.
     And a "JOIN MY SERVER" button at the bottom.
     """
+
+
+@enum.unique
+class OnboardingMode(enum.IntEnum):
+    """Onboarding mode.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-mode
+    """
+
+    ONBOARDING_DEFAULT = 0
+    """	Counts only Default Channels towards constraints"""
+
+    ONBOARDING_ADVANCED = 1
+    """Counts Default Channels and Questions towards constraints."""
+
+
+@enum.unique
+class OnboardingPromptType(enum.IntEnum):
+    """Onboarding prompt types.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-types
+    """
+
+    MULTIPLE_CHOICE = 0
+
+    DROPDOWN = 1

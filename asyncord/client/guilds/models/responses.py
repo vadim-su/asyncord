@@ -8,7 +8,14 @@ from pydantic import BaseModel
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.responses import ApplicationCommandResponse
-from asyncord.client.guilds.models.common import AuditLogEvents, ExpireBehaviorOut, IntegrationType, InviteTargetType
+from asyncord.client.guilds.models.common import (
+    AuditLogEvents,
+    ExpireBehaviorOut,
+    IntegrationType,
+    InviteTargetType,
+    OnboardingMode,
+    OnboardingPromptType,
+)
 from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
@@ -785,3 +792,86 @@ class VanityUrlInviteResponse(BaseModel):
 
     uses: int
     """Number of times this invite has been used."""
+
+
+class OnboardingPromptOptionOut(BaseModel):
+    """Onboarding Prompt Option object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure
+    """
+
+    id: Snowflake
+    """Id of the prompt option."""
+
+    channel_ids: list[Snowflake]
+    """Id for channels a member is added to when the option is selected."""
+
+    role_ids: list[Snowflake]
+    """Id for roles assigned to a member when the option is selected."""
+
+    emoji: Emoji | None = None
+    """Emoji of the option."""
+
+    title: str
+    """Title of the option."""
+
+    description: str | None = None
+    """Description of the option."""
+
+
+class OnboardingPromptOut(BaseModel):
+    """Onboarding Prompt object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
+    """
+
+    id: Snowflake
+    """ID of the prompt."""
+    type: FallbackAdapter[OnboardingPromptType]
+    """Type of prompt."""
+
+    options: list[OnboardingPromptOptionOut]
+    """Options available within the prompt."""
+
+    title: str
+    """Title of the prompt."""
+
+    single_select: bool
+    """Indicates whether users are limited to selecting one option for the prompt."""
+
+    required: bool
+    """Indicates whether the prompt is required.
+
+    Before a user completes the onboarding flow.
+    """
+
+    in_boarding: bool
+    """Indicates whether the prompt is present in the onboarding flow.
+
+    If false, the prompt will only appear in the Channels & Roles tab.
+    """
+
+
+class OnboardingResponse(BaseModel):
+    """Onboarding object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-guild-onboarding-structure
+    """
+
+    guild_id: Snowflake
+    """ID of the guild this onboarding is part of."""
+
+    prompts: list[OnboardingPromptOut]
+    """Prompts shown during onboarding and in customize community."""
+
+    default_channel_ids: list[Snowflake]
+    """Channel IDs that members get opted into automatically."""
+
+    enabled: bool
+    """Whether onboarding is enabled in the guild."""
+
+    mode: FallbackAdapter[OnboardingMode]
+    """Current mode of onboarding."""
