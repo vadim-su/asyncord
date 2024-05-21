@@ -61,7 +61,6 @@ class ReactionResource(ClientSubresource):
 
         Args:
             emoji: Emoji to react with.
-            user_id: ID of the user to react as.
         """
         url = self.reactions_url / emoji / '@me'
         await self._http_client.put(url, None)

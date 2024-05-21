@@ -384,6 +384,29 @@ class UpdateChannelPermissionsRequest(BaseModel):
     """
 
 
+class UpdateChannelPositionRequest(BaseModel):
+    """Data to update a channel's position with.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#modify-guild-channel-positions-json-params
+    """
+
+    id: SnowflakeInputType
+    """Channel id."""
+
+    position: int | None = None
+    """Position of the channel in the left-hand listing."""
+
+    lock_permissions: bool | None = None
+    """Syncs the permission overwrites with the new parent.
+
+    If moving to a new category.
+    """
+
+    parent_id: SnowflakeInputType | None = None
+    """New parent ID for the channel that is moved."""
+
+
 type UpdateChannelRequestType = (
     UpdateGuildCategoryRequest
     | UpdateChannelRequest

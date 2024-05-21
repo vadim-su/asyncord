@@ -7,7 +7,12 @@ from pydantic import BaseModel, Field, model_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.channels.models.requests.creation import CreateChannelRequestType
-from asyncord.client.guilds.models.common import DefaultMessageNotificationLevel, ExplicitContentFilterLevel
+from asyncord.client.guilds.models.common import (
+    DefaultMessageNotificationLevel,
+    ExplicitContentFilterLevel,
+    OnboardingMode,
+    OnboardingPromptType,
+)
 from asyncord.client.models.automoderation import AutoModerationRuleEventType, RuleAction, TriggerMetadata, TriggerType
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.snowflake import SnowflakeInputType
@@ -217,3 +222,104 @@ class UpdateAutoModerationRuleRequest(BaseModel):
 
     Maximum of 50.
     """
+
+
+class UpdateWidgetSettingsRequest(BaseModel):
+    """Data for updating widget settings.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#guild-widget-settings-object-guild-widget-settings-structure
+    """
+
+    enabled: bool | None = None
+    """Whether the widget is enabled."""
+
+    channel_id: SnowflakeInputType | None = None
+    """Widget channel id."""
+
+
+class OnboardingPromptOption(BaseModel):
+    """Onboarding prompt option object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure
+    """
+
+    id: SnowflakeInputType
+    """Id of the prompt option."""
+
+    channel_ids: list[SnowflakeInputType]
+    """Id for channels a member is added to when the option is selected."""
+
+    role_ids: list[SnowflakeInputType]
+    """Id for roles assigned to a member when the option is selected."""
+
+    emoji_id: SnowflakeInputType | None = None
+    """ID for the emoji."""
+
+    emoji_name: str | None = None
+    """Emoji name of the option."""
+
+    emoji_animated: bool | None = None
+    """Whether the emoji is animated."""
+
+    title: str
+    """Title of the option."""
+
+    description: str | None = None
+    """Description of the option."""
+
+
+class OnboardingPrompt(BaseModel):
+    """Onboarding prompt object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
+    """
+
+    id: SnowflakeInputType
+    """ID of the prompt."""
+
+    type: OnboardingPromptType
+    """Type of prompt."""
+
+    options: list[OnboardingPromptOption]
+    """Options available within the prompt."""
+
+    title: str
+    """Title of the prompt."""
+
+    single_select: bool
+    """Indicates whether users are limited to selecting one option for the prompt."""
+
+    required: bool
+    """Indicates whether the prompt is required.
+
+    Before a user completes the onboarding flow.
+    """
+
+    in_boarding: bool
+    """Indicates whether the prompt is present in the onboarding flow.
+
+    If false, the prompt will only appear in the Channels & Roles tab.
+    """
+
+
+class UpdateOnboardingRequest(BaseModel):
+    """Update onboarding settings.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild#modify-guild-onboarding-json-params
+    """
+
+    prompts: list[OnboardingPrompt]
+    """Prompts shown during onboarding and in customize community."""
+
+    default_channel_ids: list[SnowflakeInputType]
+    """Channel IDs that members get opted into automatically"""
+
+    enabled: bool
+    """Whether onboarding is enabled."""
+
+    mode: OnboardingMode
+    """Current mode of onboarding."""

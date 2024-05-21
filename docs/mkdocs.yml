@@ -1,0 +1,52 @@
+site_name: Asyncord
+copyright: Copyright ©2024 Asyncord Team
+site_description: 'Asyncord is a Python library for Discord API interaction.'
+
+docs_dir: pages
+
+theme:
+  name: material
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - announce.dismiss
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Overview: index.md
+  - Reference:
+    - Asyncord: reference/index.md
+    - Client: reference/client/index.md
+    - Gateway: reference/gateway/index.md
+    - Resources: reference/client/resources/index.md
+    - Applications: reference/client/resources/applications.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [..]
+          options:
+            show_source: false
