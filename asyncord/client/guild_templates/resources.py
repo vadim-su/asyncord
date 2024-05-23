@@ -39,6 +39,7 @@ class GuildTemplatesResource(ClientSubresource):
     ) -> GuildTemplateResponse:
         """Get a guild template by its code.
 
+        Reference:
         https://canary.discord.com/developers/docs/resources/guild-template#get-guild-template
 
         Args:
