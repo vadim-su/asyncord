@@ -25,7 +25,7 @@ class ScheduledEventsResource(ClientSubresource):
     guilds_url = REST_API_URL / 'guilds'
 
     def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):
-        """Create a new member resource."""
+        """Create a new scheduled events resource."""
         super().__init__(parent)
         self.guild_id = guild_id
         self.events_url = self.guilds_url / str(self.guild_id) / 'scheduled-events'

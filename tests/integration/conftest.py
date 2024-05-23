@@ -2,10 +2,11 @@ from collections.abc import AsyncGenerator
 
 import pytest
 
-from asyncord.client.bans.resources import BanResource
 from asyncord.client.applications.resources import ApplicationResource
+from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
+from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.guilds.resources import GuildResource
 from asyncord.client.members.resources import MemberResource
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
@@ -16,7 +17,6 @@ from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
 from asyncord.client.threads.models.common import ThreadType
-from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.threads.models.requests import CreateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.client.threads.resources import ThreadResource
@@ -28,6 +28,7 @@ from tests.conftest import IntegrationTestData
 async def client(token: str) -> RestClient:
     """Get a rest client."""
     return RestClient(token)
+
 
 @pytest.fixture()
 async def applications_res(
@@ -74,6 +75,15 @@ async def members_res(
 
 
 @pytest.fixture()
+async def guild_templates_res(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> GuildResource:
+    """Get guild templates resource for the guild."""
+    return guilds_res.guild_templates(integration_data.guild_id)
+
+
+@pytest.fixture()
 async def roles_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
@@ -116,7 +126,6 @@ async def commands_res(
 ) -> CommandResource:
     """Get commands resource for the application."""
     return client.applications.commands(integration_data.app_id)
-
 
 
 @pytest.fixture()
