@@ -2,9 +2,14 @@
 
 from datetime import datetime
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel
 
-from asyncord.client.channels.models.responses import ChannelResponse
+from asyncord.client.channels.models.common import (
+    ChannelFlag,
+    ChannelType,
+)
+from asyncord.client.channels.models.responses import OverwriteOut
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.color import Color
@@ -35,6 +40,99 @@ class RoleGuildTemplateOut(BaseModel):
 
     mentionable: bool
     """Whether this role is mentionable."""
+
+
+class ChannelGuildTemplateOut(BaseModel):
+    """Partial channel object for guild template response.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
+    """
+
+    id: Snowflake
+    """Channel id."""
+
+    type: FallbackAdapter[ChannelType]
+    """Type of channel."""
+
+    guild_id: Snowflake | None = None
+    """Guild id.
+
+    May be missing for some channel objects received over gateway guild dispatches.
+    """
+
+    position: int | None = None
+    """Sorting position of the channel"""
+
+    permission_overwrites: list[OverwriteOut] | None = None
+    """Explicit permission overwrites for members and roles."""
+
+    name: str | None = None
+    """Channel name (1-100 characters)"""
+
+    topic: str | None = None
+    """Channel topic.
+
+    Should be between 0 and 1024 characters.
+    """
+
+    nsfw: bool | None = None
+    """Whether the channel is nsfw."""
+
+    last_message_id: Snowflake | None = None
+    """Last id message sent in this channel.
+
+    May not point to an existing or valid message.
+    """
+
+    bitrate: int | None = None
+    """Bitrate of the voice channel."""
+
+    user_limit: int | None = None
+    """User limit of the voice channel."""
+
+    rate_limit_per_user: int | None = None
+    """Amount of seconds a user has to wait before sending another message.
+
+    Should be between 0 and 21600.
+
+    Bots, as well as users with the permission manage_messages or manage_channel,
+    are unaffected. `rate_limit_per_user` also applies to thread creation.
+    Users can send one message and create one thread during each
+    `rate_limit_per_user` interval.
+    """
+
+    icon: str | None = None
+    """Icon hash."""
+
+    owner_id: Snowflake | None = None
+    """Creator id of the group DM or thread."""
+
+    application_id: Snowflake | None = None
+    """Application id of the group DM creator if it is bot - created."""
+
+    parent_id: Snowflake | None = None
+    """Parent category or channel id.
+
+    For guild channels: id of the parent category for a channel.
+    for threads:
+        id of the text channel this thread was created.
+    Each parent category can contain up to 50 channels.
+    """
+
+    rtc_region: str | None = None
+    """Voice region id for the voice channel, automatic when set to null."""
+
+    permissions: str | None = None
+    """Computed permissions for the invoking user in the channel, including overwrites.
+
+    Only included when part of the resolved data received
+    on a slash command interaction. This does not include implicit permissions,
+    which may need to be checked separately
+    """
+
+    flags: ChannelFlag | None = None
+    """Flags for the channel."""
 
 
 class GuildGuildTemplateOut(BaseModel):
@@ -78,7 +176,7 @@ class GuildGuildTemplateOut(BaseModel):
     """Roles in the guild."""
 
     # Doesn't exists in the whole GuildResponse model.
-    channels: list[ChannelResponse] | None = None
+    channels: list[ChannelGuildTemplateOut] | None = None
     """Channels in the guild."""
 
     afk_channel_id: Snowflake | None = None
