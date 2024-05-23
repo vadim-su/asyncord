@@ -10,6 +10,7 @@ import datetime
 from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.emojis.resources import EmojiResource
+from asyncord.client.guild_templates.resources import GuildTemplatesResource
 from asyncord.client.guilds.models.common import MFALevel, WidgetStyleOptions
 from asyncord.client.guilds.models.requests import (
     CreateAutoModerationRuleRequest,
@@ -63,6 +64,14 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Member subresource for the guild.
         """
         return MemberResource(self, guild_id)
+
+    def guild_templates(self, guild_id: SnowflakeInputType) -> GuildTemplatesResource:
+        """Get the guild templates subresource for a guild.
+
+        Args:
+            guild_id: ID of the guild to get the guild templates subresource for.
+        """
+        return GuildTemplatesResource(self, guild_id)
 
     def ban_managment(self, guild_id: SnowflakeInputType) -> BanResource:
         """Get the ban subresource for a guild.
