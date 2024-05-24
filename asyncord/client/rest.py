@@ -12,6 +12,7 @@ from asyncord.client.interactions.resources import InteractionResource
 from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.resources import ClientResource
 from asyncord.client.stage_instances.resources import StageInstancesResource
+from asyncord.client.stickers.resources import StickersResource
 from asyncord.client.users.resources import UserResource
 
 
@@ -39,3 +40,4 @@ class RestClient(ClientResource):
         self.interactions = InteractionResource(self)
         self.invites = InvitesResource(self)
         self.stage_instances = StageInstancesResource(self)
+        self.stickers = StickersResource(self)

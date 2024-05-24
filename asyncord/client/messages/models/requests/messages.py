@@ -54,7 +54,7 @@ class AttachedFile(BaseModel, arbitrary_types_allowed=True):
     """File content."""
 
     @model_validator(mode='before')
-    def validate_file_info(cls, values: dict[str, Any]) -> dict[str, Any]:
+    def validate_file_info(cls, values: Any) -> dict[str, Any]:  # noqa: ANN401, PLR0912
         """Fill filename and content type if not provided.
 
         Args:
@@ -63,7 +63,11 @@ class AttachedFile(BaseModel, arbitrary_types_allowed=True):
         Returns:
             Validated values.
         """
+        if isinstance(values, str):
+            values = {'content': values}
+
         content = values.get('content')
+
         if not content:
             return values
 
