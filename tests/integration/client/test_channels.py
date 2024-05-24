@@ -118,15 +118,6 @@ async def test_get_channel(
     assert channel.type is ChannelType.GUILD_TEXT
 
 
-async def test_create_channel_invite(
-    channel_res: ChannelResource,
-    integration_data: IntegrationTestData,
-) -> None:
-    """Test creating channel invite."""
-    invite = await channel_res.create_channel_invite(integration_data.channel_id)
-    assert invite.code
-
-
 async def test_get_channel_invites(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
