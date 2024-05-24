@@ -8,6 +8,7 @@ from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.members.resources import MemberResource
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
@@ -57,6 +58,12 @@ async def messages_res(
 async def guilds_res(client: RestClient) -> GuildResource:
     """Get guilds resource for the client."""
     return client.guilds
+
+
+@pytest.fixture()
+async def invite_res(client: RestClient) -> InvitesResource:
+    """Get invites resource for the client."""
+    return client.invites
 
 
 @pytest.fixture()
