@@ -2,8 +2,6 @@ from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.invites.resources import InvitesResource
 from tests.conftest import IntegrationTestData
 
-CHANNEL_NAME = 'test'
-
 
 async def test_create_get_delete_channel_invite(
     channel_res: ChannelResource,

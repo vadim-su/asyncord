@@ -11,6 +11,7 @@ from asyncord.client.http.client import AsyncHttpClient
 from asyncord.client.interactions.resources import InteractionResource
 from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.resources import ClientResource
+from asyncord.client.stage_instances.resources import StageInstancesResource
 from asyncord.client.users.resources import UserResource
 
 
@@ -37,3 +38,4 @@ class RestClient(ClientResource):
         self.applications = ApplicationResource(self)
         self.interactions = InteractionResource(self)
         self.invites = InvitesResource(self)
+        self.stage_instances = StageInstancesResource(self)

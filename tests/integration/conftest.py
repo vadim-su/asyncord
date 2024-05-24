@@ -18,6 +18,7 @@ from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
+from asyncord.client.stage_instances.resources import StageInstancesResource
 from asyncord.client.threads.models.common import ThreadType
 from asyncord.client.threads.models.requests import CreateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse
@@ -38,6 +39,14 @@ async def applications_res(
 ) -> ApplicationResource:
     """Get applications resource for the client."""
     return client.applications
+
+
+@pytest.fixture()
+async def stage_instances_res(
+    client: RestClient,
+) -> StageInstancesResource:
+    """Get stage instances resource for the client."""
+    return client.stage_instances
 
 
 @pytest.fixture()
