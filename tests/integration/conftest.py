@@ -13,6 +13,7 @@ from asyncord.client.members.resources import MemberResource
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
+from asyncord.client.polls.resources import PollsResource
 from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
@@ -52,6 +53,15 @@ async def messages_res(
 ) -> MessageResource:
     """Get messages resource for the channel."""
     return channel_res.messages(integration_data.channel_id)
+
+
+@pytest.fixture()
+async def polls_res(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> PollsResource:
+    """Get polls resource for the channel."""
+    return channel_res.polls(integration_data.channel_id)
 
 
 @pytest.fixture()
