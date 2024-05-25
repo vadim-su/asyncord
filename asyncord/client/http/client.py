@@ -40,7 +40,7 @@ class AttachedFile(NamedTuple):
     content_type: str
     """Content type of the file."""
 
-    file: BinaryIO
+    content: BinaryIO
     """File object."""
 
 
@@ -103,10 +103,11 @@ class AsyncHttpClient:
             headers=headers,
         )
 
-    async def post(
+    async def post(  # noqa: PLR0913
         self,
         url: StrOrURL,
         payload: Payload,
+        file: AttachedFile | None = None,
         files: list[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
@@ -115,6 +116,7 @@ class AsyncHttpClient:
         Args:
             url: URL to send the request to.
             payload: Payload to send with the request.
+            file: File to send with the request. Defaults to None.
             files: Files to send with the request. Defaults to None.
             headers: Headers to send with the request. Defaults to None.
 
@@ -125,6 +127,7 @@ class AsyncHttpClient:
             method=HttpMethod.POST,
             url=url,
             payload=payload,
+            file=file,
             files=files,
             headers=headers,
         )
@@ -218,6 +221,7 @@ class AsyncHttpClient:
         method: HttpMethod,
         url: StrOrURL,
         payload: Payload | None = None,
+        file: AttachedFile | None = None,
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response:
@@ -227,6 +231,7 @@ class AsyncHttpClient:
             method: HTTP method to use.
             url: URL to send the request to.
             payload: Payload to send. Defaults to None.
+            file: File to send. Defaults to None.
             files: Files to send. Defaults to None.
             headers: Headers to send. Defaults to None.
 
@@ -244,6 +249,7 @@ class AsyncHttpClient:
             method=method,
             url=url,
             payload=payload,
+            file=file,
             files=files,
             headers=headers,
         ) as resp:
@@ -349,6 +355,7 @@ class AsyncHttpClient:
         method: HttpMethod,
         url: StrOrURL,
         payload: Any | None = None,  # noqa: ANN401
+        file: AttachedFile | None = None,
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> AbstractAsyncContextManager[ClientResponse]:
@@ -361,6 +368,7 @@ class AsyncHttpClient:
             method: HTTP method to use.
             url: URL to request.
             payload: Payload to send. Defaults to None.
+            file: File to send. Defaults to None.
             files: Files to send. Defaults to None.
             headers: Headers to send. Defaults to None.
 
@@ -369,7 +377,16 @@ class AsyncHttpClient:
         """
         data = None
 
-        if files:
+        if file:
+            data = aiohttp.FormData()
+
+            files = [file]
+            if payload is not None:
+                data.add_field('payload_json', json.dumps(payload), content_type=JSON_CONTENT_TYPE)
+
+            data.add_field('file', file.content, filename=file.filename, content_type=file.content_type)
+
+        elif files:
             data = aiohttp.FormData()
             if payload is not None:
                 data.add_field('payload_json', json.dumps(payload), content_type=JSON_CONTENT_TYPE)

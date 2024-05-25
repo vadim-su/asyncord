@@ -130,13 +130,7 @@ class StickersResource(ClientSubresource):
         resp = await self._http_client.post(
             url,
             payload=payload,
-            files=[
-                (
-                    sticker_data.file.filename,
-                    sticker_data.file.content_type,
-                    sticker_data.file.content,
-                ),
-            ],
+            file=sticker_data.file,
             headers=headers,
         )
 
