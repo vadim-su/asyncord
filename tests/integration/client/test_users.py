@@ -65,3 +65,11 @@ async def test_create_dm(
     assert recipients
     assert len(recipients)
     assert integration_data.user_id in {recipient.id for recipient in recipients}
+
+
+async def test_get_connections(
+    users_res: UserResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting the current user's connections."""
+    await users_res.get_current_user_connections()

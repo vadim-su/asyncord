@@ -5,8 +5,16 @@ from __future__ import annotations
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.resources import ClientSubresource
-from asyncord.client.users.models.requests import UpdateUserRequest
-from asyncord.client.users.models.responses import UserGuildResponse, UserResponse
+from asyncord.client.users.models.requests import (
+    UpdateApplicationRoleConnectionRequest,
+    UpdateUserRequest,
+)
+from asyncord.client.users.models.responses import (
+    ApplicationRoleConnectionResponse,
+    UserConnectionResponse,
+    UserGuildResponse,
+    UserResponse,
+)
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
@@ -192,3 +200,54 @@ class UserResource(ClientSubresource):
         url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
 
         await self._http_client.delete(url)
+
+    async def get_current_user_connections(
+        self,
+    ) -> list[UserConnectionResponse]:
+        """Returns a list of connection objects.
+
+        Reference:
+        https://discord.com/developers/docs/resources/user#get-current-user-connections
+        """
+        url = self.current_user_url / 'connections'
+        resp = await self._http_client.get(url)
+        return list_model(UserConnectionResponse).validate_python(resp.body)
+
+    async def get_current_user_application_role_connection(
+        self,
+        application_id: SnowflakeInputType,
+    ) -> ApplicationRoleConnectionResponse:
+        """Returns the connection object for the current user's application.
+
+        This endpoint can not be used by bots.
+
+        Reference:
+        https://discord.com/developers/docs/resources/user#get-current-user-application-role-connection
+
+        Args:
+            application_id: ID of the application.
+        """
+        url = self.current_user_url / 'applications' / str(application_id) / 'role-connection'
+        resp = await self._http_client.get(url)
+        return ApplicationRoleConnectionResponse.model_validate(resp.body)
+
+    async def update_current_user_application_role_connection(
+        self,
+        application_id: SnowflakeInputType,
+        update_data: UpdateApplicationRoleConnectionRequest,
+    ) -> ApplicationRoleConnectionResponse:
+        """Modify the current user's application role connection.
+
+        This endpoint can not be used by bots.
+
+        Reference:
+        https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection\
+
+        Args:
+            application_id: ID of the application.
+            update_data: Update application role connection request model.
+        """
+        url = self.current_user_url / 'applications' / str(application_id) / 'role-connection'
+        payload = update_data.model_dump(mode='json', exclude_unset=True)
+        resp = await self._http_client.put(url, payload)
+        return ApplicationRoleConnectionResponse.model_validate(resp.body)

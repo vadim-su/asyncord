@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import enum
+from typing import Any
 
+from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field
 
+from asyncord.client.users.models.common import ConnectionVisibilyTypes, Services
 from asyncord.color import ColorInput
 from asyncord.snowflake import Snowflake
 
@@ -192,3 +195,62 @@ class UserGuildResponse(BaseModel):
 
     features: list[str] = Field(default_factory=list)
     """Strings enabled guild features."""
+
+
+class UserConnectionResponse(BaseModel):
+    """The connection object that the user has attached.
+
+    Reference:
+    https://discord.com/developers/docs/resources/user#connection-object-connection-structure
+    """
+
+    id: str
+    """ID of the connection account."""
+
+    name: str
+    """Username of the connection account."""
+
+    type: FallbackAdapter[Services]
+    """Service of this connection."""
+
+    revoked: bool | None = None
+    """Whether the connection is revoked."""
+
+    # FIXME: No partial integrations example to make model.
+    integrations: list[dict[str, Any]] | None = None
+    """Array of partial server integrations."""
+
+    verified: bool
+    """Whether the connection is verified."""
+
+    friend_sync: bool
+    """Whether friend sync is enabled for this connection."""
+
+    show_activity: bool
+    """Whether activities related to this connection will be shown in presence updates."""
+
+    two_way_link: bool
+    """Whether this connection has a corresponding third party OAuth2 token."""
+
+    visibility: FallbackAdapter[ConnectionVisibilyTypes]
+    """Visibility of this connection."""
+
+
+class ApplicationRoleConnectionResponse(BaseModel):
+    """Application role connection object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/user#application-role-connection-object-application-role-connection-structure
+    """
+
+    platform_name: str | None = None
+    """Vanity name of the platform a bot has connected"""
+
+    platform_username: str | None = None
+    """Username of the platform a bot has connected"""
+
+    metadata: dict[str, str] | None = None
+    """Object mapping application role connection metadata keys to their string-ified value.
+
+    For the user on the platform a bot has connected.
+    """
