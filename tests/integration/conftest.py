@@ -25,6 +25,7 @@ from asyncord.client.threads.models.requests import CreateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.client.users.resources import UserResource
+from asyncord.client.webhooks.resources import WebhooksResource
 from tests.conftest import IntegrationTestData
 
 
@@ -40,6 +41,14 @@ async def applications_res(
 ) -> ApplicationResource:
     """Get applications resource for the client."""
     return client.applications
+
+
+@pytest.fixture()
+async def webhooks_res(
+    client: RestClient,
+) -> WebhooksResource:
+    """Get webhooks resource for the client."""
+    return client.webhooks
 
 
 @pytest.fixture()

@@ -14,6 +14,7 @@ from asyncord.client.resources import ClientResource
 from asyncord.client.stage_instances.resources import StageInstancesResource
 from asyncord.client.stickers.resources import StickersResource
 from asyncord.client.users.resources import UserResource
+from asyncord.client.webhooks.resources import WebhooksResource
 
 
 class RestClient(ClientResource):
@@ -41,3 +42,4 @@ class RestClient(ClientResource):
         self.invites = InvitesResource(self)
         self.stage_instances = StageInstancesResource(self)
         self.stickers = StickersResource(self)
+        self.webhooks = WebhooksResource(self)
