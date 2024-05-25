@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from asyncord.base64_image import Base64Image, Base64ImageInputType
 
-TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.jpg']
+TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.png']
 
 
 @pytest.mark.parametrize('img_name', [Path(f'tests/data/{file_name}') for file_name in TEST_FILE_NAMES])
