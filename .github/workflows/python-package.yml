@@ -44,5 +44,6 @@ jobs:
           ASYNCORD_TEST_APP_ID: ${{ vars.ASYNCORD_TEST_APP_ID }}
           ASYNCORD_TEST_ROLE_ID: ${{ vars.ASYNCORD_TEST_ROLE_ID }}
           ASYNCORD_TEST_USER_TO_BAN: ${{ vars.ASYNCORD_TEST_USER_TO_BAN }}
+          ASYNCORD_TEST_STAGE_ID: ${{ vars.ASYNCORD_TEST_STAGE_ID }}
 
         run: pdm run pytest

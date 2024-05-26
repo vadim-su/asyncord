@@ -24,6 +24,7 @@ class IntegrationTestData:
     app_id: str
     role_id: str
     user_to_ban: str
+    stage_id: str
 
 
 @pytest.fixture(scope='session')
@@ -45,6 +46,7 @@ def integration_data() -> IntegrationTestData:
         app_id=os.environ['ASYNCORD_TEST_APP_ID'],
         role_id=os.environ['ASYNCORD_TEST_ROLE_ID'],
         user_to_ban=os.environ['ASYNCORD_TEST_USER_TO_BAN'],
+        stage_id=os.environ['ASYNCORD_TEST_STAGE_ID'],
     )
 
 

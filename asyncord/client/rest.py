@@ -9,8 +9,11 @@ from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.guilds.resources import GuildResource
 from asyncord.client.http.client import AsyncHttpClient
 from asyncord.client.interactions.resources import InteractionResource
+from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.resources import ClientResource
+from asyncord.client.stage_instances.resources import StageInstancesResource
 from asyncord.client.users.resources import UserResource
+from asyncord.client.webhooks.resources import WebhooksResource
 
 
 class RestClient(ClientResource):
@@ -35,3 +38,6 @@ class RestClient(ClientResource):
         self.channels = ChannelResource(self)
         self.applications = ApplicationResource(self)
         self.interactions = InteractionResource(self)
+        self.invites = InvitesResource(self)
+        self.stage_instances = StageInstancesResource(self)
+        self.webhooks = WebhooksResource(self)

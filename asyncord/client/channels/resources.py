@@ -19,6 +19,7 @@ from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.guilds.models.responses import InviteResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
+from asyncord.client.polls.resources import PollsResource
 from asyncord.client.resources import ClientSubresource
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.snowflake import SnowflakeInputType
@@ -47,6 +48,17 @@ class ChannelResource(ClientSubresource):
             Resource for managing messages.
         """
         return MessageResource(self, channel_id)
+
+    def polls(self, channel_id: SnowflakeInputType) -> PollsResource:
+        """Get the polls resource for the channel.
+
+        Args:
+            channel_id: Channel id.
+
+        Returns:
+            Resource for managing polls.
+        """
+        return PollsResource(self, channel_id)
 
     def threads(self, channel_id: SnowflakeInputType) -> ThreadResource:
         """Get the thread resource for the channel.

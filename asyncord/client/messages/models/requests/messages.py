@@ -64,6 +64,7 @@ class AttachedFile(BaseModel, arbitrary_types_allowed=True):
             Validated values.
         """
         content = values.get('content')
+
         if not content:
             return values
 

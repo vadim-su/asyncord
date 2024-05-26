@@ -17,7 +17,7 @@ from asyncord.client.messages.models.requests.messages import (
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
 
-TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.jpg']
+TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.png']
 
 
 async def test_cteate_message_with_files(messages_res: MessageResource) -> None:

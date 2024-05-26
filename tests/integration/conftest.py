@@ -8,19 +8,23 @@ from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.members.resources import MemberResource
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
+from asyncord.client.polls.resources import PollsResource
 from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
+from asyncord.client.stage_instances.resources import StageInstancesResource
 from asyncord.client.threads.models.common import ThreadType
 from asyncord.client.threads.models.requests import CreateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.client.users.resources import UserResource
+from asyncord.client.webhooks.resources import WebhooksResource
 from tests.conftest import IntegrationTestData
 
 
@@ -39,6 +43,22 @@ async def applications_res(
 
 
 @pytest.fixture()
+async def webhooks_res(
+    client: RestClient,
+) -> WebhooksResource:
+    """Get webhooks resource for the client."""
+    return client.webhooks
+
+
+@pytest.fixture()
+async def stage_instances_res(
+    client: RestClient,
+) -> StageInstancesResource:
+    """Get stage instances resource for the client."""
+    return client.stage_instances
+
+
+@pytest.fixture()
 async def channel_res(client: RestClient) -> ChannelResource:
     """Get channels resource for the client."""
     return client.channels
@@ -54,9 +74,24 @@ async def messages_res(
 
 
 @pytest.fixture()
+async def polls_res(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> PollsResource:
+    """Get polls resource for the channel."""
+    return channel_res.polls(integration_data.channel_id)
+
+
+@pytest.fixture()
 async def guilds_res(client: RestClient) -> GuildResource:
     """Get guilds resource for the client."""
     return client.guilds
+
+
+@pytest.fixture()
+async def invite_res(client: RestClient) -> InvitesResource:
+    """Get invites resource for the client."""
+    return client.invites
 
 
 @pytest.fixture()

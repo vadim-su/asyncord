@@ -16,7 +16,7 @@ from asyncord.client.threads.models.responses import ThreadResponse, ThreadsResp
 from asyncord.client.threads.resources import ThreadResource
 from tests.conftest import IntegrationTestData
 
-TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.jpg']
+TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.png']
 
 
 async def test_get_thread(
