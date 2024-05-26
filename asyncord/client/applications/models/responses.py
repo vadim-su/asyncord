@@ -15,6 +15,7 @@ from asyncord.client.applications.models.common import (
     ApplicationCommandPermissionType,
     ApplicationFlag,
     ApplicationRoleConnectionMetadataType,
+    OauthScopes,
 )
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.users.models.responses import UserFlags
@@ -29,7 +30,7 @@ class InstallParamsOut(BaseModel):
     https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure
     """
 
-    scopes: list[str]
+    scopes: list[FallbackAdapter[OauthScopes]]
     """OAuth2 scopes.
 
     Reference:
@@ -84,6 +85,7 @@ class TeamMemberUserOut(BaseModel):
 class TeamMemberOut(BaseModel):
     """Represents a Discord team member.
 
+    Reference:
     https://discord.com/developers/docs/topics/teams#data-models-team-member-object
     """
 
@@ -103,6 +105,7 @@ class TeamMemberOut(BaseModel):
 class TeamOut(BaseModel):
     """Represents a Discord team.
 
+    Reference:
     https://discord.com/developers/docs/topics/teams#data-models-team-object
     """
 
@@ -172,6 +175,10 @@ class ApplicationOut(BaseModel):
 
     guild_id: Snowflake | None = None
     """the id of the app's guild"""
+
+    # FIXME: Partial guild object. Not clear.
+    guild: dict[str, Any] | None
+    """Partial object of the associated guild."""
 
     primary_sku_id: Snowflake | None = None
     """the id of the app's primary sku"""
