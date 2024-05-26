@@ -1,6 +1,6 @@
 """Models for StageInstance responses."""
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from asyncord.client.stage_instances.models.common import StageInstancePrivacyLevel
 from asyncord.snowflake import Snowflake
@@ -22,7 +22,7 @@ class StageInstanceResponse(BaseModel):
     channel_id: Snowflake
     """Id of the associated Stage channel."""
 
-    topic: str = Field(None, min_length=1, max_length=120)
+    topic: str
     """Topic of the Stage instance. 1-120 characters."""
 
     privacy_level: StageInstancePrivacyLevel = StageInstancePrivacyLevel.GUILD_ONLY
