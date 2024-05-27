@@ -188,7 +188,7 @@ class WebhooksResource(ClientSubresource):
         execute_data: ExecuteWebhookRequest,
         wait: bool | None = None,
         thread_id: SnowflakeInputType | None = None,
-    ) -> None:
+    ) -> MessageResponse | None:
         """Execute a webhook.
 
         Reference:
@@ -203,17 +203,23 @@ class WebhooksResource(ClientSubresource):
         """
         params = {}
         if wait is not None:
-            params['wait'] = wait
+            params['wait'] = str(wait)
         if thread_id is not None:
             params['thread_id'] = thread_id
 
         url = self.webhooks_url / str(webhook_id) / str(webhook_token) % params
         payload = execute_data.model_dump(mode='json', exclude_unset=True)
-        await self._http_client.post(
+
+        message = await self._http_client.post(
             url,
             payload,
             files=[(file.filename, file.content_type, file.content) for file in execute_data.files],
         )
+
+        if wait:
+            return MessageResponse.model_validate(message.body)
+
+        return None
 
     async def get_webhook_message(
         self,
