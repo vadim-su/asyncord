@@ -94,6 +94,9 @@ class ChannelResource(ClientSubresource):
 
         This endpoint can only be used on guilds.
 
+        Reference:
+        https://discord.com/developers/docs/resources/guild#create-guild-channel
+
         Args:
             guild_id: Guild id.
             channel_data: Data to create the channel with.
@@ -125,6 +128,9 @@ class ChannelResource(ClientSubresource):
     ) -> ChannelResponse:
         """Update a channel's settings.
 
+        Reference:
+        https://discord.com/developers/docs/resources/channel#modify-channel
+
         Args:
             channel_id: Channel id.
             channel_data: The data to update the channel with.
@@ -153,7 +159,7 @@ class ChannelResource(ClientSubresource):
         """Update the positions of a set of channel objects.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#modify-guild-channel-positions
+        https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
 
         Args:
             guild_id: Guild id.

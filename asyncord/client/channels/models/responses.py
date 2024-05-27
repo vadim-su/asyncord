@@ -21,6 +21,7 @@ from asyncord.client.channels.models.common import (
 )
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.models.permissions import PermissionFlag
+from asyncord.client.threads.models.responses import ThreadMetadataOut
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
@@ -209,6 +210,9 @@ class ChannelResponse(BaseModel):
     application_id: Snowflake | None = None
     """Application id of the group DM creator if it is bot - created."""
 
+    managed: bool | None = None
+    """Whether the channel is managed via the gdm.join OAuth2 scope."""
+
     parent_id: Snowflake | None = None
     """Parent category or channel id.
 
@@ -230,6 +234,18 @@ class ChannelResponse(BaseModel):
     video_quality_mode: FallbackAdapter[VideoQualityMode] | None = None
     """Camera video quality mode of the voice channel, 1 when not present."""
 
+    message_count: int | None = None
+    """An approximate count of messages in a thread."""
+
+    member_count: int | None = None
+    """An approximate count of users in a thread."""
+
+    thread_metadata: ThreadMetadataOut | None = None
+    """Thread-specific fields not needed by other channels."""
+
+    member: ThreadMemberResponse | None = None
+    """Thread member object for the current user, if they have joined the thread."""
+
     default_auto_archive_duration: int | None = None
     """Default duration that the clients (not the API) will use for newly created threads.
 
@@ -245,11 +261,17 @@ class ChannelResponse(BaseModel):
     which may need to be checked separately
     """
 
+    total_message_sent: int | None = None
+    """Number of messages ever sent in a thread."""
+
     flags: ChannelFlag | None = None
     """Flags for the channel."""
 
     available_tags: list[TagOut] | None = None
     """Set of tags that can be used."""
+
+    applied_tags: list[Snowflake] | None = None
+    """IDs of the set of tags that have been applied to a thread."""
 
     default_reaction_emoji: DefaultReactionOut | None = None
     """Emoji to show in the add reaction button on a thread."""

@@ -208,6 +208,13 @@ class CreateForumChannelRequest(BaseCreateChannel):
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
+    default_auto_archive_duration: Literal[60, 1440, 4320, 10080] | None = None
+    """This field represents the default duration in minutes.
+
+    That clients use to automatically archive newly created threads in the channel
+    after recent activity.
+    """
+
     default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the forum channel."""
 
@@ -250,11 +257,21 @@ class CreateMediaChannelRequest(BaseCreateChannel):
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
+    default_auto_archive_duration: Literal[60, 1440, 4320, 10080] | None = None
+    """This field represents the default duration in minutes.
+
+    That clients use to automatically archive newly created threads in the channel
+    after recent activity.
+    """
+
     default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the media channel."""
 
     available_tags: list[Tag] | None = None
     """List of available tags for the media channel."""
+
+    default_sort_order: ThreadSortOrder | None = None
+    """Default sort order for the forum channel."""
 
     default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
     """Amount of seconds a user has to wait before sending another message in a thread.

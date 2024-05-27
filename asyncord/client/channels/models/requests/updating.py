@@ -388,7 +388,7 @@ class UpdateChannelPositionRequest(BaseModel):
     """Data to update a channel's position with.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#modify-guild-channel-positions-json-params
+    https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions-json-params
     """
 
     id: SnowflakeInputType
