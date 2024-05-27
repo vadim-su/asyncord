@@ -8,50 +8,10 @@ from pydantic import BaseModel
 from asyncord.client.channels.models.common import ChannelFlag
 from asyncord.client.channels.models.responses import (
     ThreadMemberResponse,
+    ThreadMetadataOut,
 )
 from asyncord.client.threads.models.common import ThreadType
 from asyncord.snowflake import Snowflake
-
-
-class ThreadMetadataOut(BaseModel):
-    """Thread metadata object.
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#thread-metadata-object
-    """
-
-    archived: bool
-    """Whether the thread is archived."""
-
-    auto_archive_duration: int
-    """Duration in minutes to automatically archive the thread after recent activity.
-
-    Can be set to: 60, 1440, 4320, 10080.
-    """
-
-    archive_timestamp: datetime.datetime
-    """Timestamp when the thread's archive status was last changed.
-
-    Used for calculating recent activity.
-    """
-
-    locked: bool
-    """Whether the thread is locked.
-
-    When a thread is locked, only users with `MANAGE_THREADS` can unarchive it.
-    """
-
-    invitable: bool | None = None
-    """Whether non-moderators can add other non-moderators to a thread.
-
-    Only available on private threads.
-    """
-
-    create_timestamp: datetime.datetime | None = None
-    """Timestamp when the thread was created.
-
-    Only populated for threads created after 2022-01-09.
-    """
 
 
 class ThreadResponse(BaseModel):
