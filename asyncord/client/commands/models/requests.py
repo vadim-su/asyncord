@@ -74,9 +74,6 @@ class BaseApplicationCommandOption(BaseModel):
     description_localizations: dict[LocaleInputType, str] | None = None
     """Dictionary of language codes to localized descriptions."""
 
-    required: bool = False
-    """Indicates whether the option is required. Defaults to False."""
-
 
 class ApplicationCommandSubCommandOption(BaseApplicationCommandOption):
     """Represents a SUB_COMMAND type option for a Discord application command.
@@ -131,6 +128,9 @@ class ApplicationCommandStringOption(BaseApplicationCommandOption):
     Options using autocomplete are not confined to only use choices given by the application.
     """
 
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
+
 
 class ApplicationCommandIntegerOption(BaseApplicationCommandOption):
     """Represents an INTEGER type option for a Discord application command.
@@ -159,6 +159,9 @@ class ApplicationCommandIntegerOption(BaseApplicationCommandOption):
     Options using autocomplete are not confined to only use choices given by the application.
     """
 
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
+
 
 class ApplicationCommandBooleanOption(BaseApplicationCommandOption):
     """Represents a BOOLEAN type option for a Discord application command.
@@ -169,6 +172,9 @@ class ApplicationCommandBooleanOption(BaseApplicationCommandOption):
 
     type: Literal[AppCommandOptionType.BOOLEAN] = AppCommandOptionType.BOOLEAN
 
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
+
 
 class ApplicationCommandUserOption(BaseApplicationCommandOption):
     """Represents a USER type option for a Discord application command.
@@ -178,6 +184,9 @@ class ApplicationCommandUserOption(BaseApplicationCommandOption):
     """
 
     type: Literal[AppCommandOptionType.USER] = AppCommandOptionType.USER
+
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
 
 
 class ApplicationCommandChannelOption(BaseApplicationCommandOption):
@@ -192,6 +201,9 @@ class ApplicationCommandChannelOption(BaseApplicationCommandOption):
     channel_types: list[ChannelType] | None = None
     """List of available channel types if the option type is a `CHANNEL`."""
 
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
+
 
 class ApplicationCommandRoleOption(BaseApplicationCommandOption):
     """Represents a ROLE type option for a Discord application command.
@@ -202,6 +214,9 @@ class ApplicationCommandRoleOption(BaseApplicationCommandOption):
 
     type: Literal[AppCommandOptionType.ROLE] = AppCommandOptionType.ROLE
 
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
+
 
 class ApplicationCommandMentionableOption(BaseApplicationCommandOption):
     """Represents a MENTIONABLE type option for a Discord application command.
@@ -211,6 +226,9 @@ class ApplicationCommandMentionableOption(BaseApplicationCommandOption):
     """
 
     type: Literal[AppCommandOptionType.MENTIONABLE] = AppCommandOptionType.MENTIONABLE
+
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
 
 
 class ApplicationCommandNumberOption(BaseApplicationCommandOption):
@@ -240,6 +258,9 @@ class ApplicationCommandNumberOption(BaseApplicationCommandOption):
     Options using autocomplete are not confined to only use choices given by the application.
     """
 
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
+
 
 class ApplicationCommandAttachmentOption(BaseApplicationCommandOption):
     """Represents an ATTACHMENT type option for a Discord application command.
@@ -249,6 +270,9 @@ class ApplicationCommandAttachmentOption(BaseApplicationCommandOption):
     """
 
     type: Literal[AppCommandOptionType.ATTACHMENT] = AppCommandOptionType.ATTACHMENT
+
+    required: bool = False
+    """Indicates whether the option is required. Defaults to False."""
 
 
 class CreateApplicationCommandRequest(BaseModel):
