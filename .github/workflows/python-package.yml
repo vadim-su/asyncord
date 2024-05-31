@@ -21,15 +21,22 @@ jobs:
       PDM_VERSION: "2.*"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+          clean: false
+
       - name: Set up Python ${{ matrix.python-version }} (PDM ${{ env.PDM_VERSION }})
         uses: pdm-project/setup-pdm@v3
         with:
           python-version: ${{ matrix.python-version }}
           version: ${{ env.PDM_VERSION }}
           cache: true
+
       - name: Install dependencies
         run: pdm sync -G testing
+
       - name: Run pytest
         env:
           ASYNCORD_TEST_TOKEN: ${{ secrets.ASYNCORD_TEST_TOKEN }}
