@@ -28,7 +28,7 @@ jobs:
           clean: false
 
       - name: Set up Python ${{ matrix.python-version }} (PDM ${{ env.PDM_VERSION }})
-        uses: pdm-project/setup-pdm@v3
+        uses: pdm-project/setup-pdm@v4
         with:
           python-version: ${{ matrix.python-version }}
           version: ${{ env.PDM_VERSION }}
