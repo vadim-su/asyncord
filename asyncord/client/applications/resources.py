@@ -63,7 +63,7 @@ class ApplicationResource(ClientSubresource):
     async def get_application_role_connection_metadata_records(
         self,
         app_id: SnowflakeInputType,
-    ) -> ApplicationRoleConnectionMetadataOut:
+    ) -> list[ApplicationRoleConnectionMetadataOut]:
         """Get the role connection metadata records for an application.
 
         Args:
@@ -73,7 +73,7 @@ class ApplicationResource(ClientSubresource):
             List of application role connection metadata objects.
         """
         resp = await self._http_client.get(
-            self.apps_url / app_id / 'role-connections/metadata',
+            self.apps_url / str(app_id) / 'role-connections/metadata',
         )
         return list_model(ApplicationRoleConnectionMetadataOut).validate_python(resp.body)
 
@@ -81,7 +81,7 @@ class ApplicationResource(ClientSubresource):
         self,
         app_id: SnowflakeInputType,
         apllication_role_metadata: UpdateApplicationRoleConnectionMetadataRequest,
-    ) -> ApplicationRoleConnectionMetadataOut:
+    ) -> list[ApplicationRoleConnectionMetadataOut]:
         """Update the role connection metadata records for an application.
 
         Args:
@@ -93,7 +93,7 @@ class ApplicationResource(ClientSubresource):
         """
         payload = apllication_role_metadata.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.patch(
-            self.apps_url / app_id / 'role-connections/metadata',
+            self.apps_url / str(app_id) / 'role-connections/metadata',
             payload=payload,
         )
 
