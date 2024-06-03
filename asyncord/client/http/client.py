@@ -6,16 +6,13 @@ import asyncio
 import json
 import logging
 from collections.abc import Mapping, Sequence
-from http import HTTPStatus
-from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, BinaryIO, NamedTuple
+from typing import TYPE_CHECKING
 
 import aiohttp
 from aiohttp.client import ClientResponse
-from pydantic import BaseModel, Field
 
-from asyncord.client.http import errors
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
+from asyncord.client.http.middleware import AttachedFile, MiddleWare, RequestData, Response
 from asyncord.typedefs import Payload, StrOrURL
 
 if TYPE_CHECKING:
@@ -28,60 +25,18 @@ MAX_NEXT_RETRY_SEC = 10
 logger = logging.getLogger(__name__)
 
 
-class AttachedFile(NamedTuple):
-    """Type alias for a file to be attached to a request.
-
-    The tuple contains the filename, the content type, and the file object.
-    """
-
-    filename: str
-    """Name of the file."""
-
-    content_type: str
-    """Content type of the file."""
-
-    file: BinaryIO
-    """File object."""
-
-
-class Response(NamedTuple):
-    """Response structure for the HTTP client."""
-
-    status: int
-    """Response status code."""
-
-    headers: Mapping[str, str]
-    """Response headers."""
-
-    body: Any
-    """Response body."""
-
-
-class RateLimitBody(BaseModel):
-    """The body of a rate limit response."""
-
-    message: str
-    """Message saying you are being rate limited."""
-
-    retry_after: float
-    """Number of seconds to wait before submitting another request."""
-
-    is_global: bool = Field(alias='global')
-    """Whether this is a global rate limit."""
-
-
 class AsyncHttpClient:
     """Asyncronous HTTP client."""
 
     def __init__(
         self,
         session: aiohttp.ClientSession | None = None,
-        headers: dict[str, str] | None = None,
+        middleware: MiddleWare | None = None,
     ) -> None:
         """Initialize the client."""
         asyncio.get_running_loop()
         self._session = session
-        self._headers = headers or {}
+        self.middleware = middleware
 
     async def get(
         self,
@@ -204,14 +159,6 @@ class AsyncHttpClient:
             headers=headers,
         )
 
-    def set_headers(self, headers: Mapping[str, str]) -> None:
-        """Set the headers to send with requests.
-
-        Args:
-            headers: Headers to send with requests.
-        """
-        self._headers = headers
-
     async def _request(  # noqa: PLR0913
         self,
         *,
@@ -238,119 +185,32 @@ class AsyncHttpClient:
             ServerError: If the response status code is in the 500 range.
             RateLimitError: If the response status code is 429 and the retry_after is greater than 10.
         """
-        headers = {**self._headers, **(headers or {})}
+        headers = {**(headers or {})}
 
-        async with self._make_raw_request(
+        request_data = RequestData(
             method=method,
             url=url,
             payload=payload,
             files=files,
             headers=headers,
+        )
+
+        request_data = await self.middleware.before_request(
+            request_data=request_data,
+        )
+
+        async with self._make_raw_request(
+            request_data=request_data,
         ) as resp:
-            body = await self._extract_body(resp)
-            status = resp.status
-
-            if resp.status < HTTPStatus.BAD_REQUEST:
-                return Response(
-                    status=resp.status,
-                    headers=MappingProxyType(dict(resp.headers.items())),
-                    body=body,
-                )
-
-            if not isinstance(body, dict):
-                raise errors.ServerError(
-                    message='Expected JSON body',
-                    payload=payload,
-                    headers=headers,
-                    resp=resp,
-                    body=body,
-                )
-
-            if status == HTTPStatus.TOO_MANY_REQUESTS:
-                # FIXME: It's a simple hack for now. Potentially 'endless' recursion
-                ratelimit = RateLimitBody.model_validate(body)
-                logger.warning('Rate limited: %s (retry after %s)', ratelimit.message, ratelimit.retry_after)
-
-                if ratelimit.retry_after > MAX_NEXT_RETRY_SEC:
-                    raise errors.RateLimitError(
-                        message=ratelimit.message,
-                        payload=payload,
-                        headers=headers,
-                        resp=resp,
-                        retry_after=ratelimit.retry_after,
-                    )
-
-                # FIXME: Move to decorator
-                await asyncio.sleep(ratelimit.retry_after + 0.1)
-                return await self._request(
-                    method=method,
-                    url=url,
-                    payload=payload,
-                    files=files,
-                    headers=headers,
-                )
-
-            error_body = errors.RequestErrorBody.model_validate(body)
-
-            if status == HTTPStatus.NOT_FOUND:
-                raise errors.NotFoundError(
-                    message=body.get('message', 'Unknown'),
-                    payload=payload,
-                    headers=headers,
-                    resp=resp,
-                    body=error_body,
-                )
-
-            if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
-                raise errors.ClientError(
-                    message=error_body.message,
-                    payload=payload,
-                    headers=headers,
-                    resp=resp,
-                    body=error_body,
-                )
-
-            raise errors.ServerError(
-                message=error_body.message,
-                payload=payload,
-                headers=headers,
-                resp=resp,
-                body=error_body,
+            return await self.middleware.after_request(
+                request_data,
+                resp,
             )
 
-    @classmethod
-    async def _extract_body(cls, resp: ClientResponse) -> dict[str, Any] | str:
-        """Extract the body from the response.
-
-        Args:
-            resp: Request response.
-
-        Returns:
-            Body of the response.
-        """
-        if resp.status == HTTPStatus.NO_CONTENT:
-            return {}
-
-        if resp.headers.get('Content-Type') == JSON_CONTENT_TYPE:
-            try:
-                return await resp.json()
-            except json.JSONDecodeError:
-                body = await resp.text()
-                logger.warning('Failed to decode JSON body: %s', body)
-                if body:
-                    return body
-                return {}
-
-        return {}
-
-    def _make_raw_request(  # noqa: PLR0913
+    def _make_raw_request(
         self,
         *,
-        method: HttpMethod,
-        url: StrOrURL,
-        payload: Any | None = None,  # noqa: ANN401
-        files: Sequence[AttachedFile] | None = None,
-        headers: Mapping[str, str] | None = None,
+        request_data: RequestData,
     ) -> AbstractAsyncContextManager[ClientResponse]:
         """Make a raw http request.
 
@@ -358,28 +218,34 @@ class AsyncHttpClient:
         Read more here: https://discord.com/developers/docs/resources/channel#create-message.
 
         Args:
-            method: HTTP method to use.
-            url: URL to request.
-            payload: Payload to send. Defaults to None.
-            files: Files to send. Defaults to None.
-            headers: Headers to send. Defaults to None.
+            request_data: Request data.
 
         Returns:
             Response context.
         """
         data = None
 
-        if files:
+        if request_data.files:
             data = aiohttp.FormData()
-            if payload is not None:
-                data.add_field('payload_json', json.dumps(payload), content_type=JSON_CONTENT_TYPE)
+            if request_data.payload is not None:
+                data.add_field('payload_json', json.dumps(request_data.payload), content_type=JSON_CONTENT_TYPE)
 
-            for index, (file_name, content_type, file_data) in enumerate(files):
+            for index, (file_name, content_type, file_data) in enumerate(request_data.files):
                 data.add_field(f'files[{index}]', file_data, filename=file_name, content_type=content_type)
 
-        elif payload is not None:
-            data = aiohttp.JsonPayload(payload)
+        elif request_data.payload is not None:
+            data = aiohttp.JsonPayload(request_data.payload)
 
         if self._session:
-            return self._session.request(method, url, data=data, headers=headers)
-        return aiohttp.request(method, url, data=data, headers=headers)
+            return self._session.request(
+                request_data.method,
+                request_data.url,
+                data=data,
+                headers=request_data.headers,
+            )
+        return aiohttp.request(
+            request_data.method,
+            request_data.url,
+            data=data,
+            headers=request_data.headers,
+        )
