@@ -7,7 +7,6 @@ And handles the limits with strategy.
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import time
 from abc import ABC, abstractmethod
@@ -22,7 +21,7 @@ from pydantic import BaseModel, Field
 
 from asyncord.client.http import errors
 from asyncord.client.http.bucket_track import Bucket, BucketTrack
-from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
+from asyncord.client.http.headers import HttpMethod
 from asyncord.typedefs import StrOrURL
 
 if TYPE_CHECKING:
@@ -176,7 +175,7 @@ class BasicMiddleWare(MiddleWare):
     ) -> Response:
         """Post request middleware checks."""
         # Implement your custom rate limit handling logic here.
-        body = await self._extract_body(response)
+        body = await http_client._extract_body(response)
         status = response.status
 
         bucket = self._update_buckets(response)
@@ -251,31 +250,6 @@ class BasicMiddleWare(MiddleWare):
             resp=response,
             body=error_body,
         )
-
-    @classmethod
-    async def _extract_body(cls, resp: ClientResponse) -> dict[str, Any] | str:
-        """Extract the body from the response.
-
-        Args:
-            resp: Request response.
-
-        Returns:
-            Body of the response.
-        """
-        if resp.status == HTTPStatus.NO_CONTENT:
-            return {}
-
-        if resp.headers.get('Content-Type') == JSON_CONTENT_TYPE:
-            try:
-                return await resp.json()
-            except json.JSONDecodeError:
-                body = await resp.text()
-                logger.warning('Failed to decode JSON body: %s', body)
-                if body:
-                    return body
-                return {}
-
-        return {}
 
     def _update_buckets(self, response: ClientResponse) -> Bucket:
         """Update the bucket tracker."""

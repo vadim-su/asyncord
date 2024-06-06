@@ -6,7 +6,8 @@ import asyncio
 import json
 import logging
 from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING
+from http import HTTPStatus
+from typing import TYPE_CHECKING, Any
 
 import aiohttp
 from aiohttp.client import ClientResponse
@@ -242,3 +243,28 @@ class AsyncHttpClient:
             data=data,
             headers=request_data.headers,
         )
+
+    @classmethod
+    async def _extract_body(cls, resp: ClientResponse) -> dict[str, Any] | str:
+        """Extract the body from the response.
+
+        Args:
+            resp: Request response.
+
+        Returns:
+            Body of the response.
+        """
+        if resp.status == HTTPStatus.NO_CONTENT:
+            return {}
+
+        if resp.headers.get('Content-Type') == JSON_CONTENT_TYPE:
+            try:
+                return await resp.json()
+            except json.JSONDecodeError:
+                body = await resp.text()
+                logger.warning('Failed to decode JSON body: %s', body)
+                if body:
+                    return body
+                return {}
+
+        return {}
