@@ -5,6 +5,7 @@ from __future__ import annotations
 import aiohttp
 
 from asyncord.client.applications.resources import ApplicationResource
+from asyncord.client.auth.resources import OAuthResource
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.guilds.resources import GuildResource
 from asyncord.client.http.client import AsyncHttpClient
@@ -41,3 +42,4 @@ class RestClient(ClientResource):
         self.invites = InvitesResource(self)
         self.stage_instances = StageInstancesResource(self)
         self.webhooks = WebhooksResource(self)
+        self.auth = OAuthResource(self)
