@@ -46,21 +46,3 @@ class BucketTrack:
     def update(self, bucket: Bucket) -> None:
         """Update the bucket for a specific route."""
         self.buckets[bucket.name] = bucket
-
-    def get(self, name: str) -> Bucket | None:
-        """Get the bucket for a specific route."""
-        return self.buckets.get(name)
-
-    def decrement(self, name: str) -> None:
-        """Decrement the number of requests made to a route."""
-        if name in self.buckets:
-            self.buckets[name].count -= 1
-
-    def reset(self, name: str) -> None:
-        """Reset the bucket for a specific route."""
-        if name in self.buckets:
-            self.buckets[name].count = 0
-
-    def set_bucket(self, bucket: Bucket) -> None:
-        """Set the bucket for a specific route."""
-        self.buckets[bucket.name] = bucket

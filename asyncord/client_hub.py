@@ -11,7 +11,9 @@ from typing import NamedTuple, Self
 
 import aiohttp
 
+from asyncord.client.http.bucket_track import BucketTrack
 from asyncord.client.http.client import AsyncHttpClient
+from asyncord.client.http.middleware import BasicMiddleWare
 from asyncord.client.rest import RestClient
 from asyncord.gateway.client.client import GatewayClient
 from asyncord.gateway.client.heartbeat import HeartbeatFactory
@@ -160,7 +162,11 @@ class ClientHub:
         Returns:
             A set of clients to interact with Discord.
         """
-        http_client = AsyncHttpClient(session=self.session, headers={'Authorization': f'Bot {token}'})
+        middleware = BasicMiddleWare(
+            headers={'Authorization': f'Bot {token}'},
+            bucket_tracker=BucketTrack(),
+        )
+        http_client = AsyncHttpClient(session=self.session, middleware=middleware)
         rest_client = RestClient(token=token, http_client=http_client)
         gateway_client = GatewayClient(
             token=token,
