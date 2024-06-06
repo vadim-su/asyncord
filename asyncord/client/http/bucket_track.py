@@ -16,8 +16,14 @@ class Bucket:
     reset: float
     """Time at which the bucket resets."""
 
+    reset_after: float
+    """Time in seconds until the bucket resets."""
+
     limit: int
     """Number of requests allowed per bucket."""
+
+    internal_retry_count: int
+    """Number of retries made by the client."""
 
 
 class BucketTrack:
@@ -36,6 +42,10 @@ class BucketTrack:
             self.buckets[bucket.name].count += 1
         else:
             self.buckets[bucket.name] = bucket
+
+    def update(self, bucket: Bucket) -> None:
+        """Update the bucket for a specific route."""
+        self.buckets[bucket.name] = bucket
 
     def get(self, name: str) -> Bucket | None:
         """Get the bucket for a specific route."""

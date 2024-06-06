@@ -195,17 +195,10 @@ class AsyncHttpClient:
             headers=headers,
         )
 
-        request_data = await self.middleware.before_request(
+        return await self.middleware.start_middleware(
             request_data=request_data,
+            http_client=self,
         )
-
-        async with self._make_raw_request(
-            request_data=request_data,
-        ) as resp:
-            return await self.middleware.after_request(
-                request_data,
-                resp,
-            )
 
     def _make_raw_request(
         self,

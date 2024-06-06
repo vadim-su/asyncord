@@ -6,14 +6,16 @@ And handles the limits with strategy.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
+import time
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from http import HTTPStatus
 from types import MappingProxyType
-from typing import Any, BinaryIO, NamedTuple
+from typing import TYPE_CHECKING, Any, BinaryIO, NamedTuple
 
 from aiohttp import ClientResponse
 from pydantic import BaseModel, Field
@@ -22,6 +24,9 @@ from asyncord.client.http import errors
 from asyncord.client.http.bucket_track import Bucket, BucketTrack
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
 from asyncord.typedefs import StrOrURL
+
+if TYPE_CHECKING:
+    from asyncord.client.http.client import AsyncHttpClient
 
 logger = logging.getLogger(__name__)
 
@@ -88,18 +93,35 @@ class RequestData:
     """Headers to send with the request."""
 
 
+@dataclass
+class CallbackData:
+    """Callback data for http client."""
+
+    retry: bool
+    """Whether to retry the request."""
+
+    bucket: Bucket | None = None
+    """Bucket to update."""
+
+
 class MiddleWare(ABC):
     """Middleware template."""
 
     @abstractmethod
-    async def before_request(
+    async def start_middleware(
         self,
         request_data: RequestData,
+        http_client: AsyncHttpClient,
     ) -> RequestData:
         """Pre request rate limit handling."""
 
     @abstractmethod
-    async def after_request(self, response: ClientResponse) -> Response:
+    async def after_request(
+        self,
+        request_data: RequestData,
+        response: ClientResponse,
+        http_client: AsyncHttpClient,
+    ) -> Response:
         """After request rate limit handling."""
         ...
 
@@ -124,26 +146,40 @@ class BasicMiddleWare(MiddleWare):
         self._headers = headers or {}
         self._bucket_tracker = bucket_tracker or BucketTrack()
 
-    async def before_request(
+    async def start_middleware(
         self,
         request_data: RequestData,
-    ) -> RequestData:
-        """Pre request middleware checks."""
+        http_client: AsyncHttpClient,
+        bucket: Bucket | None = None,
+    ) -> Response:
+        """Middleware start."""
         if self._headers:
             request_data.headers = {**self._headers, **(request_data.headers or {})}
-        return request_data
+
+        if (not bucket) or (bucket.count < bucket.limit):
+            async with http_client._make_raw_request(
+                request_data=request_data,
+            ) as resp:
+                return await self.after_request(
+                    request_data,
+                    resp,
+                    http_client=http_client,
+                )
+
+        return resp
 
     async def after_request(
         self,
         request_data: RequestData,
         response: ClientResponse,
+        http_client: AsyncHttpClient,
     ) -> Response:
         """Post request middleware checks."""
         # Implement your custom rate limit handling logic here.
         body = await self._extract_body(response)
         status = response.status
 
-        self._update_buckets(response)
+        bucket = self._update_buckets(response)
 
         if response.status < HTTPStatus.BAD_REQUEST:
             return Response(
@@ -162,19 +198,30 @@ class BasicMiddleWare(MiddleWare):
             )
 
         if status == HTTPStatus.TOO_MANY_REQUESTS:
-            # FIXME: It's a simple hack for now. Potentially 'endless' recursion
             ratelimit = RateLimitBody.model_validate(body)
             logger.warning('Rate limited: %s (retry after %s)', ratelimit.message, ratelimit.retry_after)
 
-            max_retry = 5
+            bucket.internal_retry_count += 1
+            self._bucket_tracker.update(bucket)
 
-            if ratelimit.retry_after > max_retry:
+            if bucket.internal_retry_count > 5:  # noqa: PLR2004
                 raise errors.RateLimitError(
                     message=ratelimit.message,
                     payload=request_data.payload,
                     headers=request_data.headers,
                     resp=response,
                     retry_after=ratelimit.retry_after,
+                )
+
+            time_til_reset = bucket.reset_after - time.time()
+            asyncio.sleep(time_til_reset)
+            async with http_client._make_raw_request(
+                request_data=request_data,
+            ) as resp:
+                return await self.after_request(
+                    request_data,
+                    resp,
+                    http_client=http_client,
                 )
 
         error_body = errors.RequestErrorBody.model_validate(body)
@@ -230,18 +277,22 @@ class BasicMiddleWare(MiddleWare):
 
         return {}
 
-    def _update_buckets(self, response: ClientResponse) -> None:
+    def _update_buckets(self, response: ClientResponse) -> Bucket:
         """Update the bucket tracker."""
         bucket_name = response.headers.get('X-RateLimit-Bucket')
 
         if not bucket_name:
-            return
+            return None
 
         bucket = Bucket(
             name=bucket_name,
             count=int(response.headers.get('X-RateLimit-Remaining', 0)),
-            reset=float(response.headers.get('X-RateLimit-Reset-After', 0)),
+            reset=float(response.headers.get('X-RateLimit-Reset', 0)),
+            reset_after=float(response.headers.get('X-RateLimit-Reset-After', 0)),
             limit=int(response.headers.get('X-RateLimit-Limit', 0)),
+            internal_retry_count=0,
         )
 
         self._bucket_tracker.increment(bucket)
+
+        return bucket
