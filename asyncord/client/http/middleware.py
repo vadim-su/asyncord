@@ -214,7 +214,7 @@ class BasicMiddleWare(MiddleWare):
                 )
 
             time_til_reset = bucket.reset_after - time.time()
-            asyncio.sleep(time_til_reset)
+            await asyncio.sleep(time_til_reset)
             async with http_client._make_raw_request(
                 request_data=request_data,
             ) as resp:
