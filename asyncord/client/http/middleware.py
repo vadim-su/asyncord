@@ -10,7 +10,7 @@ import asyncio
 import logging
 import time
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from http import HTTPStatus
 from types import MappingProxyType
@@ -21,13 +21,13 @@ from pydantic import BaseModel, Field
 
 from asyncord.client.http import errors
 from asyncord.client.http.bucket_track import Bucket, BucketTrack
-from asyncord.client.http.headers import HttpMethod
-from asyncord.typedefs import StrOrURL
 
 if TYPE_CHECKING:
-    from asyncord.client.http.client import AsyncHttpClient
+    from asyncord.client.http.client import HttpClient
 
 logger = logging.getLogger(__name__)
+
+type NextCallbackType = Callable[[Request, HttpClient, NextCallbackType], Response]
 
 
 class AttachedFile(NamedTuple):
@@ -73,26 +73,6 @@ class RateLimitBody(BaseModel):
 
 
 @dataclass
-class RequestData:
-    """Request data class."""
-
-    method: HttpMethod
-    """HTTP method to use."""
-
-    url: StrOrURL
-    """URL to send the request to."""
-
-    payload: Any | None = (None,)
-    """Payload to send with the request."""
-
-    files: Sequence[AttachedFile] | None = None
-    """Files to send with the request."""
-
-    headers: Mapping[str, str] | None = None
-    """Headers to send with the request."""
-
-
-@dataclass
 class CallbackData:
     """Callback data for http client."""
 
@@ -103,29 +83,29 @@ class CallbackData:
     """Bucket to update."""
 
 
-class MiddleWare(ABC):
+class BaseMiddleware(ABC):
     """Middleware template."""
 
     @abstractmethod
-    async def start_middleware(
+    async def handle(
         self,
-        request_data: RequestData,
-        http_client: AsyncHttpClient,
-    ) -> RequestData:
-        """Pre request rate limit handling."""
+        request_data: Request,
+        http_client: HttpClient,
+        next_call: NextCallbackType,
+    ) -> Request:
+        """Handle the request."""
 
-    @abstractmethod
-    async def after_request(
+    async def __call__(
         self,
-        request_data: RequestData,
-        response: ClientResponse,
-        http_client: AsyncHttpClient,
+        request_data: Request,
+        http_client: HttpClient,
+        next_call: NextCallbackType,
     ) -> Response:
-        """After request rate limit handling."""
-        ...
+        """Middleware call."""
+        return await self.handle(request_data, http_client, next_call)
 
 
-class BasicMiddleWare(MiddleWare):
+class BasicMiddleWare(BaseMiddleware):
     """Basic Middleware.
 
     It's basic cause I have no idea what it's supposed to do yet.
@@ -145,10 +125,10 @@ class BasicMiddleWare(MiddleWare):
         self._headers = headers or {}
         self._bucket_tracker = bucket_tracker or BucketTrack()
 
-    async def start_middleware(
+    async def handle(
         self,
-        request_data: RequestData,
-        http_client: AsyncHttpClient,
+        request_data: Request,
+        http_client: HttpClient,
         bucket: Bucket | None = None,
     ) -> Response:
         """Middleware start."""
@@ -156,7 +136,7 @@ class BasicMiddleWare(MiddleWare):
             request_data.headers = {**self._headers, **(request_data.headers or {})}
 
         if (not bucket) or (bucket.count < bucket.limit):
-            async with http_client._make_raw_request(
+            async with http_client._raw_request(
                 request_data=request_data,
             ) as resp:
                 return await self.after_request(
@@ -169,9 +149,9 @@ class BasicMiddleWare(MiddleWare):
 
     async def after_request(
         self,
-        request_data: RequestData,
+        request_data: Request,
         response: ClientResponse,
-        http_client: AsyncHttpClient,
+        http_client: HttpClient,
     ) -> Response:
         """Post request middleware checks."""
         # Implement your custom rate limit handling logic here.
@@ -214,7 +194,7 @@ class BasicMiddleWare(MiddleWare):
 
             time_til_reset = bucket.reset_after - time.time()
             await asyncio.sleep(time_til_reset)
-            async with http_client._make_raw_request(
+            async with http_client._raw_request(
                 request_data=request_data,
             ) as resp:
                 return await self.after_request(

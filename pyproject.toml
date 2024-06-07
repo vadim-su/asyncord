@@ -197,6 +197,7 @@ mypy-init-return = true
 
 [tool.ruff.lint.pylint]
 allow-dunder-method-names = ["__get_pydantic_core_schema__"]
+max-args = 7
 
 [tool.ruff.format]
 preview = true

@@ -6,65 +6,68 @@ import asyncio
 import json
 import logging
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from http import HTTPStatus
-from typing import TYPE_CHECKING, Any
+from typing import Any, NamedTuple
 
 import aiohttp
 from aiohttp.client import ClientResponse
 
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
-from asyncord.client.http.middleware import AttachedFile, MiddleWare, RequestData, Response
+from asyncord.client.http.middleware import AttachedFile, BaseMiddleware
 from asyncord.typedefs import Payload, StrOrURL
-
-if TYPE_CHECKING:
-    from contextlib import AbstractAsyncContextManager
-
-
-MAX_NEXT_RETRY_SEC = 10
-"""Maximum number of seconds to wait before retrying a request."""
 
 logger = logging.getLogger(__name__)
 
 
-class AsyncHttpClient:
+class HttpClient:
     """Asyncronous HTTP client."""
 
     def __init__(
         self,
         session: aiohttp.ClientSession | None = None,
-        middleware: MiddleWare | None = None,
+        middlewares: list[BaseMiddleware] | None = None,
     ) -> None:
         """Initialize the client."""
         asyncio.get_running_loop()
         self._session = session
-        self.middleware = middleware
+        self.middlewares = middlewares or []
+        self.system_middlewares = []
 
     async def get(
         self,
+        *,
         url: StrOrURL,
         headers: Mapping[str, str] | None = None,
+        skip_middleware: bool = False,
     ) -> Response:
         """Send a GET request.
 
         Args:
             url: URL to send the request to.
             headers: Headers to send with the request. Defaults to None.
+            skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
             Response response from the request.
         """
-        return await self._request(
-            method=HttpMethod.GET,
-            url=url,
-            headers=headers,
+        return await self.request(
+            Request(
+                method=HttpMethod.GET,
+                url=url,
+                headers=headers,
+            ),
+            skip_middleware=skip_middleware,
         )
 
     async def post(
         self,
+        *,
         url: StrOrURL,
         payload: Payload,
         files: list[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
+        skip_middleware: bool = False,
     ) -> Response:
         """Send a POST request.
 
@@ -73,24 +76,30 @@ class AsyncHttpClient:
             payload: Payload to send with the request.
             files: Files to send with the request. Defaults to None.
             headers: Headers to send with the request. Defaults to None.
+            skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
             Response from the request.
         """
-        return await self._request(
-            method=HttpMethod.POST,
-            url=url,
-            payload=payload,
-            files=files,
-            headers=headers,
+        return await self.request(
+            Request(
+                method=HttpMethod.POST,
+                url=url,
+                payload=payload,
+                files=files,
+                headers=headers,
+            ),
+            skip_middleware=skip_middleware,
         )
 
     async def put(
         self,
+        *,
         url: StrOrURL,
         payload: Payload,
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
+        skip_middleware: bool = False,
     ) -> Response:
         """Send a PUT request.
 
@@ -99,24 +108,30 @@ class AsyncHttpClient:
             payload: Payload to send with the request.
             files: Files to send with the request. Defaults to None.
             headers: Headers to send with the request. Defaults to None.
+            skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
             Response from the request.
         """
-        return await self._request(
-            method=HttpMethod.PUT,
-            url=url,
-            payload=payload,
-            files=files,
-            headers=headers,
+        return await self.request(
+            Request(
+                method=HttpMethod.PUT,
+                url=url,
+                payload=payload,
+                files=files,
+                headers=headers,
+            ),
+            skip_middleware=skip_middleware,
         )
 
     async def patch(
         self,
+        *,
         url: StrOrURL,
         payload: Payload,
         files: Sequence[AttachedFile] | None = None,
         headers: Mapping[str, str] | None = None,
+        skip_middleware: bool = False,
     ) -> Response:
         """Send a PATCH request.
 
@@ -125,23 +140,29 @@ class AsyncHttpClient:
             payload: Payload to send with the request.
             files: Files to send with the request. Defaults to None.
             headers: Headers to send with the request. Defaults to None.
+            skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
             Response from the request.
         """
-        return await self._request(
-            method=HttpMethod.PATCH,
-            url=url,
-            payload=payload,
-            files=files,
-            headers=headers,
+        return await self.request(
+            Request(
+                method=HttpMethod.PATCH,
+                url=url,
+                payload=payload,
+                files=files,
+                headers=headers,
+            ),
+            skip_middleware=skip_middleware,
         )
 
     async def delete(
         self,
+        *,
         url: StrOrURL,
         payload: Payload | None = None,
         headers: Mapping[str, str] | None = None,
+        skip_middleware: bool = False,
     ) -> Response:
         """Send a DELETE request.
 
@@ -149,34 +170,27 @@ class AsyncHttpClient:
             url: Url to send the request to.
             payload: Payload to send with the request. Defaults to None.
             headers: Headers to send with the request. Defaults to None.
+            skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Response:
             Response from the request.
         """
-        return await self._request(
-            method=HttpMethod.DELETE,
-            url=url,
-            payload=payload,
-            headers=headers,
+        return await self.request(
+            Request(
+                method=HttpMethod.DELETE,
+                url=url,
+                payload=payload,
+                headers=headers,
+            ),
+            skip_middleware=skip_middleware,
         )
 
-    async def _request(  # noqa: PLR0913
-        self,
-        *,
-        method: HttpMethod,
-        url: StrOrURL,
-        payload: Payload | None = None,
-        files: Sequence[AttachedFile] | None = None,
-        headers: Mapping[str, str] | None = None,
-    ) -> Response:
+    async def request(self, request: Request, *, skip_middleware: bool = False) -> Response:
         """Make a request to the Discord API.
 
         Args:
-            method: HTTP method to use.
-            url: URL to send the request to.
-            payload: Payload to send. Defaults to None.
-            files: Files to send. Defaults to None.
-            headers: Headers to send. Defaults to None.
+            request: Request data.
+            skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
             Response from the request.
@@ -186,30 +200,18 @@ class AsyncHttpClient:
             ServerError: If the response status code is in the 500 range.
             RateLimitError: If the response status code is 429 and the retry_after is greater than 10.
         """
-        headers = {**(headers or {})}
-
-        request_data = RequestData(
-            method=method,
-            url=url,
-            payload=payload,
-            files=files,
-            headers=headers,
-        )
-
-        return await self.middleware.start_middleware(
-            request_data=request_data,
+        return await self.middleware.handle(
+            request_data=request,
             http_client=self,
         )
 
-    def _make_raw_request(
-        self,
-        *,
-        request_data: RequestData,
-    ) -> AbstractAsyncContextManager[ClientResponse]:
+    async def _raw_request(self, request_data: Request) -> Response:
         """Make a raw http request.
 
         When files are provided, the payload is sent as a form.
-        Read more here: https://discord.com/developers/docs/resources/channel#create-message.
+
+        Reference:
+        https://discord.com/developers/docs/resources/channel#create-message.
 
         Args:
             request_data: Request data.
@@ -231,21 +233,29 @@ class AsyncHttpClient:
             data = aiohttp.JsonPayload(request_data.payload)
 
         if self._session:
-            return self._session.request(
+            req_context = self._session.request(
                 request_data.method,
                 request_data.url,
                 data=data,
                 headers=request_data.headers,
             )
-        return aiohttp.request(
+        req_context = aiohttp.request(
             request_data.method,
             request_data.url,
             data=data,
             headers=request_data.headers,
         )
 
+        async with req_context as resp:
+            return Response(
+                status=resp.status,
+                headers=resp.headers,
+                raw_body=await resp.text(),
+                body=await self._extract_body(resp),
+            )
+
     @classmethod
-    async def _extract_body(cls, resp: ClientResponse) -> dict[str, Any] | str:
+    async def _extract_body(cls, resp: ClientResponse) -> dict[str, Any]:
         """Extract the body from the response.
 
         Args:
@@ -263,8 +273,42 @@ class AsyncHttpClient:
             except json.JSONDecodeError:
                 body = await resp.text()
                 logger.warning('Failed to decode JSON body: %s', body)
-                if body:
-                    return body
                 return {}
 
         return {}
+
+
+class Response(NamedTuple):
+    """Response structure for the HTTP client."""
+
+    status: int
+    """Response status code."""
+
+    headers: Mapping[str, str]
+    """Response headers."""
+
+    raw_body: Any
+    """Raw response body."""
+
+    body: dict[str, Any]
+    """Parsed response body."""
+
+
+@dataclass
+class Request:
+    """Request data class."""
+
+    method: HttpMethod
+    """HTTP method to use."""
+
+    url: StrOrURL
+    """URL to send the request to."""
+
+    payload: Any | None = (None,)
+    """Payload to send with the request."""
+
+    files: Sequence[AttachedFile] | None = None
+    """Files to send with the request."""
+
+    headers: Mapping[str, str] | None = None
+    """Headers to send with the request."""

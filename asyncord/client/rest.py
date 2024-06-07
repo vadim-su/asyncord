@@ -7,8 +7,8 @@ import aiohttp
 from asyncord.client.applications.resources import ApplicationResource
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.guilds.resources import GuildResource
-from asyncord.client.http.client import AsyncHttpClient
-from asyncord.client.http.middleware import MiddleWare
+from asyncord.client.http.client import HttpClient
+from asyncord.client.http.middleware import BaseMiddleware
 from asyncord.client.interactions.resources import InteractionResource
 from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.resources import ClientResource
@@ -24,8 +24,8 @@ class RestClient(ClientResource):
         self,
         token: str,
         session: aiohttp.ClientSession | None = None,
-        http_client: AsyncHttpClient | None = None,
-        middleware: MiddleWare | None = None,
+        http_client: HttpClient | None = None,
+        middleware: BaseMiddleware | None = None,
     ) -> None:
         """Initialize the REST client.
 
