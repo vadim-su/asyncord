@@ -5,16 +5,17 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from collections.abc import Sequence
+from functools import partial
 from http import HTTPStatus
-from typing import Any, NamedTuple
+from typing import Any
 
 import aiohttp
 from aiohttp.client import ClientResponse
 
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
-from asyncord.client.http.middleware import AttachedFile, BaseMiddleware
+from asyncord.client.http.middleware.base import Middleware, NextCallType
+from asyncord.client.http.models import AttachedFile, Request, Response
 from asyncord.typedefs import Payload, StrOrURL
 
 logger = logging.getLogger(__name__)
@@ -26,19 +27,19 @@ class HttpClient:
     def __init__(
         self,
         session: aiohttp.ClientSession | None = None,
-        middlewares: list[BaseMiddleware] | None = None,
+        middlewares: list[Middleware] | None = None,
     ) -> None:
         """Initialize the client."""
         asyncio.get_running_loop()
-        self._session = session
-        self.middlewares = middlewares or []
-        self.system_middlewares = []
+        self.session = session
+        self.middlewares: list[Middleware] = middlewares or []
+        self.system_middlewares: list[Middleware] = []
 
     async def get(
         self,
         *,
         url: StrOrURL,
-        headers: Mapping[str, str] | None = None,
+        headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
         """Send a GET request.
@@ -49,13 +50,13 @@ class HttpClient:
             skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
-            Response response from the request.
+            Response response from the processed request.
         """
         return await self.request(
             Request(
                 method=HttpMethod.GET,
                 url=url,
-                headers=headers,
+                headers=headers or {},
             ),
             skip_middleware=skip_middleware,
         )
@@ -66,7 +67,7 @@ class HttpClient:
         url: StrOrURL,
         payload: Payload,
         files: list[AttachedFile] | None = None,
-        headers: Mapping[str, str] | None = None,
+        headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
         """Send a POST request.
@@ -79,7 +80,7 @@ class HttpClient:
             skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
-            Response from the request.
+            Response from the processed request.
         """
         return await self.request(
             Request(
@@ -87,7 +88,7 @@ class HttpClient:
                 url=url,
                 payload=payload,
                 files=files,
-                headers=headers,
+                headers=headers or {},
             ),
             skip_middleware=skip_middleware,
         )
@@ -98,7 +99,7 @@ class HttpClient:
         url: StrOrURL,
         payload: Payload,
         files: Sequence[AttachedFile] | None = None,
-        headers: Mapping[str, str] | None = None,
+        headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
         """Send a PUT request.
@@ -111,7 +112,7 @@ class HttpClient:
             skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
-            Response from the request.
+            Response from the processed request.
         """
         return await self.request(
             Request(
@@ -119,7 +120,7 @@ class HttpClient:
                 url=url,
                 payload=payload,
                 files=files,
-                headers=headers,
+                headers=headers or {},
             ),
             skip_middleware=skip_middleware,
         )
@@ -130,7 +131,7 @@ class HttpClient:
         url: StrOrURL,
         payload: Payload,
         files: Sequence[AttachedFile] | None = None,
-        headers: Mapping[str, str] | None = None,
+        headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
         """Send a PATCH request.
@@ -143,7 +144,7 @@ class HttpClient:
             skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
-            Response from the request.
+            Response from the processed request.
         """
         return await self.request(
             Request(
@@ -151,7 +152,7 @@ class HttpClient:
                 url=url,
                 payload=payload,
                 files=files,
-                headers=headers,
+                headers=headers or {},
             ),
             skip_middleware=skip_middleware,
         )
@@ -161,7 +162,7 @@ class HttpClient:
         *,
         url: StrOrURL,
         payload: Payload | None = None,
-        headers: Mapping[str, str] | None = None,
+        headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
         """Send a DELETE request.
@@ -173,14 +174,14 @@ class HttpClient:
             skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Response:
-            Response from the request.
+            Response from the processed request.
         """
         return await self.request(
             Request(
                 method=HttpMethod.DELETE,
                 url=url,
                 payload=payload,
-                headers=headers,
+                headers=headers or {},
             ),
             skip_middleware=skip_middleware,
         )
@@ -193,19 +194,19 @@ class HttpClient:
             skip_middleware: Whether to skip the middleware. Defaults to False.
 
         Returns:
-            Response from the request.
+            Response from the processed request.
 
         Raises:
             ClientError: If the response status code is in the 400 range.
             ServerError: If the response status code is in the 500 range.
             RateLimitError: If the response status code is 429 and the retry_after is greater than 10.
         """
-        return await self.middleware.handle(
-            request_data=request,
-            http_client=self,
-        )
+        if skip_middleware:
+            return await self._raw_request(request)
 
-    async def _raw_request(self, request_data: Request) -> Response:
+        return await self._apply_middleware(request)
+
+    async def _raw_request(self, request: Request) -> Response:
         """Make a raw http request.
 
         When files are provided, the payload is sent as a form.
@@ -214,37 +215,38 @@ class HttpClient:
         https://discord.com/developers/docs/resources/channel#create-message.
 
         Args:
-            request_data: Request data.
+            request: Request data.
 
         Returns:
-            Response context.
+            Response from the processed request.
         """
         data = None
 
-        if request_data.files:
+        if request.files:
             data = aiohttp.FormData()
-            if request_data.payload is not None:
-                data.add_field('payload_json', json.dumps(request_data.payload), content_type=JSON_CONTENT_TYPE)
+            if request.payload is not None:
+                data.add_field('payload_json', json.dumps(request.payload), content_type=JSON_CONTENT_TYPE)
 
-            for index, (file_name, content_type, file_data) in enumerate(request_data.files):
+            for index, (file_name, content_type, file_data) in enumerate(request.files):
                 data.add_field(f'files[{index}]', file_data, filename=file_name, content_type=content_type)
 
-        elif request_data.payload is not None:
-            data = aiohttp.JsonPayload(request_data.payload)
+        elif request.payload is not None:
+            data = aiohttp.JsonPayload(request.payload)
 
-        if self._session:
-            req_context = self._session.request(
-                request_data.method,
-                request_data.url,
+        if self.session:
+            req_context = self.session.request(
+                method=request.method,
+                url=request.url,
                 data=data,
-                headers=request_data.headers,
+                headers=request.headers,
             )
-        req_context = aiohttp.request(
-            request_data.method,
-            request_data.url,
-            data=data,
-            headers=request_data.headers,
-        )
+        else:
+            req_context = aiohttp.request(
+                method=request.method,
+                url=request.url,
+                data=data,
+                headers=request.headers,
+            )
 
         async with req_context as resp:
             return Response(
@@ -262,7 +264,7 @@ class HttpClient:
             resp: Request response.
 
         Returns:
-            Body of the response.
+            Body of the parsed response.
         """
         if resp.status == HTTPStatus.NO_CONTENT:
             return {}
@@ -277,38 +279,26 @@ class HttpClient:
 
         return {}
 
+    async def _apply_middleware(self, request: Request) -> Response:
+        """Apply middleware to the request.
 
-class Response(NamedTuple):
-    """Response structure for the HTTP client."""
+        Args:
+            request: Request data.
 
-    status: int
-    """Response status code."""
+        Returns:
+            Response from the processed request.
+        """
 
-    headers: Mapping[str, str]
-    """Response headers."""
+        async def _raw_request_wrap(
+            request: Request,
+            http_client: HttpClient,
+        ) -> Response:
+            return await self._raw_request(request)
 
-    raw_body: Any
-    """Raw response body."""
+        middlewares = self.system_middlewares + list(reversed(self.middlewares))
+        next_call: NextCallType = _raw_request_wrap
 
-    body: dict[str, Any]
-    """Parsed response body."""
+        for middleware in middlewares:
+            next_call = partial(middleware, next_call=next_call)
 
-
-@dataclass
-class Request:
-    """Request data class."""
-
-    method: HttpMethod
-    """HTTP method to use."""
-
-    url: StrOrURL
-    """URL to send the request to."""
-
-    payload: Any | None = (None,)
-    """Payload to send with the request."""
-
-    files: Sequence[AttachedFile] | None = None
-    """Files to send with the request."""
-
-    headers: Mapping[str, str] | None = None
-    """Headers to send with the request."""
+        return await next_call(request, self)

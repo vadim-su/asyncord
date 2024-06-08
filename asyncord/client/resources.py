@@ -4,10 +4,7 @@ from __future__ import annotations
 
 import aiohttp
 
-from asyncord.client.http.bucket_track import BucketTrack
 from asyncord.client.http.client import HttpClient
-from asyncord.client.http.headers import AUTHORIZATION
-from asyncord.client.http.middleware import BaseMiddleware, BasicMiddleWare
 
 
 class ClientResource:
@@ -18,7 +15,6 @@ class ClientResource:
         token: str,
         session: aiohttp.ClientSession | None = None,
         http_client: HttpClient | None = None,
-        middleware: BaseMiddleware | None = None,
     ) -> None:
         """Initialize the resource.
 
@@ -34,14 +30,6 @@ class ClientResource:
         else:
             self._http_client: HttpClient = HttpClient(
                 session=session,
-            )
-
-        if middleware:
-            self._http_client.middleware = middleware
-        else:
-            self._http_client.middleware = BasicMiddleWare(
-                headers={AUTHORIZATION: f'Bot {token}'},
-                bucket_tracker=BucketTrack(),
             )
 
 
