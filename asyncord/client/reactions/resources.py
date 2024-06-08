@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from asyncord.client.http.client import HttpClient
 from asyncord.client.resources import APIResource
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import SnowflakeInputType
@@ -20,12 +21,12 @@ class ReactionResource(APIResource):
 
     def __init__(
         self,
-        parent: APIResource,
+        http_client: HttpClient,
         channel_id: SnowflakeInputType,
         message_id: SnowflakeInputType,
     ):
         """Initialize the reaction resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.channel_id = channel_id
         messages_url = self.channels_url / str(self.channel_id) / 'messages'
         self.reactions_url = messages_url / str(message_id) / 'reactions'

@@ -63,7 +63,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         Returns:
             Member subresource for the guild.
         """
-        return MemberResource(self, guild_id)
+        return MemberResource(self._http_client, guild_id)
 
     def guild_templates(self, guild_id: SnowflakeInputType) -> GuildTemplatesResource:
         """Get the guild templates subresource for a guild.
@@ -71,7 +71,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         Args:
             guild_id: ID of the guild to get the guild templates subresource for.
         """
-        return GuildTemplatesResource(self, guild_id)
+        return GuildTemplatesResource(self._http_client, guild_id)
 
     def ban_managment(self, guild_id: SnowflakeInputType) -> BanResource:
         """Get the ban subresource for a guild.
@@ -82,7 +82,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         Returns:
             Ban subresource for the guild.
         """
-        return BanResource(self, guild_id)
+        return BanResource(self._http_client, guild_id)
 
     def roles(self, guild_id: SnowflakeInputType) -> RoleResource:
         """Get the role subresource for a guild.
@@ -93,7 +93,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         Returns:
             Role subresource for the guild.
         """
-        return RoleResource(self, guild_id)
+        return RoleResource(self._http_client, guild_id)
 
     def events(self, guild_id: SnowflakeInputType) -> ScheduledEventsResource:
         """Get the events subresource for a guild.
@@ -104,7 +104,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         Returns:
             Events subresource for the guild.
         """
-        return ScheduledEventsResource(self, guild_id)
+        return ScheduledEventsResource(self._http_client, guild_id)
 
     def emojis(self, guild_id: SnowflakeInputType) -> EmojiResource:
         """Get the emojis subresource for a guild.
@@ -115,7 +115,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         Returns:
             Emojis subresource for the guild.
         """
-        return EmojiResource(self, guild_id)
+        return EmojiResource(self._http_client, guild_id)
 
     async def get(self, guild_id: SnowflakeInputType, with_counts: bool = False) -> GuildResponse:
         """Get a guild.

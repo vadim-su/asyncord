@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from asyncord.client.emojis.models.requests import CreateEmojiRequest, UpdateEmojiRequest
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.resources import APIResource
@@ -22,11 +23,11 @@ class EmojiResource(APIResource):
 
     def __init__(
         self,
-        parent: APIResource,
+        http_client: HttpClient,
         guild_id: SnowflakeInputType,
     ):
         """Create a new emojis resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.guild_id = guild_id
         self.emojis_url = self.guilds_url / str(self.guild_id) / 'emojis'
 

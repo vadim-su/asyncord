@@ -37,7 +37,7 @@ class MessageResource(APIResource):
         Returns:
             Reactions resource for the message.
         """
-        return ReactionResource(self, self.channel_id, message_id)
+        return ReactionResource(self._http_client, self.channel_id, message_id)
 
     async def get(
         self,

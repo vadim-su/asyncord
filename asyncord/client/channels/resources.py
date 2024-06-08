@@ -58,7 +58,7 @@ class ChannelResource(APIResource):
         Returns:
             Resource for managing polls.
         """
-        return PollsResource(self, channel_id)
+        return PollsResource(self._http_client, channel_id)
 
     def threads(self, channel_id: SnowflakeInputType) -> ThreadResource:
         """Get the thread resource for the channel.
@@ -69,7 +69,7 @@ class ChannelResource(APIResource):
         Returns:
             Resource for managing threads.
         """
-        return ThreadResource(self, channel_id)
+        return ThreadResource(self._http_client, channel_id)
 
     async def get(self, channel_id: SnowflakeInputType) -> ChannelResponse:
         """Get a channel by id.

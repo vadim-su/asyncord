@@ -30,7 +30,7 @@ class ApplicationResource(APIResource):
         Returns:
             Commands resource.
         """
-        return CommandResource(self, app_id)
+        return CommandResource(self._http_client, app_id)
 
     async def get_application(self) -> ApplicationOut:
         """Get the current application.

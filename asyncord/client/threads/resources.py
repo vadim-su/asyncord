@@ -47,7 +47,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
         Returns:
             Messages resource for the thread.
         """
-        return MessageResource(self, thread_id)
+        return MessageResource(self._http_client, thread_id)
 
     async def get(self, thread_id: SnowflakeInputType) -> ThreadResponse:
         """Get a thread."""
