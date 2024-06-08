@@ -41,7 +41,7 @@ class ScheduledEventsResource(ClientSubresource):
             GuildScheduleEvent object for the ID provided.
         """
         url = self.events_url / str(event_id) % {'with_user_count': str(with_user_count)}
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ScheduledEventResponse.model_validate(resp.body)
 
     async def get_list(self, with_user_count: bool = False) -> list[ScheduledEventResponse]:
@@ -54,7 +54,7 @@ class ScheduledEventsResource(ClientSubresource):
             List of GuildScheduleEvent objects.
         """
         url = self.events_url % {'with_user_count': str(with_user_count)}
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(ScheduledEventResponse).validate_python(resp.body)
 
     async def create(
@@ -77,7 +77,7 @@ class ScheduledEventsResource(ClientSubresource):
             headers = {}
 
         paylod = event_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(self.events_url, payload=paylod, headers=headers)
+        resp = await self._http_client.post(url=self.events_url, payload=paylod, headers=headers)
         return ScheduledEventResponse.model_validate(resp.body)
 
     async def update(
@@ -96,7 +96,7 @@ class ScheduledEventsResource(ClientSubresource):
         """
         url = self.events_url / str(event_id)
         payload = event_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(url, payload)
+        resp = await self._http_client.patch(url=url, payload=payload)
         return ScheduledEventResponse.model_validate(resp.body)
 
     async def delete(self, event_id: SnowflakeInputType) -> None:
@@ -106,7 +106,7 @@ class ScheduledEventsResource(ClientSubresource):
             event_id: ID of the event to delete.
         """
         url = self.events_url / str(event_id)
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def get_event_users(self, event_id: SnowflakeInputType) -> list[ScheduledEventUserResponse]:
         """Get a list of users who have signed up for a scheduled event.
@@ -118,5 +118,5 @@ class ScheduledEventsResource(ClientSubresource):
             List of users who have signed up for the event.
         """
         url = self.events_url / str(event_id) / 'users'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(ScheduledEventUserResponse).validate_python(resp.body)

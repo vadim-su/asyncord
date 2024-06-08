@@ -1,13 +1,12 @@
 """This module contains some useful type definitions and type adapters."""
 
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, NewType
+from typing import TYPE_CHECKING
 
 from pydantic import TypeAdapter
 from yarl import URL
 
 StrOrURL = str | URL
-Payload = NewType('Payload', Any)
 
 
 # Fix for pydanitc and pylance. Pylance doesn't correctly infer the type

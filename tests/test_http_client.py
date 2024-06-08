@@ -72,6 +72,7 @@ async def test_http_client_general_methods(
         request_mock = mocker.patch('aiohttp.request')
 
     client = HttpClient(session)
+    client.system_middlewares = []
     client_method = getattr(client, method.lower())
     if payload is not None:
         await client_method(url=url, headers=headers, payload=payload)
@@ -152,6 +153,7 @@ async def test_apply_middleware(mocker: MockFixture) -> None:
             _middleware_wrap(middleware2),
         ],
     )
+    client.system_middlewares = []
     client.system_middlewares.append(_middleware_wrap(system_middleware))
 
     request_mock = Mock()

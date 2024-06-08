@@ -7,6 +7,7 @@ https://discord.com/developers/docs/interactions/message-components#message-comp
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Sequence
 from typing import Annotated, Any, Literal, Self
 from typing import get_args as get_typing_args
 
@@ -110,8 +111,8 @@ class Button(BaseComponent):
     @model_validator(mode='after')
     def validate_style(self) -> Self:
         """Check that `custom_id` or `url` are set."""
-        custom_id: str | None = self.custom_id
-        url: str | None = self.url
+        custom_id = self.custom_id
+        url = self.url
 
         if self.style is ButtonStyle.LINK:
             if custom_id:
@@ -378,7 +379,7 @@ class ActionRow(BaseComponent):
     https://discord.com/developers/docs/interactions/message-components#action-rows
     """
 
-    def __init__(self, components: list[Component | TextInput] | Component | TextInput) -> None:
+    def __init__(self, components: Sequence[Component | TextInput] | Component | TextInput) -> None:
         """Create a new action row.
 
         This constructor helps to avoid us to add extra indentation in the code.
@@ -415,7 +416,7 @@ class ActionRow(BaseComponent):
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
     """Type of the component."""
 
-    components: Annotated[list[Component | TextInput], Field(min_length=1, max_length=5)] | Component | TextInput
+    components: Annotated[Sequence[Component | TextInput], Field(min_length=1, max_length=5)] | Component | TextInput
     """Components in the action row.
 
     Text input components are not allowed in action rows.
@@ -450,7 +451,8 @@ class ActionRow(BaseComponent):
             raise ValueError('ActionRow can contain only one select menu')
 
         # Check if TextInputInput is mixed with other components
-        if component_counts[TextInput] and len(components) != component_counts[TextInput]:
+        text_input_count = component_counts[ComponentType.TEXT_INPUT]
+        if text_input_count and len(components) != text_input_count:
             raise ValueError('Text input components cannot be mixed with other components')
 
         return components

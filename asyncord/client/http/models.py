@@ -6,6 +6,8 @@ from collections.abc import Mapping, MutableMapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, BinaryIO, NamedTuple
 
+import aiohttp
+
 from asyncord.client.http.headers import HttpMethod
 from asyncord.typedefs import StrOrURL
 
@@ -13,13 +15,16 @@ from asyncord.typedefs import StrOrURL
 class Response(NamedTuple):
     """Response structure for the HTTP client."""
 
+    raw_response: aiohttp.ClientResponse
+    """Raw response object."""
+
     status: int
     """Response status code."""
 
     headers: Mapping[str, str]
     """Response headers."""
 
-    raw_body: Any
+    raw_body: str
     """Raw response body."""
 
     body: dict[str, Any]
@@ -36,7 +41,7 @@ class Request:
     url: StrOrURL
     """URL to send the request to."""
 
-    payload: Any | None = (None,)
+    payload: Any | None = None
     """Payload to send with the request."""
 
     files: Sequence[AttachedFile] | None = None

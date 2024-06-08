@@ -40,7 +40,7 @@ class CommandResource(ClientSubresource):
             Object of the command.
         """
         url = self.commands_url / str(command_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ApplicationCommandResponse.model_validate(resp.body)
 
     async def get_list(self) -> list[ApplicationCommandResponse]:
@@ -49,7 +49,7 @@ class CommandResource(ClientSubresource):
         Returns:
             List of commands.
         """
-        resp = await self._http_client.get(self.commands_url)
+        resp = await self._http_client.get(url=self.commands_url)
         return list_model(ApplicationCommandResponse).validate_python(resp.body)
 
     async def create(self, command_data: CreateApplicationCommandRequest) -> ApplicationCommandResponse:
@@ -64,7 +64,7 @@ class CommandResource(ClientSubresource):
             Created command.
         """
         payload = command_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(self.commands_url, payload)
+        resp = await self._http_client.post(url=self.commands_url, payload=payload)
         return ApplicationCommandResponse.model_validate(resp.body)
 
     async def delete(self, command_id: SnowflakeInputType) -> None:
@@ -74,4 +74,4 @@ class CommandResource(ClientSubresource):
             command_id: ID of the command to delete.
         """
         url = self.commands_url / str(command_id)
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)

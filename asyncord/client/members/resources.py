@@ -38,7 +38,7 @@ class MemberResource(ClientSubresource):
             Member object for the ID provided.
         """
         url = self.members_url / str(user_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return MemberResponse.model_validate(resp.body)
 
     async def get_list(self, limit: int | None = None, after: SnowflakeInputType | None = None) -> list[MemberResponse]:
@@ -62,7 +62,7 @@ class MemberResource(ClientSubresource):
             url_params['after'] = after
 
         url = self.members_url % url_params
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(MemberResponse).validate_python(resp.body)
 
     async def search(self, nick_or_name: str, limit: int | None = None) -> list[MemberResponse]:
@@ -83,7 +83,7 @@ class MemberResource(ClientSubresource):
             url_params['limit'] = limit
 
         url = self.members_url % url_params
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(MemberResponse).validate_python(resp.body)
 
     async def update(
@@ -107,7 +107,7 @@ class MemberResource(ClientSubresource):
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
-        resp = await self._http_client.patch(url, member_data, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=member_data, headers=headers)
         return MemberResponse(**resp.body)
 
     async def update_current_member(
@@ -131,7 +131,7 @@ class MemberResource(ClientSubresource):
         else:
             headers = {}
         payload = {'nick': nickname}
-        resp = await self._http_client.patch(url, payload, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return MemberResponse.model_validate(resp.body)
 
     async def add_role(
@@ -152,7 +152,7 @@ class MemberResource(ClientSubresource):
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
-        await self._http_client.put(url, None, headers=headers)
+        await self._http_client.put(url=url, headers=headers)
 
     async def remove_role(
         self,
@@ -172,7 +172,7 @@ class MemberResource(ClientSubresource):
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def kick(self, user_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Kick a member from the guild.
@@ -186,7 +186,7 @@ class MemberResource(ClientSubresource):
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     # Fixme: Possibly need to add a test.
     # Needs users oauth2 token.
@@ -207,7 +207,7 @@ class MemberResource(ClientSubresource):
         https://canary.discord.com/developers/docs/resources/guild#add-guild-member
         """
         url = self.members_url / str(user_id)
-        resp = await self._http_client.put(url)
+        resp = await self._http_client.put(url=url)
 
         if resp.status == 201:  # noqa: PLR2004
             return MemberResponse.model_validate(resp.body)

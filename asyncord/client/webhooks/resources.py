@@ -49,7 +49,7 @@ class WebhooksResource(ClientSubresource):
             channel_id: ID of the channel to get webhooks for.
         """
         url = self.channel_url / str(channel_id) / 'webhooks'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(WebhookResponse).validate_python(resp.body)
 
     async def get_guild_webhooks(
@@ -65,7 +65,7 @@ class WebhooksResource(ClientSubresource):
             guild_id: ID of the guild to get webhooks for.
         """
         url = self.guilds_url / str(guild_id) / 'webhooks'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(WebhookResponse).validate_python(resp.body)
 
     async def get_webhook(
@@ -87,7 +87,7 @@ class WebhooksResource(ClientSubresource):
         if webhook_token is not None:
             url /= str(webhook_token)
 
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return WebhookResponse.model_validate(resp.body)
 
     async def create_webhook(
@@ -114,7 +114,7 @@ class WebhooksResource(ClientSubresource):
             headers = {}
 
         payload = create_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(url, payload, headers=headers)
+        resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return WebhookResponse.model_validate(resp.body)
 
     async def update_webhook(
@@ -150,7 +150,7 @@ class WebhooksResource(ClientSubresource):
         else:
             headers = {}
 
-        resp = await self._http_client.patch(url, payload, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return WebhookResponse.model_validate(resp.body)
 
     async def delete_webhook(
@@ -179,9 +179,9 @@ class WebhooksResource(ClientSubresource):
         else:
             headers = {}
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
-    async def execute_webhook(  # noqa: PLR0913
+    async def execute_webhook(
         self,
         webhook_id: SnowflakeInputType,
         webhook_token: str,
@@ -210,11 +210,17 @@ class WebhooksResource(ClientSubresource):
         url = self.webhooks_url / str(webhook_id) / str(webhook_token) % params
         payload = execute_data.model_dump(mode='json', exclude_unset=True)
 
+        # TODO: Fix type of files field
+        # fmt: off
         message = await self._http_client.post(
-            url,
-            payload,
-            files=[(file.filename, file.content_type, file.content) for file in execute_data.files],
+            url=url,
+            payload=payload,
+            files=[
+                (file.filename, file.content_type, file.content)
+                for file in execute_data.files
+            ],  # type: ignore
         )
+        # fmt: on
 
         if wait:
             return MessageResponse.model_validate(message.body)
@@ -241,13 +247,13 @@ class WebhooksResource(ClientSubresource):
         """
         url = self.webhooks_url / str(webhook_id) / str(webhook_token) / 'messages' / str(message_id)
         if thread_id is not None:
-            params = {'thread_id': thread_id}
+            params = {'thread_id': str(thread_id)}
             url %= params
 
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return MessageResponse.model_validate(resp.body)
 
-    async def update_webhook_message(  # noqa: PLR0913
+    async def update_webhook_message(
         self,
         webhook_id: SnowflakeInputType,
         webhook_token: str,
@@ -269,16 +275,22 @@ class WebhooksResource(ClientSubresource):
         """
         url = self.webhooks_url / str(webhook_id) / str(webhook_token) / 'messages' / str(message_id)
         if thread_id is not None:
-            params = {'thread_id': thread_id}
+            params = {'thread_id': str(thread_id)}
             url %= params
 
         payload = update_data.model_dump(mode='json', exclude_unset=True)
 
+        # TODO: Fix type of files field
+        # fmt: off
         resp = await self._http_client.patch(
-            url,
-            payload,
-            files=[(file.filename, file.content_type, file.content) for file in update_data.files],
+            url=url,
+            payload=payload,
+            files=[
+                (file.filename, file.content_type, file.content)
+                for file in update_data.files
+            ],  # type: ignore
         )
+        # fmt: on
 
         return MessageResponse.model_validate(resp.body)
 
@@ -302,7 +314,7 @@ class WebhooksResource(ClientSubresource):
         """
         url = self.webhooks_url / str(webhook_id) / str(webhook_token) / 'messages' / str(message_id)
         if thread_id is not None:
-            params = {'thread_id': thread_id}
+            params = {'thread_id': str(thread_id)}
             url %= params
 
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)

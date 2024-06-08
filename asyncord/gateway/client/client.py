@@ -23,6 +23,7 @@ from asyncord.gateway.dispatcher import EventDispatcher
 from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 from asyncord.gateway.message import (
     DatalessMessage,
+    DispatchMessage,
     GatewayCommandOpcode,
     GatewayMessageAdapter,
     GatewayMessageOpcode,
@@ -170,7 +171,7 @@ class GatewayClient:
             self._need_restart.clear()
 
             url = self.conn_data.resume_url
-            async with self.session.ws_connect(url) as ws:
+            async with self.session.ws_connect(url=url) as ws:
                 self._ws = ws
                 try:
                     await self._ws_recv_loop(ws)
@@ -225,7 +226,7 @@ class GatewayClient:
         return None
 
     async def _handle_message(self, message: GatewayMessageType) -> None:
-        if message.opcode is GatewayMessageOpcode.DISPATCH:
+        if isinstance(message, DispatchMessage):
             self.logger.info('Dispatching event: %s', message.event_name)
         else:
             self.logger.info('Received message: %s', message.opcode.name)

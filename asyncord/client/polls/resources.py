@@ -55,7 +55,7 @@ class PollsResource(ClientSubresource):
 
         url = self.poll_url / str(message_id) / 'answers' / str(answer_id) % query_param
 
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return GetAnswerVotersResponse.model_validate(resp.body)
 
     async def end_poll(
@@ -76,5 +76,5 @@ class PollsResource(ClientSubresource):
 
         payload = {}
 
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return MessageResponse.model_validate(resp.body)

@@ -81,7 +81,7 @@ class ChannelResource(ClientSubresource):
             Channel object.
         """
         url = self.channels_url / str(channel_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ChannelResponse(**resp.body)
 
     async def create_channel(
@@ -114,7 +114,7 @@ class ChannelResource(ClientSubresource):
         channel_data.type = channel_data.type  # type: ignore
 
         payload = channel_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(url, payload, headers=headers)
+        resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return ChannelResponse.model_validate(resp.body)
 
     async def update(
@@ -142,7 +142,7 @@ class ChannelResource(ClientSubresource):
 
         payload = channel_data.model_dump(mode='json', exclude_unset=True)
 
-        resp = await self._http_client.patch(url, payload, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return ChannelResponse.model_validate(resp.body)
 
     async def update_channel_position(
@@ -163,7 +163,7 @@ class ChannelResource(ClientSubresource):
 
         payload = [position.model_dump(mode='json', exclude_unset=True) for position in position_data]
 
-        await self._http_client.patch(url, payload)
+        await self._http_client.patch(url=url, payload=payload)
 
     async def delete(self, channel_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Delete a channel, or close a private message.
@@ -187,7 +187,7 @@ class ChannelResource(ClientSubresource):
         else:
             headers = {}
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def update_permissions(
         self,
@@ -244,7 +244,7 @@ class ChannelResource(ClientSubresource):
 
         url = self.channels_url / str(channel_id) / 'permissions' / str(overwrite_id)
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def get_channel_invites(self, channel_id: SnowflakeInputType) -> list[InviteResponse]:
         """Get the invites for a channel.
@@ -259,7 +259,7 @@ class ChannelResource(ClientSubresource):
             List of invites for the channel.
         """
         url = self.channels_url / str(channel_id) / 'invites'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(InviteResponse).validate_python(resp.body)
 
     async def create_channel_invite(
@@ -313,7 +313,7 @@ class ChannelResource(ClientSubresource):
             'webhook_channel_id': str(webhook_channel_id),
         }
 
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return resp.body
 
     async def trigger_typing_indicator(self, channel_id: SnowflakeInputType) -> None:
@@ -328,4 +328,4 @@ class ChannelResource(ClientSubresource):
 
         payload = {}
 
-        await self._http_client.post(url, payload)
+        await self._http_client.post(url=url, payload=payload)

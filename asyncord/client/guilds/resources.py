@@ -130,7 +130,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Guild with the specified ID.
         """
         url = self.guilds_url / str(guild_id) % {'with_counts': str(with_counts)}
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return GuildResponse.model_validate(resp.body)
 
     async def get_preview(self, guild_id: SnowflakeInputType) -> GuildPreviewResponse:
@@ -146,7 +146,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Preview of the guild with the specified ID.
         """
         url = self.guilds_url / str(guild_id) / 'preview'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return GuildPreviewResponse.model_validate(resp.body)
 
     async def create(self, guild_data: CreateGuildRequest) -> GuildResponse:
@@ -163,7 +163,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             The created guild.
         """
         payload = guild_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(self.guilds_url, payload)
+        resp = await self._http_client.post(url=self.guilds_url, payload=payload)
         return GuildResponse.model_validate(resp.body)
 
     async def delete(self, guild_id: SnowflakeInputType) -> None:
@@ -173,7 +173,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             guild_id: ID of the guild to delete.
         """
         url = self.guilds_url / str(guild_id)
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def update_mfa(self, guild_id: SnowflakeInputType, level: MFALevel) -> MFALevel:
         """Update the MFA (Multi Factor Authentication) level for a guild.
@@ -189,8 +189,8 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'mfa'
         payload = {'level': level}
-        resp = await self._http_client.patch(url, payload)
-        return MFALevel(int(resp.body))
+        resp = await self._http_client.patch(url=url, payload=payload)
+        return MFALevel(int(resp.raw_body))
 
     async def get_prune_count(
         self,
@@ -224,11 +224,11 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             headers = {}
 
         url = self.guilds_url / str(guild_id) / 'prune' % url_params
-        resp = await self._http_client.get(url, headers)
+        resp = await self._http_client.get(url=url, headers=headers)
         return PruneResponse.model_validate(resp.body)
 
     # TODO: #15 Replace args with a dataclass
-    async def begin_prune(  # noqa: PLR0913
+    async def begin_prune(
         self,
         *,
         guild_id: SnowflakeInputType,
@@ -273,7 +273,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             headers = {}
 
         url = self.guilds_url / str(guild_id) / 'prune'
-        resp = await self._http_client.post(url, payload, headers=headers)
+        resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return PruneResponse.model_validate(resp.body)
 
     async def get_voice_regions(self, guild_id: SnowflakeInputType) -> list[VoiceRegionResponse]:
@@ -288,7 +288,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Voice regions for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'regions'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(VoiceRegionResponse).validate_python(resp.body)
 
     async def get_invites(self, guild_id: SnowflakeInputType) -> list[InviteResponse]:
@@ -303,7 +303,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Invites for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'invites'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(InviteResponse).validate_python(resp.body)
 
     async def get_channels(self, guild_id: SnowflakeInputType) -> list[ChannelResponse]:
@@ -318,7 +318,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Channels for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'channels'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(ChannelResponse).validate_python(resp.body)
 
     async def get_integrations(self, guild_id: SnowflakeInputType) -> list[IntegrationResponse]:
@@ -333,7 +333,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Integrations for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'integrations'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(IntegrationResponse).validate_python(resp.body)
 
     async def delete_integration(
@@ -358,7 +358,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         else:
             headers = {AUDIT_LOG_REASON: reason}
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def get_widget(
         self,
@@ -366,7 +366,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
     ) -> WidgetResponse:
         """Get the widget for a guild."""
         url = self.guilds_url / str(guild_id) / 'widget.json'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return WidgetResponse.model_validate(resp.body)
 
     async def get_widget_settings(
@@ -382,7 +382,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             guild_id: ID of the guild to get the widget for.
         """
         url = self.guilds_url / str(guild_id) / 'widget'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return WidgetSettingsResponse.model_validate(resp.body)
 
     async def update_widget(
@@ -409,13 +409,13 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             headers = {}
 
         payload = widget_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(url, payload, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return WidgetSettingsResponse.model_validate(resp.body)
 
     async def get_widget_image(
         self,
         guild_id: SnowflakeInputType,
-        style: WidgetStyleOptions = None,
+        style: WidgetStyleOptions | None = None,
     ) -> bytes:
         """Get the widget image for a guild.
 
@@ -430,8 +430,8 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         if style is not None:
             url %= {'style': style}
 
-        resp = await self._http_client.get(url)
-        return resp.body
+        resp = await self._http_client.get(url=url)
+        return resp.raw_body.encode()
 
     async def get_onboarding(
         self,
@@ -446,7 +446,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             guild_id: ID of the guild to get the welcome screen for.
         """
         url = self.guilds_url / str(guild_id) / 'onboarding'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return OnboardingResponse.model_validate(resp.body)
 
     async def update_onboarding(
@@ -473,7 +473,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             headers = {}
 
         payload = onboarding_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.put(url, payload, headers=headers)
+        resp = await self._http_client.put(url=url, payload=payload, headers=headers)
         return OnboardingResponse.model_validate(resp.body)
 
     async def get_welcome_screen(self, guild_id: SnowflakeInputType) -> WelcomeScreenResponse:
@@ -488,7 +488,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             Welcome screen for the guild.
         """
         url = self.guilds_url / str(guild_id) / 'welcome-screen'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return WelcomeScreenResponse.model_validate(resp.body)
 
     async def update_welcome_screen(
@@ -517,7 +517,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             headers = {}
 
         payload = welcome_screen_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(url, payload, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return WelcomeScreenResponse.model_validate(resp.body)
 
     async def update_current_user_voice_state(
@@ -546,7 +546,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             payload['suppress'] = suppress
         if request_to_speak_timestamp is not None:
             payload['request_to_speak_timestamp'] = request_to_speak_timestamp.isoformat()
-        await self._http_client.patch(url, payload)
+        await self._http_client.patch(url=url, payload=payload)
 
     async def update_user_voice_state(
         self,
@@ -572,9 +572,9 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             payload['channel_id'] = str(channel_id)
         if suppress is not None:
             payload['suppress'] = suppress
-        await self._http_client.patch(url, payload)
+        await self._http_client.patch(url=url, payload=payload)
 
-    async def get_audit_log(  # noqa: PLR0913, PLR0917
+    async def get_audit_log(
         self,
         guild_id: SnowflakeInputType,
         user_id: SnowflakeInputType | None = None,
@@ -610,7 +610,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
 
         url = self.guilds_url / str(guild_id) / 'audit-logs' % query_params
 
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return AuditLogResponse.model_validate(resp.body)
 
     async def get_list_auto_moderation_rules(
@@ -626,7 +626,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         https://canary.discord.com/developers/docs/resources/auto-moderation#list-auto-moderation-rules-for-guild
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(AutoModerationRule).validate_python(resp.body)
 
     async def get_auto_moderation_rule(
@@ -644,7 +644,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         https://canary.discord.com/developers/docs/resources/auto-moderation#get-auto-moderation-rule
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return AutoModerationRule.model_validate(resp.body)
 
     async def create_auto_moderation_rule(
@@ -659,7 +659,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules'
         payload = rule.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return AutoModerationRule.model_validate(resp.body)
 
     async def update_auto_moderation_rule(
@@ -675,7 +675,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
         payload = rule.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(url, payload)
+        resp = await self._http_client.patch(url=url, payload=payload)
         return AutoModerationRule.model_validate(resp.body)
 
     async def delete_auto_moderation_rule(
@@ -689,7 +689,7 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
         https://canary.discord.com/developers/docs/resources/auto-moderation#delete-auto-moderation-rule
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def get_vanity_url(
         self,
@@ -704,5 +704,5 @@ class GuildResource(ClientSubresource):  # noqa: PLR0904
             guild_id: ID of the guild to get the vanity url for.
         """
         url = self.guilds_url / str(guild_id) / 'vanity-url'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return VanityUrlInviteResponse.model_validate(resp.body)

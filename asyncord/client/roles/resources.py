@@ -34,7 +34,7 @@ class RoleResource(ClientSubresource):
         Returns:
             List of roles in the guild.
         """
-        resp = await self._http_client.get(self.roles_url)
+        resp = await self._http_client.get(url=self.roles_url)
         return list_model(RoleResponse).validate_python(resp.body)
 
     async def create(
@@ -59,7 +59,7 @@ class RoleResource(ClientSubresource):
             headers = {}
 
         payload = role_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(self.roles_url, payload, headers=headers)
+        resp = await self._http_client.post(url=self.roles_url, payload=payload, headers=headers)
         return RoleResponse.model_validate(resp.body)
 
     async def change_role_positions(self, role_positions: list[RolePositionRequest]) -> list[RoleResponse]:
@@ -73,7 +73,7 @@ class RoleResource(ClientSubresource):
         Returns:
             List of roles in the guild.
         """
-        resp = await self._http_client.patch(self.roles_url, role_positions)
+        resp = await self._http_client.patch(url=self.roles_url, payload=role_positions)
         return list_model(RoleResponse).validate_python(resp.body)
 
     async def update_role(self, role_id: SnowflakeInputType, role_data: UpdateRoleRequest) -> RoleResponse:
@@ -90,7 +90,7 @@ class RoleResource(ClientSubresource):
         """
         url = self.roles_url / str(role_id)
         payload = role_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(url, payload)
+        resp = await self._http_client.patch(url=url, payload=payload)
         return RoleResponse.model_validate(resp.body)
 
     async def delete(self, role_id: SnowflakeInputType, reason: str | None = None) -> None:
@@ -108,4 +108,4 @@ class RoleResource(ClientSubresource):
         else:
             headers = {}
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)

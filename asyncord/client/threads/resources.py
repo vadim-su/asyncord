@@ -51,7 +51,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
     async def get(self, thread_id: SnowflakeInputType) -> ThreadResponse:
         """Get a thread."""
         url = self.channels_url / str(thread_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ThreadResponse.model_validate(resp.body)
 
     async def get_active_threads(self, guild_id: SnowflakeInputType) -> ThreadsResponse:
@@ -64,7 +64,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             Thread list resource for the channel.
         """
         url = self.guilds_url / str(guild_id) / 'threads' / 'active'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ThreadsResponse.model_validate(resp.body)
 
     async def get_archived_threads(
@@ -93,7 +93,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             url = self.threads_url / 'archived' / 'private' % params
         else:
             url = self.threads_url / 'archived' / 'public' % params
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
 
         return ThreadsResponse.model_validate(resp.body)
 
@@ -116,7 +116,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
         private_url_part = 'users/@me/threads/archived/private'
         url = self.channels_url / str(self.channel_id) / private_url_part % params
 
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ThreadsResponse.model_validate(resp.body)
 
     async def create_thread_from_message(
@@ -139,7 +139,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
         url = self.channels_url / str(self.channel_id) / 'messages' / str(message_id) / 'threads'
 
         payload = thread_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(url, payload=payload, headers=headers)
+        resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return ThreadResponse.model_validate(resp.body)
 
     async def create_thread(self, thread_data: CreateThreadRequest, reason: str | None = None) -> ThreadResponse:
@@ -156,7 +156,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
         url = self.threads_url
 
         payload = thread_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(url, payload=payload, headers=headers)
+        resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return ThreadResponse.model_validate(resp.body)
 
     async def create_media_forum_thread(
@@ -176,6 +176,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             headers = {}
 
         payload = thread_data.model_dump(mode='json', exclude_unset=True)
+        # TODO: Fix type of files field
         # fmt: off
         resp = await self._http_client.post(
             url=self.threads_url,
@@ -183,7 +184,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             files=[
                 (file.filename, file.content_type, file.content)
                 for file in thread_data.message.files
-            ],
+            ],  # type: ignore
             headers=headers,
         )
         # fmt: on
@@ -203,7 +204,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
         else:
             headers = {}
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def join_thread(self, thread_id: SnowflakeInputType) -> None:
         """Join a thread.
@@ -212,7 +213,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             thread_id: Thread id.
         """
         url = self.channels_url / str(thread_id) / 'thread-members/@me'
-        await self._http_client.put(url, payload=None)
+        await self._http_client.put(url=url)
 
     async def add_member(self, thread_id: SnowflakeInputType, user_id: SnowflakeInputType) -> None:
         """Add a member to a thread.
@@ -222,7 +223,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             user_id: User id.
         """
         url = self.channels_url / str(thread_id) / 'thread-members' / str(user_id)
-        await self._http_client.put(url, payload=None)
+        await self._http_client.put(url=url)
 
     async def leave_thread(self, thread_id: SnowflakeInputType) -> None:
         """Leave a thread.
@@ -231,7 +232,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             thread_id: Thread id.
         """
         url = self.channels_url / str(thread_id) / 'thread-members/@me'
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def remove_member(
         self,
@@ -245,7 +246,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             user_id: User id.
         """
         url = self.channels_url / str(thread_id) / 'thread-members' / str(user_id)
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def get_members(
         self,
@@ -268,7 +269,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             params['limit'] = limit
 
         url = self.channels_url / str(thread_id) / 'thread-members'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(ThreadMemberResponse).validate_python(resp.body)
 
     async def get_member(
@@ -288,7 +289,7 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
         }
 
         url = self.channels_url / str(thread_id) / 'thread-members' / str(user_id) % params
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ThreadMemberResponse.model_validate(resp.body)
 
     async def lock(self, thread_id: SnowflakeInputType, reason: str | None = None) -> ThreadResponse:
@@ -364,5 +365,5 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
             headers = {}
 
         payload = thread_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(url, payload=payload, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return ThreadResponse.model_validate(resp.body)

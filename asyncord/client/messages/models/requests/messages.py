@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import io
 import mimetypes
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Annotated, Any, BinaryIO, Literal
 
@@ -307,7 +307,7 @@ class BaseMessage(BaseModel):
         return attachments
 
     @field_validator('components', check_fields=False)
-    def validate_components(cls, components: list[Component] | None) -> list[Component] | None:
+    def validate_components(cls, components: Sequence[Component] | Component | None) -> Sequence[Component] | None:
         """Validate components.
 
         Args:
@@ -322,7 +322,7 @@ class BaseMessage(BaseModel):
         if not components:
             return components
 
-        if not isinstance(components, list):
+        if not isinstance(components, Sequence):
             components = [components]
 
         if len(components) > MAX_COMPONENTS:
@@ -332,6 +332,7 @@ class BaseMessage(BaseModel):
             return components
 
         if all(not isinstance(component, ActionRow) for component in components):
+            components = [ActionRow(components=components)]
             return [ActionRow(components=components)]
 
         raise ValueError(
@@ -439,7 +440,7 @@ class CreateMessageRequest(BaseMessage):
     message_reference: MessageReference | None = None
     """Reference data sent with crossposted messages."""
 
-    components: list[Component] | Component | None = None
+    components: Sequence[Component] | Component | None = None
     """Components to include with the message."""
 
     sticker_ids: list[SnowflakeInputType] | None = None
@@ -495,7 +496,7 @@ class UpdateMessageRequest(BaseMessage):
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions for the message."""
 
-    components: list[Component] | Component | None = None
+    components: Sequence[Component] | Component | None = None
     """Components to include with the message."""
 
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)

@@ -53,7 +53,7 @@ class ReactionResource(ClientSubresource):
             url_params['limit'] = limit
 
         url = self.reactions_url / emoji % url_params
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(UserResponse).validate_python(resp.body)
 
     async def add(self, emoji: str) -> None:
@@ -63,7 +63,7 @@ class ReactionResource(ClientSubresource):
             emoji: Emoji to react with.
         """
         url = self.reactions_url / emoji / '@me'
-        await self._http_client.put(url, None)
+        await self._http_client.put(url=url)
 
     async def delete_own_reaction(self, emoji: str) -> None:
         """Delete a reaction the current user made for the message.
@@ -72,7 +72,7 @@ class ReactionResource(ClientSubresource):
             emoji: Emoji to delete the reaction for.
         """
         url = self.reactions_url / emoji / '@me'
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def delete(
         self,
@@ -94,4 +94,4 @@ class ReactionResource(ClientSubresource):
         if user_id is not None:
             url /= str(user_id)
 
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)

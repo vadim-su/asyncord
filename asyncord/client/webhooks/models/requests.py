@@ -1,5 +1,6 @@
 """Models for webhook requests."""
 
+from collections.abc import Sequence
 from typing import Any, Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
@@ -73,7 +74,7 @@ class ExecuteWebhookRequest(BaseModel):
     allowed_mentions: AllowedMentionType | None = None
     """Allowed mentions for the message."""
 
-    components: list[Component] | None = None
+    components: Sequence[Component] | None = None
     """The components to include with the message."""
 
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)
@@ -132,7 +133,7 @@ class UpdateWebhookMessageRequest(BaseModel):
     allowed_mentions: AllowedMentionType | None = None
     """Allowed mentions for the message."""
 
-    components: list[Component] | None = None
+    components: Sequence[Component] | None = None
     """The components to include with the message."""
 
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)

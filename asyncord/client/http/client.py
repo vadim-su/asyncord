@@ -15,8 +15,9 @@ from aiohttp.client import ClientResponse
 
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
 from asyncord.client.http.middleware.base import Middleware, NextCallType
+from asyncord.client.http.middleware.errors import ErrorHandlerMiddleware
 from asyncord.client.http.models import AttachedFile, Request, Response
-from asyncord.typedefs import Payload, StrOrURL
+from asyncord.typedefs import StrOrURL
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ class HttpClient:
         asyncio.get_running_loop()
         self.session = session
         self.middlewares: list[Middleware] = middlewares or []
-        self.system_middlewares: list[Middleware] = []
+        self.system_middlewares: list[Middleware] = [ErrorHandlerMiddleware()]
 
     async def get(
         self,
@@ -65,7 +66,7 @@ class HttpClient:
         self,
         *,
         url: StrOrURL,
-        payload: Payload,
+        payload: Any | None = None,  # noqa: ANN401
         files: list[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
@@ -97,7 +98,7 @@ class HttpClient:
         self,
         *,
         url: StrOrURL,
-        payload: Payload,
+        payload: Any | None = None,  # noqa: ANN401
         files: Sequence[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
@@ -129,7 +130,7 @@ class HttpClient:
         self,
         *,
         url: StrOrURL,
-        payload: Payload,
+        payload: Any,  # noqa: ANN401
         files: Sequence[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
@@ -161,7 +162,7 @@ class HttpClient:
         self,
         *,
         url: StrOrURL,
-        payload: Payload | None = None,
+        payload: Any | None = None,  # noqa: ANN401
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
@@ -250,6 +251,7 @@ class HttpClient:
 
         async with req_context as resp:
             return Response(
+                raw_response=resp,
                 status=resp.status,
                 headers=resp.headers,
                 raw_body=await resp.text(),

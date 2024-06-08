@@ -30,6 +30,7 @@ class UserResource(ClientSubresource):
 
     users_url = REST_API_URL / 'users'
     current_user_url = users_url / '@me'
+    channels_url = REST_API_URL / 'channels'
 
     async def get_current_user(self) -> UserResponse:
         """Get the current user.
@@ -37,7 +38,7 @@ class UserResource(ClientSubresource):
         Reference:
             https://discord.com/developers/docs/resources/user#modify-current-user
         """
-        resp = await self._http_client.get(self.current_user_url)
+        resp = await self._http_client.get(url=self.current_user_url)
         return UserResponse.model_validate(resp.body)
 
     async def get_user(self, user_id: SnowflakeInputType) -> UserResponse:
@@ -49,7 +50,7 @@ class UserResource(ClientSubresource):
             user_id: ID of the user to get.
         """
         url = self.users_url / str(user_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return UserResponse.model_validate(resp.body)
 
     async def update_user(self, user_update_data: UpdateUserRequest) -> UserResponse:
@@ -61,7 +62,7 @@ class UserResource(ClientSubresource):
         Reference: https://discord.com/developers/docs/resources/user#modify-current-user
         """
         payload = user_update_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(self.current_user_url, payload)
+        resp = await self._http_client.patch(url=self.current_user_url, payload=payload)
         return UserResponse.model_validate(resp.body)
 
     async def get_guilds(
@@ -96,7 +97,7 @@ class UserResource(ClientSubresource):
             url_params['limit'] = limit
 
         url = self.current_user_url / 'guilds' % url_params
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(UserGuildResponse).validate_python(resp.body)
 
     async def get_current_user_guild_member(self, guild_id: SnowflakeInputType) -> MemberResponse:
@@ -110,7 +111,7 @@ class UserResource(ClientSubresource):
             guild_id: ID of the guild.
         """
         url = self.current_user_url / f'guilds/{guild_id}/member'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return MemberResponse.model_validate(resp.body)
 
     async def leave_guild(self, guild_id: SnowflakeInputType) -> None:
@@ -122,7 +123,7 @@ class UserResource(ClientSubresource):
             guild_id: ID of the guild to leave.
         """
         url = self.current_user_url / f'guilds/{guild_id}'
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def create_dm(self, user_id: SnowflakeInputType) -> ChannelResponse:
         """Create a DM with a user.
@@ -134,7 +135,7 @@ class UserResource(ClientSubresource):
         """
         url = self.current_user_url / 'channels'
         payload = {'recipient_id': user_id}
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return ChannelResponse.model_validate(resp.body)
 
     async def create_group_dm(self, user_ids: list[SnowflakeInputType]) -> ChannelResponse:
@@ -160,7 +161,7 @@ class UserResource(ClientSubresource):
             raise ValueError('Cannot create a group DM with more than 10 users.')
         url = self.current_user_url / 'channels'
         payload = {'recipient_ids': user_ids}
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return ChannelResponse.model_validate(resp.body)
 
     async def add_group_dm_recipient(
@@ -185,7 +186,7 @@ class UserResource(ClientSubresource):
 
         payload = {'access_token': access_token, 'nick': nick}
 
-        await self._http_client.put(url, payload)
+        await self._http_client.put(url=url, payload=payload)
 
     async def remove_group_dm_recipient(
         self,
@@ -199,7 +200,7 @@ class UserResource(ClientSubresource):
         """
         url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
 
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def get_current_user_connections(
         self,
@@ -210,7 +211,7 @@ class UserResource(ClientSubresource):
         https://discord.com/developers/docs/resources/user#get-current-user-connections
         """
         url = self.current_user_url / 'connections'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(UserConnectionResponse).validate_python(resp.body)
 
     async def get_current_user_application_role_connection(
@@ -228,7 +229,7 @@ class UserResource(ClientSubresource):
             application_id: ID of the application.
         """
         url = self.current_user_url / 'applications' / str(application_id) / 'role-connection'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ApplicationRoleConnectionResponse.model_validate(resp.body)
 
     async def update_current_user_application_role_connection(
@@ -249,5 +250,5 @@ class UserResource(ClientSubresource):
         """
         url = self.current_user_url / 'applications' / str(application_id) / 'role-connection'
         payload = update_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.put(url, payload)
+        resp = await self._http_client.put(url=url, payload=payload)
         return ApplicationRoleConnectionResponse.model_validate(resp.body)

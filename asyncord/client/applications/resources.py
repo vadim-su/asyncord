@@ -38,7 +38,7 @@ class ApplicationResource(ClientSubresource):
         Returns:
             Application object.
         """
-        resp = await self._http_client.get(self.apps_url / '@me')
+        resp = await self._http_client.get(url=self.apps_url / '@me')
         return ApplicationOut.model_validate(resp.body)
 
     async def update_application(
@@ -55,7 +55,7 @@ class ApplicationResource(ClientSubresource):
         """
         payload = application_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.patch(
-            self.apps_url / '@me',
+            url=self.apps_url / '@me',
             payload=payload,
         )
         return ApplicationOut.model_validate(resp.body)
@@ -73,7 +73,7 @@ class ApplicationResource(ClientSubresource):
             List of application role connection metadata objects.
         """
         resp = await self._http_client.get(
-            self.apps_url / str(app_id) / 'role-connections/metadata',
+            url=self.apps_url / str(app_id) / 'role-connections/metadata',
         )
         return list_model(ApplicationRoleConnectionMetadataOut).validate_python(resp.body)
 
@@ -93,7 +93,7 @@ class ApplicationResource(ClientSubresource):
         """
         payload = apllication_role_metadata.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.patch(
-            self.apps_url / str(app_id) / 'role-connections/metadata',
+            url=self.apps_url / str(app_id) / 'role-connections/metadata',
             payload=payload,
         )
 

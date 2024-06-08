@@ -1,5 +1,6 @@
 """This module contains models for thread requests."""
 
+from collections.abc import Sequence
 from typing import Literal
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
@@ -76,7 +77,7 @@ class ThreadMessage(BaseMessage):
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions for the message."""
 
-    components: list[Component] | Component | None = None
+    components: Sequence[Component] | Component | None = None
     """Components to include with the message."""
 
     sticker_ids: list[SnowflakeInputType] | None = None
