@@ -6,13 +6,13 @@ from asyncord.client.applications.models.requests import (
 )
 from asyncord.client.applications.models.responses import ApplicationOut, ApplicationRoleConnectionMetadataOut
 from asyncord.client.commands.resources import CommandResource
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class ApplicationResource(ClientSubresource):
+class ApplicationResource(APIResource):
     """Represents the applications resource for the client.
 
     Attributes:

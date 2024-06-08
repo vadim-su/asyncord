@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.models.responses.messages import MessageResponse
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.webhooks.models.requests import (
     CreateWebhookRequest,
     ExecuteWebhookRequest,
@@ -23,7 +23,7 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class WebhooksResource(ClientSubresource):
+class WebhooksResource(APIResource):
     """Webhooks resource.
 
     Attributes:

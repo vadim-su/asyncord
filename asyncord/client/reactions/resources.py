@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class ReactionResource(ClientSubresource):
+class ReactionResource(APIResource):
     """Reaction resource for a message.
 
     Attributes:
@@ -20,7 +20,7 @@ class ReactionResource(ClientSubresource):
 
     def __init__(
         self,
-        parent: ClientResource,
+        parent: APIResource,
         channel_id: SnowflakeInputType,
         message_id: SnowflakeInputType,
     ):

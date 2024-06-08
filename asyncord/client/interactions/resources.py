@@ -12,7 +12,7 @@ from asyncord.client.interactions.models.requests import (
     InteractionResponseRequestType,
     InteractionUpdateMessageResponseRequest,
 )
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
 
@@ -25,7 +25,7 @@ _INTERACTIONS_CAN_CONTAIN_FILES = (
 """Interaction response types that can contain files."""
 
 
-class InteractionResource(ClientSubresource):
+class InteractionResource(APIResource):
     """Resource to perform actions on interactions."""
 
     interactions_url = REST_API_URL / 'interactions'

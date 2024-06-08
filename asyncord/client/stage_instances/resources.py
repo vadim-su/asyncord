@@ -7,13 +7,13 @@ https://canary.discord.com/developers/docs/resources/stage-instance
 from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.stage_instances.models.requests import CreateStageInstanceRequest, UpdateStageInstanceRequest
 from asyncord.client.stage_instances.models.responses import StageInstanceResponse
 from asyncord.urls import REST_API_URL
 
 
-class StageInstancesResource(ClientSubresource):
+class StageInstancesResource(APIResource):
     """Stage Instance Resource.
 
     These endpoints are for managing stage instances.

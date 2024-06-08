@@ -5,11 +5,11 @@ Reference: https://discord.com/developers/docs/topics/oauth2
 
 from asyncord.client.applications.models.responses import ApplicationOut
 from asyncord.client.auth.models import AuthorizationInfoResponse
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.urls import REST_API_URL
 
 
-class OAuthResource(ClientSubresource):
+class OAuthResource(APIResource):
     """Represents an OAuth2 resource.
 
     It defines the OAuth2 resource that can be used to authenticate a user with Discord.
@@ -30,7 +30,7 @@ class OAuthResource(ClientSubresource):
         https://discord.com/developers/docs/topics/oauth2#get-current-bot-application-information
         """
         url = self.oauth_url / 'applications' / '@me'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ApplicationOut.model_validate(resp.body)
 
     async def get_current_authorization_info(self) -> AuthorizationInfoResponse:
@@ -40,5 +40,5 @@ class OAuthResource(ClientSubresource):
         https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information
         """
         url = self.oauth_url / '@me'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return AuthorizationInfoResponse.model_validate(resp.body)

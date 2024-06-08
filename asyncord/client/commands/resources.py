@@ -6,13 +6,14 @@ https://discord.com/developers/docs/interactions/slash-commands#applicationcomma
 
 from asyncord.client.commands.models.requests import CreateApplicationCommandRequest
 from asyncord.client.commands.models.responses import ApplicationCommandResponse
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.http.client import HttpClient
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class CommandResource(ClientSubresource):
+class CommandResource(APIResource):
     """Represents the commands resource for the client.
 
     Reference:
@@ -24,9 +25,9 @@ class CommandResource(ClientSubresource):
 
     applications_url = REST_API_URL / 'applications'
 
-    def __init__(self, parent: ClientResource, app_id: SnowflakeInputType) -> None:
+    def __init__(self, http_client: HttpClient, app_id: SnowflakeInputType) -> None:
         """Initialize the command resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.app_id = app_id
         self.commands_url = self.applications_url / str(app_id) / 'commands'
 

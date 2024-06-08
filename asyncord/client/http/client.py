@@ -30,8 +30,13 @@ class HttpClient:
         session: aiohttp.ClientSession | None = None,
         middlewares: list[Middleware] | None = None,
     ) -> None:
-        """Initialize the client."""
-        asyncio.get_running_loop()
+        """Initialize the client.
+
+        Args:
+            session: Client session. Defaults to None.
+            middlewares: Middlewares to apply. Defaults to None.
+        """
+        asyncio.get_running_loop()  # we want to make sure we are running in an event loop
         self.session = session
         self.middlewares: list[Middleware] = middlewares or []
         self.system_middlewares: list[Middleware] = [ErrorHandlerMiddleware()]
@@ -186,6 +191,14 @@ class HttpClient:
             ),
             skip_middleware=skip_middleware,
         )
+
+    def add_middleware(self, middleware: Middleware) -> None:
+        """Add a middleware to the client.
+
+        Args:
+            middleware: Middleware to add.
+        """
+        self.middlewares.append(middleware)
 
     async def request(self, request: Request, *, skip_middleware: bool = False) -> Response:
         """Make a request to the Discord API.

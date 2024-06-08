@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from asyncord.client.bans.models.responses import BanResponse, BulkBanResponse
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class BanResource(ClientSubresource):
+class BanResource(APIResource):
     """Base class for ban resources.
 
     Attributes:
@@ -19,9 +20,9 @@ class BanResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):
+    def __init__(self, http_client: HttpClient, guild_id: SnowflakeInputType):
         """Initialize the ban resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.guild_id = guild_id
         self.bans_url = self.guilds_url / str(self.guild_id) / 'bans'
 

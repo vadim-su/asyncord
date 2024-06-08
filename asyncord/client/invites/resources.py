@@ -7,12 +7,12 @@ https://canary.discord.com/developers/docs/resources/invite#invite-resource
 from __future__ import annotations
 
 from asyncord.client.guilds.models.responses import InviteResponse
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
 
 
-class InvitesResource(ClientSubresource):
+class InvitesResource(APIResource):
     """Invite Resource Endpoints.
 
     These endpoints are for managing invites.

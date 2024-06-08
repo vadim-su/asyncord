@@ -6,11 +6,12 @@ from http import HTTPStatus
 from typing import TYPE_CHECKING, NoReturn
 
 from asyncord.client.http import errors as htpp_errors
-from asyncord.client.http.middleware.base import BaseMiddleware, NextCallType
-from asyncord.client.http.models import Request, Response
+from asyncord.client.http.middleware.base import BaseMiddleware
 
 if TYPE_CHECKING:
     from asyncord.client.http.client import HttpClient
+    from asyncord.client.http.middleware.base import NextCallType
+    from asyncord.client.http.models import Request, Response
 
 
 class ErrorHandlerMiddleware(BaseMiddleware):

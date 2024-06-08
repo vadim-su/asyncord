@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from asyncord.client.channels.models.responses import ThreadMemberResponse
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.threads.models.requests import (
     CreateMediaForumThreadRequest,
     CreateThreadFromMessageRequest,
@@ -18,7 +19,7 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class ThreadResource(ClientSubresource):  # noqa: PLR0904
+class ThreadResource(APIResource):  # noqa: PLR0904
     """Resource to interact with threads.
 
     Attributes:
@@ -31,9 +32,9 @@ class ThreadResource(ClientSubresource):  # noqa: PLR0904
     channels_url = REST_API_URL / 'channels'
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource, channel_id: SnowflakeInputType) -> None:
+    def __init__(self, http_client: HttpClient, channel_id: SnowflakeInputType) -> None:
         """Initialize the thread resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.channel_id = channel_id
         self.threads_url = self.channels_url / str(channel_id) / 'threads'
 

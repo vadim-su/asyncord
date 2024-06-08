@@ -1,45 +1,20 @@
-"""This module contains the base classes for client resources."""
+"""This module contains the base classe for client resources."""
 
 from __future__ import annotations
 
-import aiohttp
+from typing import TYPE_CHECKING
 
-from asyncord.client.http.client import HttpClient
+if TYPE_CHECKING:
+    from asyncord.client.http.client import HttpClient
 
 
-class ClientResource:
+class APIResource:
     """Base class for client resources."""
 
-    def __init__(
-        self,
-        token: str,
-        session: aiohttp.ClientSession | None = None,
-        http_client: HttpClient | None = None,
-    ) -> None:
+    def __init__(self, http_client: HttpClient) -> None:
         """Initialize the resource.
 
         Args:
-            token: Bot token.
-            session: Client session. Defaults to None.
-            http_client: HTTP client. Defaults to None.
-            middleware: Middleware. Defaults to basic one.
+            http_client: HTTP client.
         """
-        self._token = token
-        if http_client:
-            self._http_client = http_client
-        else:
-            self._http_client: HttpClient = HttpClient(
-                session=session,
-            )
-
-
-class ClientSubresource(ClientResource):
-    """Base class for client subresources."""
-
-    def __init__(self, parent: ClientResource) -> None:
-        """Initialize the subresource.
-
-        Args:
-            parent: Parent resource.
-        """
-        super().__init__(parent._token, http_client=parent._http_client)
+        self._http_client = http_client

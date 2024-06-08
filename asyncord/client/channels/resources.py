@@ -20,14 +20,14 @@ from asyncord.client.guilds.models.responses import InviteResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.polls.resources import PollsResource
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class ChannelResource(ClientSubresource):
+class ChannelResource(APIResource):
     """Channel Resource Endpoints.
 
     These endpoints are for managing channels. If you want to create a channel,
@@ -47,7 +47,7 @@ class ChannelResource(ClientSubresource):
         Returns:
             Resource for managing messages.
         """
-        return MessageResource(self, channel_id)
+        return MessageResource(self._http_client, channel_id)
 
     def polls(self, channel_id: SnowflakeInputType) -> PollsResource:
         """Get the polls resource for the channel.

@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest, UpdateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.reactions.resources import ReactionResource
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class MessageResource(ClientSubresource):
+class MessageResource(APIResource):
     """Resource to perform actions on messages.
 
     Attributes:
@@ -21,9 +22,9 @@ class MessageResource(ClientSubresource):
 
     channels_url = REST_API_URL / 'channels'
 
-    def __init__(self, parent: ClientResource, channel_id: SnowflakeInputType) -> None:
+    def __init__(self, http_client: HttpClient, channel_id: SnowflakeInputType) -> None:
         """Initialize the message resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.channel_id = channel_id
         self.messages_url = self.channels_url / str(channel_id) / 'messages'
 

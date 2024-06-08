@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.members.models.responses import MemberResponse
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.users.models.requests import (
     UpdateApplicationRoleConnectionRequest,
     UpdateUserRequest,
@@ -20,7 +20,7 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class UserResource(ClientSubresource):
+class UserResource(APIResource):
     """User resource.
 
     Attributes:

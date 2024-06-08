@@ -2,16 +2,17 @@
 
 from __future__ import annotations
 
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.members.models.requests import AddMemberRequest, UpdateMemberRequest
 from asyncord.client.members.models.responses import MemberResponse
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class MemberResource(ClientSubresource):
+class MemberResource(APIResource):
     """Resource to perform actions on members.
 
     Attributes:
@@ -20,9 +21,9 @@ class MemberResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):
+    def __init__(self, http_client: HttpClient, guild_id: SnowflakeInputType):
         """Create a new member resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.guild_id = guild_id
         self.members_url = self.guilds_url / str(self.guild_id) / 'members'
 

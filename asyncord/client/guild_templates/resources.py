@@ -12,13 +12,14 @@ from asyncord.client.guild_templates.models.requests import (
 )
 from asyncord.client.guild_templates.models.responses import GuildTemplateResponse
 from asyncord.client.guilds.models.responses import GuildResponse
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.http.client import HttpClient
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class GuildTemplatesResource(ClientSubresource):
+class GuildTemplatesResource(APIResource):
     """Representaion of the guild templates resource.
 
     Attributes:
@@ -27,9 +28,9 @@ class GuildTemplatesResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):
+    def __init__(self, http_client: HttpClient, guild_id: SnowflakeInputType):
         """Initialize the guild templates resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.guild_id = guild_id
         self.templates_url = self.guilds_url / str(self.guild_id) / 'templates'
 

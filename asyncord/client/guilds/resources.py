@@ -37,7 +37,7 @@ from asyncord.client.guilds.models.responses import (
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.members.resources import MemberResource
 from asyncord.client.models.automoderation import AutoModerationRule
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
 from asyncord.snowflake import SnowflakeInputType
@@ -45,7 +45,7 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class GuildResource(ClientSubresource):  # noqa: PLR0904
+class GuildResource(APIResource):  # noqa: PLR0904
     """Representaion of the guilds resource.
 
     Attributes:
