@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import enum
 from functools import lru_cache
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NewType
 
 from pydantic import TypeAdapter
 from yarl import URL
 
 StrOrURL = str | URL
 
+SentinelType = NewType('SentinelType', object)
+Sentinel: SentinelType = SentinelType(object())
 
 # Fix for pydanitc and pylance. Pylance doesn't correctly infer the type
 # of the list_model function.

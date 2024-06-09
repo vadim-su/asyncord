@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import datetime
 
+from asyncord.base64_image import Base64Image
 from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.emojis.resources import EmojiResource
@@ -416,7 +417,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         self,
         guild_id: SnowflakeInputType,
         style: WidgetStyleOptions | None = None,
-    ) -> bytes:
+    ) -> Base64Image:
         """Get the widget image for a guild.
 
         Reference:
@@ -431,7 +432,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
             url %= {'style': style}
 
         resp = await self._http_client.get(url=url)
-        return resp.raw_body.encode()
+        return Base64Image.build(resp.raw_body)
 
     async def get_onboarding(
         self,

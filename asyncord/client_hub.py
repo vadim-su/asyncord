@@ -7,15 +7,19 @@ import asyncio
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import NamedTuple, Self
+from dataclasses import dataclass, field
+from typing import Self
 
 import aiohttp
 
 from asyncord.client.http.client import HttpClient
+from asyncord.client.http.middleware.auth import AuthStrategy, BotTokenAuthStrategy
+from asyncord.client.http.middleware.ratelimit import RateLimitStrategy
 from asyncord.client.rest import RestClient
 from asyncord.gateway.client.client import GatewayClient
 from asyncord.gateway.client.heartbeat import HeartbeatFactory
 from asyncord.gateway.dispatcher import EventDispatcher
+from asyncord.typedefs import Sentinel, SentinelType
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +36,6 @@ class ClientHub:
         self,
         session: aiohttp.ClientSession | None = None,
         heartbeat_factory_type: type[HeartbeatFactory] = HeartbeatFactory,
-        event_dispatcher_type: type[EventDispatcher] = EventDispatcher,
     ) -> None:
         """Initialize hub to process multiple clients.
 
@@ -54,47 +57,68 @@ class ClientHub:
         self.heartbeat_factory = heartbeat_factory_type()
         self.client_groups: dict[str, ClientGroup] = {}  # Added type annotation
 
-        self.event_dispatcher_type = event_dispatcher_type
-
         logger.info('New ClientHub instance created.')  # Added logging
 
     @classmethod
     @asynccontextmanager
     async def setup_single_client_group(
         cls,
-        token: str,
+        auth: str | AuthStrategy | None = None,
+        ratelimit_strategy: RateLimitStrategy | None | SentinelType = Sentinel,
         session: aiohttp.ClientSession | None = None,
-        heartbeat_factory_type: type[HeartbeatFactory] = HeartbeatFactory,
         dispatcher: EventDispatcher | None = None,
+        http_client: HttpClient | None = None,
     ) -> AsyncGenerator[ClientGroup, None]:
         """Create a set of clients only for a single token.
 
         Use this method if you want to run only one application with a single token.
 
         Args:
-            token: Token to authenticate with Discord.
-            session: Optional session to use for the clients.
-            heartbeat_factory_type: Factory to create heartbeat clients.
+            auth: Auth strategy to use for authentication.
+                If str is passed, it is treated as a bot token.
+                If None is passed, you need to pass a custom http_client.
+            ratelimit_strategy: Rate limit strategy to use.
+                if didn't pass, default backoff strategy is used.
+                if passed None, no rate limit strategy is used.
+            session: Client session.
             dispatcher: Event dispatcher to use for the clients.
+            http_client: HTTP client.
 
         Returns:
             A set of clients to interact with Discord.
         """
-        async with cls(session=session, heartbeat_factory_type=heartbeat_factory_type) as hub:
-            yield hub.create_client_group('default', token, dispatcher)
+        async with cls(session=session) as hub:
+            yield hub.create_client_group(
+                group_name='default',
+                auth=auth,
+                ratelimit_strategy=ratelimit_strategy,
+                dispatcher=dispatcher,
+                http_client=http_client,
+            )
 
     def create_client_group(
         self,
         group_name: str,
-        token: str,
+        auth: str | AuthStrategy | None = None,
+        ratelimit_strategy: RateLimitStrategy | None | SentinelType = Sentinel,
         dispatcher: EventDispatcher | None = None,
+        http_client: HttpClient | None = None,
     ) -> ClientGroup:
         """Create a set of clients to interact with Discord.
 
         Args:
+            Build a set of clients to interact with Discord.
+
+        Args:
             group_name: Name of the set.
-            token: Token to authenticate with Discord.
+            auth: Auth strategy to use for authentication.
+                If str is passed, it is treated as a bot token.
+                If None is passed, you need to pass a custom http_client.
+            ratelimit_strategy: Rate limit strategy to use.
+                if didn't pass, default backoff strategy is used.
+                if passed None, no rate limit strategy is used.
             dispatcher: Event dispatcher to use for the clients.
+            http_client: HTTP client.
 
         Returns:
             A set of clients to interact with Discord.
@@ -102,14 +126,21 @@ class ClientHub:
         if group_name in self.client_groups:
             raise ValueError(f'Client group {group_name} already exists')
 
-        if dispatcher is None:
-            dispatcher = self.event_dispatcher_type()
-
-        client_group = self._build_client_group(group_name, token, dispatcher)
-
-        dispatcher.add_argument('client', client_group.rest_client)
-        dispatcher.add_argument('gateway', client_group.gateway_client)
-        dispatcher.add_argument('client_groups', self.client_groups)
+        client_group = self._build_client_group(
+            group_name=group_name,
+            auth=auth,
+            ratelimit_strategy=ratelimit_strategy,
+            session=self.session,
+            dispatcher=dispatcher,
+            http_client=http_client,
+        )
+        if not dispatcher:
+            dispatcher = client_group.dispatcher
+            dispatcher.add_argument('client', client_group.rest_client)
+            dispatcher.add_argument('gateway', client_group.gateway_client)
+            dispatcher.add_argument('client_groups', self.client_groups)
+        else:
+            logger.warning('Event dispatcher is passed. Make sure to add the required arguments.')
 
         self.client_groups[group_name] = client_group
         return client_group
@@ -147,37 +178,60 @@ class ClientHub:
     def _build_client_group(
         self,
         group_name: str,
-        token: str,
-        event_dispatcher: EventDispatcher,
+        auth: str | AuthStrategy | None,
+        ratelimit_strategy: RateLimitStrategy | None | SentinelType,
+        session: aiohttp.ClientSession | None,
+        dispatcher: EventDispatcher | None,
+        http_client: HttpClient | None,
     ) -> ClientGroup:
         """Build a set of clients to interact with Discord.
 
         Args:
             group_name: Name of the set.
-            token: Token to authenticate with Discord.
-            event_dispatcher: Event dispatcher to use for the clients.
+            auth: Auth strategy to use for authentication.
+                If str is passed, it is treated as a bot token.
+                If None is passed, you need to pass a custom http_client.
+            ratelimit_strategy: Rate limit strategy to use.
+                if didn't pass, default backoff strategy is used.
+                if passed None, no rate limit strategy is used.
+            session: Client session.
+            dispatcher: Event dispatcher to use for the clients.
+            http_client: HTTP client.
 
         Returns:
             A set of clients to interact with Discord.
         """
-        http_client = HttpClient(session=self.session)
-        rest_client = RestClient(token=token, http_client=http_client)
-        gateway_client = GatewayClient(
-            token=token,
-            session=self.session,
-            heartbeat_class=self.heartbeat_factory.create,
-            dispatcher=event_dispatcher,
-            name=group_name,
+        if dispatcher is None:
+            dispatcher = EventDispatcher()
+
+        rest_client = RestClient(
+            auth=auth,
+            ratelimit_strategy=ratelimit_strategy,
+            session=session,
+            http_client=http_client,
         )
+        if isinstance(auth, str | BotTokenAuthStrategy):
+            gateway_client = GatewayClient(
+                token=auth,
+                session=self.session,
+                heartbeat_class=self.heartbeat_factory.create,
+                dispatcher=dispatcher,
+                name=group_name,
+            )
+        else:
+            gateway_client = None
+            logger.warning('Gateway client requires a token to connect. It will not be created.')
+
         return ClientGroup(
             name=group_name,
-            dispatcher=event_dispatcher,
+            dispatcher=dispatcher,
             rest_client=rest_client,
             gateway_client=gateway_client,
         )
 
 
-class ClientGroup(NamedTuple):
+@dataclass
+class ClientGroup:
     """Group of clients.
 
     Include clients to interact with Discord.
@@ -192,8 +246,23 @@ class ClientGroup(NamedTuple):
     rest_client: RestClient
     """Discord REST client."""
 
-    gateway_client: GatewayClient
+    gateway_client: GatewayClient | None  # type: ignore
     """Discord gateway client."""
+
+    _gateway_client: GatewayClient | None = field(init=False, repr=False, default=None)
+    """Masked gateway client."""
+
+    @property
+    def gateway_client(self) -> GatewayClient:
+        """Discord gateway client."""
+        if not self._gateway_client:
+            raise ValueError('Gateway client is not created. Did you pass a token?')
+        return self._gateway_client
+
+    @gateway_client.setter
+    def gateway_client(self, gateway_client: GatewayClient | None) -> None:
+        """Set the gateway client."""
+        self._gateway_client = gateway_client
 
     async def connect(self) -> None:
         """Connect to the Discord client.

@@ -9,12 +9,10 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
 
 from pydantic import BaseModel, Field
 
-from asyncord.client.http.bucket_track import Bucket
 from asyncord.client.http.models import Request, Response
 
 if TYPE_CHECKING:
@@ -36,17 +34,6 @@ class RateLimitBody(BaseModel):
 
     is_global: bool = Field(alias='global')
     """Whether this is a global rate limit."""
-
-
-@dataclass
-class CallbackData:
-    """Callback data for http client."""
-
-    retry: bool
-    """Whether to retry the request."""
-
-    bucket: Bucket | None = None
-    """Bucket to update."""
 
 
 class Middleware(Protocol):

@@ -4,6 +4,7 @@ from unittest.mock import ANY, AsyncMock, Mock
 
 import aiohttp
 import pytest
+from multidict import CIMultiDict
 from pytest_mock import MockFixture
 
 from asyncord.client.http.client import HttpClient
@@ -71,6 +72,10 @@ async def test_http_client_general_methods(
     else:
         request_mock = mocker.patch('aiohttp.request')
 
+    resp = AsyncMock(status=HTTPStatus.OK, headers=CIMultiDict({'Content-Type': 'application/json'}))
+    resp.json = AsyncMock(return_value={'key': 'value'})
+    request_mock.return_value.__aenter__.return_value = resp
+
     client = HttpClient(session)
     client.system_middlewares = []
     client_method = getattr(client, method.lower())
@@ -101,7 +106,7 @@ async def test_extract_body_no_content() -> None:
 
 async def test_extract_body_valid_json() -> None:
     """Test extracting body from a response with valid JSON."""
-    resp = Mock(status=HTTPStatus.OK, headers={'Content-Type': 'application/json'})
+    resp = Mock(status=HTTPStatus.OK, headers=CIMultiDict({'Content-Type': 'application/json'}))
     resp.json = AsyncMock(return_value={'key': 'value'})
     result = await HttpClient._extract_body(resp)
     assert result == {'key': 'value'}
@@ -109,7 +114,7 @@ async def test_extract_body_valid_json() -> None:
 
 async def test_extract_body_invalid_json() -> None:
     """Test extracting body from a response with invalid JSON."""
-    resp = Mock(status=HTTPStatus.OK, headers={'Content-Type': 'application/json'})
+    resp = AsyncMock(status=HTTPStatus.OK, headers=CIMultiDict({'Content-Type': 'application/json'}))
     resp.json = AsyncMock(side_effect=json.JSONDecodeError('Invalid JSON', '', 0))
     resp.text = AsyncMock(return_value='Invalid JSON')
     result = await HttpClient._extract_body(resp)
@@ -118,7 +123,7 @@ async def test_extract_body_invalid_json() -> None:
 
 async def test_extract_body_not_json() -> None:
     """Test extracting body from a response that is not JSON."""
-    resp = Mock(status=HTTPStatus.OK, headers={'Content-Type': 'text/plain'})
+    resp = Mock(status=HTTPStatus.OK, headers=CIMultiDict({'Content-Type': 'text/plain'}))
     result = await HttpClient._extract_body(resp)
     assert result == {}
 

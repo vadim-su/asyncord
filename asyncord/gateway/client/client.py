@@ -10,7 +10,7 @@ import asyncio
 import logging
 from collections.abc import Mapping
 from types import MappingProxyType
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import aiohttp
 from pydantic import BaseModel
@@ -32,6 +32,10 @@ from asyncord.gateway.message import (
 from asyncord.logger import NameLoggerAdapter
 from asyncord.urls import GATEWAY_URL
 
+if TYPE_CHECKING:
+    from asyncord.client.http.middleware.auth import BotTokenAuthStrategy
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -44,7 +48,7 @@ class GatewayClient:
     def __init__(  # noqa: PLR0913
         self,
         *,
-        token: str,
+        token: str | BotTokenAuthStrategy,
         session: aiohttp.ClientSession,
         conn_data: ConnectionData | None = None,
         intents: Intent = DEFAULT_INTENTS,
@@ -63,7 +67,9 @@ class GatewayClient:
             dispatcher: Event dispatcher used to dispatch events.
             name: Name of the client.
         """
-        self.token = token
+        if not isinstance(token, str):
+            token = token.token
+
         self.session = session
         self.conn_data = conn_data or ConnectionData(token=token)
         self.intents = intents

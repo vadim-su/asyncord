@@ -3,11 +3,20 @@
 from __future__ import annotations
 
 import http
+from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, Field
+from asyncord.client.http.models import (
+    ArrayErrorType,
+    ErrorBlock,
+    ObjectErrorType,
+    RateLimitHeaders,
+    RatelimitResponse,
+    Request,
+    Response,
+)
 
-from asyncord.client.http.error_codes import ErrorCode
-from asyncord.client.http.models import Request, Response
+if TYPE_CHECKING:
+    from asyncord.client.http.models import ErrorResponse
 
 
 class BaseDiscordError(Exception):
@@ -31,7 +40,7 @@ class DiscordHTTPError(BaseDiscordError):
         message: str,
         request: Request,
         response: Response,
-        error_body: ErrorBody | None = None,
+        error_body: ErrorResponse | None = None,
     ) -> None:
         """Initialize the DiscordHTTPError.
 
@@ -45,22 +54,22 @@ class DiscordHTTPError(BaseDiscordError):
         self.request = request
         self.response = response
         self.error_body = error_body
+        self.ratelimit_headers = RateLimitHeaders.model_validate(response.headers)
 
     def __str__(self) -> str:
         """Format structured error to string."""
         phrase = http.HTTPStatus(self.response.status).phrase
-        exc_str = f'HTTP {self.response.status} ({phrase})'
+        exc_str = [f'HTTP {self.response.status} ({phrase})']
 
-        if not self.error_body:
-            if self.response.raw_body:
-                return f'{exc_str}\n{self.response.raw_body}'
-            return exc_str
+        if self.error_body:
+            exc_str.append(f'Code {self.error_body.code}: {self.error_body.message}')
+            if self.error_body.errors:
+                exc_str.append(self._format_errors('', self.error_body.errors))
 
-        exc_str = f'{exc_str}\nCode {self.error_body.code}: {self.error_body.message}'
-        if not self.error_body.errors:
-            return exc_str
+        elif self.response.raw_body:
+            exc_str.append(self.response.raw_body.decode(errors='backslashreplace'))
 
-        return f'{exc_str}\n' + self._format_errors('', self.error_body.errors)
+        return '\n'.join(exc_str)
 
     @classmethod
     def _format_errors(cls, path: str, errors: ErrorBlock | ObjectErrorType | ArrayErrorType) -> str:
@@ -76,17 +85,15 @@ class DiscordHTTPError(BaseDiscordError):
         if isinstance(errors, ErrorBlock):
             return path + '\n'.join(f'\t-> {error.code}: {error.message}' for error in errors.errors)
 
-        error_item_str_list = []
+        # fmt: off
+        error_items = (
+            cls._format_errors(f'{path}.{field_name}', error)
+            if path else str(field_name)
+            for field_name, error in errors.items()
+        )
+        # fmt: on
 
-        for field_name, error in errors.items():
-            if path:
-                new_path = f'{path}.{field_name}'
-            else:
-                new_path = str(field_name)
-
-            error_item_str_list.append(cls._format_errors(new_path, error))
-
-        return '\n'.join(error_item_str_list)
+        return '\n'.join(error_items)
 
 
 class ClientError(DiscordHTTPError):
@@ -101,7 +108,7 @@ class ClientError(DiscordHTTPError):
         message: str,
         request: Request,
         response: Response,
-        error_body: ErrorBody | None = None,
+        error_body: ErrorResponse | None = None,
     ) -> None:
         """Initialize the ClientError.
 
@@ -135,8 +142,7 @@ class RateLimitError(DiscordHTTPError):
         message: str,
         request: Request,
         response: Response,
-        error_body: ErrorBody | None = None,
-        retry_after: float,
+        ratelimit_body: RatelimitResponse,
     ) -> None:
         """Initialize the RateLimitError.
 
@@ -144,20 +150,21 @@ class RateLimitError(DiscordHTTPError):
             message: Error message.
             request: Request that was sent.
             response: Response that was received.
-            error_body: Body of the error.
-            retry_after: The time in seconds until the client can make another request.
+            ratelimit_body: Rate limit response.
         """
         super().__init__(
             message=message,
             request=request,
             response=response,
-            error_body=error_body,
+            error_body=None,
         )
-        self.retry_after = retry_after
+        self.rate_limit_body = ratelimit_body
+        self.retry_after = ratelimit_body.retry_after
 
     def __str__(self) -> str:
         """Format the error."""
-        return f'{self.message} (retry after {self.retry_after})'
+        resp = self.rate_limit_body
+        return f'{resp.message} (retry after: {resp.retry_after}s, global: {resp.global_}, code: {resp.code})'
 
 
 class ServerError(DiscordHTTPError):
@@ -169,7 +176,7 @@ class ServerError(DiscordHTTPError):
         message: str,
         request: Request,
         response: Response,
-        error_body: ErrorBody | None = None,
+        error_body: ErrorResponse | None = None,
     ) -> None:
         """Initialize the ServerError.
 
@@ -185,40 +192,3 @@ class ServerError(DiscordHTTPError):
             response=response,
             error_body=error_body,
         )
-
-
-class ErrorItem(BaseModel):
-    """Represents an error item."""
-
-    code: str
-    """Error code."""
-
-    message: str
-    """Error message."""
-
-
-class ErrorBlock(BaseModel):
-    """Represents an object error."""
-
-    errors: list[ErrorItem] = Field(alias='_errors')
-    """List of errors."""
-
-
-type ObjectErrorType = dict[str, ErrorBlock | ObjectErrorType | ArrayErrorType]
-"""Type hint for an object error."""
-
-type ArrayErrorType = dict[int, ObjectErrorType]
-"""Type hint for an array error."""
-
-
-class ErrorBody(BaseModel):
-    """Represents a body of a response error."""
-
-    code: ErrorCode
-    """Error code."""
-
-    message: str
-    """Error message."""
-
-    errors: ErrorBlock | ObjectErrorType | None = None
-    """Error block."""

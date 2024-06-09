@@ -17,7 +17,7 @@ class AuthStrategy(BaseMiddleware):
 
 
 class BotTokenAuthStrategy(AuthStrategy):
-    """Middleware for adding bot token to the Authorization header."""
+    """Bot token authentication strategy."""
 
     def __init__(self, token: str):
         """Initialize the middleware."""

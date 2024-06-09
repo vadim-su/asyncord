@@ -55,9 +55,7 @@ class InvitesResource(APIResource):
 
         url = self.invites_url / str(invite_code) % query_param
 
-        resp = await self._http_client.get(
-            url,
-        )
+        resp = await self._http_client.get(url=url)
         return InviteResponse.model_validate(resp.body)
 
     async def delete_invite(
@@ -77,8 +75,5 @@ class InvitesResource(APIResource):
 
         url = self.invites_url / str(invite_code)
 
-        resp = await self._http_client.delete(
-            url,
-            headers=headers,
-        )
+        resp = await self._http_client.delete(url=url, headers=headers)
         return InviteResponse.model_validate(resp.body)

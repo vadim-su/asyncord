@@ -151,8 +151,8 @@ class BanResource(APIResource):
             payload = None
 
         resp = await self._http_client.post(
-            url,
-            payload,
+            url=url,
+            payload=payload,
             headers=headers,
         )
         return BulkBanResponse.model_validate(resp.body)

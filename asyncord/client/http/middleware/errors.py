@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from http import HTTPStatus
-from typing import TYPE_CHECKING, NoReturn
+from typing import TYPE_CHECKING, NoReturn, cast
 
-from asyncord.client.http import errors as htpp_errors
+from asyncord.client.http import errors as http_errors
 from asyncord.client.http.middleware.base import BaseMiddleware
+from asyncord.client.http.models import ErrorResponse, RatelimitResponse
 
 if TYPE_CHECKING:
     from asyncord.client.http.client import HttpClient
@@ -38,35 +39,48 @@ class ErrorHandlerMiddleware(BaseMiddleware):
             ClientError: If the response status is 4xx.
             ServerError: If the response status is 5xx.
         """
+        if response.status is HTTPStatus.TOO_MANY_REQUESTS:
+            error_body_model = RatelimitResponse
+        else:
+            error_body_model = ErrorResponse
+
         try:
-            error_body = htpp_errors.ErrorBody.model_validate(response.body)
+            error_body = error_body_model.model_validate(response.body)
         except ValueError as err:
-            raise htpp_errors.ServerError(
+            raise http_errors.ServerError(
                 message='Failed to validate error body: {response.raw_body}',
                 request=request,
                 response=response,
             ) from err
 
-        status = response.status
-        if status == HTTPStatus.NOT_FOUND:
-            raise htpp_errors.NotFoundError(
-                message=error_body.message,
-                request=request,
-                response=response,
-                error_body=error_body,
-            )
+        match response.status:
+            case HTTPStatus.NOT_FOUND:
+                raise http_errors.NotFoundError(
+                    message=error_body.message,
+                    request=request,
+                    response=response,
+                    error_body=cast(ErrorResponse, error_body),
+                )
 
-        if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
-            raise htpp_errors.ClientError(
-                message=error_body.message,
-                request=request,
-                response=response,
-                error_body=error_body,
-            )
+            case HTTPStatus.TOO_MANY_REQUESTS:
+                raise http_errors.RateLimitError(
+                    message=error_body.message,
+                    request=request,
+                    response=response,
+                    ratelimit_body=cast(RatelimitResponse, error_body),
+                )
 
-        raise htpp_errors.ServerError(
+            case status if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR:
+                raise http_errors.ClientError(
+                    message=error_body.message,
+                    request=request,
+                    response=response,
+                    error_body=cast(ErrorResponse, error_body),
+                )
+
+        raise http_errors.ServerError(
             message=error_body.message,
             request=request,
             response=response,
-            error_body=error_body,
+            error_body=cast(ErrorResponse, error_body),
         )

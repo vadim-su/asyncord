@@ -332,7 +332,6 @@ class BaseMessage(BaseModel):
             return components
 
         if all(not isinstance(component, ActionRow) for component in components):
-            components = [ActionRow(components=components)]
             return [ActionRow(components=components)]
 
         raise ValueError(

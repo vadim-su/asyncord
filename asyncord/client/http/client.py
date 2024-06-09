@@ -263,11 +263,18 @@ class HttpClient:
             )
 
         async with req_context as resp:
+            # fmt: off
+            headers = {
+                header.lower(): value
+                for header, value in resp.headers.items()
+            }
+            # fmt: on
+
             return Response(
                 raw_response=resp,
-                status=resp.status,
-                headers=resp.headers,
-                raw_body=await resp.text(),
+                status=HTTPStatus(resp.status),
+                headers=headers,
+                raw_body=await resp.read(),
                 body=await self._extract_body(resp),
             )
 
@@ -288,8 +295,8 @@ class HttpClient:
             try:
                 return await resp.json()
             except json.JSONDecodeError:
-                body = await resp.text()
-                logger.warning('Failed to decode JSON body: %s', body)
+                body = await resp.read()
+                logger.warning('Failed to decode JSON body: %s', body[:100])
                 return {}
 
         return {}

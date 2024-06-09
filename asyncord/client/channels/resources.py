@@ -219,8 +219,8 @@ class ChannelResource(APIResource):
         url = self.channels_url / str(channel_id) / 'permissions' / str(overwrite_id)
 
         await self._http_client.put(
-            url,
-            payload,
+            url=url,
+            payload=payload,
             headers=headers,
         )
 
@@ -291,9 +291,9 @@ class ChannelResource(APIResource):
         payload = {}
 
         if invite_request:
-            payload = invite_request.model_dump(mode='json', exclude_unset=True, headers=headers)
+            payload = invite_request.model_dump(mode='json', exclude_unset=True)
 
-        resp = await self._http_client.post(url=url, payload=payload)
+        resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return InviteResponse.model_validate(resp.body)
 
     # TODO: Add webhook models once they are implemented.

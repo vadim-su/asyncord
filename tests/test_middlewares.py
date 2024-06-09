@@ -19,6 +19,18 @@ def request_obj() -> Request:
 
 
 @pytest.fixture()
+def headers() -> dict[str, str]:
+    """Return a dictionary of headers."""
+    return {
+        'x-ratelimit-limit': '100',
+        'x-ratelimit-remaining': '50',
+        'x-ratelimit-reset': '1629878400',
+        'x-ratelimit-reset-after': '3600',
+        'x-ratelimit-bucket': 'bucket',
+    }
+
+
+@pytest.fixture()
 def err_middleware() -> ErrorHandlerMiddleware:
     """Return an instance of the error handler middleware."""
     return ErrorHandlerMiddleware()
@@ -31,7 +43,7 @@ async def test_handler_with_no_error(request_obj: Request, err_middleware: Error
             raw_response=Mock(),
             status=HTTPStatus.OK,
             headers={},
-            raw_body='{"message": "OK"}',
+            raw_body=b'{"message": "OK"}',
             body={'message': 'OK'},
         ),
     )
@@ -39,14 +51,18 @@ async def test_handler_with_no_error(request_obj: Request, err_middleware: Error
     assert response.status == HTTPStatus.OK
 
 
-async def test_handler_with_not_found_error(request_obj: Request, err_middleware: ErrorHandlerMiddleware) -> None:
+async def test_handler_with_not_found_error(
+    request_obj: Request,
+    err_middleware: ErrorHandlerMiddleware,
+    headers: dict[str, str],
+) -> None:
     """Test the handler method with a not found error."""
     next_call = AsyncMock(
         return_value=Response(
             raw_response=Mock(),
             status=HTTPStatus.NOT_FOUND,
-            headers={},
-            raw_body='{"message": "Not Found", "code": 0}',
+            headers=headers,
+            raw_body=b'{"message": "Not Found", "code": 0}',
             body={'message': 'Not Found', 'code': 0},
         ),
     )
@@ -54,14 +70,18 @@ async def test_handler_with_not_found_error(request_obj: Request, err_middleware
         await err_middleware(request_obj, Mock(), next_call)
 
 
-async def test_handler_with_client_error(request_obj: Request, err_middleware: ErrorHandlerMiddleware) -> None:
+async def test_handler_with_client_error(
+    request_obj: Request,
+    err_middleware: ErrorHandlerMiddleware,
+    headers: dict[str, str],
+) -> None:
     """Test the handler method with a client error."""
     next_call = AsyncMock(
         return_value=Response(
             raw_response=Mock(),
             status=HTTPStatus.BAD_REQUEST,
-            headers={},
-            raw_body='{message: "Bad Request", code: 0}',
+            headers=headers,
+            raw_body=b'{message: "Bad Request", code: 0}',
             body={'message': 'Bad Request', 'code': 0},
         ),
     )
@@ -69,14 +89,18 @@ async def test_handler_with_client_error(request_obj: Request, err_middleware: E
         await err_middleware(request_obj, Mock(), next_call)
 
 
-async def test_handler_with_server_error(request_obj: Request, err_middleware: ErrorHandlerMiddleware) -> None:
+async def test_handler_with_server_error(
+    request_obj: Request,
+    err_middleware: ErrorHandlerMiddleware,
+    headers: dict[str, str],
+) -> None:
     """Test the handler method with a server error."""
     next_call = AsyncMock(
         return_value=Response(
             raw_response=Mock(),
             status=HTTPStatus.INTERNAL_SERVER_ERROR,
-            headers={},
-            raw_body='{message: "Internal Server Error", code: 0}',
+            headers=headers,
+            raw_body=b'{message: "Internal Server Error", code: 0}',
             body={'message': 'Internal Server Error', 'code': 0},
         ),
     )
@@ -85,14 +109,18 @@ async def test_handler_with_server_error(request_obj: Request, err_middleware: E
         await err_middleware(request_obj, Mock(), next_call)
 
 
-async def test_handler_with_invalid_error_body(request_obj: Request, err_middleware: ErrorHandlerMiddleware) -> None:
+async def test_handler_with_invalid_error_body(
+    request_obj: Request,
+    err_middleware: ErrorHandlerMiddleware,
+    headers: dict[str, str],
+) -> None:
     """Test the handler method with an invalid error body."""
     next_call = AsyncMock(
         return_value=Response(
             raw_response=Mock(),
             status=HTTPStatus.INTERNAL_SERVER_ERROR,
-            headers={},
-            raw_body='Invalid Body',
+            headers=headers,
+            raw_body=b'Invalid Body',
             body={},
         ),
     )

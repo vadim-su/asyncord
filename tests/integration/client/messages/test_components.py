@@ -168,14 +168,14 @@ def test_wrap_component_to_list_in_action_row() -> None:
 
 def test_components_cannot_be_empty() -> None:
     """Test that components cannot be empty."""
-    with pytest.raises(ValueError, match='List should have at least 1 item'):
+    with pytest.raises(ValueError, match='Value should have at least 1 item'):
         ActionRow(components=[])
 
 
 def test_action_row_can_have_max_5_components() -> None:
     """Test that an ActionRow can have a maximum of 5 components."""
     # fmt: on
-    with pytest.raises(ValueError, match='List should have at most 5'):
+    with pytest.raises(ValueError, match='Value should have at most 5 items'):
         # fmt: off
         ActionRow(
             components=[
