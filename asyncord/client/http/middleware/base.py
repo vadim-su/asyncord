@@ -59,7 +59,11 @@ class BaseMiddleware(ABC):
         http_client: HttpClient,
         next_call: NextCallType,
     ) -> Response:
-        """Middleware handler."""
+        """Middleware handler.
+
+        I separated this method from __call__ to make it less confusing than __call__
+        on defining the middleware.
+        """
         raise NotImplementedError
 
     async def __call__(

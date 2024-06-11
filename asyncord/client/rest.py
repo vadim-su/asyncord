@@ -16,7 +16,7 @@ from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.stage_instances.resources import StageInstancesResource
 from asyncord.client.users.resources import UserResource
 from asyncord.client.webhooks.resources import WebhooksResource
-from asyncord.typedefs import Sentinel, SentinelType
+from asyncord.typedefs import Unset, UnsetType
 
 if TYPE_CHECKING:
     import aiohttp
@@ -30,7 +30,7 @@ class RestClient:
     def __init__(
         self,
         auth: str | AuthStrategy | None,
-        ratelimit_strategy: RateLimitStrategy | None | SentinelType = Sentinel,
+        ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
         session: aiohttp.ClientSession | None = None,
         http_client: HttpClient | None = None,
     ) -> None:
@@ -95,7 +95,10 @@ class RestClient:
 
         self._http_client.system_middlewares.append(auth)
 
-    def _init_ratelimit_strategy(self, ratelimit_strategy: RateLimitStrategy | None | SentinelType) -> None:
+    def _init_ratelimit_strategy(
+        self,
+        ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
+    ) -> None:
         """Initialize the rate limit strategy.
 
         Args:
@@ -104,7 +107,7 @@ class RestClient:
         if not ratelimit_strategy:
             return
 
-        if ratelimit_strategy is Sentinel:
+        if ratelimit_strategy is Unset:
             ratelimit_strategy = BackoffRateLimitStrategy()
 
         self._http_client.system_middlewares.append(cast(RateLimitStrategy, ratelimit_strategy))

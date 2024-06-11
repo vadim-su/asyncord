@@ -56,14 +56,26 @@ class BackoffRateLimitStrategy(RateLimitStrategy):
     ) -> Response:
         """Handle global rate limits."""
         last_err = None
+        total_wait_time = 0
         for _ in range(self.max_retries + 1):
             try:
                 return await next_call(request, http_client)
             except RateLimitError as err:
                 last_err = err
-                await asyncio.sleep(min(err.retry_after + 0.1, self.max_wait_time))
+                wait_time = min(err.retry_after + 0.1, self.max_wait_time)
+                total_wait_time += wait_time
+                await asyncio.sleep(wait_time)
 
-        if last_err:
-            raise last_err
+        raise MaxRetriesExceededError(self.max_retries, total_wait_time) from last_err
 
-        raise RuntimeError(f'RateLimitError was not raised after max retries ({self.max_retries})')
+
+class MaxRetriesExceededError(Exception):
+    """Error raised when the maximum number of retries is exceeded."""
+
+    def __init__(self, max_retries: int, total_wait_time: float) -> None:
+        """Initialize the error."""
+        super().__init__(
+            f'Max retries exceeded (retries: {max_retries}, total wait time: {total_wait_time})',
+        )
+        self.max_retries = max_retries
+        self.total_wait_time = total_wait_time

@@ -11,8 +11,8 @@ from yarl import URL
 
 StrOrURL = str | URL
 
-SentinelType = NewType('SentinelType', object)
-Sentinel: SentinelType = SentinelType(object())
+UnsetType = NewType('UnsetType', object)
+Unset: UnsetType = UnsetType(object())
 
 # Fix for pydanitc and pylance. Pylance doesn't correctly infer the type
 # of the list_model function.

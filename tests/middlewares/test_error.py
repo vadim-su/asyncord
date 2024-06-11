@@ -4,18 +4,8 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from asyncord.client.http import errors as http_errors
-from asyncord.client.http.headers import HttpMethod
 from asyncord.client.http.middleware.errors import ErrorHandlerMiddleware
 from asyncord.client.http.models import Request, Response
-
-
-@pytest.fixture()
-def request_obj() -> Request:
-    """Return an instance of the request model.
-
-    request is a reserved keyword in pytest, so we use request_obj instead.
-    """
-    return Request(method=HttpMethod.GET, url='https://example.com')
 
 
 @pytest.fixture()

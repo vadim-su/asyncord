@@ -164,7 +164,7 @@ class RateLimitError(DiscordHTTPError):
     def __str__(self) -> str:
         """Format the error."""
         resp = self.rate_limit_body
-        return f'{resp.message} (retry after: {resp.retry_after}s, global: {resp.global_}, code: {resp.code})'
+        return f'{resp.message} (retry after: {resp.retry_after}s, global: {resp.is_global}, code: {resp.code})'
 
 
 class ServerError(DiscordHTTPError):

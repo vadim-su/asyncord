@@ -209,11 +209,6 @@ class HttpClient:
 
         Returns:
             Response from the processed request.
-
-        Raises:
-            ClientError: If the response status code is in the 400 range.
-            ServerError: If the response status code is in the 500 range.
-            RateLimitError: If the response status code is 429 and the retry_after is greater than 10.
         """
         if skip_middleware:
             return await self._raw_request(request)

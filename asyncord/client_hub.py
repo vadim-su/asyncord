@@ -19,7 +19,7 @@ from asyncord.client.rest import RestClient
 from asyncord.gateway.client.client import GatewayClient
 from asyncord.gateway.client.heartbeat import HeartbeatFactory
 from asyncord.gateway.dispatcher import EventDispatcher
-from asyncord.typedefs import Sentinel, SentinelType
+from asyncord.typedefs import Unset, UnsetType
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class ClientHub:
     async def setup_single_client_group(
         cls,
         auth: str | AuthStrategy | None = None,
-        ratelimit_strategy: RateLimitStrategy | None | SentinelType = Sentinel,
+        ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
         session: aiohttp.ClientSession | None = None,
         dispatcher: EventDispatcher | None = None,
         http_client: HttpClient | None = None,
@@ -100,7 +100,7 @@ class ClientHub:
         self,
         group_name: str,
         auth: str | AuthStrategy | None = None,
-        ratelimit_strategy: RateLimitStrategy | None | SentinelType = Sentinel,
+        ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
         dispatcher: EventDispatcher | None = None,
         http_client: HttpClient | None = None,
     ) -> ClientGroup:
@@ -179,7 +179,7 @@ class ClientHub:
         self,
         group_name: str,
         auth: str | AuthStrategy | None,
-        ratelimit_strategy: RateLimitStrategy | None | SentinelType,
+        ratelimit_strategy: RateLimitStrategy | None | UnsetType,
         session: aiohttp.ClientSession | None,
         dispatcher: EventDispatcher | None,
         http_client: HttpClient | None,

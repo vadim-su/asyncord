@@ -124,7 +124,7 @@ class RatelimitResponse(BaseModel):
     retry_after: float
     """Time in seconds to wait before retrying."""
 
-    global_: Annotated[bool, Field(alias='global')]
+    is_global: Annotated[bool, Field(alias='global')]
     """Whether the ratelimit is global."""
 
     code: ErrorCode | None = None
@@ -163,7 +163,7 @@ class RateLimitHeaders(BaseModel):
     bucket: Annotated[str, Field(alias=headers.RATELIMIT_BUCKET.lower())]
     """Rate limit bucket."""
 
-    global_: Annotated[bool | None, Field(alias=headers.RATELIMIT_GLOBAL.lower())] = None
+    is_global: Annotated[bool | None, Field(alias=headers.RATELIMIT_GLOBAL.lower())] = None
     """Whether the ratelimit is global."""
 
     scope: Annotated[RateLimitScope | None, Field(alias=headers.RATELIMIT_SCOPE.lower())] = None

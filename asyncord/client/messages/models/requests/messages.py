@@ -76,10 +76,9 @@ class AttachedFile(BaseModel, arbitrary_types_allowed=True):
             return values
 
         if isinstance(content, Path):
-            content = content.open('rb')
-            values['content'] = content
+            values['content'] = content.open('rb')
             if not values.get('filename'):
-                values['filename'] = Path(content.name).name
+                values['filename'] = content.name
 
         elif isinstance(content, BinaryIO | io.BufferedReader | io.BufferedRandom):
             if not values.get('filename'):
