@@ -1,13 +1,42 @@
 """Contains the responce models for the webhooks resource.."""
 
-from typing import Any
-
 from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel
 
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.client.webhooks.models.common import WebhookType
 from asyncord.snowflake import Snowflake
+
+
+class SourceGuild(BaseModel):
+    """Partial model for guild object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/webhook#webhook-object-example-channel-follower-webhook
+    """
+
+    id: Snowflake | None = None
+    """ID of the guild."""
+
+    name: str | None = None
+    """Name of the guild."""
+
+    icon: str | None = None
+    """Icon hash of the guild."""
+
+
+class SourceChannel(BaseModel):
+    """Partial model for channel object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/webhook#webhook-object-example-channel-follower-webhook
+    """
+
+    id: Snowflake | None = None
+    """ID of the channel."""
+
+    name: str | None = None
+    """Name of the channel."""
 
 
 class WebhookResponse(BaseModel):
@@ -50,12 +79,10 @@ class WebhookResponse(BaseModel):
     application_id: Snowflake | None = None
     """Bot/OAuth2 application that created this webhook."""
 
-    # FIXME: This is a partial guild object. Not clear.
-    source_guild: dict[str, Any] | None = None
+    source_guild: SourceGuild | None = None
     """Guild of the channel that this webhook is following."""
 
-    # FIXME: This is a partial channel object. Not clear.
-    source_channel: dict[str, Any] | None = None
+    source_channel: SourceChannel | None = None
 
     url: str | None = None
     """The url used for executing the webhook.
