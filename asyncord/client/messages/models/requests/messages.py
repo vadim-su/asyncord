@@ -20,6 +20,7 @@ from asyncord.client.messages.models.requests.components import (
     Component,
 )
 from asyncord.client.messages.models.requests.embeds import Embed
+from asyncord.client.polls.models.requests import PollRequest
 from asyncord.snowflake import SnowflakeInputType
 
 MAX_COMPONENTS = 5
@@ -471,6 +472,9 @@ class CreateMessageRequest(BaseMessage):
     Returns an existing message with the same nonce and author instead of creating a new one.
     I set it to True because it will be default behavior in the near future.
     """
+
+    poll: PollRequest | None = None
+    """A poll."""
 
 
 class UpdateMessageRequest(BaseMessage):
