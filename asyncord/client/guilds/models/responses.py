@@ -23,6 +23,7 @@ from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.scheduled_events.models.responses import ScheduledEventResponse
 from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.client.users.models.responses import UserResponse
+from asyncord.client.webhooks.models.responces import WebhookResponse
 from asyncord.snowflake import Snowflake
 
 
@@ -366,7 +367,8 @@ class InviteGuildOut(BaseModel):
 class InviteResponse(BaseModel):
     """Invite object.
 
-    Reference: https://discord.com/developers/docs/resources/invite#invite-object-invite-structure
+    Reference:
+    https://discord.com/developers/docs/resources/invite#invite-object-invite-structure
     """
 
     code: str
@@ -692,8 +694,7 @@ class AuditLogResponse(BaseModel):
     users: list[UserResponse] | None = None
     """List of users referenced in the audit log."""
 
-    # TODO: When webhook model is created, replace dict with WebhookResponse
-    webhooks: list[dict] | None = None
+    webhooks: list[WebhookResponse] | None = None
     """List of webhooks referenced in the audit log."""
 
 

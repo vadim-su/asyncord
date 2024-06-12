@@ -15,7 +15,7 @@ from asyncord.client.channels.models.requests.updating import (
     UpdateChannelPositionRequest,
     UpdateChannelRequestType,
 )
-from asyncord.client.channels.models.responses import ChannelResponse
+from asyncord.client.channels.models.responses import ChannelResponse, FollowedChannelResponse
 from asyncord.client.guilds.models.responses import InviteResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
@@ -296,12 +296,11 @@ class ChannelResource(APIResource):
         resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return InviteResponse.model_validate(resp.body)
 
-    # TODO: Add webhook models once they are implemented.
     async def follow_announcement_channel(
         self,
         channel_id: SnowflakeInputType,
         webhook_channel_id: SnowflakeInputType,
-    ) -> dict:
+    ) -> FollowedChannelResponse:
         """Follow an Announcement channel to send messages to a target channel.
 
         Reference:
@@ -314,7 +313,7 @@ class ChannelResource(APIResource):
         }
 
         resp = await self._http_client.post(url=url, payload=payload)
-        return resp.body
+        return FollowedChannelResponse.model_validate(resp.body)
 
     async def trigger_typing_indicator(self, channel_id: SnowflakeInputType) -> None:
         """Post a typing indicator for the specified channel.

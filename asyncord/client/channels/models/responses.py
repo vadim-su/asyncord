@@ -271,3 +271,17 @@ class ChannelResponse(BaseModel):
 
     Defaults to 0, which indicates a layout view has not been set by a channel admin.
     """
+
+
+class FollowedChannelResponse(BaseModel):
+    """Followed channel object.
+
+    Reference:
+    https://canary.discord.com/developers/docs/resources/channel#followed-channel-object-followed-channel-structure
+    """
+
+    channel_id: Snowflake
+    """Source channel id."""
+
+    webhook_id: Snowflake
+    """Created target webhook id."""
