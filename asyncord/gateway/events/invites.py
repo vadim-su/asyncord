@@ -1,8 +1,8 @@
 """Events related to invites."""
 
 import datetime
-from typing import Any
 
+from asyncord.client.applications.models.responses import InviteCreateEventApplication
 from asyncord.client.guilds.models.common import InviteTargetType
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
@@ -49,8 +49,7 @@ class InviteCreateEvent(GatewayEvent):
     target_user: UserResponse | None = None
     """User whose stream to display for this invite."""
 
-    # TODO: There is should be a partial application object, but it is not documented
-    target_application: dict[str, Any] | None = None
+    target_application: InviteCreateEventApplication | None = None
     """Embedded application to open for this voice channel embedded application invite."""
 
     temporary: bool

@@ -5,6 +5,7 @@ from typing import Any
 
 from asyncord.client.guilds.resources import GuildResponse
 from asyncord.client.members.models.responses import MemberResponse
+from asyncord.client.models.emoji import Emoji
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
@@ -117,7 +118,7 @@ class GuildEmojisUpdateEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    emojis: list[dict[str, Any]]  # FIXME: add Emoji model
+    emojis: list[Emoji]
     """List of emojis."""
 
 
