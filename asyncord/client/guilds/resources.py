@@ -6,6 +6,7 @@ Reference: https://discord.com/developers/docs/resources/guild
 from __future__ import annotations
 
 import datetime
+from typing import TYPE_CHECKING
 
 from asyncord.base64_image import Base64Image
 from asyncord.client.bans.resources import BanResource
@@ -16,6 +17,7 @@ from asyncord.client.guilds.models.common import MFALevel, WidgetStyleOptions
 from asyncord.client.guilds.models.requests import (
     CreateAutoModerationRuleRequest,
     CreateGuildRequest,
+    PruneRequest,
     UpdateAutoModerationRuleRequest,
     UpdateOnboardingRequest,
     UpdateWelcomeScreenRequest,
@@ -41,9 +43,11 @@ from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.resources import APIResource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.snowflake import SnowflakeInputType
 
 
 class GuildResource(APIResource):  # noqa: PLR0904
@@ -228,14 +232,11 @@ class GuildResource(APIResource):  # noqa: PLR0904
         resp = await self._http_client.get(url=url, headers=headers)
         return PruneResponse.model_validate(resp.body)
 
-    # TODO: #15 Replace args with a dataclass
     async def begin_prune(
         self,
         *,
         guild_id: SnowflakeInputType,
-        days: int | None = None,
-        compute_prune_count: bool | None = None,
-        include_roles: list[SnowflakeInputType] | None = None,
+        prune_data: PruneRequest,
         reason: str | None = None,
     ) -> PruneResponse:
         """Begin pruning a guild.
@@ -252,21 +253,13 @@ class GuildResource(APIResource):  # noqa: PLR0904
 
         Args:
             guild_id: ID of the guild to prune.
-            days: Number of days to count prune for. Should be between 1 and 30. Defaults to 7.
-            compute_prune_count: Whether to compute the prune count. Defaults to True.
-            include_roles: List of role IDs to include in the prune count.
+            prune_data: Data to prune the guild with.
             reason: Reason for the prune.
 
         Returns:
             Prune object.
         """
-        payload = {}
-        if days is not None:
-            payload['days'] = days
-        if compute_prune_count is not None:
-            payload['compute_prune_count'] = compute_prune_count
-        if include_roles is not None:
-            payload['include_roles'] = ','.join(map(str, include_roles))
+        payload = prune_data.model_dump(mode='json', exclude_unset=True)
 
         if reason is not None:
             headers = {AUDIT_LOG_REASON: reason}

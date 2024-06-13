@@ -281,10 +281,13 @@ class ApplicationCommandPermissionOut(BaseModel):
     https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure
     """
 
-    id: Snowflake  # TODO: add permission constants support
+    id: Snowflake
     """ID of the command or the application ID.
 
-    It can also be a permission constant (@everyone, @here...)"""
+    It can also be a permission constant (@everyone, @here...)
+    @everyone is Guild ID.
+    All Channels is Guild ID - 1.
+    """
 
     type: FallbackAdapter[ApplicationCommandPermissionType]
     """Type of the permission"""

@@ -3,7 +3,7 @@
 from typing import Self
 
 from fbenum.adapter import FallbackAdapter
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_serializer, model_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.channels.models.requests.creation import CreateChannelRequestType
@@ -323,3 +323,26 @@ class UpdateOnboardingRequest(BaseModel):
 
     mode: OnboardingMode
     """Current mode of onboarding."""
+
+
+class PruneRequest(BaseModel):
+    """Data for pruning guild members.
+
+    Reference:
+    https://discord.com/developers/docs/resources/guild#begin-guild-prune
+    """
+
+    days: int
+    """Number of days to prune members for."""
+
+    compute_prune_count: bool | None = None
+    """Whether to compute the number of pruned members."""
+
+    include_roles: set[SnowflakeInputType] | None = None
+    """Roles to include in the prune."""
+
+    @field_serializer('include_roles', when_used='json-unless-none', return_type=str)
+    @classmethod
+    def serialize_include_roles_to_str(cls, rolese: set[SnowflakeInputType]) -> str:
+        """Serialize include roles to string."""
+        return ','.join(map(str, rolese))

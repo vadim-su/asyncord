@@ -20,7 +20,11 @@ class InviteCreateEvent(GatewayEvent):
     """Channel the invite is for."""
 
     code: str
-    """Unique invite [code](https://discord.com/developers/docs/resources/invite#invite-object)."""
+    """Unique invite.
+
+    Reference:
+    https://discord.com/developers/docs/resources/invite#invite-object.
+    """
 
     created_at: datetime.datetime
     """Time at which the invite was created."""
@@ -58,8 +62,7 @@ class InviteCreateEvent(GatewayEvent):
     Invited users will be kicked on disconnect unless they're assigned a role.
     """
 
-    # TODO: WTF? Why is this always 0?
-    uses: int
+    uses: int = 0
     """Number of times the invite has been used.
 
     Always will be 0!
