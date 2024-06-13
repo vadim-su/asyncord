@@ -18,6 +18,7 @@ from asyncord.client.messages.models.responses.components import ComponentOut
 from asyncord.client.messages.models.responses.embeds import EmbedOut
 from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import StickerFormatType
+from asyncord.client.polls.models.responses import PollResponse
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.threads.models.responses import ThreadMetadataOut
 from asyncord.client.users.models.responses import UserResponse
@@ -505,3 +506,6 @@ class MessageResponse(BaseModel):
 
     In the message's auto-populated select menus.
     """
+
+    poll: PollResponse | None = None
+    """A poll."""
