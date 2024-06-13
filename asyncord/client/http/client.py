@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from collections.abc import Sequence
 from functools import partial
 from http import HTTPStatus
 from typing import Any
@@ -16,7 +15,7 @@ from aiohttp.client import ClientResponse
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
 from asyncord.client.http.middleware.base import Middleware, NextCallType
 from asyncord.client.http.middleware.errors import ErrorHandlerMiddleware
-from asyncord.client.http.models import AttachedFile, Request, Response
+from asyncord.client.http.models import FormPayload, Request, Response
 from asyncord.typedefs import StrOrURL
 
 logger = logging.getLogger(__name__)
@@ -72,7 +71,6 @@ class HttpClient:
         *,
         url: StrOrURL,
         payload: Any | None = None,  # noqa: ANN401
-        files: list[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
@@ -93,7 +91,6 @@ class HttpClient:
                 method=HttpMethod.POST,
                 url=url,
                 payload=payload,
-                files=files,
                 headers=headers or {},
             ),
             skip_middleware=skip_middleware,
@@ -104,7 +101,6 @@ class HttpClient:
         *,
         url: StrOrURL,
         payload: Any | None = None,  # noqa: ANN401
-        files: Sequence[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
@@ -125,7 +121,6 @@ class HttpClient:
                 method=HttpMethod.PUT,
                 url=url,
                 payload=payload,
-                files=files,
                 headers=headers or {},
             ),
             skip_middleware=skip_middleware,
@@ -136,7 +131,6 @@ class HttpClient:
         *,
         url: StrOrURL,
         payload: Any,  # noqa: ANN401
-        files: Sequence[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
@@ -157,7 +151,6 @@ class HttpClient:
                 method=HttpMethod.PATCH,
                 url=url,
                 payload=payload,
-                files=files,
                 headers=headers or {},
             ),
             skip_middleware=skip_middleware,
@@ -229,18 +222,22 @@ class HttpClient:
         Returns:
             Response from the processed request.
         """
-        data = None
+        match request.payload:
+            case None:
+                data = None
 
-        if request.files:
-            data = aiohttp.FormData()
-            if request.payload is not None:
-                data.add_field('payload_json', json.dumps(request.payload), content_type=JSON_CONTENT_TYPE)
+            case FormPayload():
+                data = aiohttp.FormData()
+                for name, field in request.payload:
+                    data.add_field(
+                        name=name,
+                        value=field.value,
+                        content_type=field.content_type,
+                        filename=field.filename,
+                    )
 
-            for index, (file_name, content_type, file_data) in enumerate(request.files):
-                data.add_field(f'files[{index}]', file_data, filename=file_name, content_type=content_type)
-
-        elif request.payload is not None:
-            data = aiohttp.JsonPayload(request.payload)
+            case _:  # can't check for JsonValue because it's a type alias
+                data = aiohttp.JsonPayload(request.payload)
 
         if self.session:
             req_context = self.session.request(

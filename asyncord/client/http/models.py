@@ -2,23 +2,23 @@
 
 from __future__ import annotations
 
-import datetime
 import enum
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Annotated, Any, BinaryIO, NamedTuple
+from typing import TYPE_CHECKING, Annotated, BinaryIO, NamedTuple
 
 from fbenum.enum import FallbackEnum
-from pydantic import BaseModel, Field
-
-from asyncord.client.http import headers
-from asyncord.client.http.error_codes import ErrorCode
+from pydantic import BaseModel, Field, JsonValue
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, MutableMapping, Sequence
+    import datetime
     from http import HTTPStatus
 
     import aiohttp
+    from pydantic import JsonValue
 
+    from asyncord.client.http import headers
+    from asyncord.client.http.error_codes import ErrorCode
     from asyncord.client.http.headers import HttpMethod
     from asyncord.typedefs import StrOrURL
 
@@ -39,19 +39,23 @@ class Response(NamedTuple):
     status: HTTPStatus
     """Response status code."""
 
-    headers: Mapping[str, str]
+    headers: dict[str, str]
     """Response headers."""
 
     raw_body: bytes
     """Raw response body."""
 
-    body: dict[str, Any]
+    body: JsonValue
     """Parsed response body."""
 
 
-@dataclass
+@dataclass(slots=True)
 class Request:
-    """Request data class."""
+    """Request data class.
+
+    I want to make it simple and easy to use so I'm using dataclass
+    instead of pydantic BaseModel.
+    """
 
     method: HttpMethod
     """HTTP method to use."""
@@ -59,30 +63,56 @@ class Request:
     url: StrOrURL
     """URL to send the request to."""
 
-    payload: Any | None = None
+    payload: JsonValue | FormPayload | None = None
     """Payload to send with the request."""
 
-    files: Sequence[AttachedFile] | None = None
-    """Files to send with the request."""
-
-    headers: MutableMapping[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
     """Headers to send with the request."""
 
 
-class AttachedFile(NamedTuple):
-    """Type alias for a file to be attached to a request.
+class FormPayload:
+    """Form data class."""
 
-    The tuple contains the filename, the content type, and the file object.
-    """
+    def __init__(self, fields: dict[str, FormField] | None = None) -> None:
+        """Initialize the form data.
 
-    filename: str
-    """Name of the file."""
+        Args:
+            fields: Fields to initialize the form with.
+        """
+        self._fields: dict[str, FormField] = fields or {}
 
-    content_type: str
+    def add_field(
+        self,
+        name: str,
+        value: JsonValue | BinaryIO,
+        *,
+        content_type: str | None = None,
+        filename: str | None = None,
+    ) -> None:
+        """Add a field to the form data."""
+        self._fields[name] = FormField(value, content_type=content_type, filename=filename)
+
+    def __iter__(self) -> Iterator[tuple[str, FormField]]:
+        """Iterate over the form fields."""
+        yield from ((name, field) for name, field in self._fields.items())
+
+    def __len__(self) -> int:
+        """Return the number of fields in the form data."""
+        return len(self._fields)
+
+
+@dataclass(slots=True)
+class FormField:
+    """Form field data class."""
+
+    value: JsonValue | BinaryIO | None
+    """Field value."""
+
+    content_type: str | None = None
     """Content type of the file."""
 
-    file: BinaryIO
-    """File object."""
+    filename: str | None = None
+    """Name of the file."""
 
 
 class ErrorItem(BaseModel):
