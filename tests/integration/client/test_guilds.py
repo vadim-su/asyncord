@@ -166,8 +166,7 @@ async def test_get_update_widget(
     integration_data: IntegrationTestData,
 ) -> None:
     """Test getting and updating the widget."""
-    settings = await guilds_res.get_widget_settings(integration_data.guild_id)
-    assert settings
+    assert await guilds_res.get_widget_settings(integration_data.guild_id)
 
     updated_widget_settings = await guilds_res.update_widget(
         integration_data.guild_id,
@@ -181,8 +180,8 @@ async def test_get_update_widget(
     widget = await guilds_res.get_widget(integration_data.guild_id)
     assert widget
 
-    widget_bytes = await guilds_res.get_widget_image(integration_data.guild_id)
-    assert widget_bytes is not None
+    widget_image = await guilds_res.get_widget_image(integration_data.guild_id)
+    assert widget_image.image_data.startswith('data:')
 
 
 async def test_get_onboarding(

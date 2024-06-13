@@ -50,15 +50,16 @@ class Base64Image:
                 raise exc
             return cls(image_data)
 
-        if isinstance(image_data, bytes):
-            if image_type is None:
-                image_type = filetype.guess(image_data)
+        if not image_type:
+            guessed_image_type = filetype.guess(image_data)
 
-                if not image_type:
-                    raise ValueError('Icon must be a valid image')
+            if not guessed_image_type:
+                raise ValueError('Icon must be a valid image')
 
-            encoded_image = base64.b64encode(image_data).decode()
-            return cls(f'data:{image_type.mime};base64, {encoded_image}')
+            image_type = guessed_image_type.mime
+
+        encoded_image = base64.b64encode(image_data).decode()
+        return cls(f'data:{image_type};base64, {encoded_image}')
 
         raise ValueError('Invalid image data type')
 

@@ -12,13 +12,14 @@ from asyncord.client.guild_templates.models.requests import (
 )
 from asyncord.client.guild_templates.models.responses import GuildTemplateResponse
 from asyncord.client.guilds.models.responses import GuildResponse
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.http.client import HttpClient
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class GuildTemplatesResource(ClientSubresource):
+class GuildTemplatesResource(APIResource):
     """Representaion of the guild templates resource.
 
     Attributes:
@@ -27,9 +28,9 @@ class GuildTemplatesResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):
+    def __init__(self, http_client: HttpClient, guild_id: SnowflakeInputType):
         """Initialize the guild templates resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.guild_id = guild_id
         self.templates_url = self.guilds_url / str(self.guild_id) / 'templates'
 
@@ -46,7 +47,7 @@ class GuildTemplatesResource(ClientSubresource):
             template_code: The template code.
         """
         url = self.guilds_url / 'templates' / str(template_code)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return GuildTemplateResponse.model_validate(resp.body)
 
     async def get_guild_templates(
@@ -57,7 +58,7 @@ class GuildTemplatesResource(ClientSubresource):
         Reference:
         https://canary.discord.com/developers/docs/resources/guild-template#get-guild-templates
         """
-        resp = await self._http_client.get(self.templates_url)
+        resp = await self._http_client.get(url=self.templates_url)
         return list_model(GuildTemplateResponse).validate_python(resp.body)
 
     async def create_guild_from_template(
@@ -74,7 +75,7 @@ class GuildTemplatesResource(ClientSubresource):
         """
         url = self.templates_url / str(template_code)
         payload = create_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return GuildResponse.model_validate(resp.body)
 
     async def create_guild_template(
@@ -90,7 +91,7 @@ class GuildTemplatesResource(ClientSubresource):
             template_data: The template data.
         """
         payload = template_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(self.templates_url, payload)
+        resp = await self._http_client.post(url=self.templates_url, payload=payload)
         return GuildTemplateResponse.model_validate(resp.body)
 
     async def sync_guild_template(
@@ -106,7 +107,7 @@ class GuildTemplatesResource(ClientSubresource):
             template_code: The template code.
         """
         url = self.templates_url / str(template_code)
-        resp = await self._http_client.put(url)
+        resp = await self._http_client.put(url=url)
         return GuildTemplateResponse.model_validate(resp.body)
 
     async def update_guild_template(
@@ -125,7 +126,7 @@ class GuildTemplatesResource(ClientSubresource):
         """
         url = self.templates_url / str(template_code)
         payload = template_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(url, payload)
+        resp = await self._http_client.patch(url=url, payload=payload)
         return GuildTemplateResponse.model_validate(resp.body)
 
     async def delete_guild_template(
@@ -143,5 +144,5 @@ class GuildTemplatesResource(ClientSubresource):
             template_code: The template code.
         """
         url = self.templates_url / str(template_code)
-        resp = await self._http_client.delete(url)
+        resp = await self._http_client.delete(url=url)
         return GuildTemplateResponse.model_validate(resp.body)

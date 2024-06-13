@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest, UpdateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.reactions.resources import ReactionResource
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class MessageResource(ClientSubresource):
+class MessageResource(APIResource):
     """Resource to perform actions on messages.
 
     Attributes:
@@ -21,9 +22,9 @@ class MessageResource(ClientSubresource):
 
     channels_url = REST_API_URL / 'channels'
 
-    def __init__(self, parent: ClientResource, channel_id: SnowflakeInputType) -> None:
+    def __init__(self, http_client: HttpClient, channel_id: SnowflakeInputType) -> None:
         """Initialize the message resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.channel_id = channel_id
         self.messages_url = self.channels_url / str(channel_id) / 'messages'
 
@@ -36,7 +37,7 @@ class MessageResource(ClientSubresource):
         Returns:
             Reactions resource for the message.
         """
-        return ReactionResource(self, self.channel_id, message_id)
+        return ReactionResource(self._http_client, self.channel_id, message_id)
 
     async def get(
         self,
@@ -72,7 +73,7 @@ class MessageResource(ClientSubresource):
 
         url = self.messages_url % url_params
 
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(MessageResponse).validate_python(resp.body)
 
     async def create(self, message_data: CreateMessageRequest) -> MessageResponse:
@@ -87,11 +88,12 @@ class MessageResource(ClientSubresource):
         url = self.messages_url
         payload = message_data.model_dump(mode='json', exclude_unset=True)
 
+        # TODO: Fix type error for the files parameter
         # fmt: off
         resp = await self._http_client.post(
             url=url,
             payload=payload,
-            files=[(file.filename, file.content_type, file.content) for file in message_data.files],
+            files=[(file.filename, file.content_type, file.content) for file in message_data.files],  # type: ignore
         )
         # fmt: on
 
@@ -110,11 +112,12 @@ class MessageResource(ClientSubresource):
         url = self.messages_url / str(message_id)
         payload = message_data.model_dump(mode='json', exclude_unset=True)
 
+        # TODO: Fix type error for the files parameter
         # fmt: off
         resp = await self._http_client.patch(
             url=url,
             payload=payload,
-            files=[(file.filename, file.content_type, file.content) for file in message_data.files],
+            files=[(file.filename, file.content_type, file.content) for file in message_data.files],  # type: ignore
         )
         # fmt: on
 
@@ -134,7 +137,7 @@ class MessageResource(ClientSubresource):
         else:
             headers = {}
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def bulk_delete(
         self,
@@ -155,7 +158,7 @@ class MessageResource(ClientSubresource):
         else:
             headers = {}
 
-        await self._http_client.post(url, payload, headers=headers)
+        await self._http_client.post(url=url, payload=payload, headers=headers)
 
     # FIXME: Not clear from documentation,
     #   to which channels the message is going to be crossposted.
@@ -173,7 +176,7 @@ class MessageResource(ClientSubresource):
         """
         url = self.messages_url / str(message_id) / 'crosspost'
 
-        resp = await self._http_client.post(url)
+        resp = await self._http_client.post(url=url, payload={})
         return MessageResponse.model_validate(resp.body)
 
     async def get_pinned_messages(self, channel_id: SnowflakeInputType) -> list[MessageResponse]:
@@ -184,7 +187,7 @@ class MessageResource(ClientSubresource):
         """
         url = self.channels_url / str(channel_id) / 'pins'
 
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(MessageResponse).validate_python(resp.body)
 
     async def pin_message(
@@ -208,7 +211,7 @@ class MessageResource(ClientSubresource):
             headers = {}
 
         payload = {}
-        await self._http_client.put(url, payload=payload, headers=headers)
+        await self._http_client.put(url=url, payload=payload, headers=headers)
 
     async def unpin_message(
         self,
@@ -228,4 +231,4 @@ class MessageResource(ClientSubresource):
         else:
             headers = {}
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)

@@ -1,4 +1,5 @@
-from typing import Protocol
+from collections.abc import Sequence
+from typing import Protocol, Self
 
 import pytest
 
@@ -18,7 +19,7 @@ from asyncord.client.threads.models.requests import ThreadMessage
 
 async def test_create_message_with_buttons(messages_res: MessageResource) -> None:
     """Test creating a message with buttons."""
-    components: list[Component] = [
+    components: Sequence[Component] = [
         ActionRow(
             components=[
                 Button(
@@ -58,6 +59,7 @@ async def test_create_message_with_buttons(messages_res: MessageResource) -> Non
 
     try:
         assert message.content == 'Test message with buttons'
+        assert isinstance(message.components, Sequence)
         assert len(message.components) == len(components)
     finally:
         await messages_res.delete(message.id)
@@ -69,10 +71,10 @@ def test_dont_create_message_with_button_and_select_menu() -> None:
     with pytest.raises(ValueError, match=exc_text):
         ActionRow(
             components=[
-                Button(custom_id='custom_id'),
+                Button(custom_id='custom_id', label='Button'),
                 SelectMenu(
                     custom_id='custom',
-                    options=[SelectMenuOption(label='Option 1', value='option_1')],
+                    options=[SelectMenuOption(label='Option 1', value='option_1')],  # type: ignore
                 ),
             ],
         )
@@ -83,35 +85,45 @@ def test_components_can_be_max_5() -> None:
     # fmt: off
     components = [
         ActionRow(components=[
-            Button(custom_id=f'button_{i}'),
+            Button(custom_id=f'button_{i}', label=f'Button {i}', style=ButtonStyle.PRIMARY),
         ])
         for i in range(6)
     ]
     # fmt: on
     with pytest.raises(ValueError, match='Components must have 5 or fewer action rows'):
-        CreateMessageRequest(components=components)
+        CreateMessageRequest(components=components)  # type: ignore
 
 
 def test_wrap_components_in_action_row() -> None:
     """Test that components are wrapped in an ActionRow."""
     # fmt: off
     components = [
-        Button(custom_id=f'button_{i}')
+        Button(custom_id=f'button_{i}', label=f'Button {i}', style=ButtonStyle.PRIMARY)
         for i in range(5)
     ]
     # fmt: on
 
-    request = CreateMessageRequest(components=components)
+    request = CreateMessageRequest(components=components)  # type: ignore
 
+    assert isinstance(request.components, Sequence)
     assert len(request.components) == 1
     assert isinstance(request.components[0], ActionRow)
+
+    assert isinstance(request.components[0].components, Sequence)
     assert len(request.components[0].components) == 5
+
+    assert isinstance(request.components[0].components[0], Button)
     assert request.components[0].components[0].custom_id == 'button_0'
+    assert isinstance(request.components[0].components[4], Button)
     assert request.components[0].components[4].custom_id == 'button_4'
 
 
 class _Container(Protocol):
-    components: list[Component] | Component | None
+    components: Sequence[Component] | Component | None
+
+    def __call__(self, components: Sequence[Component] | Component | None) -> Self:
+        """Initialize the container with components."""
+        ...
 
 
 @pytest.mark.parametrize(
@@ -126,36 +138,48 @@ class _Container(Protocol):
 )
 def test_wrap_component_to_list_and_action_row(container: _Container) -> None:
     """Test that components are wrapped in an ActionRow."""
-    request = container(components=Button(custom_id='button_0'))
+    request = container(
+        components=Button(
+            custom_id='button_0',
+            label='Button',
+            style=ButtonStyle.PRIMARY,
+        ),
+    )
 
+    assert isinstance(request.components, Sequence)
     assert len(request.components) == 1
     assert isinstance(request.components[0], ActionRow)
+
+    assert isinstance(request.components[0].components, Sequence)
     assert len(request.components[0].components) == 1
+    assert not isinstance(request.components[0].components[0], ActionRow)
     assert request.components[0].components[0].custom_id == 'button_0'
 
 
 def test_wrap_component_to_list_in_action_row() -> None:
     """Test that components are wrapped in an ActionRow."""
-    request = ActionRow(components=[Button(custom_id='button_0')])
+    request = ActionRow(components=[Button(custom_id='button_0', label='Button', style=ButtonStyle.PRIMARY)])
 
+    assert isinstance(request.components, Sequence)
     assert len(request.components) == 1
+    assert isinstance(request.components[0], Button)
     assert request.components[0].custom_id == 'button_0'
 
 
 def test_components_cannot_be_empty() -> None:
     """Test that components cannot be empty."""
-    with pytest.raises(ValueError, match='List should have at least 1 item'):
+    with pytest.raises(ValueError, match='Value should have at least 1 item'):
         ActionRow(components=[])
 
 
 def test_action_row_can_have_max_5_components() -> None:
     """Test that an ActionRow can have a maximum of 5 components."""
     # fmt: on
-    with pytest.raises(ValueError, match='List should have at most 5'):
+    with pytest.raises(ValueError, match='Value should have at most 5 items'):
         # fmt: off
         ActionRow(
             components=[
-                Button(custom_id=f'button_{i}')
+                Button(custom_id=f'button_{i}', label=f'Button {i}', style=ButtonStyle.PRIMARY)
                 for i in range(6)
             ],
         )

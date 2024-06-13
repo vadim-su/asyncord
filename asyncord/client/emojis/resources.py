@@ -3,15 +3,16 @@
 from __future__ import annotations
 
 from asyncord.client.emojis.models.requests import CreateEmojiRequest, UpdateEmojiRequest
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.models.emoji import Emoji
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class EmojiResource(ClientSubresource):
+class EmojiResource(APIResource):
     """Resource to perform actions on guild emojis.
 
     Attributes:
@@ -22,11 +23,11 @@ class EmojiResource(ClientSubresource):
 
     def __init__(
         self,
-        parent: ClientResource,
+        http_client: HttpClient,
         guild_id: SnowflakeInputType,
     ):
         """Create a new emojis resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.guild_id = guild_id
         self.emojis_url = self.guilds_url / str(self.guild_id) / 'emojis'
 
@@ -43,7 +44,7 @@ class EmojiResource(ClientSubresource):
         https://canary.discord.com/developers/docs/resources/emoji#get-guild-emoji
         """
         url = self.emojis_url / str(emoji_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return Emoji.model_validate(resp.body)
 
     async def get_guild_emojis(self) -> list[Emoji]:
@@ -52,7 +53,7 @@ class EmojiResource(ClientSubresource):
         Reference:
         https://canary.discord.com/developers/docs/resources/emoji#list-guild-emojis
         """
-        resp = await self._http_client.get(self.emojis_url)
+        resp = await self._http_client.get(url=self.emojis_url)
         return list_model(Emoji).validate_python(resp.body)
 
     async def create_guild_emoji(
@@ -75,7 +76,7 @@ class EmojiResource(ClientSubresource):
             headers = {}
 
         payload = emoji_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(self.emojis_url, payload=payload, headers=headers)
+        resp = await self._http_client.post(url=self.emojis_url, payload=payload, headers=headers)
         return Emoji.model_validate(resp.body)
 
     async def update_guild_emoji(
@@ -101,7 +102,7 @@ class EmojiResource(ClientSubresource):
 
         payload = emoji_data.model_dump(mode='json', exclude_unset=True)
         url = self.emojis_url / str(emoji_id)
-        resp = await self._http_client.patch(url, payload=payload, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return Emoji.model_validate(resp.body)
 
     async def delete_guild_emoji(
@@ -125,4 +126,4 @@ class EmojiResource(ClientSubresource):
 
         url = self.emojis_url / str(emoji_id)
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)

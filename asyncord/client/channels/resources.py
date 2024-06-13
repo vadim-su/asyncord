@@ -20,14 +20,14 @@ from asyncord.client.guilds.models.responses import InviteResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.polls.resources import PollsResource
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class ChannelResource(ClientSubresource):
+class ChannelResource(APIResource):
     """Channel Resource Endpoints.
 
     These endpoints are for managing channels. If you want to create a channel,
@@ -47,7 +47,7 @@ class ChannelResource(ClientSubresource):
         Returns:
             Resource for managing messages.
         """
-        return MessageResource(self, channel_id)
+        return MessageResource(self._http_client, channel_id)
 
     def polls(self, channel_id: SnowflakeInputType) -> PollsResource:
         """Get the polls resource for the channel.
@@ -58,7 +58,7 @@ class ChannelResource(ClientSubresource):
         Returns:
             Resource for managing polls.
         """
-        return PollsResource(self, channel_id)
+        return PollsResource(self._http_client, channel_id)
 
     def threads(self, channel_id: SnowflakeInputType) -> ThreadResource:
         """Get the thread resource for the channel.
@@ -69,7 +69,7 @@ class ChannelResource(ClientSubresource):
         Returns:
             Resource for managing threads.
         """
-        return ThreadResource(self, channel_id)
+        return ThreadResource(self._http_client, channel_id)
 
     async def get(self, channel_id: SnowflakeInputType) -> ChannelResponse:
         """Get a channel by id.
@@ -81,7 +81,7 @@ class ChannelResource(ClientSubresource):
             Channel object.
         """
         url = self.channels_url / str(channel_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ChannelResponse(**resp.body)
 
     async def create_channel(
@@ -114,7 +114,7 @@ class ChannelResource(ClientSubresource):
         channel_data.type = channel_data.type  # type: ignore
 
         payload = channel_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(url, payload, headers=headers)
+        resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return ChannelResponse.model_validate(resp.body)
 
     async def update(
@@ -142,7 +142,7 @@ class ChannelResource(ClientSubresource):
 
         payload = channel_data.model_dump(mode='json', exclude_unset=True)
 
-        resp = await self._http_client.patch(url, payload, headers=headers)
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return ChannelResponse.model_validate(resp.body)
 
     async def update_channel_position(
@@ -163,7 +163,7 @@ class ChannelResource(ClientSubresource):
 
         payload = [position.model_dump(mode='json', exclude_unset=True) for position in position_data]
 
-        await self._http_client.patch(url, payload)
+        await self._http_client.patch(url=url, payload=payload)
 
     async def delete(self, channel_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Delete a channel, or close a private message.
@@ -187,7 +187,7 @@ class ChannelResource(ClientSubresource):
         else:
             headers = {}
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def update_permissions(
         self,
@@ -219,8 +219,8 @@ class ChannelResource(ClientSubresource):
         url = self.channels_url / str(channel_id) / 'permissions' / str(overwrite_id)
 
         await self._http_client.put(
-            url,
-            payload,
+            url=url,
+            payload=payload,
             headers=headers,
         )
 
@@ -244,7 +244,7 @@ class ChannelResource(ClientSubresource):
 
         url = self.channels_url / str(channel_id) / 'permissions' / str(overwrite_id)
 
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def get_channel_invites(self, channel_id: SnowflakeInputType) -> list[InviteResponse]:
         """Get the invites for a channel.
@@ -259,7 +259,7 @@ class ChannelResource(ClientSubresource):
             List of invites for the channel.
         """
         url = self.channels_url / str(channel_id) / 'invites'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(InviteResponse).validate_python(resp.body)
 
     async def create_channel_invite(
@@ -291,9 +291,9 @@ class ChannelResource(ClientSubresource):
         payload = {}
 
         if invite_request:
-            payload = invite_request.model_dump(mode='json', exclude_unset=True, headers=headers)
+            payload = invite_request.model_dump(mode='json', exclude_unset=True)
 
-        resp = await self._http_client.post(url=url, payload=payload)
+        resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return InviteResponse.model_validate(resp.body)
 
     # TODO: Add webhook models once they are implemented.
@@ -313,7 +313,7 @@ class ChannelResource(ClientSubresource):
             'webhook_channel_id': str(webhook_channel_id),
         }
 
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return resp.body
 
     async def trigger_typing_indicator(self, channel_id: SnowflakeInputType) -> None:
@@ -328,4 +328,4 @@ class ChannelResource(ClientSubresource):
 
         payload = {}
 
-        await self._http_client.post(url, payload)
+        await self._http_client.post(url=url, payload=payload)

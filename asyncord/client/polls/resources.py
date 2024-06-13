@@ -6,14 +6,15 @@ Reference:
 https://canary.discord.com/developers/docs/resources/poll
 """
 
+from asyncord.client.http.client import HttpClient
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.polls.models.responses import GetAnswerVotersResponse
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
 
 
-class PollsResource(ClientSubresource):
+class PollsResource(APIResource):
     """Resource to perform actions on polls.
 
     Attributes:
@@ -22,9 +23,9 @@ class PollsResource(ClientSubresource):
 
     channels_url = REST_API_URL / 'channels'
 
-    def __init__(self, parent: ClientResource, channel_id: SnowflakeInputType) -> None:
+    def __init__(self, http_client: HttpClient, channel_id: SnowflakeInputType) -> None:
         """Initialize the polls resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.channel_id = channel_id
         self.poll_url = self.channels_url / str(channel_id) / 'polls'
 
@@ -55,7 +56,7 @@ class PollsResource(ClientSubresource):
 
         url = self.poll_url / str(message_id) / 'answers' / str(answer_id) % query_param
 
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return GetAnswerVotersResponse.model_validate(resp.body)
 
     async def end_poll(
@@ -76,5 +77,5 @@ class PollsResource(ClientSubresource):
 
         payload = {}
 
-        resp = await self._http_client.post(url, payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return MessageResponse.model_validate(resp.body)

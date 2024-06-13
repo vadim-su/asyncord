@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.http.client import HttpClient
+from asyncord.client.resources import APIResource
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class ReactionResource(ClientSubresource):
+class ReactionResource(APIResource):
     """Reaction resource for a message.
 
     Attributes:
@@ -20,12 +21,12 @@ class ReactionResource(ClientSubresource):
 
     def __init__(
         self,
-        parent: ClientResource,
+        http_client: HttpClient,
         channel_id: SnowflakeInputType,
         message_id: SnowflakeInputType,
     ):
         """Initialize the reaction resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.channel_id = channel_id
         messages_url = self.channels_url / str(self.channel_id) / 'messages'
         self.reactions_url = messages_url / str(message_id) / 'reactions'
@@ -53,7 +54,7 @@ class ReactionResource(ClientSubresource):
             url_params['limit'] = limit
 
         url = self.reactions_url / emoji % url_params
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(UserResponse).validate_python(resp.body)
 
     async def add(self, emoji: str) -> None:
@@ -63,7 +64,7 @@ class ReactionResource(ClientSubresource):
             emoji: Emoji to react with.
         """
         url = self.reactions_url / emoji / '@me'
-        await self._http_client.put(url, None)
+        await self._http_client.put(url=url)
 
     async def delete_own_reaction(self, emoji: str) -> None:
         """Delete a reaction the current user made for the message.
@@ -72,7 +73,7 @@ class ReactionResource(ClientSubresource):
             emoji: Emoji to delete the reaction for.
         """
         url = self.reactions_url / emoji / '@me'
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def delete(
         self,
@@ -94,4 +95,4 @@ class ReactionResource(ClientSubresource):
         if user_id is not None:
             url /= str(user_id)
 
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)

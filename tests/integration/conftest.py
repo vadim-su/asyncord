@@ -8,6 +8,7 @@ from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.http.middleware.ratelimit import BackoffRateLimitStrategy
 from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.members.resources import MemberResource
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
@@ -31,7 +32,13 @@ from tests.conftest import IntegrationTestData
 @pytest.fixture()
 async def client(token: str) -> RestClient:
     """Get a rest client."""
-    return RestClient(token)
+    return RestClient(
+        token,
+        ratelimit_strategy=BackoffRateLimitStrategy(
+            max_retries=10,
+            max_wait_time=60,
+        ),
+    )
 
 
 @pytest.fixture()

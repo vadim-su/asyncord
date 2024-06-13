@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from asyncord.client.bans.models.responses import BanResponse, BulkBanResponse
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class BanResource(ClientSubresource):
+class BanResource(APIResource):
     """Base class for ban resources.
 
     Attributes:
@@ -19,9 +20,9 @@ class BanResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):
+    def __init__(self, http_client: HttpClient, guild_id: SnowflakeInputType):
         """Initialize the ban resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.guild_id = guild_id
         self.bans_url = self.guilds_url / str(self.guild_id) / 'bans'
 
@@ -35,7 +36,7 @@ class BanResource(ClientSubresource):
             user_id: ID of the user to get the ban object for.
         """
         url = self.bans_url / str(user_id)
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return BanResponse.model_validate(resp.body)
 
     async def get_list(
@@ -66,7 +67,7 @@ class BanResource(ClientSubresource):
             url_params['after'] = after
 
         url = self.bans_url % url_params
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(BanResponse).validate_python(resp.body)
 
     async def ban(
@@ -98,7 +99,7 @@ class BanResource(ClientSubresource):
         else:
             payload = None
 
-        await self._http_client.put(url, payload, headers=headers)
+        await self._http_client.put(url=url, payload=payload, headers=headers)
 
     async def unban(self, user_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Unban a user from a guild.
@@ -115,7 +116,7 @@ class BanResource(ClientSubresource):
         else:
             headers = {}
         url = self.bans_url / str(user_id)
-        await self._http_client.delete(url, headers=headers)
+        await self._http_client.delete(url=url, headers=headers)
 
     async def bulk_ban(
         self,
@@ -150,8 +151,8 @@ class BanResource(ClientSubresource):
             payload = None
 
         resp = await self._http_client.post(
-            url,
-            payload,
+            url=url,
+            payload=payload,
             headers=headers,
         )
         return BulkBanResponse.model_validate(resp.body)

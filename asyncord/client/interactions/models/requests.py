@@ -4,6 +4,7 @@ Reference:
 https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 """
 
+from collections.abc import Sequence
 from typing import Annotated, Literal, cast
 
 from pydantic import BaseModel, Field, field_validator
@@ -52,7 +53,7 @@ class InteractionCreateMessageData(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS and MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: list[Component] | Component | None = None
+    components: Sequence[Component] | Component | None = None
     """List of components."""
 
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)
@@ -116,7 +117,7 @@ class InteractionUpdateMessageData(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: list[Component] | Component | None = None
+    components: Sequence[Component] | Component | None = None
     """List of components."""
 
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)

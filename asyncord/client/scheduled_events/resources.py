@@ -6,8 +6,9 @@ https://discord.com/developers/docs/resources/guild-scheduled-event
 
 from __future__ import annotations
 
+from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.resources import ClientResource, ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.scheduled_events.models.requests import CreateScheduledEventRequest, UpdateScheduledEventRequest
 from asyncord.client.scheduled_events.models.responses import ScheduledEventResponse, ScheduledEventUserResponse
 from asyncord.snowflake import SnowflakeInputType
@@ -15,7 +16,7 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 
-class ScheduledEventsResource(ClientSubresource):
+class ScheduledEventsResource(APIResource):
     """Resource to perform actions on guild scheduled events.
 
     Attributes:
@@ -24,9 +25,9 @@ class ScheduledEventsResource(ClientSubresource):
 
     guilds_url = REST_API_URL / 'guilds'
 
-    def __init__(self, parent: ClientResource, guild_id: SnowflakeInputType):
+    def __init__(self, http_client: HttpClient, guild_id: SnowflakeInputType):
         """Create a new scheduled events resource."""
-        super().__init__(parent)
+        super().__init__(http_client)
         self.guild_id = guild_id
         self.events_url = self.guilds_url / str(self.guild_id) / 'scheduled-events'
 
@@ -41,7 +42,7 @@ class ScheduledEventsResource(ClientSubresource):
             GuildScheduleEvent object for the ID provided.
         """
         url = self.events_url / str(event_id) % {'with_user_count': str(with_user_count)}
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return ScheduledEventResponse.model_validate(resp.body)
 
     async def get_list(self, with_user_count: bool = False) -> list[ScheduledEventResponse]:
@@ -54,7 +55,7 @@ class ScheduledEventsResource(ClientSubresource):
             List of GuildScheduleEvent objects.
         """
         url = self.events_url % {'with_user_count': str(with_user_count)}
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(ScheduledEventResponse).validate_python(resp.body)
 
     async def create(
@@ -77,7 +78,7 @@ class ScheduledEventsResource(ClientSubresource):
             headers = {}
 
         paylod = event_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.post(self.events_url, payload=paylod, headers=headers)
+        resp = await self._http_client.post(url=self.events_url, payload=paylod, headers=headers)
         return ScheduledEventResponse.model_validate(resp.body)
 
     async def update(
@@ -96,7 +97,7 @@ class ScheduledEventsResource(ClientSubresource):
         """
         url = self.events_url / str(event_id)
         payload = event_data.model_dump(mode='json', exclude_unset=True)
-        resp = await self._http_client.patch(url, payload)
+        resp = await self._http_client.patch(url=url, payload=payload)
         return ScheduledEventResponse.model_validate(resp.body)
 
     async def delete(self, event_id: SnowflakeInputType) -> None:
@@ -106,7 +107,7 @@ class ScheduledEventsResource(ClientSubresource):
             event_id: ID of the event to delete.
         """
         url = self.events_url / str(event_id)
-        await self._http_client.delete(url)
+        await self._http_client.delete(url=url)
 
     async def get_event_users(self, event_id: SnowflakeInputType) -> list[ScheduledEventUserResponse]:
         """Get a list of users who have signed up for a scheduled event.
@@ -118,5 +119,5 @@ class ScheduledEventsResource(ClientSubresource):
             List of users who have signed up for the event.
         """
         url = self.events_url / str(event_id) / 'users'
-        resp = await self._http_client.get(url)
+        resp = await self._http_client.get(url=url)
         return list_model(ScheduledEventUserResponse).validate_python(resp.body)

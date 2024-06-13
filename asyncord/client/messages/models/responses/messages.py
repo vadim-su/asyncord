@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 import enum
+from collections.abc import Sequence
 
 from fbenum.adapter import FallbackAdapter
 from pydantic import AnyHttpUrl, BaseModel
@@ -481,7 +482,7 @@ class MessageResponse(BaseModel):
     thread: ChannelResponse | None = None
     """The thread that was started from this message, includes thread member object."""
 
-    components: list[ComponentOut] | None = None
+    components: Sequence[ComponentOut] | None = None
     """Sent if the message is a response to an Interaction."""
 
     sticker_items: list[MessageStickerItemOut] | None = None

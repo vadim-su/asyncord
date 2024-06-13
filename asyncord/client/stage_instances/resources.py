@@ -7,13 +7,13 @@ https://canary.discord.com/developers/docs/resources/stage-instance
 from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.resources import ClientSubresource
+from asyncord.client.resources import APIResource
 from asyncord.client.stage_instances.models.requests import CreateStageInstanceRequest, UpdateStageInstanceRequest
 from asyncord.client.stage_instances.models.responses import StageInstanceResponse
 from asyncord.urls import REST_API_URL
 
 
-class StageInstancesResource(ClientSubresource):
+class StageInstancesResource(APIResource):
     """Stage Instance Resource.
 
     These endpoints are for managing stage instances.
@@ -40,9 +40,7 @@ class StageInstancesResource(ClientSubresource):
         """
         url = self.stage_instances_url / str(channel_id)
 
-        resp = await self._http_client.get(
-            url,
-        )
+        resp = await self._http_client.get(url=url)
 
         if resp.body:
             return StageInstanceResponse.model_validate(resp.body)
@@ -72,7 +70,7 @@ class StageInstancesResource(ClientSubresource):
         payload = stage_instance_data.model_dump(mode='json', exclude_unset=True)
 
         resp = await self._http_client.post(
-            url,
+            url=url,
             payload=payload,
             headers=headers,
         )
@@ -105,7 +103,7 @@ class StageInstancesResource(ClientSubresource):
         payload = stage_instance_data.model_dump(mode='json', exclude_unset=True)
 
         resp = await self._http_client.patch(
-            url,
+            url=url,
             payload=payload,
             headers=headers,
         )
@@ -133,7 +131,4 @@ class StageInstancesResource(ClientSubresource):
         else:
             headers = {}
 
-        await self._http_client.delete(
-            url,
-            headers=headers,
-        )
+        await self._http_client.delete(url=url, headers=headers)
