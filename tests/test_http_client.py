@@ -10,6 +10,7 @@ from pytest_mock import MockFixture
 from asyncord.client.http.client import HttpClient
 from asyncord.client.http.middleware.base import Middleware, NextCallType
 from asyncord.client.http.models import Request, Response
+from asyncord.client.http.request_handler import AiohttpRequestHandler
 
 
 @pytest.mark.parametrize('session', [Mock(), None])
@@ -100,7 +101,7 @@ async def test_http_client_general_methods(
 async def test_extract_body_no_content() -> None:
     """Test extracting body from a response with no content."""
     resp = Mock(status=HTTPStatus.NO_CONTENT)
-    result = await HttpClient._extract_body(resp)
+    result = await AiohttpRequestHandler._extract_body_from_response(resp)
     assert result == {}
 
 
@@ -108,7 +109,7 @@ async def test_extract_body_valid_json() -> None:
     """Test extracting body from a response with valid JSON."""
     resp = Mock(status=HTTPStatus.OK, headers=CIMultiDict({'Content-Type': 'application/json'}))
     resp.json = AsyncMock(return_value={'key': 'value'})
-    result = await HttpClient._extract_body(resp)
+    result = await AiohttpRequestHandler._extract_body_from_response(resp)
     assert result == {'key': 'value'}
 
 
@@ -117,14 +118,14 @@ async def test_extract_body_invalid_json() -> None:
     resp = AsyncMock(status=HTTPStatus.OK, headers=CIMultiDict({'Content-Type': 'application/json'}))
     resp.json = AsyncMock(side_effect=json.JSONDecodeError('Invalid JSON', '', 0))
     resp.text = AsyncMock(return_value='Invalid JSON')
-    result = await HttpClient._extract_body(resp)
+    result = await AiohttpRequestHandler._extract_body_from_response(resp)
     assert result == {}
 
 
 async def test_extract_body_not_json() -> None:
     """Test extracting body from a response that is not JSON."""
     resp = Mock(status=HTTPStatus.OK, headers=CIMultiDict({'Content-Type': 'text/plain'}))
-    result = await HttpClient._extract_body(resp)
+    result = await AiohttpRequestHandler._extract_body_from_response(resp)
     assert result == {}
 
 
@@ -135,7 +136,7 @@ async def test_apply_middleware(mocker: MockFixture) -> None:
     """
     middleware_index = 0
     raw_request_mock = mocker.patch(
-        'asyncord.client.http.client.HttpClient._raw_request',
+        'asyncord.client.http.request_handler.AiohttpRequestHandler.request',
         return_value={},
         kwargs={'call_order': 0},
     )

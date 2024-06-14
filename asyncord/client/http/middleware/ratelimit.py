@@ -12,10 +12,13 @@ if TYPE_CHECKING:
     from asyncord.client.http.client import HttpClient
     from asyncord.client.http.models import Request, Response
 
-DEFAULT_BACKOFF_MAX_RETRIES: int = 3
+DEFAULT_BACKOFF_MAX_RETRIES: int = 5
 """Default maximum number of retries for the backoff rate limit strategy."""
 
-DEFAULT_BACKOFF_MAX_WAIT_TIME: int = 60
+DEFAULT_BACKOFF_MIN_WAIT_TIME: float = 0.5
+"""Default minimum wait time in seconds for the backoff rate limit strategy."""
+
+DEFAULT_BACKOFF_MAX_WAIT_TIME: float = 60
 """Default maximum wait time in seconds for the backoff rate limit strategy."""
 
 
@@ -37,15 +40,18 @@ class BackoffRateLimitStrategy(RateLimitStrategy):
     def __init__(
         self,
         max_retries: int = DEFAULT_BACKOFF_MAX_RETRIES,
-        max_wait_time: int = DEFAULT_BACKOFF_MAX_WAIT_TIME,
+        min_wait_time: float = DEFAULT_BACKOFF_MIN_WAIT_TIME,
+        max_wait_time: float = DEFAULT_BACKOFF_MAX_WAIT_TIME,
     ):
         """Initialize strategy.
 
         Args:
             max_retries: Maximum number of retries. Defaults to 3.
+            min_wait_time: Minimum wait time in seconds. Defaults to 1.
             max_wait_time: Maximum wait time in seconds. Defaults to 60.
         """
         self.max_retries = max_retries
+        self.min_wait_time = min_wait_time
         self.max_wait_time = max_wait_time
 
     async def handler(
@@ -62,7 +68,7 @@ class BackoffRateLimitStrategy(RateLimitStrategy):
                 return await next_call(request, http_client)
             except RateLimitError as err:
                 last_err = err
-                wait_time = min(err.retry_after + 0.1, self.max_wait_time)
+                wait_time = _clamp(err.retry_after + 0.1, self.min_wait_time, self.max_wait_time)
                 total_wait_time += wait_time
                 await asyncio.sleep(wait_time)
 
@@ -79,3 +85,8 @@ class MaxRetriesExceededError(Exception):
         )
         self.max_retries = max_retries
         self.total_wait_time = total_wait_time
+
+
+def _clamp(value: float, min_value: float, max_value: float) -> float:
+    """Clamp a value between a minimum and maximum value."""
+    return max(min(value, max_value), min_value)

@@ -19,7 +19,7 @@ from tests.conftest import IntegrationTestData
         (None, None, 'message_id', 1),
     ],
 )
-async def test_get_channel_messages(  # noqa: PLR0913, PLR0917
+async def test_get_channel_messages(
     messages_res: MessageResource,
     integration_data: IntegrationTestData,
     around: SnowflakeInputType | Literal['message_id'],
@@ -93,3 +93,4 @@ async def test_message_pin_unpin_flow(
 
     # Check that the message is no longer pinned
     pins_after_unpin = await messages_res.get_pinned_messages(integration_data.channel_id)
+    assert message.id not in [msg.id for msg in pins_after_unpin]

@@ -7,6 +7,7 @@ from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.emojis.resources import EmojiResource
+from asyncord.client.guild_templates.resources import GuildTemplatesResource
 from asyncord.client.guilds.resources import GuildResource
 from asyncord.client.http.middleware.ratelimit import BackoffRateLimitStrategy
 from asyncord.client.invites.resources import InvitesResource
@@ -120,7 +121,7 @@ async def members_res(
 async def guild_templates_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
-) -> GuildResource:
+) -> GuildTemplatesResource:
     """Get guild templates resource for the guild."""
     return guilds_res.guild_templates(integration_data.guild_id)
 

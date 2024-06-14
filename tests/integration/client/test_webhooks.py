@@ -43,6 +43,7 @@ async def test_webhook_cycle(
         ),
     )
     assert webhook
+    assert webhook.token
 
     webhook_channel_resp = await webhooks_res.get_channel_webhooks(
         integration_data.channel_id,
