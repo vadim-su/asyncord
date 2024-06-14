@@ -30,7 +30,8 @@ class RoleResource(APIResource):
     async def get_list(self) -> list[RoleResponse]:
         """Get a list of roles in a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-roles
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-roles
 
         Returns:
             List of roles in the guild.
@@ -45,7 +46,8 @@ class RoleResource(APIResource):
     ) -> RoleResponse:
         """Create a new role in a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#create-guild-role
+        Reference:
+        https://discord.com/developers/docs/resources/guild#create-guild-role
 
         Args:
             role_data: Data for the role to create.
@@ -66,7 +68,8 @@ class RoleResource(APIResource):
     async def change_role_positions(self, role_positions: list[RolePositionRequest]) -> list[RoleResponse]:
         """Change the position of a role in a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
+        Reference:
+        https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
 
         Args:
             role_positions: List of role positions to change.
@@ -80,7 +83,8 @@ class RoleResource(APIResource):
     async def update_role(self, role_id: SnowflakeInputType, role_data: UpdateRoleRequest) -> RoleResponse:
         """Update a role in a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#modify-guild-role
+        Reference:
+        https://discord.com/developers/docs/resources/guild#modify-guild-role
 
         Args:
             role_id: ID of the role to update.
@@ -97,7 +101,8 @@ class RoleResource(APIResource):
     async def delete(self, role_id: SnowflakeInputType, reason: str | None = None) -> None:
         """Delete a role in a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#delete-guild-role
+        Reference:
+        https://discord.com/developers/docs/resources/guild#delete-guild-role
 
         Args:
             role_id: ID of the role to delete.

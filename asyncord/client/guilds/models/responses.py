@@ -50,7 +50,8 @@ class WelcomeScreenChannelOut(BaseModel):
 class WelcomeScreenResponse(BaseModel):
     """Welcome screen object.
 
-    Reference: https://discord.com/developers/docs/resources/guild#welcome-screen-object
+    Reference:
+    https://discord.com/developers/docs/resources/guild#welcome-screen-object
     """
 
     description: str | None
@@ -267,7 +268,8 @@ class GuildPreviewResponse(BaseModel):
 class PruneResponse(BaseModel):
     """Prune object.
 
-    Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
+    Reference:
+    https://discord.com/developers/docs/resources/guild#get-guild-prune-count
     """
 
     pruned: int
@@ -277,7 +279,8 @@ class PruneResponse(BaseModel):
 class VoiceRegionResponse(BaseModel):
     """Voice region object.
 
-    Reference: https://discord.com/developers/docs/resources/voice#voice-region-object-voice-region-structure
+    Reference:
+    https://discord.com/developers/docs/resources/voice#voice-region-object-voice-region-structure
     """
 
     id: str
@@ -422,7 +425,8 @@ class InviteResponse(BaseModel):
 class IntegrationAccountOut(BaseModel):
     """Integration Account Structure.
 
-    Reference: https://discord.com/developers/docs/resources/guild#integration-account-object
+    Reference:
+    https://discord.com/developers/docs/resources/guild#integration-account-object
     """
 
     id: str
@@ -435,7 +439,8 @@ class IntegrationAccountOut(BaseModel):
 class IntegrationApplicationOut(BaseModel):
     """Integration Application Structure.
 
-    Reference: https://discord.com/developers/docs/resources/guild#integration-application-object
+    Reference:
+    https://discord.com/developers/docs/resources/guild#integration-application-object
     """
 
     id: Snowflake
@@ -457,7 +462,8 @@ class IntegrationApplicationOut(BaseModel):
 class IntegrationResponse(BaseModel):
     """Inntegration object.
 
-    Reference: https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
+    Reference:
+    https://discord.com/developers/docs/resources/guild#integration-object-integration-structure
     """
 
     id: Snowflake

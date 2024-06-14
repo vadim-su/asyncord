@@ -43,6 +43,7 @@ class Shard(NamedTuple):
 class ReadyEventApplication(BaseModel):
     """Application object.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields
     """
 
@@ -70,6 +71,7 @@ class ReadyEvent(GatewayEvent):
     as it contains all the state required for a client to begin interacting with
     the rest of the platform.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#ready
     """
 
@@ -106,6 +108,7 @@ class ResumedEvent(GatewayEvent):
 
     For resuming existing sessions.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#resume.
     """
 
@@ -113,6 +116,7 @@ class ResumedEvent(GatewayEvent):
 class ReconnectEvent(BaseModel):
     """Dispatched when the client should reconnect to the gateway.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#reconnect
     """
 
@@ -125,6 +129,7 @@ class InvalidSessionEvent(GatewayEvent):
     - the gateway could not resume a session after receiving a Resume event
     - the gateway has invalidated an active session and is requesting client action
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#invalid-session
     """
 

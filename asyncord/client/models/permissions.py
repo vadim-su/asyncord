@@ -12,7 +12,7 @@ from pydantic_core import CoreSchema, core_schema
 class PermissionFlag(enum.IntFlag):
     """Permission flags.
 
-    More info at:
+    Reference:
     https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
     """
 

@@ -103,7 +103,7 @@ class MessageReferenceOut(BaseModel):
 class ChannelMentionOut(BaseModel):
     """Channel mention object.
 
-    Read more info at:
+    Reference:
     https://discord.com/developers/docs/resources/channel#channel-mention-object
     """
 

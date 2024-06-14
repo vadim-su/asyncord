@@ -87,6 +87,7 @@ class MentionUser(BaseModel):
 class MessageCreateEvent(GatewayEvent, MessageResponse):
     """Sent when a message is created.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#message-create
     """
 
@@ -108,6 +109,7 @@ class MessageCreateEvent(GatewayEvent, MessageResponse):
 class MessageUpdateEvent(GatewayEvent):
     """Sent when a message is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#message-update.
     """
 
@@ -217,6 +219,7 @@ class MessageUpdateEvent(GatewayEvent):
 class MessageDeleteEvent(GatewayEvent):
     """Sent when a message is deleted.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#message-delete
     """
 
@@ -233,6 +236,7 @@ class MessageDeleteEvent(GatewayEvent):
 class MessageDeleteBulkEvent(GatewayEvent):
     """Sent when multiple messages are deleted at once.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#message-delete-bulk
     """
 
@@ -247,7 +251,11 @@ class MessageDeleteBulkEvent(GatewayEvent):
 
 
 class MessageReactionEmoji(BaseModel):
-    """https://discord.com/developers/docs/topics/gateway-events#message-reaction-add-message-reaction-add-event-fields."""
+    """Emoji sent with a message reaction.
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#message-reaction-add-message-reaction-add-event-fields
+    """
 
     name: str
     """Name of the emoji."""
@@ -262,6 +270,7 @@ class MessageReactionEmoji(BaseModel):
 class MessageReactionAddEvent(GatewayEvent):
     """Sent when a user adds a reaction to a message.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#message-reaction-add
     """
 
@@ -290,6 +299,7 @@ class MessageReactionAddEvent(GatewayEvent):
 class MessageReactionRemoveEvent(GatewayEvent):
     """Sent when a user removes a reaction from a message.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove
     """
 
@@ -312,6 +322,7 @@ class MessageReactionRemoveEvent(GatewayEvent):
 class MessageReactionRemoveAllEvent(GatewayEvent):
     """Sent when all reactions are explicitly removed from a message.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-all
     """
 
@@ -328,6 +339,7 @@ class MessageReactionRemoveAllEvent(GatewayEvent):
 class MessageReactionRemoveEmojiEvent(GatewayEvent):
     """Sent when all reactions for a given emoji are explicitly removed from a message.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#message-reaction-remove-emoji
     """
 

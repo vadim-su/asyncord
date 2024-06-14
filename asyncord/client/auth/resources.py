@@ -1,6 +1,7 @@
 """This module contains all the necessary components related to OAuth2 authentication for Discord.
 
-Reference: https://discord.com/developers/docs/topics/oauth2
+Reference:
+https://discord.com/developers/docs/topics/oauth2
 """
 
 from asyncord.client.applications.models.responses import ApplicationOut
@@ -18,7 +19,8 @@ class OAuthResource(APIResource):
     only accept a content type of application/x-www-form-urlencoded.
     JSON content is not permitted and will return an error.
 
-    Reference: https://discord.com/developers/docs/topics/oauth2
+    Reference:
+    https://discord.com/developers/docs/topics/oauth2
     """
 
     oauth_url = REST_API_URL / 'oauth2'

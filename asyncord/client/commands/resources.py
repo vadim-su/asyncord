@@ -17,7 +17,7 @@ class CommandResource(APIResource):
     """Represents the commands resource for the client.
 
     Reference:
-        https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands
+    https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands
 
     Attributes:
         applications_url: Base applications url.

@@ -8,6 +8,7 @@ from asyncord.snowflake import Snowflake
 class GuildScheduledEventCreateEvent(GatewayEvent, ScheduledEventResponse):
     """Sent when a guild scheduled event is created.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-create
     """
 
@@ -15,6 +16,7 @@ class GuildScheduledEventCreateEvent(GatewayEvent, ScheduledEventResponse):
 class GuildScheduledEventUpdateEvent(GatewayEvent, ScheduledEventResponse):
     """Sent when a guild scheduled event is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-update
     """
 
@@ -22,6 +24,7 @@ class GuildScheduledEventUpdateEvent(GatewayEvent, ScheduledEventResponse):
 class GuildScheduledEventDeleteEvent(GatewayEvent, ScheduledEventResponse):
     """Sent when a guild scheduled event is deleted.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-delete
     """
 
@@ -29,6 +32,7 @@ class GuildScheduledEventDeleteEvent(GatewayEvent, ScheduledEventResponse):
 class GuildScheduledEventUserAddEvent(GatewayEvent, ScheduledEventResponse):
     """Represents a GuildScheduledEventUserAddEvent.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-user-add-guild-scheduled-event-user-add-event-fields
     """
 
@@ -45,6 +49,7 @@ class GuildScheduledEventUserAddEvent(GatewayEvent, ScheduledEventResponse):
 class GuildScheduledEventUserRemoveEvent(GatewayEvent):
     """Sent when a user has unsubscribed from a guild scheduled event.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-scheduled-event-user-remove-guild-scheduled-event-user-remove-event-fields
     """
 

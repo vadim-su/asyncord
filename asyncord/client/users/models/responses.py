@@ -51,7 +51,7 @@ class UserFlags(enum.IntFlag):
     TEAM_PSEUDO_USER = 1 << 10
     """User is a team.
 
-    More info at:
+    Reference:
     https://discord.com/developers/docs/topics/teams
     """
 
@@ -70,14 +70,14 @@ class UserFlags(enum.IntFlag):
     BOT_HTTP_INTERACTIONS = 1 << 19
     """Bot uses only HTTP interactions and is shown in the online member list.
 
-    More info at:
+    Reference:
     https://discord.com/developers/docs/interactions/receiving-and-responding#receiving-an-interaction
     """
 
     ACTIVE_DEVELOPER = 1 << 22
     """User is an Active Developer
 
-    More info at:
+    Reference:
     https://support-dev.discord.com/hc/en-us/articles/10113997751447
     """
 

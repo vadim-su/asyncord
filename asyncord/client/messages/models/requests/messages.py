@@ -448,14 +448,14 @@ class CreateMessageRequest(BaseMessage):
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)
     """Contents of the file being sent.
 
-    See Uploading Files:
+    Reference:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
     attachments: list[AttachmentData] | None = None
     """Attachment objects with filename and description.
 
-    See Uploading Files:
+    Reference:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
@@ -504,13 +504,13 @@ class UpdateMessageRequest(BaseMessage):
     files: list[AttachedFile] = Field(default_factory=list, exclude=True)
     """Contents of the file being sent.
 
-    See Uploading Files:
+    Reference:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
     attachments: list[AttachmentData] | None = None
     """Attachment objects with filename and description.
 
-    See Uploading Files:
+    Reference:
     https://discord.com/developers/docs/reference#uploading-files
     """

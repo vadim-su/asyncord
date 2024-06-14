@@ -13,6 +13,7 @@ from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 class IdentifyConnectionProperties(BaseModel):
     """Identify connection properties.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#identify-identify-connection-properties
     """
 
@@ -30,6 +31,7 @@ class IdentifyConnectionProperties(BaseModel):
 class StatusType(enum.StrEnum):
     """Possible statuses for a user.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#update-presence-status-types
     """
 

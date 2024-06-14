@@ -83,6 +83,7 @@ class TeamMemberUserOut(BaseModel):
 class TeamMemberOut(BaseModel):
     """Represents a Discord team member.
 
+    Reference:
     https://discord.com/developers/docs/topics/teams#data-models-team-member-object
     """
 
@@ -102,6 +103,7 @@ class TeamMemberOut(BaseModel):
 class TeamOut(BaseModel):
     """Represents a Discord team.
 
+    Reference:
     https://discord.com/developers/docs/topics/teams#data-models-team-object
     """
 
@@ -192,6 +194,7 @@ class BotApplicationOut(BaseModel):
 class ApplicationOut(BaseModel):
     """Represents a Discord application.
 
+    Reference:
     https://discord.com/developers/docs/resources/application#application-object-application-structure
     """
 
@@ -299,6 +302,7 @@ class ApplicationCommandPermissionOut(BaseModel):
 class GuildApplicationCommandPermissionsOut(BaseModel):
     """Returned when fetching the permissions for an app's command(s) in a guild.
 
+    Reference:
     https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object
     """
 
