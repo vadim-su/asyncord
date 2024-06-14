@@ -16,6 +16,7 @@ class ClientStatus(BaseModel):
 
     If a user is offline or invisible, the corresponding field is not present.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#client-status-object
     """
 
@@ -32,6 +33,7 @@ class ClientStatus(BaseModel):
 class PresenceUpdateUser(BaseModel):
     """User object sent in presence update events.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#presence-update-presence-update-event-fields
     """
 
@@ -81,6 +83,7 @@ class PresenceUpdateUser(BaseModel):
 class PresenceUpdateEvent(GatewayEvent):
     """Sent when a user's presence or info, such as name or avatar, is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#presence-update
     """
 
@@ -109,6 +112,7 @@ class PresenceUpdateEvent(GatewayEvent):
 class TypingStartEvent(GatewayEvent):
     """Sent when a user starts typing in a channel.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#typing-start
     """
 
@@ -131,5 +135,6 @@ class TypingStartEvent(GatewayEvent):
 class UserUpdateEvent(GatewayEvent, UserResponse):
     """Sent when properties about the user change.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#user-update
     """

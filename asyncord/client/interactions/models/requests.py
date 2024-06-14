@@ -16,8 +16,7 @@ from asyncord.client.messages.models.requests.components import ActionRow, Compo
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import (
     AllowedMentions,
-    AttachedFile,
-    AttachmentData,
+    Attachment,
     BaseMessage,
 )
 
@@ -56,17 +55,10 @@ class InteractionCreateMessageData(BaseMessage):
     components: Sequence[Component] | Component | None = None
     """List of components."""
 
-    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
-    """Contents of the file being sent.
-
-    See Uploading Files:
-    https://discord.com/developers/docs/reference#uploading-files
-    """
-
-    attachments: list[AttachmentData] | None = None
+    attachments: list[Attachment] | None = None
     """Attachment objects with filename and description.
 
-    See Uploading Files:
+    Reference:
     https://discord.com/developers/docs/reference#uploading-files
     """
 
@@ -120,17 +112,10 @@ class InteractionUpdateMessageData(BaseMessage):
     components: Sequence[Component] | Component | None = None
     """List of components."""
 
-    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
-    """Contents of the file being sent.
-
-    See Uploading Files:
-    https://discord.com/developers/docs/reference#uploading-files
-    """
-
-    attachments: list[AttachmentData] | None = None
+    attachments: list[Attachment] | None = None
     """Attachment objects with filename and description.
 
-    See Uploading Files:
+    Reference:
     https://discord.com/developers/docs/reference#uploading-files
     """
 

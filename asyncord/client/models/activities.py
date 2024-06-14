@@ -19,6 +19,7 @@ from asyncord.snowflake import Snowflake
 class ActivityType(enum.IntEnum):
     """Activity type.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
     """
 
@@ -84,6 +85,7 @@ class ActivityType(enum.IntEnum):
 class ActivityTimestamps(BaseModel):
     """Timestamps for start and/or end of the `Activity`.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
     """
 
@@ -97,6 +99,7 @@ class ActivityTimestamps(BaseModel):
 class ActivityEmoji(BaseModel):
     """Activity emoji.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji
     """
 
@@ -113,6 +116,7 @@ class ActivityEmoji(BaseModel):
 class ActivityParty(BaseModel):
     """Activity party.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party
     """
 
@@ -126,6 +130,7 @@ class ActivityParty(BaseModel):
 class ActivityAssets(BaseModel):
     """Activity assets.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets
     """
 
@@ -154,6 +159,7 @@ class ActivityAssets(BaseModel):
 class ActivitySecrets(BaseModel):
     """Activity secrets.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets
     """
 
@@ -170,6 +176,7 @@ class ActivitySecrets(BaseModel):
 class ActivityFlag(enum.IntFlag):
     """Activity flags.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags
     """
 
@@ -204,6 +211,7 @@ class ActivityFlag(enum.IntFlag):
 class ActivityButton(BaseModel):
     """Activity button.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
     """
 
@@ -219,6 +227,7 @@ class Activity(BaseModel):
 
     Bots are only able to send name, state, type, and optionally url.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object
     """
 
@@ -282,6 +291,7 @@ class Activity(BaseModel):
 class ActivityResponse(BaseModel):
     """Represents a Discord activity.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#activity-object
     """
 

@@ -9,7 +9,7 @@ from enum import IntFlag, unique
 class Intent(IntFlag):
     """Gateway intents.
 
-    You can get more information about intent values and related events by the link:
+    Reference:
     https://discord.com/developers/docs/topics/gateway#gateway-intents
     """
 

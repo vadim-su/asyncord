@@ -23,6 +23,7 @@ class GuildCreateEvent(GatewayEvent, GuildResponse):
         2. When a Guild becomes available again to the client.
         3. When the current user joins a new Guild.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-create
     """
 
@@ -63,6 +64,7 @@ class GuildCreateEvent(GatewayEvent, GuildResponse):
 class GuildUpdateEvent(GatewayEvent, GuildResponse):
     """Sent when a guild is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-update
     """
 
@@ -70,6 +72,7 @@ class GuildUpdateEvent(GatewayEvent, GuildResponse):
 class GuildDeleteEvent(GatewayEvent):
     """Sent when a guild becomes unavailable, or when the user leaves or is removed from a guild.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-delete
     """
 
@@ -86,6 +89,7 @@ class GuildDeleteEvent(GatewayEvent):
 class GuildBanAddEvent(GatewayEvent):
     """Sent when a user is banned from a guild.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-ban-add
     """
 
@@ -99,6 +103,7 @@ class GuildBanAddEvent(GatewayEvent):
 class GuildBanRemoveEvent(GatewayEvent):
     """Sent when a user is unbanned from a guild.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-ban-remove
     """
 
@@ -112,6 +117,7 @@ class GuildBanRemoveEvent(GatewayEvent):
 class GuildEmojisUpdateEvent(GatewayEvent):
     """Sent when a guild's emojis have been updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-emojis-update
     """
 
@@ -125,6 +131,7 @@ class GuildEmojisUpdateEvent(GatewayEvent):
 class GuildStickersUpdateEvent(GatewayEvent):
     """Sent when a guild's stickers have been updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-stickers-update
     """
 
@@ -138,6 +145,7 @@ class GuildStickersUpdateEvent(GatewayEvent):
 class GuildIntegrationsUpdateEvent(GatewayEvent):
     """Sent when a guild integration is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-integrations-update
     """
 
@@ -148,6 +156,7 @@ class GuildIntegrationsUpdateEvent(GatewayEvent):
 class GuildMemberAddEvent(GatewayEvent, MemberResponse):
     """Sent when a new user joins a guild.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-member-add
     """
 
@@ -158,6 +167,7 @@ class GuildMemberAddEvent(GatewayEvent, MemberResponse):
 class GuildMemberRemoveEvent(GatewayEvent):
     """Sent when a user leaves a guild, or is kicked/banned.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-member-remove
     """
 
@@ -171,6 +181,7 @@ class GuildMemberRemoveEvent(GatewayEvent):
 class GuildMemberUpdateEvent(GatewayEvent, MemberResponse):
     """Sent when a guild member is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-member-update
     """
 
@@ -215,6 +226,7 @@ class GuildMemberUpdateEvent(GatewayEvent, MemberResponse):
 class GuildMembersChunkEvent(GatewayEvent):
     """Sent when a chunk of guild members is received.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-members-chunk
     """
 
@@ -246,6 +258,7 @@ class GuildMembersChunkEvent(GatewayEvent):
 class GuildRoleCreateEvent(GatewayEvent):
     """Sent when a guild role is created.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-role-create
     """
 
@@ -259,6 +272,7 @@ class GuildRoleCreateEvent(GatewayEvent):
 class GuildRoleUpdateEvent(GatewayEvent):
     """Sent when a guild role is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-role-update
     """
 
@@ -272,6 +286,7 @@ class GuildRoleUpdateEvent(GatewayEvent):
 class GuildRoleDeleteEvent(GatewayEvent):
     """Sent when a guild role is deleted.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#guild-role-delete
     """
 

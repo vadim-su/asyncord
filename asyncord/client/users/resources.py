@@ -36,7 +36,7 @@ class UserResource(APIResource):
         """Get the current user.
 
         Reference:
-            https://discord.com/developers/docs/resources/user#modify-current-user
+        https://discord.com/developers/docs/resources/user#modify-current-user
         """
         resp = await self._http_client.get(url=self.current_user_url)
         return UserResponse.model_validate(resp.body)
@@ -44,7 +44,8 @@ class UserResource(APIResource):
     async def get_user(self, user_id: SnowflakeInputType) -> UserResponse:
         """Get a user.
 
-        Reference: https://discord.com/developers/docs/resources/user#modify-current-user
+        Reference:
+        https://discord.com/developers/docs/resources/user#modify-current-user
 
         Args:
             user_id: ID of the user to get.
@@ -59,7 +60,8 @@ class UserResource(APIResource):
         Args:
             user_update_data: Update user request model.
 
-        Reference: https://discord.com/developers/docs/resources/user#modify-current-user
+        Reference:
+        https://discord.com/developers/docs/resources/user#modify-current-user
         """
         payload = user_update_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.patch(url=self.current_user_url, payload=payload)
@@ -105,7 +107,8 @@ class UserResource(APIResource):
 
         Requires the guilds.members.read OAuth2 scope.
 
-        Reference: https://discord.com/developers/docs/resources/user#get-current-user-guild-member
+        Reference:
+        https://discord.com/developers/docs/resources/user#get-current-user-guild-member
 
         Args:
             guild_id: ID of the guild.
@@ -117,7 +120,8 @@ class UserResource(APIResource):
     async def leave_guild(self, guild_id: SnowflakeInputType) -> None:
         """Leave a guild.
 
-        Reference: https://discord.com/developers/docs/resources/user#leave-guild
+        Reference:
+        https://discord.com/developers/docs/resources/user#leave-guild
 
         Args:
             guild_id: ID of the guild to leave.
@@ -128,7 +132,8 @@ class UserResource(APIResource):
     async def create_dm(self, user_id: SnowflakeInputType) -> ChannelResponse:
         """Create a DM with a user.
 
-        Reference: https://discord.com/developers/docs/resources/user#create-dm
+        Reference:
+        https://discord.com/developers/docs/resources/user#create-dm
 
         Args:
             user_id: ID of the user to create a DM with.
@@ -144,7 +149,8 @@ class UserResource(APIResource):
         This endpoint was intended to be used with the now-deprecated GameBridge SDK.
         DMs created with this endpoint will not be shown in the Discord client.
 
-        Reference: https://discord.com/developers/docs/resources/user#create-group-dm
+        Reference:
+        https://discord.com/developers/docs/resources/user#create-group-dm
 
         Args:
             user_ids: IDs of the users to create a group DM with.

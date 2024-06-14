@@ -31,12 +31,13 @@ RATELIMIT_GLOBAL: Final[str] = 'X-RateLimit-Global'
 """Whether the rate limit is global."""
 
 RATELIMIT_SCOPE: Final[str] = 'X-RateLimit-Scope'
+"""Rate limit scope."""
 # endregion Rate limit headers
 
 
 @enum.unique
 class HttpMethod(enum.StrEnum):
-    """HTTP method enum."""
+    """HTTP methods which we use in the client."""
 
     GET = 'GET'
     POST = 'POST'

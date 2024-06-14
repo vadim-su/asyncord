@@ -3,21 +3,26 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
-from collections.abc import Sequence
+import warnings
 from functools import partial
-from http import HTTPStatus
-from typing import Any
-
-import aiohttp
-from aiohttp.client import ClientResponse
+from typing import TYPE_CHECKING, Any
 
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
 from asyncord.client.http.middleware.base import Middleware, NextCallType
 from asyncord.client.http.middleware.errors import ErrorHandlerMiddleware
-from asyncord.client.http.models import AttachedFile, Request, Response
+from asyncord.client.http.models import FormField, FormPayload, Request
+from asyncord.client.http.request_handler import AiohttpRequestHandler
 from asyncord.typedefs import StrOrURL
+
+if TYPE_CHECKING:
+    import aiohttp
+    from pydantic import JsonValue
+
+    from asyncord.client.http.middleware.base import Middleware, NextCallType
+    from asyncord.client.http.models import Response
+    from asyncord.client.http.request_handler import RequestHandler
+    from asyncord.typedefs import StrOrURL
 
 logger = logging.getLogger(__name__)
 
@@ -27,19 +32,34 @@ class HttpClient:
 
     def __init__(
         self,
-        session: aiohttp.ClientSession | None = None,
+        session: aiohttp.ClientSession | object | None = None,
+        request_handler: RequestHandler | None = None,
         middlewares: list[Middleware] | None = None,
     ) -> None:
         """Initialize the client.
 
+        If no session is provided, requests will be made using the default session.
+        When no request handler is provided, the default aiohttp request handler will be used.
+        You should not provide both a session and a request handler at the same time because
+        the session will be used only if no request handler is provided.
+
         Args:
             session: Client session. Defaults to None.
+            request_handler: Request handler to use. Defaults to None.
             middlewares: Middlewares to apply. Defaults to None.
         """
         asyncio.get_running_loop()  # we want to make sure we are running in an event loop
         self.session = session
         self.middlewares: list[Middleware] = middlewares or []
         self.system_middlewares: list[Middleware] = [ErrorHandlerMiddleware()]
+
+        if session and request_handler:
+            warnings.warn(
+                'You should not provide both a session and a request handler. Session will not be used.',
+                stacklevel=2,
+            )
+
+        self._request_handler = request_handler or AiohttpRequestHandler(session)  # type: ignore
 
     async def get(
         self,
@@ -72,7 +92,6 @@ class HttpClient:
         *,
         url: StrOrURL,
         payload: Any | None = None,  # noqa: ANN401
-        files: list[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
@@ -93,7 +112,6 @@ class HttpClient:
                 method=HttpMethod.POST,
                 url=url,
                 payload=payload,
-                files=files,
                 headers=headers or {},
             ),
             skip_middleware=skip_middleware,
@@ -104,7 +122,6 @@ class HttpClient:
         *,
         url: StrOrURL,
         payload: Any | None = None,  # noqa: ANN401
-        files: Sequence[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
@@ -125,7 +142,6 @@ class HttpClient:
                 method=HttpMethod.PUT,
                 url=url,
                 payload=payload,
-                files=files,
                 headers=headers or {},
             ),
             skip_middleware=skip_middleware,
@@ -136,7 +152,6 @@ class HttpClient:
         *,
         url: StrOrURL,
         payload: Any,  # noqa: ANN401
-        files: Sequence[AttachedFile] | None = None,
         headers: dict[str, str] | None = None,
         skip_middleware: bool = False,
     ) -> Response:
@@ -157,7 +172,6 @@ class HttpClient:
                 method=HttpMethod.PATCH,
                 url=url,
                 payload=payload,
-                files=files,
                 headers=headers or {},
             ),
             skip_middleware=skip_middleware,
@@ -211,90 +225,9 @@ class HttpClient:
             Response from the processed request.
         """
         if skip_middleware:
-            return await self._raw_request(request)
+            return await self._request_handler.request(request)
 
         return await self._apply_middleware(request)
-
-    async def _raw_request(self, request: Request) -> Response:
-        """Make a raw http request.
-
-        When files are provided, the payload is sent as a form.
-
-        Reference:
-        https://discord.com/developers/docs/resources/channel#create-message.
-
-        Args:
-            request: Request data.
-
-        Returns:
-            Response from the processed request.
-        """
-        data = None
-
-        if request.files:
-            data = aiohttp.FormData()
-            if request.payload is not None:
-                data.add_field('payload_json', json.dumps(request.payload), content_type=JSON_CONTENT_TYPE)
-
-            for index, (file_name, content_type, file_data) in enumerate(request.files):
-                data.add_field(f'files[{index}]', file_data, filename=file_name, content_type=content_type)
-
-        elif request.payload is not None:
-            data = aiohttp.JsonPayload(request.payload)
-
-        if self.session:
-            req_context = self.session.request(
-                method=request.method,
-                url=request.url,
-                data=data,
-                headers=request.headers,
-            )
-        else:
-            req_context = aiohttp.request(
-                method=request.method,
-                url=request.url,
-                data=data,
-                headers=request.headers,
-            )
-
-        async with req_context as resp:
-            # fmt: off
-            headers = {
-                header.lower(): value
-                for header, value in resp.headers.items()
-            }
-            # fmt: on
-
-            return Response(
-                raw_response=resp,
-                status=HTTPStatus(resp.status),
-                headers=headers,
-                raw_body=await resp.read(),
-                body=await self._extract_body(resp),
-            )
-
-    @classmethod
-    async def _extract_body(cls, resp: ClientResponse) -> dict[str, Any]:
-        """Extract the body from the response.
-
-        Args:
-            resp: Request response.
-
-        Returns:
-            Body of the parsed response.
-        """
-        if resp.status == HTTPStatus.NO_CONTENT:
-            return {}
-
-        if resp.headers.get('Content-Type') == JSON_CONTENT_TYPE:
-            try:
-                return await resp.json()
-            except json.JSONDecodeError:
-                body = await resp.read()
-                logger.warning('Failed to decode JSON body: %s', body[:100])
-                return {}
-
-        return {}
 
     async def _apply_middleware(self, request: Request) -> Response:
         """Apply middleware to the request.
@@ -306,16 +239,40 @@ class HttpClient:
             Response from the processed request.
         """
 
-        async def _raw_request_wrap(
+        async def _request_wrap(
             request: Request,
             http_client: HttpClient,
         ) -> Response:
-            return await self._raw_request(request)
+            """Wrap the request with middleware.
+
+            It allows the request to be passed through the middleware stack and
+            call at the end of the chain.
+            """
+            return await self._request_handler.request(request)
 
         middlewares = self.system_middlewares + list(reversed(self.middlewares))
-        next_call: NextCallType = _raw_request_wrap
+        next_call: NextCallType = _request_wrap
 
         for middleware in middlewares:
             next_call = partial(middleware, next_call=next_call)
 
         return await next_call(request, self)
+
+
+def make_payload_form(*, json_payload: JsonValue, **other_fields: FormField) -> FormPayload:
+    """Make payload for a form request.
+
+    Args:
+        json_payload: Json payload to send.
+        **other_fields: Other fields to send.
+
+    Returns:
+        Form payload.
+    """
+    fields: dict[str, FormField] = {}
+    fields['payload_json'] = FormField(value=json_payload, content_type=JSON_CONTENT_TYPE)
+
+    if other_fields:
+        fields.update(other_fields)
+
+    return FormPayload(fields)

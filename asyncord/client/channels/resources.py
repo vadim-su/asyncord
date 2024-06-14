@@ -33,7 +33,8 @@ class ChannelResource(APIResource):
     These endpoints are for managing channels. If you want to create a channel,
     use the Guild Resource endpoints.
 
-    More info at: https://discord.com/developers/docs/resources/channel
+    Reference:
+    https://discord.com/developers/docs/resources/channel
     """
 
     channels_url = REST_API_URL / 'channels'

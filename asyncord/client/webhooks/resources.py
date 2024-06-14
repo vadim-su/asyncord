@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.models.responses.messages import MessageResponse
+from asyncord.client.models.attachments import make_attachment_payload
 from asyncord.client.resources import APIResource
 from asyncord.client.webhooks.models.requests import (
     CreateWebhookRequest,
@@ -21,6 +22,8 @@ from asyncord.client.webhooks.models.responces import (
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+__ALL__ = ('WebhooksResource',)
 
 
 class WebhooksResource(APIResource):
@@ -208,19 +211,9 @@ class WebhooksResource(APIResource):
             params['thread_id'] = thread_id
 
         url = self.webhooks_url / str(webhook_id) / str(webhook_token) % params
-        payload = execute_data.model_dump(mode='json', exclude_unset=True)
+        payload = make_attachment_payload(execute_data)
 
-        # TODO: Fix type of files field
-        # fmt: off
-        message = await self._http_client.post(
-            url=url,
-            payload=payload,
-            files=[
-                (file.filename, file.content_type, file.content)
-                for file in execute_data.files
-            ],  # type: ignore
-        )
-        # fmt: on
+        message = await self._http_client.post(url=url, payload=payload)
 
         if wait:
             return MessageResponse.model_validate(message.body)
@@ -278,19 +271,8 @@ class WebhooksResource(APIResource):
             params = {'thread_id': str(thread_id)}
             url %= params
 
-        payload = update_data.model_dump(mode='json', exclude_unset=True)
-
-        # TODO: Fix type of files field
-        # fmt: off
-        resp = await self._http_client.patch(
-            url=url,
-            payload=payload,
-            files=[
-                (file.filename, file.content_type, file.content)
-                for file in update_data.files
-            ],  # type: ignore
-        )
-        # fmt: on
+        payload = make_attachment_payload(update_data)
+        resp = await self._http_client.patch(url=url, payload=payload)
 
         return MessageResponse.model_validate(resp.body)
 

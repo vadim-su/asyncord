@@ -1,18 +1,24 @@
 """Models for webhook requests."""
 
 from collections.abc import Sequence
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.messages.models.common import AllowedMentionType, MessageFlags
-from asyncord.client.messages.models.requests.components import (
-    Component,
-)
+from asyncord.client.messages.models.requests.components import Component
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import AttachedFile
+from asyncord.client.messages.models.requests.messages import Attachment, BaseMessage
+from asyncord.client.models.attachments import AttachmentContentType
 from asyncord.snowflake import SnowflakeInputType
+
+__ALL__ = (
+    'CreateWebhookRequest',
+    'ExecuteWebhookRequest',
+    'UpdateWebhookMessageRequest',
+    'UpdateWebhookRequest',
+)
 
 
 class CreateWebhookRequest(BaseModel):
@@ -22,7 +28,7 @@ class CreateWebhookRequest(BaseModel):
     https://discord.com/developers/docs/resources/webhook#create-webhook-json-params
     """
 
-    name: str = Field(None, min_length=1, max_length=80)
+    name: str = Field(min_length=1, max_length=80)
     """Name of the webhook."""
 
     avatar: Base64ImageInputType | None = None
@@ -36,7 +42,7 @@ class UpdateWebhookRequest(BaseModel):
     https://discord.com/developers/docs/resources/webhook#modify-webhook-json-params
     """
 
-    name: str
+    name: str = Field(min_length=1, max_length=80)
     """Default name of the webhook."""
 
     avatar: Base64ImageInputType | None = None
@@ -49,14 +55,14 @@ class UpdateWebhookRequest(BaseModel):
     """
 
 
-class ExecuteWebhookRequest(BaseModel):
+class ExecuteWebhookRequest(BaseMessage):
     """Model for executing webhook request.
 
     Reference:
     https://discord.com/developers/docs/resources/webhook#execute-webhook-jsonform-params
     """
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """The message contents (up to 2000 characters)."""
 
     username: str | None = None
@@ -68,7 +74,7 @@ class ExecuteWebhookRequest(BaseModel):
     tts: bool | None = None
     """True if this is a TTS message."""
 
-    embeds: list[Embed] | None = Field(None, max_length=10)
+    embeds: Annotated[list[Embed] | None, Field(max_length=10)] = None
     """Embedded rich content."""
 
     allowed_mentions: AllowedMentionType | None = None
@@ -77,12 +83,12 @@ class ExecuteWebhookRequest(BaseModel):
     components: Sequence[Component] | None = None
     """The components to include with the message."""
 
-    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
-    """The contents of the file being sent."""
+    attachments: list[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    """List of attachment object.
 
-    # FIXME: Partial attachment objects. No reference found.
-    attachments: list[dict[str, Any]] | None = None
-    """Attachment objects with filename and description."""
+    See Uploading Files:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
 
     flags: Literal[MessageFlags.SUPPRESS_EMBEDS, MessageFlags.SUPPRESS_NOTIFICATIONS] | None = None
     """Message flags combined as a bitfield.
@@ -106,28 +112,18 @@ class ExecuteWebhookRequest(BaseModel):
     poll: dict[str, Any] | None = None
     """A poll."""
 
-    @model_validator(mode='after')
-    def validate_required(self) -> Self:
-        """At least one of content, file, embeds, poll must be present."""
-        if not any([self.content, self.files, self.embeds, self.poll]):
-            raise ValueError(
-                'At least one of content, file, embeds, poll must be present.',
-            )
 
-        return self
-
-
-class UpdateWebhookMessageRequest(BaseModel):
+class UpdateWebhookMessageRequest(BaseMessage):
     """Model for updating a webhook message.
 
     Reference:
     https://discord.com/developers/docs/resources/webhook#edit-webhook-message-jsonform-params
     """
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """The message contents (up to 2000 characters)."""
 
-    embeds: list[Embed] | None = Field(None, max_length=10)
+    embeds: Annotated[list[Embed], Field(max_length=10)] | None = None
     """Embedded rich content."""
 
     allowed_mentions: AllowedMentionType | None = None
@@ -136,9 +132,9 @@ class UpdateWebhookMessageRequest(BaseModel):
     components: Sequence[Component] | None = None
     """The components to include with the message."""
 
-    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
-    """The contents of the file being sent."""
+    attachments: list[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    """List of attachment object.
 
-    # FIXME: Partial attachment objects. No reference found.
-    attachments: list[dict[str, Any]] | None = None
-    """Attachment objects with filename and description."""
+    See Uploading Files:
+    https://discord.com/developers/docs/reference#uploading-files
+    """

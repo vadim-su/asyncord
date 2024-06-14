@@ -50,5 +50,6 @@ EVENT_MAP: Mapping[str, type[base.GatewayEvent]] = MappingProxyType({
 })
 """Mapping of event names to event classes.
 
+Reference:
 https://discord.com/developers/docs/topics/gateway-events#commands-and-events-gateway-events
 """

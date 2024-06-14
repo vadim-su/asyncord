@@ -40,7 +40,7 @@ class RoleResponse(BaseModel):
 
     The @everyone role has the same ID as the guild it belongs to.
 
-    More info at:
+    Reference:
     https://discord.com/developers/docs/topics/permissions#role-object
     """
 

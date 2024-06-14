@@ -17,6 +17,7 @@ class ChannelCreateEvent(GatewayEvent, ChannelResponse):
 
     Relevant to the current user.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#channel-create
     """
 
@@ -24,6 +25,7 @@ class ChannelCreateEvent(GatewayEvent, ChannelResponse):
 class ChannelUpdateEvent(GatewayEvent, ChannelResponse):
     """Sent when a channel is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#channel-update
     """
 
@@ -31,6 +33,7 @@ class ChannelUpdateEvent(GatewayEvent, ChannelResponse):
 class ChannelDeleteEvent(GatewayEvent):
     """Sent when a channel is deleted.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#channel-delete
     """
 
@@ -56,6 +59,7 @@ class ChannelDeleteEvent(GatewayEvent):
 class ChannelPinsUpdateEvent(GatewayEvent):
     """Sent when a channel's pins are updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#channel-pins-update
     """
 
@@ -72,6 +76,7 @@ class ChannelPinsUpdateEvent(GatewayEvent):
 class ThreadCreateEvent(GatewayEvent, ChannelResponse):
     """Sent when a thread is created or when the current user is added to a private thread.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#thread-create
     """
 
@@ -84,6 +89,7 @@ class ThreadCreateEvent(GatewayEvent, ChannelResponse):
 class ThreadUpdateEvent(GatewayEvent, ChannelResponse):
     """Sent when a thread is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#thread-update
     """
 
@@ -91,6 +97,7 @@ class ThreadUpdateEvent(GatewayEvent, ChannelResponse):
 class ThreadDeleteEvent(GatewayEvent, ChannelResponse):
     """Sent when a thread is deleted.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#thread-delete
     """
 
@@ -98,6 +105,7 @@ class ThreadDeleteEvent(GatewayEvent, ChannelResponse):
 class ThreadListSyncEvent(GatewayEvent):
     """Sent when the current user gains access to a channel that contains threads.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#thread-list-sync
     """
 
@@ -145,7 +153,11 @@ class ThreadMemberUpdate(ThreadMemberResponse):
     """Member object."""
 
     presence: dict[str, Any] | None = None  # FIXME: Add presence object
-    """https://discord.com/developers/docs/topics/gateway-events#presence"""
+    """Presence object.
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#presence
+    """
 
 
 class ThreadMembersUpdateEvent(GatewayEvent):

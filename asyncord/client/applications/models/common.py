@@ -25,6 +25,7 @@ class ApplicationCommandPermissionType(enum.IntEnum):
 class MembershipState(enum.Enum):
     """Discord team member's membership state.
 
+    Reference:
     https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum
     """
 
@@ -39,6 +40,7 @@ class MembershipState(enum.Enum):
 class ApplicationFlag(enum.IntFlag):
     """Discord application flag.
 
+    Reference:
     https://discord.com/developers/docs/resources/application#application-object-application-flags
     """
 
@@ -63,49 +65,32 @@ class ApplicationRoleConnectionMetadataType(enum.IntEnum):
     """
 
     INTEGER_LESS_THAN_OR_EQUAL = 1
-    """Metadata value(integer) is less than or equal to the guild's configured value.
-
-    (integer).
-    """
+    """Metadata value is less than or equal to the guild's configured value."""
 
     INTEGER_GREATER_THAN_OR_EQUAL = 2
-    """Metadata value (integer) is greater than or equal
-
-    to the guild's configured value (integer).
-    """
+    """Metadata value is greater than or equal to the guild's configured value."""
 
     INTEGER_EQUAL = 3
-    """Metadata value (integer) is equal
-
-    to the guild's configured value (integer).
+    """Metadata value  is equal to the guild's configured value .
     """
 
     INTEGER_NOT_EQUAL = 4
-    """Metadata value (integer) is not equal
-
-    to the guild's configured value (integer).
-    """
+    """Metadata value  is not equal to the guild's configured value."""
 
     DATETIME_LESS_THAN_OR_EQUAL = 5
-    """Metadata value (ISO8601 string) is less than or equal
+    """Metadata value is less than or equal to the guild's configured value.
 
-    to the guild's configured value (integer; days before current date).
+    Days besfore current date.
     """
 
     DATETIME_GREATER_THAN_OR_EQUAL = 6
-    """Metadata value (ISO8601 string) is greater than or equal
+    """Metadata value is greater than or equal to the guild's configured value.
 
-    to the guild's configured value (integer; days before current date).
+    Days before current date.
     """
 
     BOOLEAN_EQUAL = 7
-    """Metadata value (integer) is equal
-
-    to the guild's configured value (integer; 1).
-    """
+    """Metadata value is equal to the guild's configured value."""
 
     BOOLEAN_NOT_EQUAL = 8
-    """Metadata value (integer) is not equal
-
-    to the guild's configured value (integer; 1).
-    """
+    """Metadata value  is not equal to the guild's configured value."""

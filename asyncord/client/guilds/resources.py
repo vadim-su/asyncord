@@ -1,6 +1,7 @@
 """This module contains the guilds resource endpoints.
 
-Reference: https://discord.com/developers/docs/resources/guild
+Reference:
+https://discord.com/developers/docs/resources/guild
 """
 
 from __future__ import annotations
@@ -125,7 +126,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     async def get(self, guild_id: SnowflakeInputType, with_counts: bool = False) -> GuildResponse:
         """Get a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#et-guild
+        Reference:
+        https://discord.com/developers/docs/resources/guild#et-guild
 
         Args:
             guild_id: ID of the guild to get.
@@ -159,7 +161,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
 
         This endpoint can be used only by bots in less than 10 guilds.
 
-        Reference: https://discord.com/developers/docs/resources/guild#create-guild
+        Reference:
+        https://discord.com/developers/docs/resources/guild#create-guild
 
         Args:
             guild_data: The data for the guild to create.
@@ -183,7 +186,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     async def update_mfa(self, guild_id: SnowflakeInputType, level: MFALevel) -> MFALevel:
         """Update the MFA (Multi Factor Authentication) level for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level
+        Reference:
+        https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level
 
         Args:
             guild_id: ID of the guild to update.
@@ -206,7 +210,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     ) -> PruneResponse:
         """Get the number of members that would be removed from a guild if pruned.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-prune-count
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-prune-count
 
         Args:
             guild_id: ID of the guild to get the prune count for.
@@ -249,7 +254,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
         Any inactive user that has a subset of the provided role(s) will be
         included in the prune and users with additional roles will not.
 
-        Reference: https://discord.com/developers/docs/resources/guild#begin-guild-prune
+        Reference:
+        https://discord.com/developers/docs/resources/guild#begin-guild-prune
 
         Args:
             guild_id: ID of the guild to prune.
@@ -273,7 +279,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     async def get_voice_regions(self, guild_id: SnowflakeInputType) -> list[VoiceRegionResponse]:
         """Get the voice regions for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-voice-regions
 
         Args:
             guild_id: ID of the guild to get the voice regions for.
@@ -288,7 +295,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     async def get_invites(self, guild_id: SnowflakeInputType) -> list[InviteResponse]:
         """Get the invites for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-invites
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-invites
 
         Args:
             guild_id: ID of the guild to get the invites for.
@@ -303,7 +311,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     async def get_channels(self, guild_id: SnowflakeInputType) -> list[ChannelResponse]:
         """Get the channels for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-channels
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-channels
 
         Args:
             guild_id: ID of the guild to get the channels for.
@@ -318,7 +327,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     async def get_integrations(self, guild_id: SnowflakeInputType) -> list[IntegrationResponse]:
         """Get the integrations for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-integrations
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-integrations
 
         Args:
             guild_id: ID of the guild to get the integrations for.
@@ -338,7 +348,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     ) -> None:
         """Delete an integration.
 
-        Reference: https://discord.com/developers/docs/resources/guild
+        Reference:
+        https://discord.com/developers/docs/resources/guild
 
         Args:
             guild_id: ID of the guild to delete the integration for.
@@ -473,7 +484,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     async def get_welcome_screen(self, guild_id: SnowflakeInputType) -> WelcomeScreenResponse:
         """Get the welcome screen for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen
+        Reference:
+        https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen
 
         Args:
             guild_id: ID of the guild to get the welcome screen for.
@@ -493,7 +505,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     ) -> WelcomeScreenResponse:
         """Update the welcome screen for a guild.
 
-        Reference: https://discord.com/developers/docs/resources/guild#update-guild-welcome-screen
+        Reference:
+        https://discord.com/developers/docs/resources/guild#update-guild-welcome-screen
 
         Args:
             guild_id: ID of the guild to update the welcome screen for.
@@ -523,7 +536,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     ) -> None:
         """Update the current user's voice state.
 
-        Reference: https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state
+        Reference:
+        https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state
 
         Args:
             guild_id: ID of the guild to update the current user's voice state for.
@@ -551,7 +565,8 @@ class GuildResource(APIResource):  # noqa: PLR0904
     ) -> None:
         """Update a user's voice state.
 
-        Reference: https://discord.com/developers/docs/resources/guild#modify-user-voice-state
+        Reference:
+        https://discord.com/developers/docs/resources/guild#modify-user-voice-state
 
         Args:
             guild_id: ID of the guild to update the user's voice state for.

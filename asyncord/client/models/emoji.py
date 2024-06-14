@@ -9,6 +9,7 @@ from asyncord.snowflake import Snowflake
 class Emoji(BaseModel):
     """Represents a custom emoji that can be used in messages.
 
+    Reference:
     https://discord.com/developers/docs/resources/emoji#emoji-object
     """
 

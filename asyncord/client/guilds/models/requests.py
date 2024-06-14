@@ -108,7 +108,8 @@ class WelcomeScreenChannel(BaseModel):
 class UpdateWelcomeScreenRequest(BaseModel):
     """Data for updating a welcome screen.
 
-    Reference: https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
+    Reference:
+    https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
     """
 
     enabled: bool | None = None

@@ -13,6 +13,7 @@ from asyncord.snowflake import Snowflake
 class AutoModerationRuleCreateEvent(GatewayEvent, AutoModerationRule):
     """Sent when a new auto moderation rule is created.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-create
     """
 
@@ -20,6 +21,7 @@ class AutoModerationRuleCreateEvent(GatewayEvent, AutoModerationRule):
 class AutoModerationRuleUpdateEvent(GatewayEvent, AutoModerationRule):
     """Sent when an auto moderation rule is updated.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-create
     """
 
@@ -27,6 +29,7 @@ class AutoModerationRuleUpdateEvent(GatewayEvent, AutoModerationRule):
 class AutoModerationRuleDeleteEvent(GatewayEvent, AutoModerationRule):
     """Sent when an auto moderation rule is deleted.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#auto-moderation-rule-create
     """
 
@@ -34,6 +37,7 @@ class AutoModerationRuleDeleteEvent(GatewayEvent, AutoModerationRule):
 class AutoModerationActionExecutionEvent(GatewayEvent):
     """Sent when an auto moderation action is executed.
 
+    Reference:
     https://discord.com/developers/docs/topics/gateway-events#auto-moderation-action-execution
     """
 
@@ -73,8 +77,9 @@ class AutoModerationActionExecutionEvent(GatewayEvent):
     """User generated text content.
 
     Required MESSAGE_CONTENT (1 << 15).
-    Read the message content intent section for
-    [details](https://discord.com/developers/docs/topics/gateway-events#message-content-intent).
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#message-content-intent
     """
     matched_keyword: str | None
     """the word or phrase configured in the rule that triggered the rule."""
@@ -83,6 +88,7 @@ class AutoModerationActionExecutionEvent(GatewayEvent):
     """Substring in content that triggered the rule.
 
     Required MESSAGE_CONTENT (1 << 15).
-    Read the message content intent section for
-    [details](https://discord.com/developers/docs/topics/gateway-events#message-content-intent).
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#message-content-intent
     """

@@ -110,14 +110,18 @@ class ThreadMemberResponse(BaseModel):
     """Thread id.
 
     These field is ommitted on the member sent within each thread in the `GUILD_CREATE` event.
-    More info at https://discord.com/developers/docs/topics/gateway-events#guild-create
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#guild-create
     """
 
     user_id: Snowflake | None = None
     """User id.
 
     These field is ommitted on the member sent within each thread in the `GUILD_CREATE` event.
-    More info at https://discord.com/developers/docs/topics/gateway-events#guild-create
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#guild-create
     """
 
     join_timestamp: datetime.datetime

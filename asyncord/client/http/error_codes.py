@@ -506,7 +506,7 @@ class ErrorCode(enum.IntEnum, FallbackEnum):
     """Ownership cannot be transferred to a bot user."""
 
     FAILED_TO_RESIZE_ASSET_BELOW_MAXIMUM_SIZE = 50138
-    """Failed to resize asset below the maximum size: 262144."""
+    """Failed to resize asset below the maximum size 262144."""
 
     CANNOT_MIX_SUBSCRIPTION_AND_NON_SUBSCRIPTION_ROLES_FOR_EMOJI = 50144
     """Cannot mix subscription and non subscription roles for an emoji."""

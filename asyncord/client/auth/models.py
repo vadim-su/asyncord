@@ -18,7 +18,8 @@ class OAuthScope(StrFlag):
     It defines the OAuth2 scopes that can be used to authenticate a user with Discord.
     Note: Some scopes may not be currently available for apps, or may require special approval from Discord.
 
-    Reference: https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes
+    Reference:
+    https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes
     """
 
     ACTIVITIES_READ = 'activities.read'
