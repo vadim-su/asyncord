@@ -73,8 +73,9 @@ class AutoModerationActionExecutionEvent(GatewayEvent):
     """User generated text content.
 
     Required MESSAGE_CONTENT (1 << 15).
-    Read the message content intent section for
-    [details](https://discord.com/developers/docs/topics/gateway-events#message-content-intent).
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#message-content-intent
     """
     matched_keyword: str | None
     """the word or phrase configured in the rule that triggered the rule."""
@@ -83,6 +84,7 @@ class AutoModerationActionExecutionEvent(GatewayEvent):
     """Substring in content that triggered the rule.
 
     Required MESSAGE_CONTENT (1 << 15).
-    Read the message content intent section for
-    [details](https://discord.com/developers/docs/topics/gateway-events#message-content-intent).
+
+    Reference:
+    https://discord.com/developers/docs/topics/gateway-events#message-content-intent
     """

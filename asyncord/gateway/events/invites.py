@@ -83,4 +83,7 @@ class InviteDeleteEvent(GatewayEvent):
     """Guild of the invite."""
 
     code: str
-    """Unique invite [code](https://discord.com/developers/docs/resources/invite#invite-object)."""
+    """Unique invite code.
+
+    Reference:
+    https://discord.com/developers/docs/resources/invite#invite-object)."""

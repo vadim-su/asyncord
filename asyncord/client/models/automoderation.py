@@ -74,8 +74,8 @@ class TriggerMetadata(BaseModel):
     (not available to allow lists) can be used to customize how each keyword
     will be matched.
 
-    See keyword matching
-    [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
+    Reference:
+    https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies
     """
 
     regex_patterns: list[str] | None = Field(None, max_length=10)
@@ -105,8 +105,8 @@ class TriggerMetadata(BaseModel):
     (not available to allow lists) can be used to customize how each keyword
     will be matched.
 
-    See keyword matching
-    [strategies](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies).
+    Reference:
+    https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies
     """
 
     mention_total_limit: int | None = Field(None, le=50)
