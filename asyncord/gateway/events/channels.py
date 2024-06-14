@@ -8,6 +8,7 @@ from fbenum.adapter import FallbackAdapter
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.channels.models.responses import ChannelResponse, ThreadMemberResponse
 from asyncord.client.members.models.responses import MemberResponse
+from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
@@ -80,10 +81,11 @@ class ThreadCreateEvent(GatewayEvent, ChannelResponse):
     https://discord.com/developers/docs/topics/gateway-events#thread-create
     """
 
-    # FIXME: read the docs and add the missing thread member object
-
     newly_created: bool
     """when a thread is created"""
+
+    thread_member: ThreadMemberResponse | None = None
+    """Is sent when the user is added to a private thread."""
 
 
 class ThreadUpdateEvent(GatewayEvent, ChannelResponse):
@@ -121,7 +123,7 @@ class ThreadListSyncEvent(GatewayEvent):
     so you know to clear that data.
     """
 
-    threads: list[dict[str, Any]]  # FIXME: Add thread object
+    threads: list[ThreadResponse]
     """All active threads in the given channels that the current user can access."""
 
     members: list[MemberResponse]

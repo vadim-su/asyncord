@@ -151,8 +151,6 @@ class MessageResource(APIResource):
 
         await self._http_client.post(url=url, payload=payload, headers=headers)
 
-    # FIXME: Not clear from documentation,
-    #   to which channels the message is going to be crossposted.
     async def crosspost_message(self, message_id: SnowflakeInputType) -> MessageResponse:
         """Crosspost a message in an Announcement channel to all channels following it.
 

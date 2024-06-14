@@ -1,7 +1,7 @@
 """Models for webhook requests."""
 
 from collections.abc import Sequence
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -11,6 +11,7 @@ from asyncord.client.messages.models.requests.components import Component
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import Attachment, BaseMessage
 from asyncord.client.models.attachments import AttachmentContentType
+from asyncord.client.polls.models.requests import PollRequest
 from asyncord.snowflake import SnowflakeInputType
 
 __ALL__ = (
@@ -108,8 +109,7 @@ class ExecuteWebhookRequest(BaseMessage):
     (requires the webhook channel to be a forum or media channel).
     """
 
-    # FIXME: Add poll request model when it gets added.
-    poll: dict[str, Any] | None = None
+    poll: PollRequest | None = None
     """A poll."""
 
 

@@ -9,6 +9,7 @@ from asyncord.client.models.emoji import Emoji
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
+from asyncord.gateway.events.presence import PresenceUpdateEvent
 from asyncord.snowflake import Snowflake
 
 
@@ -248,7 +249,7 @@ class GuildMembersChunkEvent(GatewayEvent):
     not_found: list[Snowflake] | None = None
     """List of user ids that were not found."""
 
-    presences: list[dict[str, Any]] | None = None  # FIXME: add Presence model
+    presences: list[PresenceUpdateEvent] | None = None
     """List of presences of the members."""
 
     nonce: str | None = None
