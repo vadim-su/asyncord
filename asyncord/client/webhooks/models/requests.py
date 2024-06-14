@@ -109,7 +109,7 @@ class ExecuteWebhookRequest(BaseMessage):
     (requires the webhook channel to be a forum or media channel).
     """
 
-    poll: dict[PollRequest] | None = None
+    poll: PollRequest | None = None
     """A poll."""
 
 
