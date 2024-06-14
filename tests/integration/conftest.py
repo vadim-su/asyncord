@@ -37,6 +37,7 @@ async def client(token: str) -> RestClient:
         token,
         ratelimit_strategy=BackoffRateLimitStrategy(
             max_retries=10,
+            min_wait_time=2,
             max_wait_time=60,
         ),
     )
