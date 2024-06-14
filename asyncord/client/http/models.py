@@ -5,7 +5,9 @@ from __future__ import annotations
 import enum
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Annotated, BinaryIO, NamedTuple
+from io import BufferedReader, IOBase
+from pathlib import Path
+from typing import TYPE_CHECKING, Annotated, Any, NamedTuple
 
 from fbenum.enum import FallbackEnum
 from pydantic import BaseModel, Field, JsonValue
@@ -29,6 +31,14 @@ type ObjectErrorType = dict[str, ErrorBlock | ObjectErrorType | ArrayErrorType]
 type ArrayErrorType = dict[int, ObjectErrorType]
 """Type hint for an array error."""
 
+type _RawFieldValue = bytes | bytearray | memoryview
+"""Type hint for a bytes field value."""
+
+type _ReaderFieldValue = BufferedReader | IOBase | Path
+"""Type hint for a reader field value."""
+
+type FieldValueType = JsonValue | _RawFieldValue | _ReaderFieldValue
+
 
 class Response(NamedTuple):
     """Response structure for the HTTP client."""
@@ -45,7 +55,8 @@ class Response(NamedTuple):
     raw_body: bytes
     """Raw response body."""
 
-    body: JsonValue
+    # Any type is used here because it make too many typing errors when using JsonValue
+    body: Any
     """Parsed response body."""
 
 
@@ -84,7 +95,7 @@ class FormPayload:
     def add_field(
         self,
         name: str,
-        value: JsonValue | BinaryIO,
+        value: FieldValueType,
         *,
         content_type: str | None = None,
         filename: str | None = None,
@@ -105,7 +116,7 @@ class FormPayload:
 class FormField:
     """Form field data class."""
 
-    value: JsonValue | BinaryIO | None
+    value: FieldValueType
     """Field value."""
 
     content_type: str | None = None
