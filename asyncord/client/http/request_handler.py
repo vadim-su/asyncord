@@ -83,8 +83,8 @@ class AiohttpRequestHandler:
                         value = json.dumps(field.value)
 
                     elif isinstance(field.value, Path):
-                        with field.value.open('rb') as value:
-                            oppened_files.append(value)
+                        value = field.value.open('rb')
+                        oppened_files.append(value)
 
                     else:
                         value = field.value

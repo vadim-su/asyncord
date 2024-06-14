@@ -6,163 +6,42 @@ https://discord.com/developers/docs/resources/channel#message-object
 
 from __future__ import annotations
 
-import io
-import mimetypes
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
+from io import BufferedReader, IOBase
 from pathlib import Path
-from typing import Annotated, Any, BinaryIO, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import AnyHttpUrl, BaseModel, Field, field_validator, model_validator
-
-from asyncord.client.messages.models.common import AllowedMentionType, AttachmentFlags, MessageFlags
-from asyncord.client.messages.models.requests.components import (
-    ActionRow,
-    Component,
+from pydantic import (
+    BaseModel,
+    Field,
+    SerializerFunctionWrapHandler,
+    field_serializer,
+    field_validator,
+    model_validator,
 )
+
+from asyncord.client.messages.models.common import AllowedMentionType, MessageFlags
+from asyncord.client.messages.models.requests.components import ActionRow, Component
 from asyncord.client.messages.models.requests.embeds import Embed
+from asyncord.client.models.attachments import Attachment, AttachmentContentType
 from asyncord.client.polls.models.requests import PollRequest
 from asyncord.snowflake import SnowflakeInputType
+
+__ALL__ = (
+    'MAX_COMPONENTS',
+    'MAX_EMBED_TEXT_LENGTH',
+    'BaseMessage',
+    'AllowedMentions',
+    'MessageReference',
+    'CreateMessageRequest',
+    'UpdateMessageRequest',
+)
 
 MAX_COMPONENTS = 5
 """Maximum number of components in a message."""
 
 MAX_EMBED_TEXT_LENGTH = 6000
 """Maximum length of the embed text."""
-
-_OpennedFileType = io.BufferedReader | io.BufferedRandom
-_AttachmentContentType = bytes | BinaryIO | _OpennedFileType
-_FilePathType = str | Path
-_AttachedFileInputType = Annotated[_FilePathType | _AttachmentContentType, _AttachmentContentType]
-
-
-class AttachedFile(BaseModel, arbitrary_types_allowed=True):
-    """Attached file.
-
-    Arbitrary types are allowed because of the `content` field can be BinaryIO
-    and other unsupported pydantic types.
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure
-    """
-
-    filename: str = None  # type: ignore
-    """Name of attached file."""
-
-    content_type: str = None  # type: ignore
-    """Media type of the file."""
-
-    content: _AttachedFileInputType
-    """File content."""
-
-    @model_validator(mode='before')
-    def validate_file_info(cls, values: dict[str, Any]) -> dict[str, Any]:
-        """Fill filename and content type if not provided.
-
-        Args:
-            values: Values to validate.
-
-        Returns:
-            Validated values.
-        """
-        content = values.get('content')
-
-        if not content:
-            return values
-
-        if isinstance(content, str):
-            content = Path(content)
-
-        # if file informaton is provided, skip other checks
-        if values.get('filename') and values.get('content_type'):
-            return values
-
-        if isinstance(content, Path):
-            values['content'] = content.open('rb')
-            if not values.get('filename'):
-                values['filename'] = content.name
-
-        elif isinstance(content, BinaryIO | io.BufferedReader | io.BufferedRandom):
-            if not values.get('filename'):
-                values['filename'] = Path(content.name).name
-
-        elif isinstance(content, bytes):
-            if not values.get('filename'):
-                raise ValueError("'filename' is required for bytes file")
-
-        else:
-            raise ValueError(f'Unsupported file object type: {type(content).__name__}')
-
-        if not values.get('content_type'):
-            content_type = mimetypes.guess_type(values['filename'])[0]
-            if not content_type:
-                raise ValueError(f"Unable to guess content type for {values['filename']}")
-
-            values['content_type'] = content_type
-
-        return values
-
-
-_FilesListType = list[AttachedFile | _FilePathType | _OpennedFileType]
-_FileMapType = Mapping[str | Path, _AttachmentContentType]
-_FilesType = _FilesListType | _FileMapType
-
-
-class AttachmentData(BaseModel):
-    """Attachment object used for creating and editing messages.
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#attachment-object
-    """
-
-    id: SnowflakeInputType | int | None = None
-    """Attachment ID."""
-
-    filename: str | None = None
-    """Name of the attached file."""
-
-    description: str | None = Field(None, max_length=1024)
-    """Description for the file.
-
-    Max 1024 characters.
-    """
-
-    content_type: str | None = None
-    """Media type of the file."""
-
-    size: int | None = None
-    """Size of the file in bytes."""
-
-    url: AnyHttpUrl | None = None
-    """Source URL of the file."""
-
-    proxy_url: AnyHttpUrl | None = None
-    """Proxied URL of the file."""
-
-    height: int | None = None
-    """Height of the file (if image)."""
-
-    width: int | None = None
-    """Width of the file (if image)."""
-
-    ephemeral: bool | None = None
-    """Whether this attachment is ephemeral.
-
-    Ephemeral attachments will automatically be removed after a set period of time.
-    Ephemeral attachments on messages are guaranteed to be available as long as
-    the message itself exists.
-    """
-
-    duration_secs: float | None = None
-    """Duration of the audio file (currently for voice messages)."""
-
-    waveform: str | None = None
-    """base64 encoded bytearray representing a sampled waveform.
-
-    Currently for voice messages.
-    """
-
-    flags: AttachmentFlags | None = None
-    """Attachment flags."""
 
 
 class BaseMessage(BaseModel):
@@ -192,7 +71,7 @@ class BaseMessage(BaseModel):
             or values.get('embeds', False)
             or values.get('sticker_ids', False)
             or values.get('components', False)
-            or values.get('files', False),
+            or values.get('attachments', False),
         )
 
         if not has_any_content:
@@ -232,47 +111,35 @@ class BaseMessage(BaseModel):
 
         return embeds
 
-    @field_validator('files', mode='before', check_fields=False)
-    def validate_attached_files(cls, files: _FilesType) -> list[AttachedFile]:
-        """Prepare attached files.
+    @field_validator('attachments', mode='before', check_fields=False)
+    def convert_files_to_attachments(
+        cls,
+        attachments: Sequence[Attachment | AttachmentContentType],
+    ) -> list[Attachment]:
+        """Convert files to attachments.
 
         Args:
-            files: Files to prepare.
+            attachments: Attachments to convert.
 
         Returns:
-            Prepared files to attach.
+            Converted attachments.
         """
-        if not files:
-            return []
+        converted_attachments = []
+        for index, attachment in enumerate(attachments):
+            match attachment:
+                case Attachment():
+                    converted_attachments.append(attachment)
 
-        attached_files = files.items() if isinstance(files, Mapping) else files
-
-        prepared_files = []
-
-        for content in attached_files:
-            match content:
-                case AttachedFile():
-                    prepared_files.append(content)
-
-                # if list item - file_path or BinaryIO
-                case str() | Path() | io.BufferedReader() | io.BufferedRandom() | BinaryIO():
-                    prepared_files.append(AttachedFile(content=content))
-
-                # if mapping item - filename, file
-                case str() | Path() as filename, content if isinstance(content, _AttachmentContentType):
-                    if isinstance(filename, Path):
-                        filename = filename.name
-                    prepared_files.append(
-                        AttachedFile(filename=filename, content=content),
-                    )
+                case bytes() | bytearray() | memoryview() | BufferedReader() | IOBase() | Path():
+                    converted_attachments.append(Attachment(id=index, content=attachment))
 
                 case _:
-                    raise ValueError('Invalid file object type')
+                    raise ValueError(f'Invalid attachment type: {type(attachment)}')
 
-        return prepared_files
+        return converted_attachments
 
     @field_validator('attachments', check_fields=False)
-    def validate_attachments(cls, attachments: list[AttachmentData] | None) -> list[AttachmentData] | None:
+    def validate_attachments(cls, attachments: list[Attachment] | None) -> list[Attachment] | None:
         """Validate attachments.
 
         Args:
@@ -280,6 +147,7 @@ class BaseMessage(BaseModel):
 
         Raises:
             ValueError: If attachments have mixed ids.
+                All attachments must have ids or none of them.
 
         Returns:
             Validated attachments.
@@ -287,24 +155,48 @@ class BaseMessage(BaseModel):
         if not attachments:
             return attachments
 
-        attachment_id_exist_list = [attach.id is not None for attach in attachments]
+        attachment_ids_is_not_none = [attach.id is not None for attach in attachments]
 
-        if all(attachment_id_exist_list):
-            # Check is disabled because updated attachments already have id generated by Discord.
-            # It means that after creating message with attachments all attachments will have Snowflake id.
-
-            # for attachment in attachments:
-            #     if attachment.id >= len(files):
-
-            return attachments
-
-        if any(attachment_id_exist_list):
+        if any(attachment_ids_is_not_none) and not all(attachment_ids_is_not_none):
             raise ValueError('Attachments must have all ids or none of them')
 
         for index, attachment in enumerate(attachments):
-            attachment.id = index
+            if attachment.do_not_attach and not attachment.content:
+                raise ValueError('Do not attach attachments must have content')
+
+            if attachment.id is None:
+                attachment.id = index
 
         return attachments
+
+    @field_serializer('attachments', mode='wrap', when_used='json-unless-none', check_fields=False)
+    @classmethod
+    def serialize_attachments(
+        cls,
+        attachments: list[Attachment] | None,
+        next_serializer: SerializerFunctionWrapHandler,
+    ) -> list[dict[str, Any]] | None:
+        """Serialize attachments.
+
+        Args:
+            attachments: Attachments to serialize.
+            next_serializer: Next serializer in the chain.
+
+        Returns:
+            Serialized attachments.
+        """
+        if attachments is None:
+            return next_serializer(attachments)
+
+        # fmt: off
+        attachments = [
+            attachment
+            for attachment in attachments
+            if not attachment.do_not_attach
+        ]
+        # fmt: on
+
+        return next_serializer(attachments)
 
     @field_validator('components', check_fields=False)
     def validate_components(cls, components: Sequence[Component] | Component | None) -> Sequence[Component] | None:
@@ -418,7 +310,7 @@ class CreateMessageRequest(BaseMessage):
     https://discord.com/developers/docs/resources/channel#create-message
     """
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
     nonce: Annotated[str, Field(max_length=25)] | int | None = None
@@ -445,15 +337,8 @@ class CreateMessageRequest(BaseMessage):
     sticker_ids: list[SnowflakeInputType] | None = None
     """Sticker ids to include with the message."""
 
-    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
-    """Contents of the file being sent.
-
-    Reference:
-    https://discord.com/developers/docs/reference#uploading-files
-    """
-
-    attachments: list[AttachmentData] | None = None
-    """Attachment objects with filename and description.
+    attachments: list[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    """List of attachment object.
 
     Reference:
     https://discord.com/developers/docs/reference#uploading-files
@@ -483,7 +368,7 @@ class UpdateMessageRequest(BaseMessage):
     https://discord.com/developers/docs/resources/channel#edit-message
     """
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
     embeds: list[Embed] | None = None
@@ -501,15 +386,8 @@ class UpdateMessageRequest(BaseMessage):
     components: Sequence[Component] | Component | None = None
     """Components to include with the message."""
 
-    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
-    """Contents of the file being sent.
-
-    Reference:
-    https://discord.com/developers/docs/reference#uploading-files
-    """
-
-    attachments: list[AttachmentData] | None = None
-    """Attachment objects with filename and description.
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    """List of attachment object.
 
     Reference:
     https://discord.com/developers/docs/reference#uploading-files

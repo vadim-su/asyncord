@@ -1,7 +1,7 @@
 """This module contains models for thread requests."""
 
 from collections.abc import Sequence
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
@@ -9,7 +9,8 @@ from asyncord.client.channels.models.common import MAX_RATELIMIT
 from asyncord.client.messages.models.common import MessageFlags
 from asyncord.client.messages.models.requests.components import Component
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import AllowedMentions, AttachedFile, AttachmentData, BaseMessage
+from asyncord.client.messages.models.requests.messages import AllowedMentions, Attachment, BaseMessage
+from asyncord.client.models.attachments import AttachmentContentType
 from asyncord.client.threads.models.common import ThreadType
 from asyncord.snowflake import SnowflakeInputType
 
@@ -83,15 +84,8 @@ class ThreadMessage(BaseMessage):
     sticker_ids: list[SnowflakeInputType] | None = None
     """Sticker ids to include with the message."""
 
-    attachments: list[AttachmentData] | None = None
-    """Attachment objects with filename and description.
-
-    See Uploading Files:
-    https://discord.com/developers/docs/reference#uploading-files
-    """
-
-    files: list[AttachedFile] = Field(default_factory=list, exclude=True)
-    """Contents of the file being sent.
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    """List of attachment object.
 
     See Uploading Files:
     https://discord.com/developers/docs/reference#uploading-files

@@ -6,6 +6,7 @@ from asyncord.client.channels.models.responses import ThreadMemberResponse
 from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
+from asyncord.client.models.attachments import make_attachment_payload
 from asyncord.client.resources import APIResource
 from asyncord.client.threads.models.requests import (
     CreateMediaForumThreadRequest,
@@ -176,19 +177,13 @@ class ThreadResource(APIResource):  # noqa: PLR0904
         else:
             headers = {}
 
-        payload = thread_data.model_dump(mode='json', exclude_unset=True)
-        # TODO: Fix type of files field
-        # fmt: off
+        payload = make_attachment_payload(thread_data.message, root_payload=thread_data)
+
         resp = await self._http_client.post(
             url=self.threads_url,
             payload=payload,
-            files=[
-                (file.filename, file.content_type, file.content)
-                for file in thread_data.message.files
-            ],  # type: ignore
             headers=headers,
         )
-        # fmt: on
         return ThreadResponse.model_validate(resp.body)
 
     async def delete(self, thread_id: SnowflakeInputType, reason: str | None = None) -> None:

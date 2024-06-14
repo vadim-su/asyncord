@@ -2,28 +2,39 @@
 
 from __future__ import annotations
 
+import datetime
 import enum
 from collections.abc import Iterator
 from dataclasses import dataclass, field
+from http import HTTPStatus
 from io import BufferedReader, IOBase
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, NamedTuple
+from typing import Annotated, Any, NamedTuple
 
+import aiohttp
 from fbenum.enum import FallbackEnum
 from pydantic import BaseModel, Field, JsonValue
 
-if TYPE_CHECKING:
-    import datetime
-    from http import HTTPStatus
+from asyncord.client.http import headers
+from asyncord.client.http.error_codes import ErrorCode
+from asyncord.client.http.headers import HttpMethod
+from asyncord.typedefs import StrOrURL
 
-    import aiohttp
-    from pydantic import JsonValue
-
-    from asyncord.client.http import headers
-    from asyncord.client.http.error_codes import ErrorCode
-    from asyncord.client.http.headers import HttpMethod
-    from asyncord.typedefs import StrOrURL
-
+__all__ = (
+    'ArrayErrorType',
+    'ErrorBlock',
+    'ErrorItem',
+    'ErrorResponse',
+    'FieldValueType',
+    'FormField',
+    'FormPayload',
+    'ObjectErrorType',
+    'RateLimitHeaders',
+    'RateLimitScope',
+    'RatelimitResponse',
+    'Request',
+    'Response',
+)
 
 type ObjectErrorType = dict[str, ErrorBlock | ObjectErrorType | ArrayErrorType]
 """Type hint for an object error."""

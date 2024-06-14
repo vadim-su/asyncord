@@ -2,15 +2,22 @@
 
 from __future__ import annotations
 
-from asyncord.client.http.client import HttpClient
+from typing import TYPE_CHECKING
+
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.messages.models.requests.messages import CreateMessageRequest, UpdateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
+from asyncord.client.models.attachments import make_attachment_payload
 from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.http.client import HttpClient
+    from asyncord.client.messages.models.requests.messages import CreateMessageRequest, UpdateMessageRequest
+    from asyncord.snowflake import SnowflakeInputType
+
+__ALL__ = ('MessageResource',)
 
 
 class MessageResource(APIResource):
@@ -86,16 +93,8 @@ class MessageResource(APIResource):
             Created message object.
         """
         url = self.messages_url
-        payload = message_data.model_dump(mode='json', exclude_unset=True)
-
-        # TODO: Fix type error for the files parameter
-        # fmt: off
-        resp = await self._http_client.post(
-            url=url,
-            payload=payload,
-            files=[(file.filename, file.content_type, file.content) for file in message_data.files],  # type: ignore
-        )
-        # fmt: on
+        payload = make_attachment_payload(message_data)
+        resp = await self._http_client.post(url=url, payload=payload)
 
         return MessageResponse.model_validate(resp.body)
 
@@ -110,16 +109,8 @@ class MessageResource(APIResource):
             Updated message object.
         """
         url = self.messages_url / str(message_id)
-        payload = message_data.model_dump(mode='json', exclude_unset=True)
-
-        # TODO: Fix type error for the files parameter
-        # fmt: off
-        resp = await self._http_client.patch(
-            url=url,
-            payload=payload,
-            files=[(file.filename, file.content_type, file.content) for file in message_data.files],  # type: ignore
-        )
-        # fmt: on
+        payload = make_attachment_payload(message_data)
+        resp = await self._http_client.patch(url=url, payload=payload)
 
         return MessageResponse(**resp.body)
 

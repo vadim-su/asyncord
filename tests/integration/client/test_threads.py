@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from asyncord.client.channels.models.requests.creation import CreateForumChannelRequest, Tag
@@ -166,7 +168,7 @@ async def test_post_to_forum_channel(
 
     thread_res = channel_res.threads(channel_id=channel.id)
     if with_files:
-        files = [f'tests/data/{file_name}' for file_name in TEST_FILE_NAMES]
+        files = [Path(f'tests/data/{file_name}') for file_name in TEST_FILE_NAMES]
     else:
         files = []
 
@@ -177,7 +179,7 @@ async def test_post_to_forum_channel(
                 applied_tags=[tag_id],
                 message=ThreadMessage(
                     content='test message',
-                    files=files,  # type: ignore
+                    attachments=files,
                 ),
             ),
         )

@@ -107,18 +107,6 @@ class MessageType(enum.IntEnum):
 
 
 @enum.unique
-class AttachmentFlags(enum.IntFlag):
-    """Attachment flags.
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#attachment-object-attachment-flags
-    """
-
-    IS_REMIX = 1 << 2
-    """This attachment has been edited using the remix feature on mobile."""
-
-
-@enum.unique
 class EmbedType(enum.StrEnum):
     """Object representing the type of an embed.
 

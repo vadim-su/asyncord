@@ -12,6 +12,7 @@ from asyncord.client.interactions.models.requests import (
     InteractionResponseRequestType,
     InteractionUpdateMessageResponseRequest,
 )
+from asyncord.client.models.attachments import make_attachment_payload
 from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
@@ -44,19 +45,12 @@ class InteractionResource(APIResource):
             interaction_response: Response to send to the interaction.
         """
         url = self.interactions_url / str(interaction_id) / interaction_token / 'callback'
-        payload = interaction_response.model_dump(mode='json')
-
         if isinstance(interaction_response, _INTERACTIONS_CAN_CONTAIN_FILES):
-            # fmt: off
-            files = [
-                (file.filename, file.content_type, file.content)
-                for file in interaction_response.data.files
-            ]
-            # fmt: on
+            payload = make_attachment_payload(interaction_response.data, interaction_response)
         else:
-            files = None
+            payload = interaction_response.model_dump(mode='json')
 
-        await self._http_client.post(url=url, payload=payload, files=files)
+        await self._http_client.post(url=url, payload=payload)
 
     async def send_pong(self, interaction_id: SnowflakeInputType, interaction_token: str) -> None:
         """Send a pong response to an interaction.

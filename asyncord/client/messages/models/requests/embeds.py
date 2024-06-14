@@ -1,6 +1,7 @@
 """This module contains models for embeds in message requests."""
 
 import datetime
+from typing import Annotated
 
 from pydantic import BaseModel, Field
 
@@ -146,7 +147,7 @@ class Embed(BaseModel):
     https://discord.com/developers/docs/resources/channel#embed-object
     """
 
-    title: str | None = Field(None, max_length=256)
+    title: Annotated[str | None, Field(max_length=256)] = None
     """Title of the embed."""
 
     type: EmbedType | None = None
@@ -155,7 +156,7 @@ class Embed(BaseModel):
     Always "rich" for webhook embeds.
     """
 
-    description: str | None = Field(None, max_length=4096)
+    description: Annotated[str | None, Field(max_length=4096)] = None
     """Description of the embed."""
 
     url: str | None = None
