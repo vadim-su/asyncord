@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from asyncord.client.stage_instances.models.common import StageInstancePrivacyLevel
 from asyncord.snowflake import Snowflake
 
+__all__ = ('StageInstanceResponse',)
+
 
 class StageInstanceResponse(BaseModel):
     """Represents a StageInstance response.

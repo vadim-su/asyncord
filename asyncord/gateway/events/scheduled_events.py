@@ -4,6 +4,14 @@ from asyncord.client.scheduled_events.models.responses import ScheduledEventResp
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'GuildScheduledEventCreateEvent',
+    'GuildScheduledEventDeleteEvent',
+    'GuildScheduledEventUpdateEvent',
+    'GuildScheduledEventUserAddEvent',
+    'GuildScheduledEventUserRemoveEvent',
+)
+
 
 class GuildScheduledEventCreateEvent(GatewayEvent, ScheduledEventResponse):
     """Sent when a guild scheduled event is created.

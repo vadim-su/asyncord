@@ -26,6 +26,22 @@ from asyncord.client.channels.models.requests.creation import (
 )
 from asyncord.snowflake import SnowflakeInputType
 
+__all__ = (
+    'BaseUpdateChannel',
+    'UpdateAnnouncementChannelRequest',
+    'UpdateChannelPermissionsRequest',
+    'UpdateChannelPositionRequest',
+    'UpdateChannelRequest',
+    'UpdateChannelRequestType',
+    'UpdateForumChannelRequest',
+    'UpdateGroupDMChannelRequest',
+    'UpdateGuildCategoryRequest',
+    'UpdateMediaChannelRequest',
+    'UpdateStageChannelReuqest',
+    'UpdateTextChannelRequest',
+    'UpdateVoiceChannelRequest',
+)
+
 
 class BaseUpdateChannel(BaseModel):
     """Data to create a channel with."""
@@ -143,7 +159,7 @@ class UpdateChannelRequest(BaseUpdateChannel):
         return flags
 
 
-class UpdatGroupDMChannelRequest(BaseModel):
+class UpdateGroupDMChannelRequest(BaseModel):
     """Data to update a group DM channel with.
 
     Reference:
@@ -410,7 +426,7 @@ class UpdateChannelPositionRequest(BaseModel):
 type UpdateChannelRequestType = (
     UpdateGuildCategoryRequest
     | UpdateChannelRequest
-    | UpdatGroupDMChannelRequest
+    | UpdateGroupDMChannelRequest
     | UpdateTextChannelRequest
     | UpdateAnnouncementChannelRequest
     | UpdateForumChannelRequest

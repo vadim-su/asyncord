@@ -13,6 +13,8 @@ from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
 
+__all__ = ('PollsResource',)
+
 
 class PollsResource(APIResource):
     """Resource to perform actions on polls.

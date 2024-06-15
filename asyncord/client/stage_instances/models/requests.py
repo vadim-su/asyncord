@@ -5,6 +5,11 @@ from pydantic import BaseModel, Field
 from asyncord.client.stage_instances.models.common import StageInstancePrivacyLevel
 from asyncord.snowflake import SnowflakeInputType
 
+__all__ = (
+    'CreateStageInstanceRequest',
+    'UpdateStageInstanceRequest',
+)
+
 
 class CreateStageInstanceRequest(BaseModel):
     """Model for CreateStageInstance request.

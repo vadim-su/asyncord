@@ -28,8 +28,6 @@ from asyncord.client.polls.models.requests import PollRequest
 from asyncord.snowflake import SnowflakeInputType
 
 __ALL__ = (
-    'MAX_COMPONENTS',
-    'MAX_EMBED_TEXT_LENGTH',
     'BaseMessage',
     'AllowedMentions',
     'MessageReference',

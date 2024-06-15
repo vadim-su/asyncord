@@ -17,6 +17,8 @@ from asyncord.gateway.events import (
     scheduled_events,
 )
 
+__all__ = ('EVENT_MAP',)
+
 logger = logging.getLogger(__name__)
 
 

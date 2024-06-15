@@ -14,16 +14,7 @@ from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.guild_templates.resources import GuildTemplatesResource
-from asyncord.client.guilds.models.common import MFALevel, WidgetStyleOptions
-from asyncord.client.guilds.models.requests import (
-    CreateAutoModerationRuleRequest,
-    CreateGuildRequest,
-    PruneRequest,
-    UpdateAutoModerationRuleRequest,
-    UpdateOnboardingRequest,
-    UpdateWelcomeScreenRequest,
-    UpdateWidgetSettingsRequest,
-)
+from asyncord.client.guilds.models.common import MFALevel
 from asyncord.client.guilds.models.responses import (
     AuditLogResponse,
     GuildPreviewResponse,
@@ -48,7 +39,21 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 if TYPE_CHECKING:
+    import datetime
+
+    from asyncord.client.guilds.models.common import WidgetStyleOptions
+    from asyncord.client.guilds.models.requests import (
+        CreateAutoModerationRuleRequest,
+        CreateGuildRequest,
+        PruneRequest,
+        UpdateAutoModerationRuleRequest,
+        UpdateOnboardingRequest,
+        UpdateWelcomeScreenRequest,
+        UpdateWidgetSettingsRequest,
+    )
     from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('GuildResource',)
 
 
 class GuildResource(APIResource):  # noqa: PLR0904

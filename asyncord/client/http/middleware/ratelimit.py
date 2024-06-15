@@ -6,11 +6,18 @@ import asyncio
 from typing import TYPE_CHECKING
 
 from asyncord.client.http.errors import RateLimitError
-from asyncord.client.http.middleware.base import BaseMiddleware, NextCallType
+from asyncord.client.http.middleware.base import BaseMiddleware
 
 if TYPE_CHECKING:
     from asyncord.client.http.client import HttpClient
+    from asyncord.client.http.middleware.base import NextCallType
     from asyncord.client.http.models import Request, Response
+
+__all__ = (
+    'BackoffRateLimitStrategy',
+    'MaxRetriesExceededError',
+    'RateLimitStrategy',
+)
 
 DEFAULT_BACKOFF_MAX_RETRIES: int = 5
 """Default maximum number of retries for the backoff rate limit strategy."""

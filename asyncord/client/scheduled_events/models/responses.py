@@ -12,6 +12,12 @@ from asyncord.client.scheduled_events.models.common import EventEntityType, Even
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'EventEntityMetadataOut',
+    'ScheduledEventResponse',
+    'ScheduledEventUserResponse',
+)
+
 
 class EventEntityMetadataOut(BaseModel):
     """Metadata for the guild scheduled event.

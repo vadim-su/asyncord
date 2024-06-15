@@ -6,11 +6,20 @@ https://discord.com/developers/docs/resources/stage-instance
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import APIResource
-from asyncord.client.stage_instances.models.requests import CreateStageInstanceRequest, UpdateStageInstanceRequest
 from asyncord.client.stage_instances.models.responses import StageInstanceResponse
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.stage_instances.models.requests import (
+        CreateStageInstanceRequest,
+        UpdateStageInstanceRequest,
+    )
+
+__all__ = ('StageInstancesResource',)
 
 
 class StageInstancesResource(APIResource):

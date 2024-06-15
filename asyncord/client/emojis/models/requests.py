@@ -4,6 +4,11 @@ from pydantic import BaseModel
 
 from asyncord.base64_image import Base64ImageInputType
 
+__all__ = (
+    'CreateEmojiRequest',
+    'UpdateEmojiRequest',
+)
+
 
 class CreateEmojiRequest(BaseModel):
     """Create emoji request model.

@@ -1,16 +1,27 @@
 """Request handler for the asyncord http client."""
 
-import io
+from __future__ import annotations
+
 import json
 import logging
 from http import HTTPStatus
 from pathlib import Path
-from typing import Any, Final, Protocol
+from typing import TYPE_CHECKING, Any, Final, Protocol
 
 import aiohttp
 
 from asyncord.client.http.headers import JSON_CONTENT_TYPE
-from asyncord.client.http.models import FormPayload, Request, Response
+from asyncord.client.http.models import FormPayload, Response
+
+if TYPE_CHECKING:
+    import io
+
+    from asyncord.client.http.models import Request
+
+__all__ = (
+    'AiohttpRequestHandler',
+    'RequestHandler',
+)
 
 logger = logging.getLogger(__name__)
 

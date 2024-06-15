@@ -12,6 +12,15 @@ from asyncord.client.users.models.common import ConnectionVisibilyTypes, Service
 from asyncord.color import ColorInput
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'ApplicationRoleConnectionResponse',
+    'PremiumType',
+    'UserConnectionResponse',
+    'UserFlags',
+    'UserGuildResponse',
+    'UserResponse',
+)
+
 
 @enum.unique
 class UserFlags(enum.IntFlag):

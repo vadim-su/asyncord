@@ -16,10 +16,19 @@ from typing import (
 
 from asyncord.gateway.events.base import GatewayEvent
 
+__all__ = (
+    'EventDispatcher',
+    'EventHandlerType',
+)
+
 logger = logging.getLogger(__name__)
 
 
 EVENT_T = TypeVar('EVENT_T', bound=GatewayEvent)
+"""Type variable for a gateway event.
+
+This old generic alias format to make code complexity lower.
+"""
 
 type EventHandlerType[EVENT_T: GatewayEvent] = Callable[Concatenate[EVENT_T, ...], Awaitable[None]]
 """Type alias for an event handler."""

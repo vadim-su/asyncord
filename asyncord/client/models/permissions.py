@@ -7,6 +7,8 @@ from typing import Any, Self
 from pydantic import BaseModel
 from pydantic_core import CoreSchema, core_schema
 
+__all__ = ('PermissionFlag',)
+
 
 @enum.unique
 class PermissionFlag(enum.IntFlag):

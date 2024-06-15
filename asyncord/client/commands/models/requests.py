@@ -18,6 +18,24 @@ from asyncord.client.commands.models.common import (
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.locale import LocaleInputType
 
+__all__ = (
+    'ApplicationCommandAttachmentOption',
+    'ApplicationCommandBooleanOption',
+    'ApplicationCommandChannelOption',
+    'ApplicationCommandIntegerOption',
+    'ApplicationCommandMentionableOption',
+    'ApplicationCommandNumberOption',
+    'ApplicationCommandOption',
+    'ApplicationCommandOptionChoice',
+    'ApplicationCommandRoleOption',
+    'ApplicationCommandStringOption',
+    'ApplicationCommandSubCommandGroupOption',
+    'ApplicationCommandSubCommandOption',
+    'ApplicationCommandUserOption',
+    'BaseApplicationCommandOption',
+    'CreateApplicationCommandRequest',
+)
+
 _APP_COMMAND_NAME_PATTERN: Final[str] = r'^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$'
 _NameAnnotation = Annotated[str, Field(min_length=1, max_length=32, pattern=_APP_COMMAND_NAME_PATTERN)]
 _DescriptionAnnotation = Annotated[str, Field(min_length=1, max_length=100)]

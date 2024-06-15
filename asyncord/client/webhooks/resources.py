@@ -6,22 +6,26 @@ https://discord.com/developers/docs/resources/webhook
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.models.attachments import make_attachment_payload
 from asyncord.client.resources import APIResource
-from asyncord.client.webhooks.models.requests import (
-    CreateWebhookRequest,
-    ExecuteWebhookRequest,
-    UpdateWebhookMessageRequest,
-    UpdateWebhookRequest,
-)
 from asyncord.client.webhooks.models.responces import (
     WebhookResponse,
 )
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.webhooks.models.requests import (
+        CreateWebhookRequest,
+        ExecuteWebhookRequest,
+        UpdateWebhookMessageRequest,
+        UpdateWebhookRequest,
+    )
+    from asyncord.snowflake import SnowflakeInputType
 
 __ALL__ = ('WebhooksResource',)
 

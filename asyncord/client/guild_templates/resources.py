@@ -1,22 +1,29 @@
 """This module contains the guilds templates resource endpoints.
 
-Reference: https://canary.discord.com/developers/docs/resources/guild-template
+Reference: https://discord.com/developers/docs/resources/guild-template
 """
 
 from __future__ import annotations
 
-from asyncord.client.guild_templates.models.requests import (
-    CreateGuildFromTemplateRequest,
-    CreateGuildTemplateRequest,
-    UpdateGuildTemplateRequest,
-)
+from typing import TYPE_CHECKING
+
 from asyncord.client.guild_templates.models.responses import GuildTemplateResponse
 from asyncord.client.guilds.models.responses import GuildResponse
-from asyncord.client.http.client import HttpClient
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.guild_templates.models.requests import (
+        CreateGuildFromTemplateRequest,
+        CreateGuildTemplateRequest,
+        UpdateGuildTemplateRequest,
+    )
+    from asyncord.client.http.client import HttpClient
+    from asyncord.snowflake import SnowflakeInputType
+
+
+__all__ = ('GuildTemplatesResource',)
 
 
 class GuildTemplatesResource(APIResource):

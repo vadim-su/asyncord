@@ -10,6 +10,14 @@ from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'ActivityResponse',
+    'ClientStatus',
+    'PresenceUpdateEvent',
+    'TypingStartEvent',
+    'UserUpdateEvent',
+)
+
 
 class ClientStatus(BaseModel):
     """Active sessions are indicated with an 'online', 'idle', or 'dnd' string per platform.

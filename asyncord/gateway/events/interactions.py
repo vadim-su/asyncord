@@ -24,6 +24,28 @@ from asyncord.gateway.events.base import GatewayEvent
 from asyncord.locale import Locale
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'ApplicationCommandAutocompleteInteraction',
+    'ApplicationCommandInteraction',
+    'ApplicationCommandInteractionChannelType',
+    'ApplicationCommandInteractionData',
+    'ApplicationCommandInteractionMember',
+    'ApplicationCommandInteractionMessage',
+    'ApplicationCommandInteractionOption',
+    'ApplicationCommandInterationChannel',
+    'ApplicationCommandInterationThread',
+    'ApplicationCommandResolvedData',
+    'BaseInteraction',
+    'FallbackInteraction',
+    'Interaction',
+    'InteractionCreateEvent',
+    'MessageComponentInteraction',
+    'MessageComponentInteractionData',
+    'ModalSubmitInteraction',
+    'ModalSubmitInteractionData',
+    'PingInteraction',
+)
+
 
 class BaseInteraction(BaseModel):
     """Base interaction object.

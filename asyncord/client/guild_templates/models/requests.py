@@ -4,6 +4,12 @@ from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInputType
 
+__all__ = (
+    'CreateGuildFromTemplateRequest',
+    'CreateGuildTemplateRequest',
+    'UpdateGuildTemplateRequest',
+)
+
 
 class CreateGuildFromTemplateRequest(BaseModel):
     """Create guild from template request.

@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING, ClassVar
 if TYPE_CHECKING:
     from asyncord.gateway.client.client import ConnectionData, GatewayClient
 
+__all__ = ('Heartbeat', 'HeartbeatFactory')
+
 
 logger = logging.getLogger(__name__)
 

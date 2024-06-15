@@ -9,6 +9,12 @@ from asyncord.client.models.permissions import PermissionFlag
 from asyncord.color import Color
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'RoleFlag',
+    'RoleResponse',
+    'RoleTagsOut',
+)
+
 
 @enum.unique
 class RoleFlag(enum.IntFlag):

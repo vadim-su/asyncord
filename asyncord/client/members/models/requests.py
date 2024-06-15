@@ -9,6 +9,11 @@ from pydantic import BaseModel
 from asyncord.client.members.models.common import GuildMemberFlags
 from asyncord.snowflake import SnowflakeInputType
 
+__all__ = (
+    'AddMemberRequest',
+    'UpdateMemberRequest',
+)
+
 
 class UpdateMemberRequest(BaseModel):
     """Represents data to update a member.

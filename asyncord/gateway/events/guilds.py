@@ -12,6 +12,24 @@ from asyncord.gateway.events.base import GatewayEvent
 from asyncord.gateway.events.presence import PresenceUpdateEvent
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'GuildBanAddEvent',
+    'GuildBanRemoveEvent',
+    'GuildCreateEvent',
+    'GuildDeleteEvent',
+    'GuildEmojisUpdateEvent',
+    'GuildIntegrationsUpdateEvent',
+    'GuildMemberAddEvent',
+    'GuildMemberRemoveEvent',
+    'GuildMemberUpdateEvent',
+    'GuildMembersChunkEvent',
+    'GuildRoleCreateEvent',
+    'GuildRoleDeleteEvent',
+    'GuildRoleUpdateEvent',
+    'GuildStickersUpdateEvent',
+    'GuildUpdateEvent',
+)
+
 
 class GuildCreateEvent(GatewayEvent, GuildResponse):
     """Sent when a guild is created/joined.
@@ -192,7 +210,7 @@ class GuildMemberUpdateEvent(GatewayEvent, MemberResponse):
     roles: list[Snowflake]
     """User role ids."""
 
-    user: UserResponse
+    user: UserResponse  # type: ignore
     """User."""
 
     nick: str | None = None
@@ -213,10 +231,10 @@ class GuildMemberUpdateEvent(GatewayEvent, MemberResponse):
     mute: bool | None = None
     """Whether the user is muted in voice channels."""
 
-    pending: bool | None
+    pending: bool | None  # type: ignore
     """Whether the user has not yet passed the guild's Membership Screening requirements."""
 
-    communication_disabled_until: datetime | None
+    communication_disabled_until: datetime | None  # type: ignore
     """When the user's timeout will expire.
 
     User will be able to communicate in the guild again.

@@ -5,17 +5,14 @@ from __future__ import annotations
 import enum
 from io import BufferedReader, IOBase
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, cast
+from typing import Annotated, Any, cast
 
 from pydantic import AnyHttpUrl, BaseModel, Field
 
 from asyncord.client.http.client import make_payload_form
 from asyncord.client.http.models import FormField, FormPayload
+from asyncord.client.messages.models.requests.messages import BaseMessage
 from asyncord.snowflake import SnowflakeInputType
-
-if TYPE_CHECKING:
-    from asyncord.client.messages.models.requests.messages import BaseMessage
-
 
 __ALL__ = (
     'AttachmentContentType',

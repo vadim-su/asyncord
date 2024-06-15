@@ -9,11 +9,9 @@ from functools import partial
 from typing import TYPE_CHECKING, Any
 
 from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
-from asyncord.client.http.middleware.base import Middleware, NextCallType
 from asyncord.client.http.middleware.errors import ErrorHandlerMiddleware
 from asyncord.client.http.models import FormField, FormPayload, Request
 from asyncord.client.http.request_handler import AiohttpRequestHandler
-from asyncord.typedefs import StrOrURL
 
 if TYPE_CHECKING:
     import aiohttp
@@ -23,6 +21,10 @@ if TYPE_CHECKING:
     from asyncord.client.http.models import Response
     from asyncord.client.http.request_handler import RequestHandler
     from asyncord.typedefs import StrOrURL
+
+
+__all__ = ('HttpClient', 'make_payload_form')
+
 
 logger = logging.getLogger(__name__)
 

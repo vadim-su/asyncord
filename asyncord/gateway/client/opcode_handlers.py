@@ -14,16 +14,25 @@ from yarl import URL
 from asyncord.gateway.commands import IdentifyCommand, ResumeCommand
 from asyncord.gateway.events.base import ReadyEvent
 from asyncord.gateway.events.event_map import EVENT_MAP
-from asyncord.gateway.message import (
-    DatalessMessage,
-    DispatchMessage,
-    GatewayMessageOpcode,
-    GatewayMessageType,
-    InvalidSessionMessage,
-)
+from asyncord.gateway.message import GatewayMessageOpcode
 
 if TYPE_CHECKING:
     from asyncord.gateway.client.client import GatewayClient
+    from asyncord.gateway.message import (
+        DatalessMessage,
+        DispatchMessage,
+        GatewayMessageType,
+        InvalidSessionMessage,
+    )
+
+__all__ = (
+    'DispatchHandler',
+    'HeartbeatAckHandler',
+    'HelloHandler',
+    'InvalidSessionHandler',
+    'OpcodeHandler',
+    'ReconnectHandler',
+)
 
 
 class OpcodeHandler(ABC):

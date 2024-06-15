@@ -8,18 +8,22 @@ import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 import aiohttp
 
-from asyncord.client.http.client import HttpClient
 from asyncord.client.http.middleware.auth import AuthStrategy, BotTokenAuthStrategy
-from asyncord.client.http.middleware.ratelimit import RateLimitStrategy
 from asyncord.client.rest import RestClient
 from asyncord.gateway.client.client import GatewayClient
 from asyncord.gateway.client.heartbeat import HeartbeatFactory
 from asyncord.gateway.dispatcher import EventDispatcher
 from asyncord.typedefs import Unset, UnsetType
+
+if TYPE_CHECKING:
+    from asyncord.client.http.client import HttpClient
+    from asyncord.client.http.middleware.ratelimit import RateLimitStrategy
+
+__all__ = ('ClientGroup', 'ClientHub')
 
 logger = logging.getLogger(__name__)
 
