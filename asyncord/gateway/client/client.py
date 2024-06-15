@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 import aiohttp
 from pydantic import BaseModel
+from yarl import URL
 
 from asyncord.gateway.client import errors, opcode_handlers
 from asyncord.gateway.client.heartbeat import Heartbeat
@@ -29,8 +30,6 @@ from asyncord.logger import NameLoggerAdapter
 from asyncord.urls import GATEWAY_URL
 
 if TYPE_CHECKING:
-    from yarl import URL
-
     from asyncord.client.http.middleware.auth import BotTokenAuthStrategy
     from asyncord.gateway.commands import IdentifyCommand, PresenceUpdateData, ResumeCommand
     from asyncord.gateway.intents import Intent
