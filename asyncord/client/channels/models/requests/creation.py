@@ -360,7 +360,7 @@ class ChannelInviteRequest(BaseModel):
     https://canary.discord.com/developers/docs/resources/channel#create-channel-invite-json-params
     """
 
-    max_age: int | None = Field(None, max=604800)
+    max_age: int | None = Field(None, le=604800)
     """Duration of invite in seconds before expiry, or 0 for never."""
 
     max_uses: int | None = Field(None, ge=0, le=100)
