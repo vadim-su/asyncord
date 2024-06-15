@@ -3,7 +3,10 @@ from typing import Protocol, Self
 
 import pytest
 
-from asyncord.client.interactions.models.requests import InteractionCreateMessageData, InteractionUpdateMessageData
+from asyncord.client.interactions.models.requests import (
+    InteractionRespMessageRequest,
+    InteractionRespUpdateMessageRequest,
+)
 from asyncord.client.messages.models.requests.components import (
     ActionRow,
     Button,
@@ -131,8 +134,8 @@ class _Container(Protocol):
     [
         CreateMessageRequest,
         UpdateMessageRequest,
-        InteractionCreateMessageData,
-        InteractionUpdateMessageData,
+        InteractionRespMessageRequest,
+        InteractionRespUpdateMessageRequest,
         ThreadMessage,
     ],
 )

@@ -5,25 +5,15 @@ provide any other actions for interactions.
 """
 
 from asyncord.client.interactions.models.requests import (
-    InteractionChannelMessageResponsRequest,
-    InteractionDeferredChannelMessageResponseRequest,
-    InteractionDeferredUpdateMessageResponseRequest,
-    InteractionPongResponseRequest,
+    INTERACTIONS_CAN_CONTAIN_FILES,
     InteractionResponseRequestType,
-    InteractionUpdateMessageResponseRequest,
+    InteractionRespPongRequest,
+    RootInteractionResponse,
 )
 from asyncord.client.models.attachments import make_attachment_payload
 from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
-
-_INTERACTIONS_CAN_CONTAIN_FILES = (
-    InteractionChannelMessageResponsRequest
-    | InteractionDeferredChannelMessageResponseRequest
-    | InteractionDeferredUpdateMessageResponseRequest
-    | InteractionUpdateMessageResponseRequest
-)
-"""Interaction response types that can contain files."""
 
 
 class InteractionResource(APIResource):
@@ -45,15 +35,27 @@ class InteractionResource(APIResource):
             interaction_response: Response to send to the interaction.
         """
         url = self.interactions_url / str(interaction_id) / interaction_token / 'callback'
-        if isinstance(interaction_response, _INTERACTIONS_CAN_CONTAIN_FILES):
-            payload = make_attachment_payload(interaction_response.data, interaction_response)
+        if isinstance(interaction_response, InteractionRespPongRequest):
+            # Pong response doesn't have a data key
+            wraped_model = interaction_response
+        else:
+            wraped_model = RootInteractionResponse(data=interaction_response)
+
+        if isinstance(interaction_response, INTERACTIONS_CAN_CONTAIN_FILES):
+            payload = make_attachment_payload(interaction_response, wraped_model)
         else:
             payload = interaction_response.model_dump(mode='json')
 
         await self._http_client.post(url=url, payload=payload)
 
-    async def send_pong(self, interaction_id: SnowflakeInputType, interaction_token: str) -> None:
+    async def send_pong(
+        self,
+        interaction_id: SnowflakeInputType,
+        interaction_token: str,
+    ) -> None:
         """Send a pong response to an interaction.
+
+        It's just a sugar method to send a pong response to an interaction.
 
         Args:
             interaction_id: Interaction ID.
@@ -62,5 +64,5 @@ class InteractionResource(APIResource):
         await self.send_response(
             interaction_id=interaction_id,
             interaction_token=interaction_token,
-            interaction_response=InteractionPongResponseRequest(),
+            interaction_response=InteractionRespPongRequest(),
         )

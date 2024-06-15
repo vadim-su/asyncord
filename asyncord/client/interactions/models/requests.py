@@ -1,34 +1,129 @@
-"""This module contains models for interactions and their responses.
+"""Module for defining interaction response request models in the asyncord library.
 
-Reference:
+This module contains various classes that define the structure of
+different types of interaction responses that a bot can send.
+These classes are used to create request models for different types of
+interaction responses, such as Pong, Message, Deferred Message,
+Update Deferred Message, Autocomplete, and Modal (not all types are enumerated here).
+
+References:
 https://discord.com/developers/docs/interactions/receiving-and-responding#interactions
 """
+
+from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import Annotated, Literal, cast
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from asyncord.client.commands.models.requests import ApplicationCommandOptionChoice
 from asyncord.client.interactions.models.common import InteractionResponseType
 from asyncord.client.messages.models.common import MessageFlags
 from asyncord.client.messages.models.requests.components import ActionRow, Component, TextInput
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import (
-    AllowedMentions,
-    Attachment,
-    BaseMessage,
-)
+from asyncord.client.messages.models.requests.messages import AllowedMentions, Attachment, BaseMessage
 
 
-class InteractionPongResponseRequest(BaseModel):
-    """Interaction response request data for PONG."""
+class InteractionRespPongRequest(BaseModel):
+    """A request model for sending a Pong response to an interaction.
+
+    This model is used when the bot needs to respond to an interaction with a Pong message.
+    The 'type' field is set to InteractionResponseType.PONG by default.
+    """
 
     type: Literal[InteractionResponseType.PONG] = InteractionResponseType.PONG
+    """Type of interaction response.
+
+    Set to InteractionResponseType.PONG by default.
+    """
 
 
-class InteractionCreateMessageData(BaseMessage):
-    """Message response request data.
+class InteractionRespMessageRequest(BaseMessage):
+    """Request model for sending a Message response to an interaction.
+
+    This model is used when the bot needs to respond to an interaction with a Message.
+    It inherits from the BaseMessage model and includes validations.
+
+    References:
+    https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
+
+    """
+
+    tts: bool = False
+    """True if this is a TTS message."""
+
+    content: str | None = Field(None, max_length=2000)
+    """Message content."""
+
+    embeds: list[Embed] | None = None
+    """List of embeds included in the message."""
+
+    allowed_mentions: AllowedMentions | None = None
+    """Object specifying which mentions are allowed in the message."""
+
+    flags: Literal[MessageFlags.EPHEMERAL, MessageFlags.SUPPRESS_EMBEDS] | None = None
+    """Flags to use when sending the message.
+
+    Only MessageFlags.SUPPRESS_EMBEDS and MessageFlags.SUPPRESS_EMBEDS can be set.
+    """
+
+    components: Sequence[Component] | Component | None = None
+    """List of components included in the message.."""
+
+    attachments: list[Attachment] | None = None
+    """List of attachment objects with filename and description.
+
+    Reference:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
+
+
+class InteractionRespUpdateMessageRequest(BaseMessage):
+    """Request model for updating a Message response to an interaction.
+
+    This model is used when the bot needs to respond to an interaction with an updated Message.
+    It inherits from the BaseMessage model and includes validations.
+
+    References:
+    https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
+
+    """
+
+    tts: bool = False
+    """True if this is a TTS message."""
+
+    content: str | None = Field(None, max_length=2000)
+    """Message content."""
+
+    embeds: list[Embed] | None = None
+    """List of embeds included in the message."""
+
+    allowed_mentions: AllowedMentions | None = None
+    """Object specifying which mentions are allowed in the message."""
+
+    flags: Literal[MessageFlags.EPHEMERAL, MessageFlags.SUPPRESS_EMBEDS] | None = None
+    """Flags to use when sending the message.
+
+    Only MessageFlags.SUPPRESS_EMBEDS and MessageFlags.SUPPRESS_EMBEDS can be set.
+    """
+
+    components: Sequence[Component] | Component | None = None
+    """List of components included in the message.."""
+
+    attachments: list[Attachment] | None = None
+    """List of attachment objects with filename and description.
+
+    Reference:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
+
+
+class InteractionRespDeferredMessageRequest(BaseMessage):
+    """Request model for creating a deferred message response to an interaction.
+
+    This model is used when the bot needs to respond to an interaction with a deferred Message.
+    It inherits from the BaseMessage model and includes validations.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
@@ -37,7 +132,7 @@ class InteractionCreateMessageData(BaseMessage):
     tts: bool = False
     """True if this is a TTS message."""
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
     embeds: list[Embed] | None = None
@@ -63,38 +158,18 @@ class InteractionCreateMessageData(BaseMessage):
     """
 
 
-class InteractionChannelMessageResponsRequest(BaseModel):
-    """Interaction response request data for CHANNEL_MESSAGE_WITH_SOURCE."""
+class InteractionRespUpdateDeferredMessageRequest(BaseMessage):
+    """Request model for updating a deferred message response to an interaction.
 
-    # fmt: off
-    type: Literal[
-        InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-    ] = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
-    # fmt: on
-
-    data: InteractionCreateMessageData
-
-
-class InteractionDeferredChannelMessageResponseRequest(BaseModel):
-    """Interaction response data for DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE."""
-
-    # fmt: off
-    type: Literal[
-        InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
-    ] = InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
-    # fmt: on
-
-    data: InteractionCreateMessageData
-
-
-class InteractionUpdateMessageData(BaseMessage):
-    """Interaction response data for UPDATE_MESSAGE.
+    This model is used when the bot needs to update a previously
+    sent deferred Message in response to an interaction.
+    It inherits from the BaseMessage model and includes validations.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
     """
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
     embeds: list[Embed] | None = None
@@ -120,32 +195,10 @@ class InteractionUpdateMessageData(BaseMessage):
     """
 
 
-class InteractionDeferredUpdateMessageResponseRequest(BaseModel):
-    """Interaction response request data for DEFERRED_UPDATE_MESSAGE."""
+class InteractionRespAutocompleteRequest(BaseModel):
+    """Request model for sending an Autocomplete response to an interaction.
 
-    # fmt: off
-    type: Literal[
-        InteractionResponseType.DEFERRED_UPDATE_MESSAGE,
-    ] = InteractionResponseType.DEFERRED_UPDATE_MESSAGE
-    # fmt: on
-
-    data: InteractionUpdateMessageData
-
-
-class InteractionUpdateMessageResponseRequest(BaseModel):
-    """Interaction response request data for UPDATE_MESSAGE."""
-
-    # fmt: off
-    type: Literal[
-        InteractionResponseType.UPDATE_MESSAGE,
-    ] = InteractionResponseType.UPDATE_MESSAGE
-    # fmt: on
-
-    data: InteractionUpdateMessageData
-
-
-class InteractionAutocompleteResultData(BaseModel):
-    """Autocomplete response request data.
+    This model is used when the bot needs to respond to an interaction with an Autocomplete message.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete
@@ -155,27 +208,17 @@ class InteractionAutocompleteResultData(BaseModel):
     """List of autocomplete choices."""
 
 
-class InteractionAutocompleteResponseRequest(BaseModel):
-    """Autocomplete response request data."""
+class InteractionRespModalRequest(BaseModel):
+    """Request model for sending modal popup interaction response.
 
-    # fmt: off
-    type: Literal[
-        InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
-    ] = InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
-    # fmt: on
-
-    data: InteractionAutocompleteResultData
-
-
-class InteractionModalData(BaseModel):
-    """Modal response request data.
+    This model is used when the bot needs to respond to an interaction with modal popup.
 
     References:
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal
     """
 
     custom_id: str = Field(max_length=100)
-    """Developer-defined identifier for the modal.
+    """Developer - defined identifier for the modal.
 
     Max 100 characters.
     """
@@ -220,20 +263,99 @@ class InteractionModalData(BaseModel):
         return components
 
 
-class InteractionModalResponseRequest(BaseModel):
-    """Interaction response request data for MODAL."""
-
-    type: Literal[InteractionResponseType.MODAL] = InteractionResponseType.MODAL
-    data: InteractionModalData
-
-
 type InteractionResponseRequestType = (
-    InteractionPongResponseRequest
-    | InteractionChannelMessageResponsRequest
-    | InteractionDeferredChannelMessageResponseRequest
-    | InteractionDeferredUpdateMessageResponseRequest
-    | InteractionUpdateMessageResponseRequest
-    | InteractionAutocompleteResponseRequest
-    | InteractionModalResponseRequest
+    InteractionRespPongRequest
+    | InteractionRespMessageRequest
+    | InteractionRespUpdateMessageRequest
+    | InteractionRespDeferredMessageRequest
+    | InteractionRespUpdateDeferredMessageRequest
+    | InteractionRespAutocompleteRequest
+    | InteractionRespModalRequest
 )
-"""Collection of all interaction response data models."""
+"""Type of interaction response request data.
+
+This type is a union of several different interaction response request models.
+It is used in the `_RootInteractionResponse` class to represent the `data` field,
+which can be any of these types depending on the type of interaction response.
+
+The possible types are:
+- InteractionRespPongRequest: A request model for sending a Pong response
+    to an interaction.
+- InteractionRespMessageRequest: A request model for sending a Message response
+    to an interaction.
+- InteractionRespDeferredMessageRequest: A request model for sending a deferred
+    Message response to an interaction.
+- InteractionRespUpdateDeferredMessageRequest: A request model for updating
+    a deferred Message response to an interaction.
+- InteractionRespAutocompleteRequest: A request model for sending an Autocomplete
+    response to an interaction.
+- InteractionRespModalRequest: A request model for sending a Modal interaction response.
+"""
+
+INTERACTIONS_CAN_CONTAIN_FILES = (
+    InteractionRespMessageRequest
+    | InteractionRespUpdateMessageRequest
+    | InteractionRespDeferredMessageRequest
+    | InteractionRespUpdateDeferredMessageRequest
+)
+"""Interaction response types that can contain files."""
+
+
+class RootInteractionResponse(BaseModel):
+    """Root interaction response request data.
+
+    This model represents the root of an interaction response request. In general only
+    for internal use.
+    """
+
+    data: InteractionResponseRequestType
+    """Interaction response data."""
+
+    type: InteractionResponseType | None = None
+    """Interaction response type.
+
+    This field always has a value, but it is not required to be provided.
+    """
+
+    @field_validator('type')
+    @classmethod
+    def validate_type(
+        cls,
+        type_value: InteractionResponseType | None,
+        field_info: ValidationInfo,
+    ) -> InteractionResponseType:
+        """Validate the type of interaction response request.
+
+        If type is not provided, extract it from data.
+        """
+        data_value = cast(InteractionResponseRequestType, field_info.data.get('data'))
+        calculated_type = cls._calculate_data_type(data_value)
+
+        if type_value is None:
+            return calculated_type
+
+        if type_value != calculated_type:
+            raise ValueError('Provided type is not valid for the given data')
+
+        return type_value
+
+    @classmethod
+    def _calculate_data_type(cls, data_value: InteractionResponseRequestType) -> InteractionResponseType:
+        """Calculate the type of interaction response request."""
+        calculated_type = None
+
+        match data_value:
+            case InteractionRespMessageRequest():
+                calculated_type = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+            case InteractionRespDeferredMessageRequest():
+                calculated_type = InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+            case InteractionRespUpdateDeferredMessageRequest():
+                calculated_type = InteractionResponseType.DEFERRED_UPDATE_MESSAGE
+            case InteractionRespAutocompleteRequest():
+                calculated_type = InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
+            case InteractionRespModalRequest():
+                calculated_type = InteractionResponseType.MODAL
+            case _:
+                raise ValueError('Invalid interaction response data')
+
+        return calculated_type
