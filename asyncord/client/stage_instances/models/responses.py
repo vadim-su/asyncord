@@ -10,7 +10,7 @@ class StageInstanceResponse(BaseModel):
     """Represents a StageInstance response.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/stage-instance#stage-instance-object-stage-instance-structure
+    https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-stage-instance-structure
     """
 
     id: Snowflake

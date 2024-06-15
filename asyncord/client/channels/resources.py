@@ -154,7 +154,7 @@ class ChannelResource(APIResource):
         """Update the positions of a set of channel objects.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#modify-guild-channel-positions
+        https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions
 
         Args:
             guild_id: Guild id.
@@ -251,7 +251,7 @@ class ChannelResource(APIResource):
         """Get the invites for a channel.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#get-channel-invites
+        https://discord.com/developers/docs/resources/channel#get-channel-invites
 
         Args:
             channel_id: Channel id.
@@ -272,7 +272,7 @@ class ChannelResource(APIResource):
         """Create a new invite for a channel.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#create-channel-invite
+        https://discord.com/developers/docs/resources/channel#create-channel-invite
 
         Args:
             channel_id: Channel id.
@@ -305,7 +305,7 @@ class ChannelResource(APIResource):
         """Follow an Announcement channel to send messages to a target channel.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#follow-announcement-channel
+        https://discord.com/developers/docs/resources/channel#follow-announcement-channel
         """
         url = self.channels_url / str(channel_id) / 'followers'
 
@@ -322,7 +322,7 @@ class ChannelResource(APIResource):
         Expires after 10 seconds.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#trigger-typing-indicator
+        https://discord.com/developers/docs/resources/channel#trigger-typing-indicator
         """
         url = self.channels_url / str(channel_id) / 'typing'
 

@@ -20,7 +20,7 @@ class RoleGuildTemplateOut(BaseModel):
     """Partial role object for guild template response.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
+    https://discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
     """
 
     id: Snowflake
@@ -46,7 +46,7 @@ class ChannelGuildTemplateOut(BaseModel):
     """Partial channel object for guild template response.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
+    https://discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
     """
 
     id: Snowflake
@@ -139,7 +139,7 @@ class GuildGuildTemplateOut(BaseModel):
     """Partial guild object for guild template response.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
+    https://discord.com/developers/docs/resources/guild-template#guild-template-object-example-guild-template-object
     """
 
     name: str
@@ -196,7 +196,7 @@ class GuildTemplateResponse(BaseModel):
     """Represents a guild template response.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild-template#guild-template-object
+    https://discord.com/developers/docs/resources/guild-template#guild-template-object
     """
 
     code: str

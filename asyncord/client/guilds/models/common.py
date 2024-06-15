@@ -95,7 +95,7 @@ class AuditLogEvents(enum.IntEnum):
     """Audit log events.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events
+    https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events
     """
 
     GUILD_UPDATE = 1
@@ -423,7 +423,7 @@ class OnboardingMode(enum.IntEnum):
     """Onboarding mode.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-mode
+    https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-mode
     """
 
     ONBOARDING_DEFAULT = 0
@@ -438,7 +438,7 @@ class OnboardingPromptType(enum.IntEnum):
     """Onboarding prompt types.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-types
+    https://discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-types
     """
 
     MULTIPLE_CHOICE = 0

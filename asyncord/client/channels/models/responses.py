@@ -281,7 +281,7 @@ class FollowedChannelResponse(BaseModel):
     """Followed channel object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/channel#followed-channel-object-followed-channel-structure
+    https://discord.com/developers/docs/resources/channel#followed-channel-object-followed-channel-structure
     """
 
     channel_id: Snowflake

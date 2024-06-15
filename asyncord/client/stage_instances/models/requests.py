@@ -10,7 +10,7 @@ class CreateStageInstanceRequest(BaseModel):
     """Model for CreateStageInstance request.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/stage-instance#create-stage-instance-json-params
+    https://discord.com/developers/docs/resources/stage-instance#create-stage-instance-json-params
     """
 
     channel_id: SnowflakeInputType
@@ -33,7 +33,7 @@ class UpdateStageInstanceRequest(BaseModel):
     """Model for Update StageInstance request.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/stage-instance#modify-stage-instance-json-params
+    https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance-json-params
     """
 
     topic: str | None = Field(None, min_length=1, max_length=120)

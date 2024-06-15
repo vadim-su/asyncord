@@ -129,7 +129,7 @@ class CreateAutoModerationRuleRequest(BaseModel):
     """Data for creating an auto moderation rule.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule-json-params
+    https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule-json-params
     """
 
     name: str
@@ -190,7 +190,7 @@ class UpdateAutoModerationRuleRequest(BaseModel):
     """Data for updating an auto moderation rule.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule-json-params
+    https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule-json-params
     """
 
     name: str
@@ -204,7 +204,7 @@ class UpdateAutoModerationRuleRequest(BaseModel):
 
     Required, but can be omited based on trigger type.
     Reference:
-    https://canary.discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
+    https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
     """
 
     actions: list[RuleAction]
@@ -247,7 +247,7 @@ class OnboardingPromptOption(BaseModel):
     """Onboarding prompt option object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure
+    https://discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure
     """
 
     id: SnowflakeInputType
@@ -279,7 +279,7 @@ class OnboardingPrompt(BaseModel):
     """Onboarding prompt object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
+    https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
     """
 
     id: SnowflakeInputType
@@ -314,7 +314,7 @@ class UpdateOnboardingRequest(BaseModel):
     """Update onboarding settings.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#modify-guild-onboarding-json-params
+    https://discord.com/developers/docs/resources/guild#modify-guild-onboarding-json-params
     """
 
     prompts: list[OnboardingPrompt]

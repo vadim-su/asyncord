@@ -9,7 +9,7 @@ class CreateGuildFromTemplateRequest(BaseModel):
     """Create guild from template request.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template-json-params
+    https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template-json-params
     """
 
     name: str = Field(None, min_length=2, max_length=100)
@@ -23,7 +23,7 @@ class CreateGuildTemplateRequest(BaseModel):
     """Create guild template request.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild-template#create-guild-template-json-params
+    https://discord.com/developers/docs/resources/guild-template#create-guild-template-json-params
     """
 
     name: str = Field(None, min_length=1, max_length=100)
@@ -37,7 +37,7 @@ class UpdateGuildTemplateRequest(BaseModel):
     """Update guild template request.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild-template#modify-guild-template-json-params
+    https://discord.com/developers/docs/resources/guild-template#modify-guild-template-json-params
     """
 
     name: str | None = Field(None, min_length=1, max_length=100)

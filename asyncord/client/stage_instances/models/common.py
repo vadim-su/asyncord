@@ -8,7 +8,7 @@ class StageInstancePrivacyLevel(enum.IntEnum):
     """Privacy level of a stage instance.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level
+    https://discord.com/developers/docs/resources/stage-instance#stage-instance-object-privacy-level
     """
 
     GUILD_ONLY = 2

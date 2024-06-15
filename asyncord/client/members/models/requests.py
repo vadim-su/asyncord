@@ -14,7 +14,7 @@ class UpdateMemberRequest(BaseModel):
     """Represents data to update a member.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#modify-guild-member-json-params
+    https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params
     """
 
     nick: str | None = None
@@ -58,7 +58,7 @@ class AddMemberRequest(BaseModel):
     """Represents data to add a member to a guild.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#add-guild-member-json-params
+    https://discord.com/developers/docs/resources/guild#add-guild-member-json-params
     """
 
     access_token: str

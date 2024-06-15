@@ -205,7 +205,7 @@ class MemberResource(APIResource):
             add_member_data: Data to add the member with.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#add-guild-member
+        https://discord.com/developers/docs/resources/guild#add-guild-member
         """
         url = self.members_url / str(user_id)
         resp = await self._http_client.put(url=url)

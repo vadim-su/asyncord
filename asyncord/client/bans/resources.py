@@ -30,7 +30,7 @@ class BanResource(APIResource):
         """Get a ban object for a user.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#get-guild-ban
+        https://discord.com/developers/docs/resources/guild#get-guild-ban
 
         Args:
             user_id: ID of the user to get the ban object for.
@@ -48,7 +48,7 @@ class BanResource(APIResource):
         """List bans of a guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#get-guild-bans
+        https://discord.com/developers/docs/resources/guild#get-guild-bans
 
         Args:
             limit: Number of bans to return. Defaults to None.
@@ -79,7 +79,7 @@ class BanResource(APIResource):
         """Ban a user from a guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#create-guild-ban
+        https://discord.com/developers/docs/resources/guild#create-guild-ban
 
         Args:
             user_id: ID of a user to ban.
@@ -105,7 +105,7 @@ class BanResource(APIResource):
         """Unban a user from a guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#remove-guild-ban
+        https://discord.com/developers/docs/resources/guild#remove-guild-ban
 
         Args:
             user_id: ID of the user to unban.
@@ -127,7 +127,7 @@ class BanResource(APIResource):
         """Ban up to 200 users from a guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#create-guild-ban
+        https://discord.com/developers/docs/resources/guild#create-guild-ban
 
         Args:
             user_ids: List of user IDs to ban.

@@ -41,7 +41,7 @@ class EmojiResource(APIResource):
             emoji_id: ID of the emoji to get.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/emoji#get-guild-emoji
+        https://discord.com/developers/docs/resources/emoji#get-guild-emoji
         """
         url = self.emojis_url / str(emoji_id)
         resp = await self._http_client.get(url=url)
@@ -51,7 +51,7 @@ class EmojiResource(APIResource):
         """Returns a list of emoji objects for the given guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/emoji#list-guild-emojis
+        https://discord.com/developers/docs/resources/emoji#list-guild-emojis
         """
         resp = await self._http_client.get(url=self.emojis_url)
         return list_model(Emoji).validate_python(resp.body)
@@ -68,7 +68,7 @@ class EmojiResource(APIResource):
             reason: Reason for creating the emoji.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/emoji#create-guild-emoji
+        https://discord.com/developers/docs/resources/emoji#create-guild-emoji
         """
         if reason is not None:
             headers = {AUDIT_LOG_REASON: reason}
@@ -93,7 +93,7 @@ class EmojiResource(APIResource):
             reason: Reason for updating the emoji.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/emoji#modify-guild-emoji
+        https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
         """
         if reason is not None:
             headers = {AUDIT_LOG_REASON: reason}
@@ -117,7 +117,7 @@ class EmojiResource(APIResource):
             reason: Reason for deleting the emoji.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/emoji#delete-guild-emoji
+        https://discord.com/developers/docs/resources/emoji#delete-guild-emoji
         """
         if reason is not None:
             headers = {AUDIT_LOG_REASON: reason}

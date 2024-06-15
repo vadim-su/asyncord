@@ -186,7 +186,7 @@ class UserResource(APIResource):
             nick: Nickname of the user to add.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#group-dm-add-recipient
+        https://discord.com/developers/docs/resources/channel#group-dm-add-recipient
         """
         url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
 
@@ -202,7 +202,7 @@ class UserResource(APIResource):
         """Removes a recipient from a Group DM.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#group-dm-remove-recipient
+        https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient
         """
         url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
 

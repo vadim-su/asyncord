@@ -357,7 +357,7 @@ class ChannelInviteRequest(BaseModel):
     """Data to create channel invite.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/channel#create-channel-invite-json-params
+    https://discord.com/developers/docs/resources/channel#create-channel-invite-json-params
     """
 
     max_age: int | None = Field(None, le=604800)
