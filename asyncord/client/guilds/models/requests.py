@@ -171,13 +171,17 @@ class CreateAutoModerationRuleRequest(BaseModel):
     @model_validator(mode='after')
     def validate_trigger_metadata(self) -> Self:
         """Validate trigger metadata based on trigger type."""
-        if self.trigger_type == TriggerType.KEYWORD and not (
-            self.trigger_metadata.keyword_filter or self.trigger_metadata.regex_patterns
-        ):
-            raise ValueError('Keyword filter or regex patterns are required for keyword trigger type.')
+        if self.trigger_type is TriggerType.KEYWORD:
+            has_filter_or_regex = self.trigger_metadata and (
+                self.trigger_metadata.keyword_filter or self.trigger_metadata.regex_patterns
+            )
+            if not has_filter_or_regex:
+                raise ValueError('Keyword filter or regex patterns are required for keyword trigger type.')
 
-        if self.trigger_type == TriggerType.KEYWORD_PRESET and not self.trigger_metadata.presets:
-            raise ValueError('Keyword preset is required for keyword preset trigger type.')
+        if self.trigger_type is TriggerType.KEYWORD_PRESET:
+            has_preset = self.trigger_metadata and self.trigger_metadata.presets
+            if not has_preset:
+                raise ValueError('Keyword preset is required for keyword preset trigger type.')
 
         return self
 
