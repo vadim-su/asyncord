@@ -119,6 +119,7 @@ class MemberResource(APIResource):
 
     async def update_current_member(
         self,
+        *,
         nickname: str | None,
         reason: str | None = None,
     ) -> MemberResponse:
