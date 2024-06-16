@@ -168,7 +168,8 @@ class ClientHub:
         for client in self.client_groups.values():
             await client.close()
         self.heartbeat_factory.stop()
-        await self.session.close()
+        if not self._outer_session:
+            await self.session.close()
         logger.info(':wave: Shutdown complete', extra={'markup': True})
 
     async def __aenter__(self) -> Self:
@@ -218,7 +219,7 @@ class ClientHub:
             gateway_client = GatewayClient(
                 token=auth,
                 session=self.session,
-                heartbeat_class=self.heartbeat_factory.create,
+                heartbeat_class=self.heartbeat_factory,
                 dispatcher=dispatcher,
                 name=group_name,
             )
