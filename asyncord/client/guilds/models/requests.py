@@ -1,6 +1,6 @@
 """Request models for guilds."""
 
-from typing import Self
+from typing import Annotated, Self
 
 from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field, field_serializer, model_validator
@@ -169,13 +169,13 @@ class CreateAutoModerationRuleRequest(BaseModel):
     False by default.
     """
 
-    exempt_roles: list[SnowflakeInputType] | None = Field(None, max_length=20)
+    exempt_roles: Annotated[list[SnowflakeInputType], Field(max_length=20)] | None = None
     """Role ids that should not be affected by the rule.
 
     Maximum of 20.
     """
 
-    exempt_channels: list[SnowflakeInputType] | None = Field(None, max_length=50)
+    exempt_channels: Annotated[list[SnowflakeInputType], Field(max_length=50)] | None = None
     """Channel ids that should not be affected by the rule.
 
     Maximum of 50.

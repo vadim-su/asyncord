@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import enum
+from typing import Annotated
 
 from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field
@@ -88,7 +89,7 @@ class TriggerMetadata(BaseModel):
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies
     """
 
-    regex_patterns: list[str] | None = Field(None, max_length=10)
+    regex_patterns: Annotated[list[str] | None, Field(max_length=10)] = None
     """regular expression patterns which will be matched against content (Maximum of 10)
 
     Associated with `TriggerType.KEYWORD`.
@@ -104,7 +105,7 @@ class TriggerMetadata(BaseModel):
     Associated with `TriggerType.KEYWORD_PRESET`.
     """
 
-    allow_list: list[str] | None = Field(None, max_length=1000)
+    allow_list: Annotated[list[str] | None, Field(max_length=1000)] = None
     """Substrings which will be exempt from triggering the preset trigger type.
 
     Associated with `TriggerType.KEYWORD` and `TriggerType.KEYWORD_PRESET`.
@@ -119,7 +120,7 @@ class TriggerMetadata(BaseModel):
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-matching-strategies
     """
 
-    mention_total_limit: int | None = Field(None, le=50)
+    mention_total_limit: Annotated[int | None, Field(le=50)] = None
     """Total number of mentions(role & user) allowed per message.
 
     Maximum of 50.
