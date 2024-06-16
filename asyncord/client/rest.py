@@ -14,6 +14,7 @@ from asyncord.client.http.middleware.ratelimit import BackoffRateLimitStrategy, 
 from asyncord.client.interactions.resources import InteractionResource
 from asyncord.client.invites.resources import InvitesResource
 from asyncord.client.stage_instances.resources import StageInstancesResource
+from asyncord.client.stickers.resources import StickersResource
 from asyncord.client.users.resources import UserResource
 from asyncord.client.webhooks.resources import WebhooksResource
 from asyncord.typedefs import Unset, UnsetType
@@ -83,6 +84,7 @@ class RestClient:
         self.stage_instances = StageInstancesResource(self._http_client)
         self.webhooks = WebhooksResource(self._http_client)
         self.auth = OAuthResource(self._http_client)
+        self.stickers = StickersResource(self._http_client)
 
     def _init_auth_strategy(self, auth: str | AuthStrategy | None) -> None:
         """Initialize the authentication strategy.

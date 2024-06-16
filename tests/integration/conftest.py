@@ -21,6 +21,7 @@ from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
 from asyncord.client.stage_instances.resources import StageInstancesResource
+from asyncord.client.stickers.resources import StickersResource
 from asyncord.client.threads.models.common import ThreadType
 from asyncord.client.threads.models.requests import CreateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse
@@ -49,6 +50,14 @@ async def applications_res(
 ) -> ApplicationResource:
     """Get applications resource for the client."""
     return client.applications
+
+
+@pytest.fixture()
+async def stickers_res(
+    client: RestClient,
+) -> StickersResource:
+    """Get stickers resource for the client."""
+    return client.stickers
 
 
 @pytest.fixture()
