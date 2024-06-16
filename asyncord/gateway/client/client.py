@@ -10,7 +10,7 @@ import asyncio
 import logging
 from collections.abc import Mapping
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 import aiohttp
 from pydantic import BaseModel
@@ -79,7 +79,10 @@ class GatewayClient:
         self.session = session
         self.conn_data = conn_data or ConnectionData(token=token)
         self.intents = intents
-        self.heartbeat = heartbeat_class(self, self.conn_data)
+        if isinstance(heartbeat_class, HeartbeatFactoryProtocol):
+            self.heartbeat = heartbeat_class.create(self, self.conn_data)
+        else:
+            self.heartbeat = heartbeat_class(self, self.conn_data)
         self.dispatcher = dispatcher or EventDispatcher()
 
         self.is_started = False
@@ -295,8 +298,10 @@ class HeartbeatProtocol(Protocol):
         """Stop the heartbeat."""
 
 
+@runtime_checkable
 class HeartbeatFactoryProtocol(Protocol):
     """Protocol for the heartbeat factory class."""
 
-    def __call__(self, client: GatewayClient, conn_data: ConnectionData) -> HeartbeatProtocol:  # type: ignore
-        """Create a heartbeat for the client."""
+    def create(self, client: GatewayClient, conn_data: ConnectionData) -> HeartbeatProtocol:
+        """Create a heartbeat instance."""
+        ...
