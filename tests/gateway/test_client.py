@@ -1,8 +1,10 @@
 from types import MappingProxyType
 from typing import Literal
+from unittest.mock import Mock
 
 import aiohttp
 import pytest
+from pytest_mock import MockFixture
 from yarl import URL
 
 from asyncord.client.http.middleware.auth import BotTokenAuthStrategy
@@ -14,13 +16,13 @@ from asyncord.urls import GATEWAY_URL
 
 
 @pytest.mark.parametrize('token', ['token', BotTokenAuthStrategy('token')])
-@pytest.mark.parametrize('session', [aiohttp.ClientSession()])
+@pytest.mark.parametrize('session', [Mock()])
 @pytest.mark.parametrize('conn_data', [None, ConnectionData(token='token')])  # noqa: S106
 @pytest.mark.parametrize('intents', [DEFAULT_INTENTS, Intent.GUILDS])
 @pytest.mark.parametrize('heartbeat_class', [Heartbeat, HeartbeatFactory(), None])
 @pytest.mark.parametrize('dispatcher', [None, EventDispatcher()])
 @pytest.mark.parametrize('name', [None, 'TestClient'])
-def test_init(
+def test_init(  # noqa: PLR0917, PLR0913
     token: BotTokenAuthStrategy | Literal['token'],
     session: aiohttp.ClientSession,
     conn_data: None | ConnectionData,
@@ -28,8 +30,10 @@ def test_init(
     heartbeat_class: type[Heartbeat] | HeartbeatFactory | None,
     dispatcher: None | EventDispatcher,
     name: None | Literal['TestClient'],
+    mocker: MockFixture,
 ) -> None:
     """Test initializing the GatewayClient."""
+    mocker.patch('asyncio.get_event_loop', return_value=Mock())
     if heartbeat_class:
         client = GatewayClient(
             token=token,

@@ -39,10 +39,10 @@ async def test_search_members(
 async def test_update_current_member(members_res: MemberResource) -> None:
     """Test updating the current member."""
     new_nickname = 'Cucaracha'
-    member = await members_res.update_current_member(new_nickname)
+    member = await members_res.update_current_member(nickname=new_nickname)
     assert member.nick == new_nickname
     # reset to default nickname
-    await members_res.update_current_member(None)
+    await members_res.update_current_member(nickname=None)
 
 
 async def test_add_and_remove_role(

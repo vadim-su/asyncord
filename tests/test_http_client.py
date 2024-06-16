@@ -2,7 +2,6 @@ import json
 from http import HTTPStatus
 from unittest.mock import ANY, AsyncMock, Mock
 
-import aiohttp
 import pytest
 from multidict import CIMultiDict
 from pytest_mock import MockFixture
@@ -55,7 +54,7 @@ from asyncord.client.http.request_handler import AiohttpRequestHandler
     ],
 )
 async def test_http_client_general_methods(
-    session: aiohttp.ClientSession | None,
+    session: Mock | None,
     method: str,
     url: str,
     headers: dict[str, str],

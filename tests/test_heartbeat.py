@@ -2,6 +2,8 @@ import asyncio
 import threading
 from unittest.mock import Mock
 
+from pytest_mock import MockFixture
+
 from asyncord.gateway.client.client import ConnectionData, GatewayClient
 from asyncord.gateway.client.heartbeat import Heartbeat, HeartbeatFactory
 
@@ -62,8 +64,10 @@ def test_multiple_heartbeats() -> None:
     assert heartbeat1 != heartbeat2
 
 
-def test_heartbeat_continues_after_one_stops() -> None:
+def test_heartbeat_continues_after_one_stops(mocker: MockFixture) -> None:
     """Test that a heartbeat continues after another stops."""
+    mock_run_coroutine = mocker.patch('asyncord.gateway.client.heartbeat.asyncio.run_coroutine_threadsafe')
+    mocker.patch('asyncord.gateway.client.heartbeat.Heartbeat._run', new=Mock())
     factory = HeartbeatFactory()
     session = Mock(spec=GatewayClient)
     conn_data = Mock(spec=ConnectionData)
@@ -74,3 +78,5 @@ def test_heartbeat_continues_after_one_stops() -> None:
     heartbeat1.stop()
     assert not heartbeat1.is_running
     assert heartbeat2.is_running
+    assert mock_run_coroutine.call_count == 2
+    factory.stop()

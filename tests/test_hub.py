@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 from pytest_mock import MockerFixture
 
@@ -9,7 +11,7 @@ async def test_setup_single_client_group(mocker: MockerFixture) -> None:
     mock_gather = mocker.patch('asyncio.gather', new=mocker.async_stub('gather'))
     mock_client_group_class = mocker.patch('asyncord.client_hub.ClientGroup')
 
-    async with ClientHub.setup_single_client_group(auth='token') as client_group:
+    async with ClientHub.setup_single_client_group(auth='token', session=Mock()) as client_group:
         mock_client_group_class.assert_called_once()
         mock_client_group = mock_client_group_class.return_value
         assert client_group is mock_client_group
@@ -21,7 +23,7 @@ async def test_setup_single_client_group(mocker: MockerFixture) -> None:
 async def test_create_client_group(mocker: MockerFixture) -> None:
     """Test creation of a client group."""
     mock_client_group_class = mocker.patch('asyncord.client_hub.ClientGroup')
-    hub = ClientHub()
+    hub = ClientHub(session=Mock())
     hub.create_client_group('group_name', 'token')
 
     mock_client_group_class.assert_called_once()
