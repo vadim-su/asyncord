@@ -53,9 +53,22 @@ build-docs = "mkdocs build -f docs/mkdocs.yml"
 
 [tool.pytest.ini_options]
 minversion = "6.2"
-addopts = "-ra --color=yes"
+addopts = "-ra --dist=loadscope --color=yes"
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.paths]
+source = ["asyncord"]
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "^class .*\\(Protocol\\):$"
+]
 
 [tool.isort]
 line_length = 110

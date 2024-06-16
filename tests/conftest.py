@@ -1,18 +1,17 @@
 import os
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
 
 import pytest
+from pydantic import BaseModel, SecretStr
 
 INTEGRATION_TEST_DIR: Final[Path] = Path(__file__).parent / 'integration'
 
 
-@dataclass
-class IntegrationTestData:
+class IntegrationTestData(BaseModel):
     """Data to perform integration tests."""
 
-    token: str
+    token: SecretStr
     channel_id: str
     voice_channel_id: str
     guild_id: str
@@ -34,7 +33,7 @@ def integration_data() -> IntegrationTestData:
     if token is None:
         raise RuntimeError('ASYNCORD_TEST_TOKEN env variable is not set')
     return IntegrationTestData(
-        token=token,
+        token=token,  # type: ignore
         channel_id=os.environ['ASYNCORD_TEST_CHANNEL_ID'],
         voice_channel_id=os.environ['ASYNCORD_TEST_VOICE_CHANNEL_ID'],
         guild_id=os.environ['ASYNCORD_TEST_GUILD_ID'],
@@ -53,7 +52,7 @@ def integration_data() -> IntegrationTestData:
 @pytest.fixture(scope='session')
 def token(integration_data: IntegrationTestData) -> str:
     """Get token to perform integration tests."""
-    return integration_data.token
+    return integration_data.token.get_secret_value()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

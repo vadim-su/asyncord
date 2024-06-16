@@ -115,13 +115,15 @@ class GatewayClient:
     async def close(self) -> None:
         """Stop the client."""
         self.logger.info('Closing gateway client')
-        if not self.is_started or not self._ws:
+        if not self.is_started and not self._ws:
             return
 
         self.is_started = False
         self._need_restart.set()
         self.heartbeat.stop()
-        await self._ws.close()
+        if self._ws:
+            await self._ws.close()
+        self._ws = None
         self.logger.info('Gateway client closed')
 
     async def send_command(self, opcode: GatewayCommandOpcode, data: Any) -> None:  # noqa: ANN401

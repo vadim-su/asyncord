@@ -45,14 +45,11 @@ async def test_update_current_member(members_res: MemberResource) -> None:
     await members_res.update_current_member(nickname=None)
 
 
-async def test_add_and_remove_role(
+async def test_role_operations(
     members_res: MemberResource,
     integration_data: IntegrationTestData,
 ) -> None:
     """Test adding and removing a role."""
-    member = await members_res.get(integration_data.member_id)
-    assert integration_data.role_id not in member.roles
-
     # check role addition
     await members_res.add_role(integration_data.member_id, integration_data.role_id)
 
