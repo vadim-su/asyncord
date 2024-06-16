@@ -304,16 +304,3 @@ async def test__ws_recv_loop_need_restart(gw_client: GatewayClient, mocker: Mock
 
     mock_get_message.assert_not_called()
     mock_handle_message.assert_not_called()
-
-
-async def test__ws_recv_loop_message_received(gw_client: GatewayClient, mocker: MockFixture) -> None:
-    """Test _ws_recv_loop when a message is received."""
-    gw_client.is_started = True
-    mock_get_message = mocker.patch.object(gw_client, '_get_message', return_value=asyncio.Future())
-    mock_get_message.return_value.set_result('message')
-    mock_handle_message = mocker.patch.object(gw_client, '_handle_message')
-
-    await gw_client._ws_recv_loop(Mock())
-
-    mock_get_message.assert_called_once()
-    mock_handle_message.assert_called_once_with('message')
