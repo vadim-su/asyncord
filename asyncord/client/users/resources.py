@@ -2,22 +2,28 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.resources import APIResource
-from asyncord.client.users.models.requests import (
-    UpdateApplicationRoleConnectionRequest,
-    UpdateUserRequest,
-)
 from asyncord.client.users.models.responses import (
     ApplicationRoleConnectionResponse,
     UserConnectionResponse,
     UserGuildResponse,
     UserResponse,
 )
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.users.models.requests import (
+        UpdateApplicationRoleConnectionRequest,
+        UpdateUserRequest,
+    )
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('UserResource',)
 
 
 class UserResource(APIResource):
@@ -186,7 +192,7 @@ class UserResource(APIResource):
             nick: Nickname of the user to add.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#group-dm-add-recipient
+        https://discord.com/developers/docs/resources/channel#group-dm-add-recipient
         """
         url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
 
@@ -202,7 +208,7 @@ class UserResource(APIResource):
         """Removes a recipient from a Group DM.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#group-dm-remove-recipient
+        https://discord.com/developers/docs/resources/channel#group-dm-remove-recipient
         """
         url = self.channels_url / str(channel_id) / 'recipients' / str(user_id)
 

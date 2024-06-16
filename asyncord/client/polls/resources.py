@@ -3,7 +3,7 @@
 For creating polls refer to messages resource.
 
 Reference:
-https://canary.discord.com/developers/docs/resources/poll
+https://discord.com/developers/docs/resources/poll
 """
 
 from asyncord.client.http.client import HttpClient
@@ -12,6 +12,8 @@ from asyncord.client.polls.models.responses import GetAnswerVotersResponse
 from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
+
+__all__ = ('PollsResource',)
 
 
 class PollsResource(APIResource):
@@ -39,7 +41,7 @@ class PollsResource(APIResource):
         """Get a list of users that voted for this specific answer.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/poll#get-answer-voters
+        https://discord.com/developers/docs/resources/poll#get-answer-voters
 
         Args:
             message_id: ID of the message.
@@ -68,7 +70,7 @@ class PollsResource(APIResource):
         You can't end polls from other users.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/poll#end-poll
+        https://discord.com/developers/docs/resources/poll#end-poll
 
         Args:
             message_id: ID of the message.

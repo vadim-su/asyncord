@@ -6,6 +6,12 @@ from asyncord.base64_image import Base64ImageInputType
 from asyncord.color import DEFAULT_COLOR, ColorInput
 from asyncord.snowflake import SnowflakeInputType
 
+__all__ = (
+    'CreateRoleRequest',
+    'RolePositionRequest',
+    'UpdateRoleRequest',
+)
+
 
 class CreateRoleRequest(BaseModel):
     """Data for creating a role."""

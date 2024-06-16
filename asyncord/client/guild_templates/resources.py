@@ -1,22 +1,29 @@
 """This module contains the guilds templates resource endpoints.
 
-Reference: https://canary.discord.com/developers/docs/resources/guild-template
+Reference: https://discord.com/developers/docs/resources/guild-template
 """
 
 from __future__ import annotations
 
-from asyncord.client.guild_templates.models.requests import (
-    CreateGuildFromTemplateRequest,
-    CreateGuildTemplateRequest,
-    UpdateGuildTemplateRequest,
-)
+from typing import TYPE_CHECKING
+
 from asyncord.client.guild_templates.models.responses import GuildTemplateResponse
 from asyncord.client.guilds.models.responses import GuildResponse
-from asyncord.client.http.client import HttpClient
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.guild_templates.models.requests import (
+        CreateGuildFromTemplateRequest,
+        CreateGuildTemplateRequest,
+        UpdateGuildTemplateRequest,
+    )
+    from asyncord.client.http.client import HttpClient
+    from asyncord.snowflake import SnowflakeInputType
+
+
+__all__ = ('GuildTemplatesResource',)
 
 
 class GuildTemplatesResource(APIResource):
@@ -41,7 +48,7 @@ class GuildTemplatesResource(APIResource):
         """Get a guild template by its code.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild-template#get-guild-template
+        https://discord.com/developers/docs/resources/guild-template#get-guild-template
 
         Args:
             template_code: The template code.
@@ -56,7 +63,7 @@ class GuildTemplatesResource(APIResource):
         """Get the guild's templates.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild-template#get-guild-templates
+        https://discord.com/developers/docs/resources/guild-template#get-guild-templates
         """
         resp = await self._http_client.get(url=self.templates_url)
         return list_model(GuildTemplateResponse).validate_python(resp.body)
@@ -71,7 +78,7 @@ class GuildTemplatesResource(APIResource):
         This endpoint can be used only by bots in less than 10 guilds.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template
+        https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template
         """
         url = self.templates_url / str(template_code)
         payload = create_data.model_dump(mode='json', exclude_unset=True)
@@ -85,7 +92,7 @@ class GuildTemplatesResource(APIResource):
         """Create a new guild template.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild-template#create-guild-template
+        https://discord.com/developers/docs/resources/guild-template#create-guild-template
 
         Args:
             template_data: The template data.
@@ -101,7 +108,7 @@ class GuildTemplatesResource(APIResource):
         """Sync a guild template.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild-template#sync-guild-template
+        https://discord.com/developers/docs/resources/guild-template#sync-guild-template
 
         Args:
             template_code: The template code.
@@ -118,7 +125,7 @@ class GuildTemplatesResource(APIResource):
         """Update a guild template.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild-template#modify-guild-template
+        https://discord.com/developers/docs/resources/guild-template#modify-guild-template
 
         Args:
             template_code: The template code.
@@ -138,7 +145,7 @@ class GuildTemplatesResource(APIResource):
         Returns deleted template object on success.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild-template#delete-guild-template
+        https://discord.com/developers/docs/resources/guild-template#delete-guild-template
 
         Args:
             template_code: The template code.

@@ -4,9 +4,12 @@ Currently, the only action is to send a response to an interaction. Discord don'
 provide any other actions for interactions.
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from asyncord.client.interactions.models.requests import (
     INTERACTIONS_CAN_CONTAIN_FILES,
-    InteractionResponseRequestType,
     InteractionRespPongRequest,
     RootInteractionResponse,
 )
@@ -14,6 +17,12 @@ from asyncord.client.models.attachments import make_attachment_payload
 from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.interactions.models.requests import InteractionResponseRequestType
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('InteractionResource',)
 
 
 class InteractionResource(APIResource):

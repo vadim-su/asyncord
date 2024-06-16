@@ -6,17 +6,28 @@ import http
 from typing import TYPE_CHECKING
 
 from asyncord.client.http.models import (
-    ArrayErrorType,
     ErrorBlock,
-    ObjectErrorType,
     RateLimitHeaders,
-    RatelimitResponse,
-    Request,
-    Response,
 )
 
 if TYPE_CHECKING:
-    from asyncord.client.http.models import ErrorResponse
+    from asyncord.client.http.models import (
+        ArrayErrorType,
+        ErrorResponse,
+        ObjectErrorType,
+        RatelimitResponse,
+        Request,
+        Response,
+    )
+
+__all__ = (
+    'BaseDiscordError',
+    'ClientError',
+    'DiscordHTTPError',
+    'NotFoundError',
+    'RateLimitError',
+    'ServerError',
+)
 
 
 class BaseDiscordError(Exception):

@@ -24,7 +24,7 @@ class BulkBanResponse(BaseModel):
     """Bulk ban object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#bulk-guild-ban-bulk-ban-response
+    https://discord.com/developers/docs/resources/guild#bulk-guild-ban-bulk-ban-response
     """
 
     banned_users: list[SnowflakeInputType] | None

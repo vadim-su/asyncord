@@ -14,16 +14,7 @@ from asyncord.client.bans.resources import BanResource
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.emojis.resources import EmojiResource
 from asyncord.client.guild_templates.resources import GuildTemplatesResource
-from asyncord.client.guilds.models.common import MFALevel, WidgetStyleOptions
-from asyncord.client.guilds.models.requests import (
-    CreateAutoModerationRuleRequest,
-    CreateGuildRequest,
-    PruneRequest,
-    UpdateAutoModerationRuleRequest,
-    UpdateOnboardingRequest,
-    UpdateWelcomeScreenRequest,
-    UpdateWidgetSettingsRequest,
-)
+from asyncord.client.guilds.models.common import MFALevel
 from asyncord.client.guilds.models.responses import (
     AuditLogResponse,
     GuildPreviewResponse,
@@ -48,7 +39,21 @@ from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 if TYPE_CHECKING:
+    import datetime
+
+    from asyncord.client.guilds.models.common import WidgetStyleOptions
+    from asyncord.client.guilds.models.requests import (
+        CreateAutoModerationRuleRequest,
+        CreateGuildRequest,
+        PruneRequest,
+        UpdateAutoModerationRuleRequest,
+        UpdateOnboardingRequest,
+        UpdateWelcomeScreenRequest,
+        UpdateWidgetSettingsRequest,
+    )
     from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('GuildResource',)
 
 
 class GuildResource(APIResource):  # noqa: PLR0904
@@ -445,7 +450,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """Get onboarding object for a guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#get-guild-onboarding
+        https://discord.com/developers/docs/resources/guild#get-guild-onboarding
 
         Args:
             guild_id: ID of the guild to get the welcome screen for.
@@ -463,7 +468,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """Update the onboarding object for a guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#modify-guild-onboarding
+        https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
 
         Args:
             guild_id: ID of the guild to update the onboarding for.
@@ -595,7 +600,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """Get the audit log for a guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/audit-log#get-guild-audit-log
+        https://discord.com/developers/docs/resources/audit-log#get-guild-audit-log
 
         Args:
             guild_id: ID of the guild to get the audit log for.
@@ -632,7 +637,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
             guild_id: ID of the guild to get the rules for.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/auto-moderation#list-auto-moderation-rules-for-guild
+        https://discord.com/developers/docs/resources/auto-moderation#list-auto-moderation-rules-for-guild
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules'
         resp = await self._http_client.get(url=url)
@@ -650,7 +655,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
             rule_id: ID of the rule to get.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/auto-moderation#get-auto-moderation-rule
+        https://discord.com/developers/docs/resources/auto-moderation#get-auto-moderation-rule
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
         resp = await self._http_client.get(url=url)
@@ -664,7 +669,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """Create a new rule. Returns an auto moderation rule on success.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
+        https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules'
         payload = rule.model_dump(mode='json', exclude_unset=True)
@@ -680,7 +685,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """Update an existing rule. Returns an auto moderation rule on success.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
+        https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
         payload = rule.model_dump(mode='json', exclude_unset=True)
@@ -695,7 +700,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """Delete a rule.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/auto-moderation#delete-auto-moderation-rule
+        https://discord.com/developers/docs/resources/auto-moderation#delete-auto-moderation-rule
         """
         url = self.guilds_url / str(guild_id) / 'auto-moderation' / 'rules' / str(rule_id)
         await self._http_client.delete(url=url)

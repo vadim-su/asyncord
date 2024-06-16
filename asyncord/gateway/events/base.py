@@ -16,6 +16,15 @@ from asyncord.client.applications.models.responses import ApplicationFlag
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'GatewayEvent',
+    'InvalidSessionEvent',
+    'ReadyEvent',
+    'ReconnectEvent',
+    'ResumedEvent',
+    'Shard',
+)
+
 
 class GatewayEvent(BaseModel):
     """Base class for all gateway events."""

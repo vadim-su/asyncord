@@ -1,16 +1,25 @@
 """Stage Instances Resource.
 
 Reference:
-https://canary.discord.com/developers/docs/resources/stage-instance
+https://discord.com/developers/docs/resources/stage-instance
 """
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import APIResource
-from asyncord.client.stage_instances.models.requests import CreateStageInstanceRequest, UpdateStageInstanceRequest
 from asyncord.client.stage_instances.models.responses import StageInstanceResponse
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.stage_instances.models.requests import (
+        CreateStageInstanceRequest,
+        UpdateStageInstanceRequest,
+    )
+
+__all__ = ('StageInstancesResource',)
 
 
 class StageInstancesResource(APIResource):
@@ -19,7 +28,7 @@ class StageInstancesResource(APIResource):
     These endpoints are for managing stage instances.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/stage-instance
+    https://discord.com/developers/docs/resources/stage-instance
     """
 
     stage_instances_url = REST_API_URL / 'stage-instances'
@@ -33,7 +42,7 @@ class StageInstancesResource(APIResource):
         If exists.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/stage-instance#get-stage-instance
+        https://discord.com/developers/docs/resources/stage-instance#get-stage-instance
 
         Args:
             channel_id (str): The channel id.
@@ -54,7 +63,7 @@ class StageInstancesResource(APIResource):
         """Creates a stage instance associated with the Stage channel.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/stage-instance#create-stage-instance
+        https://discord.com/developers/docs/resources/stage-instance#create-stage-instance
 
         Args:
             stage_instance_data (CreateStageInstanceRequest): The stage instance data.
@@ -86,7 +95,7 @@ class StageInstancesResource(APIResource):
         """Updates the stage instance associated with the Stage channel.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/stage-instance#modify-stage-instance
+        https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance
 
         Args:
             channel_id (str): The channel id.
@@ -118,7 +127,7 @@ class StageInstancesResource(APIResource):
         """Deletes the stage instance associated with the Stage channel.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/stage-instance#delete-stage-instance
+        https://discord.com/developers/docs/resources/stage-instance#delete-stage-instance
 
         Args:
             channel_id (str): The channel id.

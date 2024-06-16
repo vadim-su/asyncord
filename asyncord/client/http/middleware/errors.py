@@ -14,6 +14,8 @@ if TYPE_CHECKING:
     from asyncord.client.http.middleware.base import NextCallType
     from asyncord.client.http.models import Request, Response
 
+__all__ = ('ErrorHandlerMiddleware',)
+
 
 class ErrorHandlerMiddleware(BaseMiddleware):
     """Middleware that handles HTTP errors and raises exceptions."""

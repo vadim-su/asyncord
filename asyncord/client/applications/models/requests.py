@@ -32,7 +32,7 @@ class ApplicationIntegrationType(IntEnum):
     """Application integration type.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/application#application-object-application-integration-types
+    https://discord.com/developers/docs/resources/application#application-object-application-integration-types
     """
 
     GUILD_INSTALL = 0
@@ -46,7 +46,7 @@ class ApplicationIntegrationTypeConfig(BaseModel):
     """Application integration type configuration object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/application#application-object-application-integration-type-configuration-object
+    https://discord.com/developers/docs/resources/application#application-object-application-integration-type-configuration-object
     """
 
     oauth2_install_params: InstallParams | None = None
@@ -58,7 +58,7 @@ class UpdateApplicationRequest(BaseModel):
     """Represents data to update an application.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/application#edit-current-application-json-params
+    https://discord.com/developers/docs/resources/application#edit-current-application-json-params
     """
 
     custom_install_url: str | None = None

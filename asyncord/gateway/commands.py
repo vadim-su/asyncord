@@ -9,6 +9,14 @@ from asyncord import __version__
 from asyncord.client.models.activities import Activity
 from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
 
+__all__ = (
+    'IdentifyCommand',
+    'IdentifyConnectionProperties',
+    'PresenceUpdateData',
+    'ResumeCommand',
+    'StatusType',
+)
+
 
 class IdentifyConnectionProperties(BaseModel):
     """Identify connection properties.

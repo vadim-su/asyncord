@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
-from asyncord.client.http.client import HttpClient
+from typing import TYPE_CHECKING
+
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import APIResource
-from asyncord.client.roles.models.requests import CreateRoleRequest, RolePositionRequest, UpdateRoleRequest
 from asyncord.client.roles.models.responses import RoleResponse
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.http.client import HttpClient
+    from asyncord.client.roles.models.requests import CreateRoleRequest, RolePositionRequest, UpdateRoleRequest
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('RoleResource',)
 
 
 class RoleResource(APIResource):

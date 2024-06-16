@@ -8,6 +8,17 @@ from pydantic import BaseModel, Field
 from asyncord.client.messages.models.common import EmbedType
 from asyncord.color import Color
 
+__all__ = (
+    'EmbedAuthorOut',
+    'EmbedFieldOut',
+    'EmbedFooterOut',
+    'EmbedImageOut',
+    'EmbedOut',
+    'EmbedProviderOut',
+    'EmbedThumbnailOut',
+    'EmbedVideoOut',
+)
+
 
 class EmbedFooterOut(BaseModel):
     """Embed footer object.

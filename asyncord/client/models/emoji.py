@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
+__all__ = ('Emoji',)
+
 
 class Emoji(BaseModel):
     """Represents a custom emoji that can be used in messages.

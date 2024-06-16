@@ -26,6 +26,34 @@ from asyncord.client.users.models.responses import UserResponse
 from asyncord.client.webhooks.models.responces import WebhookResponse
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'AuditLogChangeOut',
+    'AuditLogEntryOut',
+    'AuditLogIntegrationOut',
+    'AuditLogResponse',
+    'GuildPreviewResponse',
+    'GuildResponse',
+    'IntegrationAccountOut',
+    'IntegrationApplicationOut',
+    'IntegrationResponse',
+    'InviteChannelOut',
+    'InviteGuildOut',
+    'InviteResponse',
+    'OnboardingPromptOptionOut',
+    'OnboardingPromptOut',
+    'OnboardingResponse',
+    'OptionalAuditLogEntryInfoOut',
+    'PruneResponse',
+    'VanityUrlInviteResponse',
+    'VoiceRegionResponse',
+    'WelcomeScreenChannelOut',
+    'WelcomeScreenResponse',
+    'WidgetChannelResponse',
+    'WidgetResponse',
+    'WidgetSettingsResponse',
+    'WidgetUserResponse',
+)
+
 
 class WelcomeScreenChannelOut(BaseModel):
     """Welcome screen channel object.
@@ -519,7 +547,7 @@ class AuditLogIntegrationOut(BaseModel):
     """Partial integration object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/audit-log#audit-log-object-example-partial-integration-object
+    https://discord.com/developers/docs/resources/audit-log#audit-log-object-example-partial-integration-object
     """
 
     id: Snowflake
@@ -542,7 +570,7 @@ class AuditLogChangeOut(BaseModel):
     """Audit log change object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/audit-log#audit-log-change-object-audit-log-change-structure
+    https://discord.com/developers/docs/resources/audit-log#audit-log-change-object-audit-log-change-structure
     """
 
     new_value: Any | None = None
@@ -555,7 +583,7 @@ class AuditLogChangeOut(BaseModel):
     """Name of the changed entity, with a few exceptions.
 
     Exceptions:
-    https://canary.discord.com/developers/docs/resources/audit-log#audit-log-change-object-audit-log-change-exceptions
+    https://discord.com/developers/docs/resources/audit-log#audit-log-change-object-audit-log-change-exceptions
     """
 
 
@@ -563,7 +591,7 @@ class OptionalAuditLogEntryInfoOut(BaseModel):
     """Audit log entry info object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info
+    https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info
     """
 
     application_id: Snowflake | None = None
@@ -647,7 +675,7 @@ class AuditLogEntryOut(BaseModel):
     """Audit log entry object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-entry-structure
+    https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-entry-structure
     """
 
     target_id: str | None = None
@@ -676,7 +704,7 @@ class AuditLogResponse(BaseModel):
     """AuditLog object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/audit-log#audit-log-object-audit-log-structure
+    https://discord.com/developers/docs/resources/audit-log#audit-log-object-audit-log-structure
     """
 
     application_commands: list[ApplicationCommandResponse] | None = None
@@ -805,7 +833,7 @@ class OnboardingPromptOptionOut(BaseModel):
     """Onboarding Prompt Option object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure
+    https://discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure
     """
 
     id: Snowflake
@@ -831,7 +859,7 @@ class OnboardingPromptOut(BaseModel):
     """Onboarding Prompt object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
+    https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
     """
 
     id: Snowflake
@@ -865,7 +893,7 @@ class OnboardingResponse(BaseModel):
     """Onboarding object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/guild#guild-onboarding-object-guild-onboarding-structure
+    https://discord.com/developers/docs/resources/guild#guild-onboarding-object-guild-onboarding-structure
     """
 
     guild_id: Snowflake

@@ -6,6 +6,20 @@ from typing import Annotated, Any, Literal
 from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field, TypeAdapter
 
+__all__ = (
+    'BaseGatewayMessage',
+    'DatalessMessage',
+    'DispatchMessage',
+    'FallbackGatewayMessage',
+    'GatewayCommandOpcode',
+    'GatewayMessageAdapter',
+    'GatewayMessageOpcode',
+    'GatewayMessageType',
+    'HelloMessage',
+    'HelloMessageData',
+    'InvalidSessionMessage',
+)
+
 
 @enum.unique
 class GatewayCommandOpcode(enum.IntEnum):

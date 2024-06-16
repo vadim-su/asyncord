@@ -13,10 +13,11 @@ from typing import TYPE_CHECKING, Protocol
 
 from pydantic import BaseModel, Field
 
-from asyncord.client.http.models import Request, Response
-
 if TYPE_CHECKING:
     from asyncord.client.http.client import HttpClient
+    from asyncord.client.http.models import Request, Response
+
+__all__ = ('BaseMiddleware', 'Middleware', 'NextCallType', 'RateLimitBody')
 
 logger = logging.getLogger(__name__)
 

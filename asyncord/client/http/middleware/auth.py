@@ -11,6 +11,8 @@ if TYPE_CHECKING:
     from asyncord.client.http.middleware.base import NextCallType
     from asyncord.client.http.models import Request, Response
 
+__all__ = ('AuthStrategy', 'BotTokenAuthStrategy')
+
 
 class AuthStrategy(BaseMiddleware):
     """Base class for authentication strategies."""

@@ -21,6 +21,22 @@ from asyncord.client.channels.models.common import (
 from asyncord.client.guilds.models.common import InviteTargetType
 from asyncord.snowflake import SnowflakeInputType
 
+__all__ = (
+    'BaseCreateChannel',
+    'ChannelInviteRequest',
+    'CreateAnoncementChannelRequest',
+    'CreateCategoryChannelRequest',
+    'CreateChannelRequestType',
+    'CreateForumChannelRequest',
+    'CreateMediaChannelRequest',
+    'CreateStageChannelRequest',
+    'CreateTextChannelRequest',
+    'CreateVoiceChannelRequest',
+    'DefaultReaction',
+    'Overwrite',
+    'Tag',
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -357,10 +373,10 @@ class ChannelInviteRequest(BaseModel):
     """Data to create channel invite.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/channel#create-channel-invite-json-params
+    https://discord.com/developers/docs/resources/channel#create-channel-invite-json-params
     """
 
-    max_age: int | None = Field(None, max=604800)
+    max_age: int | None = Field(None, le=604800)
     """Duration of invite in seconds before expiry, or 0 for never."""
 
     max_uses: int | None = Field(None, ge=0, le=100)

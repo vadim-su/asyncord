@@ -4,6 +4,11 @@ from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInputType
 
+__all__ = (
+    'UpdateApplicationRoleConnectionRequest',
+    'UpdateUserRequest',
+)
+
 
 class UpdateUserRequest(BaseModel):
     """Update current user request model."""

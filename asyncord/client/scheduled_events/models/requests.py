@@ -8,6 +8,12 @@ from pydantic import BaseModel, Field, model_validator
 from asyncord.client.scheduled_events.models.common import EventEntityType, EventPrivacyLevel, EventStatus
 from asyncord.snowflake import SnowflakeInputType
 
+__all__ = (
+    'CreateScheduledEventRequest',
+    'EventEntityMetadata',
+    'UpdateScheduledEventRequest',
+)
+
 
 class EventEntityMetadata(BaseModel):
     """Metadata for the guild scheduled event.

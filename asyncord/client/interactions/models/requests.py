@@ -24,6 +24,19 @@ from asyncord.client.messages.models.requests.components import ActionRow, Compo
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import AllowedMentions, Attachment, BaseMessage
 
+__all__ = (
+    'INTERACTIONS_CAN_CONTAIN_FILES',
+    'InteractionRespAutocompleteRequest',
+    'InteractionRespDeferredMessageRequest',
+    'InteractionRespMessageRequest',
+    'InteractionRespModalRequest',
+    'InteractionRespPongRequest',
+    'InteractionRespUpdateDeferredMessageRequest',
+    'InteractionRespUpdateMessageRequest',
+    'InteractionResponseRequestType',
+    'RootInteractionResponse',
+)
+
 
 class InteractionRespPongRequest(BaseModel):
     """A request model for sending a Pong response to an interaction.

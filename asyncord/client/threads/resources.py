@@ -2,22 +2,28 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from asyncord.client.channels.models.responses import ThreadMemberResponse
-from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.models.attachments import make_attachment_payload
 from asyncord.client.resources import APIResource
-from asyncord.client.threads.models.requests import (
-    CreateMediaForumThreadRequest,
-    CreateThreadFromMessageRequest,
-    CreateThreadRequest,
-    UpdateThreadRequest,
-)
+from asyncord.client.threads.models.requests import UpdateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse, ThreadsResponse
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.http.client import HttpClient
+    from asyncord.client.threads.models.requests import (
+        CreateMediaForumThreadRequest,
+        CreateThreadFromMessageRequest,
+        CreateThreadRequest,
+    )
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('ThreadResource',)
 
 
 class ThreadResource(APIResource):  # noqa: PLR0904

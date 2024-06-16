@@ -24,6 +24,9 @@ if TYPE_CHECKING:
     from asyncord.client.http.middleware.auth import AuthStrategy
 
 
+__all__ = ('RestClient',)
+
+
 class RestClient:
     """Root of the REST client for Asyncord."""
 

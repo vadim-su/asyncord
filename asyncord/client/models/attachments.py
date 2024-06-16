@@ -14,8 +14,8 @@ from asyncord.client.http.models import FormField, FormPayload
 from asyncord.snowflake import SnowflakeInputType
 
 if TYPE_CHECKING:
+    # It fixes the circular import issue
     from asyncord.client.messages.models.requests.messages import BaseMessage
-
 
 __ALL__ = (
     'AttachmentContentType',
@@ -121,7 +121,11 @@ def make_attachment_payload(
     attachment_model_data: BaseMessage,
     root_payload: BaseModel | None = None,
 ) -> FormPayload | dict[str, Any]:
-    """Convert an attachment to a form field.
+    """Convert message model data with attachments to a payload.
+
+    If attachments are present in the message model data, the attachments will be converted
+    to form fields and the message model data will be converted to a json payload field.
+    Otherwise, the message model data will be converted to a json payload - dict.
 
     Args:
         attachment_model_data: Message model data with attachments.

@@ -12,6 +12,19 @@ from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'ChannelCreateEvent',
+    'ChannelDeleteEvent',
+    'ChannelPinsUpdateEvent',
+    'ChannelUpdateEvent',
+    'ThreadCreateEvent',
+    'ThreadDeleteEvent',
+    'ThreadListSyncEvent',
+    'ThreadMemberUpdateEvent',
+    'ThreadMembersUpdateEvent',
+    'ThreadUpdateEvent',
+)
+
 
 class ChannelCreateEvent(GatewayEvent, ChannelResponse):
     """Sent when a new guild channel is created.
@@ -151,7 +164,7 @@ class ThreadMemberUpdate(ThreadMemberResponse):
     https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields
     """
 
-    member: MemberResponse
+    member: MemberResponse  # type: ignore
     """Member object."""
 
     presence: dict[str, Any] | None = None  # FIXME: Add presence object

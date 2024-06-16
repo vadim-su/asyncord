@@ -9,6 +9,8 @@ from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
+__all__ = ('MemberResponse',)
+
 
 class MemberResponse(BaseModel):
     """Represents a member of a guild.

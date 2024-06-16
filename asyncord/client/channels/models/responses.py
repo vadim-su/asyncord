@@ -24,6 +24,15 @@ from asyncord.client.models.permissions import PermissionFlag
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'ChannelResponse',
+    'DefaultReactionOut',
+    'FollowedChannelResponse',
+    'OverwriteOut',
+    'TagOut',
+    'ThreadMemberResponse',
+)
+
 
 class OverwriteOut(BaseModel):
     """Base overwrite object.
@@ -281,7 +290,7 @@ class FollowedChannelResponse(BaseModel):
     """Followed channel object.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/channel#followed-channel-object-followed-channel-structure
+    https://discord.com/developers/docs/resources/channel#followed-channel-object-followed-channel-structure
     """
 
     channel_id: Snowflake

@@ -1,15 +1,22 @@
 """Intive Resource Endpoints.
 
 Reference:
-https://canary.discord.com/developers/docs/resources/invite#invite-resource
+https://discord.com/developers/docs/resources/invite#invite-resource
 """
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from asyncord.client.guilds.models.responses import InviteResponse
 from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('InvitesResource',)
 
 
 class InvitesResource(APIResource):
@@ -18,7 +25,7 @@ class InvitesResource(APIResource):
     These endpoints are for managing invites.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/invite#invite-resource
+    https://discord.com/developers/docs/resources/invite#invite-resource
     """
 
     invites_url = REST_API_URL / 'invites'
@@ -33,7 +40,7 @@ class InvitesResource(APIResource):
         """Get an invite by its code.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/invite#get-invite
+        https://discord.com/developers/docs/resources/invite#get-invite
 
         Args:
             invite_code (str): The invite code.
@@ -66,7 +73,7 @@ class InvitesResource(APIResource):
         """Delete an invite by its code.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/invite#delete-invite
+        https://discord.com/developers/docs/resources/invite#delete-invite
         """
         if reason is not None:
             headers = {'X-Audit-Log-Reason': reason}

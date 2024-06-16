@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
-from asyncord.client.http.client import HttpClient
+from typing import TYPE_CHECKING
+
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.members.models.requests import AddMemberRequest, UpdateMemberRequest
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.http.client import HttpClient
+    from asyncord.client.members.models.requests import AddMemberRequest, UpdateMemberRequest
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('MemberResource',)
 
 
 class MemberResource(APIResource):
@@ -205,7 +211,7 @@ class MemberResource(APIResource):
             add_member_data: Data to add the member with.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/guild#add-guild-member
+        https://discord.com/developers/docs/resources/guild#add-guild-member
         """
         url = self.members_url / str(user_id)
         resp = await self._http_client.put(url=url)

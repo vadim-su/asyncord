@@ -4,13 +4,21 @@ Reference:
 https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
 """
 
-from asyncord.client.commands.models.requests import CreateApplicationCommandRequest
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from asyncord.client.commands.models.responses import ApplicationCommandResponse
-from asyncord.client.http.client import HttpClient
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.commands.models.requests import CreateApplicationCommandRequest
+    from asyncord.client.http.client import HttpClient
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('CommandResource',)
 
 
 class CommandResource(APIResource):

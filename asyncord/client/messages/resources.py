@@ -155,7 +155,7 @@ class MessageResource(APIResource):
         """Crosspost a message in an Announcement channel to all channels following it.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#crosspost-message
+        https://discord.com/developers/docs/resources/channel#crosspost-message
 
         Args:
             message_id: Id of the message to crosspost.
@@ -172,7 +172,7 @@ class MessageResource(APIResource):
         """Get all pinned messages in a channel.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#get-pinned-messages
+        https://discord.com/developers/docs/resources/channel#get-pinned-messages
         """
         url = self.channels_url / str(channel_id) / 'pins'
 
@@ -190,7 +190,7 @@ class MessageResource(APIResource):
         The max pinned messages is 50!
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#pin-message
+        https://discord.com/developers/docs/resources/channel#pin-message
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
 
@@ -211,7 +211,7 @@ class MessageResource(APIResource):
         """Unpin a message in a channel.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/channel#unpin-message
+        https://discord.com/developers/docs/resources/channel#unpin-message
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
 
