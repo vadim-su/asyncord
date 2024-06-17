@@ -2,56 +2,51 @@
 
 from __future__ import annotations
 
-from io import BufferedReader, IOBase
-from pathlib import Path
-from typing import Annotated, Any, cast
+from collections.abc import Sequence
+from collections.abc import Set as AbstractSet
+from typing import Annotated
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    Field,
+    SerializerFunctionWrapHandler,
+    WrapSerializer,
+)
 
-from asyncord.client.http.client import make_payload_form
-from asyncord.client.http.models import FormField, FormPayload
+from asyncord.client.models.attachments import AttachmentContentType
 
-type StickerContentType = bytes | bytearray | memoryview | BufferedReader | IOBase | Path
-"""Sticker content type.
+__all__ = (
+    'CreateGuildStickerRequest',
+    'TagsType',
+    'UpdateGuildStickerRequest',
+)
 
-It can be raw data, a file-like object, or a path to a file.
-"""
-
-
-class StickerFile(BaseModel, arbitrary_types_allowed=True):
-    """Stick file object used for creating stickers."""
-
-    content: Annotated[StickerContentType | None, Field(exclude=True)]
-    """Sticker file content."""
-
-    content_type: str | None = None
-
-    """Sticker file content type."""
-
-    filename: str | None = None
-    """Sticker file name."""
+MAX_TAG_SIZE = 200
+"""Maximum length of tags in sticker requests after serialization."""
 
 
-class CreateGuildStickerRequest(BaseModel):
+class CreateGuildStickerRequest(BaseModel, arbitrary_types_allowed=True):
     """Request model for creating a guild sticker.
 
     Reference:
     https://discord.com/developers/docs/resources/sticker#create-guild-sticker-form-params
     """
 
-    name: str = Field(None, min_length=2, max_length=30)
+    name: str = Field(min_length=2, max_length=30)
     """Name of sticker."""
 
-    description: str = Field(None, min_length=2, max_length=100)
+    description: str = Field(min_length=2, max_length=100)
     """Description of sticker."""
 
-    tags: str = Field(None, max_length=200)
-    """Autocomplete/suggestion tags for the sticker (max 200 characters)."""
+    tags: TagsType
+    """Autocomplete/suggestion tags for the sticker."""
 
-    file: StickerFile = Field(None, exclude=True)
-    """Sticker content.
+    image_data: AttachmentContentType = Field(serialization_alias='file')
+    """Sticker image data.
 
-    This field is not part of the Discord API and will not be serialized.
+    It can be raw data, a file-like object, or a path to a file. Can't be a string or a URL.
+    Supported file types: PNG, APNG, WEBP, LOTTIE.
     """
 
 
@@ -62,36 +57,63 @@ class UpdateGuildStickerRequest(BaseModel):
     https://discord.com/developers/docs/resources/sticker#modify-guild-sticker-json-params
     """
 
-    name: str | None = Field(None, min_length=2, max_length=30)
+    name: Annotated[str, Field(min_length=2, max_length=30)] | None = None
     """Name of sticker."""
 
-    description: str | None = Field(None, min_length=2, max_length=100)
+    description: Annotated[str, Field(min_length=2, max_length=100)] | None = None
     """Description of sticker."""
 
-    tags: str | None = Field(None, max_length=200)
-    """Autocomplete/suggestion tags for the sticker (max 200 characters)."""
+    tags: TagsType | None = None
+    """Autocomplete/suggestion tags for the sticker."""
 
 
-def make_sticker_payload(
-    sticker_data: CreateGuildStickerRequest,
-) -> FormPayload | dict[str, Any]:
-    """Convert upload sticker model to a payload.
+def _validate_tags(tags: Sequence[str] | AbstractSet[str] | str) -> set[str]:
+    """Validate tags length.
 
-    Args:
-        sticker_data: Sticker upload request model with sticker.
+    On serialization, tags converted to a string with a comma and space separator.
+    So, the total length of a resulting string must be less than or equal to 200.
+
+    The validator converts tags to a set if it's a string.
     """
-    payload_model_data = sticker_data
-    json_payload = payload_model_data.model_dump(mode='json', exclude_unset=True)
-    if not sticker_data.file:  # type: ignore
-        raise ValidationError('Sticker content is required.')
+    if isinstance(tags, str):
+        tags = set(tag.strip() for tag in tags.split(','))
+    else:
+        tags = set(tag.lower() for tag in tags)
 
-    sticker = cast(StickerFile, sticker_data.file)  # type: ignore
+    total_tags_length = (
+        sum(len(tag) for tag in tags)  # total length of all tags
+        + (len(tags) - 1) * 2  # length of all commas and spaces between tags
+    )
 
-    file_form_fields = {
-        'file': FormField(
-            value=sticker.content,
-            content_type=sticker.content_type,
-            filename=sticker.filename,
-        ),
-    }
-    return make_payload_form(json_payload=json_payload, **file_form_fields)
+    if total_tags_length > MAX_TAG_SIZE:
+        err = ValueError('Tags length must be less than or equal to 200')
+        err.add_note('Do not forget that each tag is separated by a comma with a space on serializing')
+        raise err
+
+    return tags
+
+
+def _serialize_tags_to_string(
+    tags: set[str],
+    next_serializer: SerializerFunctionWrapHandler,
+) -> str:
+    """Serialize tags to a string with a comma and space separator."""
+    return next_serializer(', '.join(tags))
+
+
+type TagsType = Annotated[
+    set[str] | str,
+    BeforeValidator(_validate_tags),
+    WrapSerializer(_serialize_tags_to_string),
+    set[str],  # after all validators, tags must be a set, pydantic will check it
+]
+"""Type for tags field in sticker requests.
+
+Tags are serialized to a string with a comma and space separator and result string length
+must be less than or equal to 200.
+"""
+
+
+# Models should rebuild after defining TagsType
+CreateGuildStickerRequest.model_rebuild()
+UpdateGuildStickerRequest.model_rebuild()

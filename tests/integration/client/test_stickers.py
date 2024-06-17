@@ -1,15 +1,13 @@
-import mimetypes
 from pathlib import Path
 
 from asyncord.client.stickers.models.requests import (
     CreateGuildStickerRequest,
-    StickerFile,
     UpdateGuildStickerRequest,
 )
 from asyncord.client.stickers.resources import StickersResource
 from tests.conftest import IntegrationTestData
 
-TEST_STICKER = 'test_sticker.png'
+TEST_STICKER = Path('tests/data/test_sticker.png')
 
 
 async def test_sticker_cycle(
@@ -23,35 +21,32 @@ async def test_sticker_cycle(
             name='test_sticker',
             description='test_sticker_description',
             tags='test_sticker_tags',
-            file=StickerFile(
-                content=f'tests/data/{TEST_STICKER}',
-                content_type=Path(TEST_STICKER).name,
-                filename=mimetypes.guess_type(TEST_STICKER)[0],
+            image_data=TEST_STICKER,
+        ),
+    )
+    try:
+        sticker = await stickers_res.get_guild_sticker(
+            integration_data.guild_id,
+            created_sticker.id,
+        )
+
+        assert sticker.id == created_sticker.id
+        assert sticker.name == 'test_sticker'
+
+        updated_sticker = await stickers_res.update_guild_sticker(
+            integration_data.guild_id,
+            created_sticker.id,
+            UpdateGuildStickerRequest(
+                name='test_sticker_updated',
+                description='test_sticker_description_updated',
+                tags='test_sticker_tags_updated',
             ),
-        ),
-    )
-    assert created_sticker
+        )
 
-    sticker = await stickers_res.get_guild_sticker(
-        integration_data.guild_id,
-        created_sticker.id,
-    )
+        assert updated_sticker.name != created_sticker.name
 
-    assert sticker.id == created_sticker.id
-
-    updated_sticker = await stickers_res.update_guild_sticker(
-        integration_data.guild_id,
-        created_sticker.id,
-        UpdateGuildStickerRequest(
-            name='test_sticker_updated',
-            description='test_sticker_description_updated',
-            tags='test_sticker_tags_updated',
-        ),
-    )
-
-    assert updated_sticker.name != created_sticker.name
-
-    await stickers_res.delete_guild_sticker(
-        integration_data.guild_id,
-        created_sticker.id,
-    )
+    finally:
+        await stickers_res.delete_guild_sticker(
+            integration_data.guild_id,
+            created_sticker.id,
+        )
