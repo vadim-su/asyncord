@@ -8,9 +8,9 @@ import warnings
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
-from asyncord.client.http.headers import JSON_CONTENT_TYPE, HttpMethod
+from asyncord.client.http.headers import HttpMethod
 from asyncord.client.http.middleware.errors import ErrorHandlerMiddleware
-from asyncord.client.http.models import FormField, FormPayload, Request
+from asyncord.client.http.models import FormField, FormPayload, JsonField, Request
 from asyncord.client.http.request_handler import AiohttpRequestHandler
 
 if TYPE_CHECKING:
@@ -272,7 +272,7 @@ def make_payload_form(*, json_payload: JsonValue, **other_fields: FormField) -> 
         Form payload.
     """
     fields: dict[str, FormField] = {}
-    fields['payload_json'] = FormField(value=json_payload, content_type=JSON_CONTENT_TYPE)
+    fields['payload_json'] = JsonField(value=json_payload)
 
     if other_fields:
         fields.update(other_fields)

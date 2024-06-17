@@ -28,8 +28,6 @@ logger = logging.getLogger(__name__)
 MAX_BINARY_BODY_LOG_SIZE: Final[int] = 100
 """Maximum size of binary body to log."""
 
-_JSON_ISINTANCE_TYPES = list | dict | str | int | float | bool | type(None)
-
 
 class RequestHandler(Protocol):
     """Request handler protocol."""
@@ -89,16 +87,13 @@ class AiohttpRequestHandler:
             case FormPayload():
                 data = aiohttp.FormData()
                 oppened_files = []
+
                 for name, field in request.payload:
-                    if isinstance(field.value, _JSON_ISINTANCE_TYPES):
-                        value = json.dumps(field.value)
+                    value = field.serialize()
 
-                    elif isinstance(field.value, Path):
-                        value = field.value.open('rb')
+                    if isinstance(value, Path):
+                        value = value.open('rb')
                         oppened_files.append(value)
-
-                    else:
-                        value = field.value
 
                     data.add_field(
                         name=name,
