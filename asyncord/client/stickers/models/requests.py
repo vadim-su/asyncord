@@ -36,7 +36,7 @@ class CreateGuildStickerRequest(BaseModel):
     """Request model for creating a guild sticker.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/sticker#create-guild-sticker-form-params
+    https://discord.com/developers/docs/resources/sticker#create-guild-sticker-form-params
     """
 
     name: str = Field(None, min_length=2, max_length=30)
@@ -59,7 +59,7 @@ class UpdateGuildStickerRequest(BaseModel):
     """Request model for updating a guild sticker.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/sticker#modify-guild-sticker-json-params
+    https://discord.com/developers/docs/resources/sticker#modify-guild-sticker-json-params
     """
 
     name: str | None = Field(None, min_length=2, max_length=30)

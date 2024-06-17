@@ -3,7 +3,7 @@
 Contains endpoints to Sticker resource.
 
 Reference:
-https://canary.discord.com/developers/docs/resources/sticker
+https://discord.com/developers/docs/resources/sticker
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ class StickersResource(APIResource):
     These endpoints are for managing Stickers.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/sticker
+    https://discord.com/developers/docs/resources/sticker
     """
 
     stickers_url = REST_API_URL / 'stickers'
@@ -42,7 +42,7 @@ class StickersResource(APIResource):
         """Returns a sticker object for the given sticker ID.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/sticker#get-sticker
+        https://discord.com/developers/docs/resources/sticker#get-sticker
 
         Args:
             sticker_id (SnowflakeInputType): The ID of the sticker.
@@ -59,7 +59,7 @@ class StickersResource(APIResource):
         """Returns a list of available sticker packs.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/sticker#list-sticker-packs
+        https://discord.com/developers/docs/resources/sticker#list-sticker-packs
         """
         url = self.sticker_packs_url
 
@@ -74,7 +74,7 @@ class StickersResource(APIResource):
         """Returns an array of sticker objects for the given guild.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/sticker#list-guild-stickers
+        https://discord.com/developers/docs/resources/sticker#list-guild-stickers
 
         Args:
             guild_id (SnowflakeInputType): The ID of the guild.
@@ -93,7 +93,7 @@ class StickersResource(APIResource):
         """Returns a sticker object for the given guild and sticker IDs.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/sticker#get-guild-sticker
+        https://discord.com/developers/docs/resources/sticker#get-guild-sticker
 
         Args:
             guild_id (SnowflakeInputType): The ID of the guild.
@@ -117,7 +117,7 @@ class StickersResource(APIResource):
         Uploaded stickers are constrained to 5 seconds in length for animated stickers, and 320 x 320 pixels.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/sticker#create-guild-sticker
+        https://discord.com/developers/docs/resources/sticker#create-guild-sticker
         """
         url = self.guild_url / str(guild_id) / 'stickers'
 
@@ -146,7 +146,7 @@ class StickersResource(APIResource):
         """Modify the given sticker.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/sticker#modify-guild-sticker
+        https://discord.com/developers/docs/resources/sticker#modify-guild-sticker
 
         Args:
             guild_id (SnowflakeInputType): The ID of the guild.
@@ -176,7 +176,7 @@ class StickersResource(APIResource):
         """Delete the given sticker.
 
         Reference:
-        https://canary.discord.com/developers/docs/resources/sticker#delete-guild-sticker
+        https://discord.com/developers/docs/resources/sticker#delete-guild-sticker
 
         Args:
             guild_id (SnowflakeInputType): The ID of the guild.

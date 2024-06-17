@@ -9,7 +9,7 @@ class StickerPackListResponse(BaseModel):
     """Response model for list of sticker packs.
 
     Reference:
-    https://canary.discord.com/developers/docs/resources/sticker#list-sticker-packs-response-structure
+    https://discord.com/developers/docs/resources/sticker#list-sticker-packs-response-structure
     """
 
     sticker_packs: list[StickerPack]
