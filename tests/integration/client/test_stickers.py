@@ -43,7 +43,7 @@ async def test_sticker_cycle(
             ),
         )
 
-        assert updated_sticker.name != created_sticker.name
+        assert updated_sticker.name == 'test_sticker_updated'
 
     finally:
         await stickers_res.delete_guild_sticker(

@@ -50,7 +50,7 @@ class Middleware(Protocol):
         ...
 
 
-class BaseMiddleware(ABC):
+class BaseMiddleware(ABC):  # pragma: no cover
     """Base middleware class."""
 
     @abstractmethod

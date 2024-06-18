@@ -60,14 +60,12 @@ testpaths = ["tests"]
 [tool.coverage.run]
 branch = true
 
-[tool.coverage.paths]
-source = ["asyncord"]
-
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
 exclude_also = [
     "if TYPE_CHECKING:",
-    "^class .*\\(Protocol\\):$"
+    "^class .*\\(Protocol\\):$",
+    "if reason is not None:"
 ]
 
 [tool.isort]

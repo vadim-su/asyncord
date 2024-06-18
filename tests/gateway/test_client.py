@@ -225,6 +225,24 @@ async def test_update_presence(gw_client: GatewayClient) -> None:
     mock_send_command.assert_called_once_with(GatewayCommandOpcode.PRESENCE_UPDATE, {'test': 'data'})
 
 
+async def test_send_heartbeat_no_ws(gw_client: GatewayClient) -> None:
+    """Test send_heartbeat when the client is not connected."""
+    gw_client._ws = None
+    with pytest.raises(RuntimeError, match='Client is not connected'):
+        await gw_client.send_heartbeat(1)
+
+
+async def test_send_heartbeat_with_ws(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test send_heartbeat when the client is connected."""
+    mock_ws = mocker.Mock()
+    mock_send_json = mocker.AsyncMock()
+    mock_ws.send_json = mock_send_json
+    gw_client._ws = mock_ws
+    seq = 1
+    await gw_client.send_heartbeat(seq)
+    mock_send_json.assert_called_once_with({'op': GatewayCommandOpcode.HEARTBEAT, 'd': seq})
+
+
 async def test__connect_when_not_started(gw_client: GatewayClient, mocker: MockFixture) -> None:
     """Test _connect when the client is not started."""
     gw_client.is_started = False

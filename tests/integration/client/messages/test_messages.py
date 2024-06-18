@@ -46,6 +46,15 @@ async def test_get_channel_messages(
         assert messages[1].id == around
 
 
+async def test_error_on_multiple_message_filters(messages_res: MessageResource) -> None:
+    """Test that an error is raised when multiple filters are used."""
+    with pytest.raises(
+        ValueError,
+        match='Only one of around, before, after can be specified',
+    ):
+        await messages_res.get(around=1, before=1)
+
+
 async def test_create_and_delete_simple_message(messages_res: MessageResource) -> None:
     """Test creating and deleting a message."""
     message = await messages_res.create(CreateMessageRequest(content='test'))
