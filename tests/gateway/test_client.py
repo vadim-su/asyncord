@@ -364,6 +364,61 @@ async def test__ws_recv_loop_when_need_restart(gw_client: GatewayClient, mocker:
     gw_client._handle_message.assert_not_called()  # type: ignore
 
 
+async def test_websocket_receive_loop_message_waiting(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test _ws_recv_loop when a message is received."""
+
+    async def _get_message_mock(_ws_resp: object) -> FallbackGatewayMessage:
+        # Add a delay before returning a message
+        # This will ensure that the loop continues to the message branch
+        await asyncio.sleep(1)
+        return FallbackGatewayMessage(op=100)  # type: ignore
+
+    mocker.patch.object(gw_client, '_get_message', new=_get_message_mock)
+
+    async def _mock_handler_message(_message: object) -> None:
+        gw_client.is_started = False
+
+    mocker.patch.object(gw_client, '_handle_message', new=_mock_handler_message)
+    gw_client.is_started = True
+
+    await gw_client._ws_recv_loop(Mock())
+    assert not gw_client._need_restart.is_set()
+
+
+async def test_ws_recv_loop_restart_waiting(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test _ws_recv_loop when waiting for restart."""
+    # dummy message which will not be completed
+    message_future = asyncio.Future()
+
+    async def _coro(_ws_resp: object) -> None:
+        await message_future
+
+    mocker.patch.object(gw_client, '_get_message', new=_coro)
+
+    # Mock the handler to stop the client
+    async def _mock_handler_message(_message: object) -> None:
+        gw_client.is_started = False
+
+    mocker.patch.object(gw_client, '_handle_message', new=_mock_handler_message)
+    gw_client.is_started = True
+
+    async def _set_need_restart() -> None:
+        # Add a delay before setting the need_restart flag
+        # This will ensure that the loop continues to the restart branch
+        await asyncio.sleep(1)
+        return gw_client._need_restart.set()
+
+    # After not so long, the need_restart flag will be set
+    # This will continue the loop to the restart branch
+    await asyncio.gather(
+        gw_client._ws_recv_loop(Mock()),
+        _set_need_restart(),
+    )
+
+    assert gw_client._need_restart.is_set()
+    assert message_future.cancelled()
+
+
 async def test__get_message_text(gw_client: GatewayClient, mocker: MockFixture) -> None:
     """Test _get_message when the message type is TEXT."""
     ws = AsyncMock()

@@ -226,12 +226,13 @@ class GatewayClient:
 
             need_restart_task.cancel()
             message = await msg_task
+            # when get ending message, message is None
             if message:
                 await self._handle_message(message)
 
-    async def _get_message(self, ws: aiohttp.ClientWebSocketResponse) -> GatewayMessageType | None:
+    async def _get_message(self, ws_resp: aiohttp.ClientWebSocketResponse) -> GatewayMessageType | None:
         """Get a message from the websocket."""
-        msg = await ws.receive()
+        msg = await ws_resp.receive()
         if msg.type is aiohttp.WSMsgType.TEXT:
             data = msg.json()
             return GatewayMessageAdapter.validate_python(data)
