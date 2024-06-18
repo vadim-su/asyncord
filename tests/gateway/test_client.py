@@ -429,7 +429,7 @@ async def test__get_message_text(gw_client: GatewayClient, mocker: MockFixture) 
 
     result = await gw_client._get_message(ws)
 
-    assert result == FallbackGatewayMessage(op=43214, d={'foo': 'bar'})
+    assert result == FallbackGatewayMessage(op=43214, d={'foo': 'bar'})  # type: ignore
 
 
 @pytest.mark.parametrize('msg_type', [aiohttp.WSMsgType.CLOSE, aiohttp.WSMsgType.CLOSING, aiohttp.WSMsgType.CLOSED])

@@ -48,6 +48,7 @@ source = "call"
 getter = "scritps.version:get_version"
 
 [tool.pdm.scripts]
+coverage = "pytest --cov=asyncord --cov-report html --cov-append -n auto tests"
 docs = "mkdocs serve -f docs/mkdocs.yml"
 build-docs = "mkdocs build -f docs/mkdocs.yml"
 
@@ -61,7 +62,6 @@ testpaths = ["tests"]
 branch = true
 
 [tool.coverage.report]
-# Regexes for lines to exclude from consideration
 exclude_also = [
     "if TYPE_CHECKING:",
     "^class .*\\(Protocol\\):$",

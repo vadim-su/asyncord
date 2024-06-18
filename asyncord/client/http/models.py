@@ -107,7 +107,7 @@ class FormPayload:
         """Iterate over the form fields."""
         yield from ((name, field) for name, field in self._fields.items())
 
-    def __len__(self) -> int:
+    def __len__(self) -> int:  # pragma: no cover
         """Return the number of fields in the form data."""
         return len(self._fields)
 
