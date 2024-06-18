@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 import enum
+import json
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from http import HTTPStatus
@@ -17,7 +18,6 @@ from pydantic import BaseModel, Field, JsonValue
 
 from asyncord.client.http import headers
 from asyncord.client.http.error_codes import ErrorCode
-from asyncord.client.http.headers import HttpMethod
 from asyncord.typedefs import StrOrURL
 
 __all__ = (
@@ -42,7 +42,7 @@ type ObjectErrorType = dict[str, ErrorBlock | ObjectErrorType | ArrayErrorType]
 type ArrayErrorType = dict[int, ObjectErrorType]
 """Type hint for an array error."""
 
-type _RawFieldValue = bytes | bytearray | memoryview
+type _RawFieldValue = str | bytes | bytearray | memoryview
 """Type hint for a bytes field value."""
 
 type _ReaderFieldValue = BufferedReader | IOBase | Path
@@ -79,7 +79,7 @@ class Request:
     instead of pydantic BaseModel.
     """
 
-    method: HttpMethod
+    method: headers.HttpMethod
     """HTTP method to use."""
 
     url: StrOrURL
@@ -103,17 +103,6 @@ class FormPayload:
         """
         self._fields: dict[str, FormField] = fields or {}
 
-    def add_field(
-        self,
-        name: str,
-        value: FieldValueType,
-        *,
-        content_type: str | None = None,
-        filename: str | None = None,
-    ) -> None:
-        """Add a field to the form data."""
-        self._fields[name] = FormField(value, content_type=content_type, filename=filename)
-
     def __iter__(self) -> Iterator[tuple[str, FormField]]:
         """Iterate over the form fields."""
         yield from ((name, field) for name, field in self._fields.items())
@@ -123,7 +112,7 @@ class FormPayload:
         return len(self._fields)
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class FormField:
     """Form field data class."""
 
@@ -135,6 +124,25 @@ class FormField:
 
     filename: str | None = None
     """Name of the file."""
+
+    def serialize(self) -> FieldValueType:
+        """Serialize field value."""
+        return self.value
+
+
+@dataclass(slots=True, frozen=True)
+class JsonField(FormField):
+    """Json field data class."""
+
+    value: JsonValue
+    """Field value."""
+
+    content_type: str | None = headers.JSON_CONTENT_TYPE
+    """Content type of the file."""
+
+    def serialize(self) -> str:
+        """Serialize field value to JSON string."""
+        return json.dumps(self.value)
 
 
 class ErrorItem(BaseModel):

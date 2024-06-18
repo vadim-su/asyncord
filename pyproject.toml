@@ -53,7 +53,7 @@ build-docs = "mkdocs build -f docs/mkdocs.yml"
 
 [tool.pytest.ini_options]
 minversion = "6.2"
-addopts = "-ra -n auto --color=yes"
+addopts = "-ra --color=yes"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 
