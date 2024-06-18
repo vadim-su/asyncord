@@ -14,6 +14,14 @@ from asyncord.gateway.client.heartbeat import Heartbeat, HeartbeatFactory
 from asyncord.gateway.commands import IdentifyCommand, PresenceUpdateData, ResumeCommand
 from asyncord.gateway.dispatcher import EventDispatcher
 from asyncord.gateway.intents import DEFAULT_INTENTS, Intent
+from asyncord.gateway.message import (
+    DatalessMessage,
+    DispatchMessage,
+    FallbackGatewayMessage,
+    GatewayMessageOpcode,
+    HelloMessage,
+    HelloMessageData,
+)
 
 
 @pytest.mark.parametrize('token', ['token', BotTokenAuthStrategy('token')])
@@ -279,15 +287,22 @@ async def test__connect_when_started_and_connection_closed_with_error(
     mock_ws.__aenter__.return_value = mock_ws
     mock_ws_connect = mocker.patch.object(gw_client.session, 'ws_connect', return_value=mock_ws)
 
+    first_raise = True
+
     def _raise(_ws: object) -> None:
+        nonlocal first_raise
+        if first_raise:
+            first_raise = False
+            raise ConnectionClosedError
+
         gw_client.is_started = False
         raise ConnectionClosedError
 
     mock_ws_recv_loop = mocker.patch.object(gw_client, '_ws_recv_loop', side_effect=_raise)
 
     await gw_client._connect()
-    mock_ws_connect.assert_called_once()
-    mock_ws_recv_loop.assert_called_once()
+    mock_ws_connect.assert_called()
+    mock_ws_recv_loop.assert_called()
 
 
 async def test__handle_heartbeat_ack(gw_client: GatewayClient, mocker: MockFixture) -> None:
@@ -322,3 +337,110 @@ async def test__ws_recv_loop_need_restart(gw_client: GatewayClient, mocker: Mock
 
     mock_get_message.assert_not_called()
     mock_handle_message.assert_not_called()
+
+
+async def test__ws_recv_loop_when_not_started(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test _ws_recv_loop when the client is not started."""
+    mocker.patch.object(gw_client, '_get_message', new_callable=AsyncMock)
+    mocker.patch.object(gw_client, '_handle_message', new_callable=AsyncMock)
+    gw_client.is_started = False
+
+    await gw_client._ws_recv_loop(Mock())
+
+    gw_client._get_message.assert_not_called()  # type: ignore
+    gw_client._handle_message.assert_not_called()  # type: ignore
+
+
+async def test__ws_recv_loop_when_need_restart(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test _ws_recv_loop when the client needs to restart."""
+    mocker.patch.object(gw_client, '_get_message', new_callable=AsyncMock)
+    mocker.patch.object(gw_client, '_handle_message', new_callable=AsyncMock)
+    gw_client.is_started = True
+    gw_client._need_restart.set()
+
+    await gw_client._ws_recv_loop(Mock())
+
+    gw_client._get_message.assert_not_called()  # type: ignore
+    gw_client._handle_message.assert_not_called()  # type: ignore
+
+
+async def test__get_message_text(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test _get_message when the message type is TEXT."""
+    ws = AsyncMock()
+    message = Mock()
+    message.type = aiohttp.WSMsgType.TEXT
+    message.json.return_value = {'op': 43214, 'd': {'foo': 'bar'}}
+    ws.receive.return_value = message
+
+    result = await gw_client._get_message(ws)
+
+    assert result == FallbackGatewayMessage(op=43214, d={'foo': 'bar'})
+
+
+@pytest.mark.parametrize('msg_type', [aiohttp.WSMsgType.CLOSE, aiohttp.WSMsgType.CLOSING, aiohttp.WSMsgType.CLOSED])
+async def test__get_message_close_types(
+    gw_client: GatewayClient,
+    msg_type: aiohttp.WSMsgType,
+) -> None:
+    """Test _get_message when the message type is CLOSE, CLOSING, or CLOSED."""
+    ws = AsyncMock()
+    message = Mock()
+    message.type = msg_type
+    ws.receive.return_value = message
+
+    with pytest.raises(ConnectionClosedError):
+        await gw_client._get_message(ws)
+
+
+async def test__get_message_unhandled_type(gw_client: GatewayClient) -> None:
+    """Test _get_message when the message type is not handled."""
+    ws = AsyncMock()
+    message = Mock()
+    message.type = aiohttp.WSMsgType.BINARY  # An unhandled type
+    ws.receive.return_value = message
+
+    result = await gw_client._get_message(ws)
+
+    assert result is None
+
+
+async def test__handle_message_dispatch(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test handling a dispatch event."""
+    mock_logger = mocker.patch.object(gw_client, 'logger')
+    message = DispatchMessage(op=GatewayMessageOpcode.DISPATCH, t='TestEvent', d={}, s=1)
+    await gw_client._handle_message(message)
+    mock_logger.info.assert_called_once_with('Dispatching event: %s', message.event_name)
+
+
+async def test__handle_message_non_dispatch(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test handling a non-dispatch event."""
+    mock_logger = mocker.patch.object(gw_client, 'logger')
+    gw_client._ws = AsyncMock()
+    message = HelloMessage(
+        op=GatewayMessageOpcode.HELLO,
+        d=HelloMessageData(heartbeat_interval=1000),
+    )
+    await gw_client._handle_message(message)
+    mock_logger.info.assert_called_once_with('Received message: %s', message.opcode.name)
+
+
+async def test__handle_message_with_opcode_handler(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test handling a message with an opcode handler."""
+    opcode = GatewayMessageOpcode.HEARTBEAT_ACK
+    handler = gw_client._opcode_handlers[opcode]
+    mock_handler = mocker.patch.object(handler, 'handle')
+    message = DatalessMessage(op=opcode)
+    await gw_client._handle_message(message)
+    mock_handler.assert_called_once_with(message)
+
+
+async def test__handle_message_without_opcode_handler(gw_client: GatewayClient, mocker: MockFixture) -> None:
+    """Test handling a message without an opcode handler."""
+    mock_logger = mocker.patch.object(gw_client, 'logger')
+
+    opcode = GatewayMessageOpcode(9999)  # Non-existent opcode
+    assert opcode.name == 'UNKNOWN'
+
+    message = FallbackGatewayMessage(op=opcode, data={})
+    await gw_client._handle_message(message)
+    mock_logger.warning.assert_called_once_with('Unhandled opcode: %s', opcode)

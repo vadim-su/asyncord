@@ -11,6 +11,7 @@ from asyncord.gateway.events import (
     channels,
     guilds,
     interactions,
+    invites,
     messages,
     moderation,
     presence,
@@ -48,6 +49,7 @@ EVENT_MAP: Mapping[str, type[base.GatewayEvent]] = MappingProxyType({
         moderation,
         presence,
         scheduled_events,
+        invites,
     ])
 })
 """Mapping of event names to event classes.

@@ -1,3 +1,4 @@
+import logging
 from unittest import mock
 
 import pytest
@@ -74,7 +75,7 @@ def test_add_handler_with_invalid_event_type(dispatcher: EventDispatcher) -> Non
         pass
 
     with pytest.raises(TypeError):
-        dispatcher.add_handler(str, handler)
+        dispatcher.add_handler(str, handler)  # type: ignore
 
 
 def test_add_argument(dispatcher: EventDispatcher) -> None:
@@ -87,7 +88,7 @@ def test_add_argument(dispatcher: EventDispatcher) -> None:
     async def handler(_: CustomEvent, arg1: str) -> None:
         pass
 
-    dispatcher.add_handler(GatewayEvent, handler)
+    dispatcher.add_handler(GatewayEvent, handler)  # type: ignore
     assert 'arg1' not in dispatcher._args
     assert 'arg1' not in dispatcher._cached_args[handler]
 
@@ -117,12 +118,74 @@ async def test_dispatch(dispatcher: EventDispatcher) -> None:
     handler.assert_called_once_with(event, arg1='value1')
 
 
+async def test_dispatch_calls_correct_handler(dispatcher: EventDispatcher) -> None:
+    """Test that dispatch calls the correct handler for a given event."""
+    event = CustomEvent()
+    handler_called = False
+
+    async def handler(event: CustomEvent) -> None:
+        nonlocal handler_called
+        handler_called = True
+
+    dispatcher.add_handler(CustomEvent, handler)
+    await dispatcher.dispatch(event)
+
+    assert handler_called, 'Handler was not called'
+
+
+async def test_dispatch_does_not_call_incorrect_handler(dispatcher: EventDispatcher) -> None:
+    """Test that dispatch does not call handlers for different events."""
+    handler_called = False
+
+    async def handler(event: CustomEvent2) -> None:
+        nonlocal handler_called
+        handler_called = True
+
+    dispatcher.add_handler(CustomEvent2, handler)
+    await dispatcher.dispatch(CustomEvent())
+
+    assert not handler_called, 'Handler was incorrectly called'
+
+
+async def test_dispatch_passes_arguments_to_handler(dispatcher: EventDispatcher) -> None:
+    """Test that dispatch passes the correct arguments to the handler."""
+    event = CustomEvent()
+    received_args = None
+
+    async def handler(event: CustomEvent, arg1: str) -> None:
+        nonlocal received_args
+        received_args = arg1
+
+    dispatcher.add_handler(CustomEvent, handler)
+    dispatcher.add_argument('arg1', 'value1')
+    await dispatcher.dispatch(event)
+
+    assert received_args == 'value1', 'Handler did not receive correct arguments'
+
+
+async def test_dispatch_logs_exception(
+    dispatcher: EventDispatcher,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Test that dispatch logs an exception if one is raised in the handler."""
+    event = CustomEvent()
+
+    async def handler(event: CustomEvent) -> None:
+        raise Exception('Test exception')
+
+    dispatcher.add_handler(CustomEvent, handler)
+    with caplog.at_level(logging.ERROR):
+        await dispatcher.dispatch(event)
+
+    assert 'Unhandled exception in event handler' in caplog.text, 'Exception was not logged'
+
+
 async def test_dispatch_with_no_handlers(dispatcher: EventDispatcher) -> None:
     """Test dispatching an event with no handlers.
 
     It should not raise any errors.
     """
-    await dispatcher.dispatch(CustomEvent)
+    await dispatcher.dispatch(CustomEvent())
 
 
 async def test_dispatch_with_multiple_handlers(dispatcher: EventDispatcher) -> None:

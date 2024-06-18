@@ -65,7 +65,9 @@ branch = true
 exclude_also = [
     "if TYPE_CHECKING:",
     "^class .*\\(Protocol\\):$",
-    "if reason is not None:"
+    "if reason is not None:",
+    "@overload",
+    "NotImplementedError",
 ]
 
 [tool.isort]
