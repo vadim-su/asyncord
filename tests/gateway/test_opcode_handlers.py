@@ -25,6 +25,7 @@ def client() -> Mock:
         seq=0,
         session_id='session_id',
     )
+    client.reconnect = Mock()
     return client
 
 
@@ -110,8 +111,11 @@ async def test_invalid_session_handler_handle_no_data(client: Mock) -> None:
 
 async def test_hello_handler_handle_can_resume(client: Mock) -> None:
     """Test handling the HELLO opcode."""
+    client.heartbeat = Mock()
+    client.hearbeat.run = AsyncMock()
     client.conn_data.seq = 1
     handler = HelloHandler(client, Mock())
+
     await handler.handle(Mock())
     client.heartbeat.run.assert_called_once()
     client.send_resume.assert_called_once_with(
@@ -126,7 +130,10 @@ async def test_hello_handler_handle_can_resume(client: Mock) -> None:
 
 async def test_hello_handler_handle_cannot_resume(client: Mock) -> None:
     """Test handling the HELLO opcode."""
+    client.heartbeat = Mock()
+    client.hearbeat.run = AsyncMock()
     handler = HelloHandler(client, Mock())
+
     await handler.handle(Mock())
     client.heartbeat.run.assert_called_once()
     client.send_resume.assert_not_called()
