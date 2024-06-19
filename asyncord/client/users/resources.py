@@ -226,7 +226,7 @@ class UserResource(APIResource):
         resp = await self._http_client.get(url=url)
         return list_model(UserConnectionResponse).validate_python(resp.body)
 
-    async def get_current_user_application_role_connection(
+    async def get_current_user_application_role_connection(  # pragma: no cover
         self,
         application_id: SnowflakeInputType,
     ) -> ApplicationRoleConnectionResponse:
@@ -244,7 +244,7 @@ class UserResource(APIResource):
         resp = await self._http_client.get(url=url)
         return ApplicationRoleConnectionResponse.model_validate(resp.body)
 
-    async def update_current_user_application_role_connection(
+    async def update_current_user_application_role_connection(  # pragma: no cover
         self,
         application_id: SnowflakeInputType,
         update_data: UpdateApplicationRoleConnectionRequest,

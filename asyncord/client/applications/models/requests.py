@@ -2,7 +2,7 @@
 
 from enum import IntEnum
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.applications.models.common import (
@@ -73,13 +73,7 @@ class UpdateApplicationRequest(BaseModel):
     install_params: InstallParams | None = None
     """Settings for the app's default in-app authorization link, if enabled."""
 
-    integration_types_config: (
-        dict[
-            ApplicationIntegrationType,
-            ApplicationIntegrationTypeConfig,
-        ]
-        | None
-    ) = None
+    integration_types_config: dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfig] | None = None
     """Default scopes and permissions for each supported installation context.
 
     Value for each key is an integration type configuration object.
@@ -109,7 +103,6 @@ class UpdateApplicationRequest(BaseModel):
     def validate_tags(
         cls,
         tags: list[str] | None,
-        field_info: ValidationInfo,
     ) -> list[str] | None:
         """Ensures that the length of tags is less than or equal to 5.
 
@@ -120,27 +113,28 @@ class UpdateApplicationRequest(BaseModel):
 
         if tags is not None:
             if len(tags) > max_tags:
-                raise ValueError('Maximum of 5 tags allowed.')
+                raise ValueError('Maximum of 5 tags allowed')
             for tag in tags:
                 if len(tag) > max_tag_length:
-                    raise ValueError('Maximum of 20 characters per tag allowed.')
+                    raise ValueError('Maximum of 20 characters per tag allowed')
         return tags
 
     @field_validator('flags')
     @classmethod
     def validate_flags(
         cls,
-        tags: ApplicationFlag | None,
-    ) -> ApplicationFlag:
+        flags: ApplicationFlag | None,
+    ) -> ApplicationFlag | None:
         """Ensures that the flag is valid."""
-        if tags is not None:
-            if tags not in {
+        if flags is not None:
+            if flags not in {
                 ApplicationFlag.GATEWAY_PRESENCE_LIMITED,
                 ApplicationFlag.GATEWAY_GUILD_MEMBERS_LIMITED,
                 ApplicationFlag.GATEWAY_MESSAGE_CONTENT_LIMITED,
             }:
-                raise ValueError('Invalid flag.')
-        return tags
+                raise ValueError('Invalid flag')
+
+        return flags
 
 
 class UpdateApplicationRoleConnectionMetadataRequest(BaseModel):
@@ -182,7 +176,6 @@ class UpdateApplicationRoleConnectionMetadataRequest(BaseModel):
     def validate_key(
         cls,
         key: str,
-        field_info: ValidationInfo,
     ) -> list[str] | None:
         """Ensures that the length of key is 1 - 50 characters.
 
@@ -192,9 +185,9 @@ class UpdateApplicationRoleConnectionMetadataRequest(BaseModel):
         allowed_symbols = set('abcdefghijklmnopqrstuvwxyz0123456789_')
 
         if not 1 <= len(key) <= max_length:
-            raise ValueError('Key length must be between 1 and 50 characters.')
+            raise ValueError('Key length must be between 1 and 50 characters')
 
         if not set(key).issubset(allowed_symbols):
-            raise ValueError('Key must contain only a - z, 0 - 9, or _ characters.')
+            raise ValueError('Key must contain only a - z, 0 - 9, or _ characters')
 
         return key
