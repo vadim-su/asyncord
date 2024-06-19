@@ -14,7 +14,6 @@ license = { text = "MIT" }
 requires-python = ">=3.12.0"
 dependencies = [
     "yarl>=1.8.1",
-    "sentinel>=1.0.0",
     "rich>=12.5.1",
     "pydantic>=2.4.2",
     "aiohttp<4",

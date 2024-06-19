@@ -5,7 +5,7 @@
 groups = ["default", "dev", "testing", "docs"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:28ebc361ee3fc1645403a7f6270c0ee0a07c662c039f978b2a60b5fc0dd7f47d"
+content_hash = "sha256:a78bab4333d4710074e5285f853cd03bd5d81c2b03bbb2256c8fcdc483531050"
 
 [[package]]
 name = "aiohttp"
@@ -948,16 +948,6 @@ files = [
     {file = "ruff-0.4.4-py3-none-win_amd64.whl", hash = "sha256:424e5b72597482543b684c11def82669cc6b395aa8cc69acc1858b5ef3e5daae"},
     {file = "ruff-0.4.4-py3-none-win_arm64.whl", hash = "sha256:39df0537b47d3b597293edbb95baf54ff5b49589eb7ff41926d8243caa995ea6"},
     {file = "ruff-0.4.4.tar.gz", hash = "sha256:f87ea42d5cdebdc6a69761a9d0bc83ae9b3b30d0ad78952005ba6568d6c022af"},
-]
-
-[[package]]
-name = "sentinel"
-version = "1.0.0"
-requires_python = ">=3.6,<4.0"
-summary = "Create sentinel objects, akin to None, NotImplemented, Ellipsis"
-files = [
-    {file = "sentinel-1.0.0-py3-none-any.whl", hash = "sha256:24f02a34cc9f0fcba5a666a23b6c7f56aff332fc624632ee442e7237751a9f60"},
-    {file = "sentinel-1.0.0.tar.gz", hash = "sha256:190928f9951af6e94a1f84eefcaed791c28097dd152b88e988906be300451fd2"},
 ]
 
 [[package]]
