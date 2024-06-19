@@ -2,12 +2,14 @@ import random
 
 import pytest
 
+from asyncord.client.guilds.models.common import MFALevel, WidgetStyleOptions
 from asyncord.client.guilds.models.requests import (
     CreateAutoModerationRuleRequest,
     CreateGuildRequest,
     UpdateWidgetSettingsRequest,
 )
 from asyncord.client.guilds.resources import GuildResource
+from asyncord.client.http import errors
 from asyncord.client.models.automoderation import (
     AutoModerationRuleEventType,
     RuleAction,
@@ -166,21 +168,35 @@ async def test_get_update_widget(
     integration_data: IntegrationTestData,
 ) -> None:
     """Test getting and updating the widget."""
-    assert await guilds_res.get_widget_settings(integration_data.guild_id)
-
     updated_widget_settings = await guilds_res.update_widget(
         integration_data.guild_id,
         widget_data=UpdateWidgetSettingsRequest(
             enabled=True,
         ),
     )
-
     assert updated_widget_settings.enabled
 
-    widget = await guilds_res.get_widget(integration_data.guild_id)
-    assert widget
 
-    widget_image = await guilds_res.get_widget_image(integration_data.guild_id)
+async def test_get_widget(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting the widget."""
+    widget = await guilds_res.get_widget(integration_data.guild_id)
+    assert widget.id == integration_data.guild_id
+
+
+@pytest.mark.parametrize('style', [None] + [style for style in WidgetStyleOptions])
+async def test_get_widget_image(
+    style: WidgetStyleOptions,
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting the widget image."""
+    widget_image = await guilds_res.get_widget_image(
+        integration_data.guild_id,
+        style=style,
+    )
     assert widget_image.image_data.startswith('data:')
 
 
@@ -193,10 +209,30 @@ async def test_get_onboarding(
     assert onboarding
 
 
-@pytest.mark.skip('Requires more rights than test bot has.')
+async def test_update_mfa_level(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test updating the MFA level.
+
+    We just check that method and input in general valid. Bot has no enough
+    permissions to update MFA level.
+    """
+    with pytest.raises(errors.ClientError, match='Missing Access'):
+        await guilds_res.update_mfa(
+            integration_data.guild_id,
+            level=MFALevel.NONE,
+        )
+
+
 async def test_get_vanity_url(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
 ) -> None:
-    """Test getting the vanity url."""
-    assert await guilds_res.get_vanity_url(integration_data.guild_id)
+    """Test getting the vanity url.
+
+    We just check that method and input in general valid. Bot has no enough
+    permissions to get vanity url.
+    """
+    with pytest.raises(errors.ClientError, match='Missing Access'):
+        assert await guilds_res.get_vanity_url(integration_data.guild_id)

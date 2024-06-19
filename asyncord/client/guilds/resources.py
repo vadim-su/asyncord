@@ -35,7 +35,7 @@ from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.resources import APIResource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
-from asyncord.typedefs import list_model
+from asyncord.typedefs import CURRENT_USER, list_model
 from asyncord.urls import REST_API_URL
 
 if TYPE_CHECKING:
@@ -203,7 +203,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'mfa'
         payload = {'level': level}
-        resp = await self._http_client.patch(url=url, payload=payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return MFALevel(int(resp.raw_body))
 
     async def get_prune_count(
@@ -550,7 +550,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
             suppress: Whether the current user should be suppressed.
             request_to_speak_timestamp: Time at which the current user requested to speak.
         """
-        url = self.guilds_url / str(guild_id) / 'voice-states' / '@me'
+        url = self.guilds_url / str(guild_id) / 'voice-states' / CURRENT_USER
 
         payload = {}
         if channel_id is not None:

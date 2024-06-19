@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.members.models.responses import MemberResponse
@@ -48,7 +48,11 @@ class MemberResource(APIResource):
         resp = await self._http_client.get(url=url)
         return MemberResponse.model_validate(resp.body)
 
-    async def get_list(self, limit: int | None = None, after: SnowflakeInputType | None = None) -> list[MemberResponse]:
+    async def get_list(
+        self,
+        limit: int | None = None,
+        after: SnowflakeInputType | None = None,
+    ) -> list[MemberResponse]:
         """List members of guild.
 
         This endpoint is restricted according to whether the GUILD_MEMBERS Privileged
@@ -75,6 +79,9 @@ class MemberResource(APIResource):
     async def search(self, nick_or_name: str, limit: int | None = None) -> list[MemberResponse]:
         """Search members of a guild by username or nickname.
 
+        Reference:
+        https://discord.com/developers/docs/resources/guild#search-guild-members
+
         Args:
             nick_or_name: Name or nickname of the member to search for.
             limit: Maximum number of members to return.
@@ -89,13 +96,14 @@ class MemberResource(APIResource):
         if limit is not None:
             url_params['limit'] = limit
 
-        url = self.members_url % url_params
+        url = self.members_url / 'search' % url_params
         resp = await self._http_client.get(url=url)
         return list_model(MemberResponse).validate_python(resp.body)
 
     async def update(
         self,
-        user_id: SnowflakeInputType,
+        *,
+        user_id: SnowflakeInputType | Literal['@me'],
         member_data: UpdateMemberRequest,
         reason: str | None = None,
     ) -> MemberResponse:
@@ -114,7 +122,9 @@ class MemberResource(APIResource):
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
-        resp = await self._http_client.patch(url=url, payload=member_data, headers=headers)
+        payload = member_data.model_dump(exclude_unset=True)
+
+        resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
         return MemberResponse(**resp.body)
 
     async def update_current_member(
@@ -144,6 +154,7 @@ class MemberResource(APIResource):
 
     async def add_role(
         self,
+        *,
         user_id: SnowflakeInputType,
         role_id: SnowflakeInputType,
         reason: str | None = None,
@@ -164,6 +175,7 @@ class MemberResource(APIResource):
 
     async def remove_role(
         self,
+        *,
         user_id: SnowflakeInputType,
         role_id: SnowflakeInputType,
         reason: str | None = None,
@@ -200,6 +212,7 @@ class MemberResource(APIResource):
     # Needs users oauth2 token.
     async def add_guild_member(
         self,
+        *,
         user_id: SnowflakeInputType,
         add_member_data: AddMemberRequest,
     ) -> MemberResponse | None:

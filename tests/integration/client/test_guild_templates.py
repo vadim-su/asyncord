@@ -19,6 +19,7 @@ async def test_guild_template_cycle(guild_templates_res: GuildTemplatesResource)
 
     assert created_template.name == 'test-template'
 
+    updated_template = None
     try:
         updated_template = await guild_templates_res.update_guild_template(
             created_template.code,
@@ -38,4 +39,6 @@ async def test_guild_template_cycle(guild_templates_res: GuildTemplatesResource)
 
         assert templates
     finally:
-        await guild_templates_res.delete_guild_template(updated_template.code)
+        await guild_templates_res.delete_guild_template(
+            updated_template.code if updated_template else created_template.code,
+        )

@@ -4,10 +4,17 @@ from __future__ import annotations
 
 import enum
 from functools import lru_cache
-from typing import TYPE_CHECKING, NewType
+from typing import TYPE_CHECKING, Literal, NewType
 
 from pydantic import TypeAdapter
 from yarl import URL
+
+CURRENT_USER: CurrentUserType = '@me'
+"""Literal for the current user endpoint."""
+
+type CurrentUserType = Literal['@me']
+"""Type alias for the current user type."""
+
 
 StrOrURL = str | URL
 
@@ -49,7 +56,7 @@ class StrFlag(str, enum.Enum):  # noqa: UP042
             self._value_ = obj_value
 
     @classmethod
-    def _missing_(cls, values: set[str]) -> object:
+    def _missing_(cls, values: set[str]) -> object:  # type: ignore
         """Returns the missing value of the scope."""
         # get members by values and fail if any value is not found
         actual_members = []
