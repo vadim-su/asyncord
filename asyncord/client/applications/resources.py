@@ -1,15 +1,23 @@
 """This module contains the applications resource for the client."""
 
-from asyncord.client.applications.models.requests import (
-    UpdateApplicationRequest,
-    UpdateApplicationRoleConnectionMetadataRequest,
-)
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from asyncord.client.applications.models.responses import ApplicationOut, ApplicationRoleConnectionMetadataOut
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import CURRENT_USER, list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.applications.models.requests import (
+        UpdateApplicationRequest,
+        UpdateApplicationRoleConnectionMetadataRequest,
+    )
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('ApplicationResource',)
 
 
 class ApplicationResource(APIResource):

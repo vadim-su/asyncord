@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from asyncord.client.bans.models.responses import BanResponse, BulkBanResponse
-from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.http.client import HttpClient
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('BanResource',)
 
 
 class BanResource(APIResource):

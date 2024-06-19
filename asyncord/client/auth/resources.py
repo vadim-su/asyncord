@@ -4,11 +4,15 @@ Reference:
 https://discord.com/developers/docs/topics/oauth2
 """
 
+from __future__ import annotations
+
 from asyncord.client.applications.models.responses import ApplicationOut
 from asyncord.client.auth.models import AuthorizationInfoResponse
 from asyncord.client.resources import APIResource
 from asyncord.typedefs import CURRENT_USER
 from asyncord.urls import REST_API_URL
+
+__all__ = ('OAuthResource',)
 
 
 class OAuthResource(APIResource):

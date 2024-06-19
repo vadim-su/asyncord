@@ -13,6 +13,14 @@ from asyncord.client.auth.models import OAuthScope
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.locale import LocaleInputType
 
+__all__ = (
+    'ApplicationIntegrationType',
+    'ApplicationIntegrationTypeConfig',
+    'InstallParams',
+    'UpdateApplicationRequest',
+    'UpdateApplicationRoleConnectionMetadataRequest',
+)
+
 
 class InstallParams(BaseModel):
     """Application install parameters.
@@ -176,7 +184,7 @@ class UpdateApplicationRoleConnectionMetadataRequest(BaseModel):
     def validate_key(
         cls,
         key: str,
-    ) -> list[str] | None:
+    ) -> str:
         """Ensures that the length of key is 1 - 50 characters.
 
         And a - z, 0 - 9, or _ characters.
