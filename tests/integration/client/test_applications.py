@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from asyncord.client.applications.models.requests import (
     UpdateApplicationRequest,
 )
@@ -9,22 +7,38 @@ from asyncord.client.applications.resources import ApplicationResource
 from tests.conftest import IntegrationTestData
 
 
-@pytest.mark.skip(reason='Dangerous operation. Needs manual control.')
-async def test_update_application(
-    applications_res: ApplicationResource,
-    integration_data: IntegrationTestData,
-) -> None:
+async def test_update_application(applications_res: ApplicationResource) -> None:
     """Test update application.
 
     This test is skipped by default because I have not enough friends to test this.
     """
+    app = await applications_res.get_application()
+    presaved_description = app.description
+    presaved_tags = app.tags
+
+    new_description = 'This is a test description'
+    new_tags = ['test', 'tags']
     app = await applications_res.update_application(
         UpdateApplicationRequest(
-            description='This is a test description.',
+            description=new_description,
+            tags=new_tags,
         ),
     )
+    try:
+        assert app.description == new_description
+        assert app.tags == new_tags
 
-    assert app.description == 'This is a test description.'
+    finally:
+        # Reset the description
+        app = await applications_res.update_application(
+            UpdateApplicationRequest(
+                description=presaved_description,
+                tags=presaved_tags,
+            ),
+        )
+
+    assert app.description == presaved_description
+    assert app.tags == presaved_tags
 
 
 async def test_get_application(
