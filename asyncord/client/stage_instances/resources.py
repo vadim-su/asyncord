@@ -71,7 +71,7 @@ class StageInstancesResource(APIResource):
         """
         url = self.stage_instances_url
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -104,7 +104,7 @@ class StageInstancesResource(APIResource):
         """
         url = self.stage_instances_url / str(channel_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -135,7 +135,7 @@ class StageInstancesResource(APIResource):
         """
         url = self.stage_instances_url / str(channel_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

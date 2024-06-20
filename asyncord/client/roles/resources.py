@@ -62,7 +62,7 @@ class RoleResource(APIResource):
         Returns:
             Created role.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -115,7 +115,7 @@ class RoleResource(APIResource):
             reason: Reason for deleting the role.
         """
         url = self.roles_url / str(role_id)
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

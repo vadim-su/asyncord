@@ -1,18 +1,19 @@
 """This module contains the response model for a polls."""
 
 import datetime
+from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from asyncord.client.polls.models.common import PollLayoutType
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
 __all__ = (
+    'AnswerOut',
     'GetAnswerVotersResponse',
-    'PartialEmojiOut',
     'PollAnswerCountOut',
-    'PollAnswerOut',
+    'PollEmojiOut',
     'PollMediaOut',
     'PollResponse',
     'PollResultsOut',
@@ -29,7 +30,7 @@ class GetAnswerVotersResponse(BaseModel):
     users: list[UserResponse]
 
 
-class PartialEmojiOut(BaseModel):
+class PollEmojiOut(BaseModel):
     """Represents a custom emoji that can be used in messages.
 
     Reference:
@@ -68,7 +69,7 @@ class PartialEmojiOut(BaseModel):
 
 
 class PollMediaOut(BaseModel):
-    """Poll Media Object.
+    """Poll Media Object in response.
 
     Reference:
     https://discord.com/developers/docs/resources/poll#poll-media-object-poll-media-object-structure
@@ -77,18 +78,18 @@ class PollMediaOut(BaseModel):
     text: str | None = None
     """Text of the field."""
 
-    emoji: PartialEmojiOut | None = None
+    emoji: PollEmojiOut | None = None
     """Partial Emoji object."""
 
 
-class PollAnswerOut(BaseModel):
-    """Poll Answer Object.
+class AnswerOut(BaseModel):
+    """Poll Answer Object in response.
 
     Reference:
     https://discord.com/developers/docs/resources/poll#poll-answer-object-poll-answer-object-structure
     """
 
-    asnwer_id: int | None = None
+    answer_id: int
     """ID of the answer."""
 
     poll_media: PollMediaOut
@@ -122,7 +123,7 @@ class PollResultsOut(BaseModel):
     is_finalized: bool
     """Whether the votes have been precisely counted."""
 
-    answer_count: list[PollAnswerCountOut] | None = None
+    answer_counts: list[PollAnswerCountOut]
     """Counts for each answer"""
 
 
@@ -133,10 +134,10 @@ class PollResponse(BaseModel):
     https://discord.com/developers/docs/resources/poll#poll-object-poll-object-structure
     """
 
-    question: PollMediaOut
+    question: str
     """The question of the poll. Only text is supported."""
 
-    answers: list[PollAnswerOut]
+    answers: list[AnswerOut]
     """Each of the answers available in the poll."""
 
     expiry: datetime.datetime | None = None
@@ -150,3 +151,10 @@ class PollResponse(BaseModel):
 
     results: PollResultsOut | None = None
     """The results of the poll."""
+
+    @model_validator(mode='before')
+    @classmethod
+    def prepare_question(cls, raw_values: dict[str, Any]) -> dict[str, Any]:
+        """Prepare question for validation."""
+        raw_values['question'] = raw_values['question']['text']
+        return raw_values

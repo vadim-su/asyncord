@@ -111,7 +111,7 @@ class ChannelResource(APIResource):
         """
         url = REST_API_URL / 'guilds' / str(guild_id) / 'channels'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -142,7 +142,7 @@ class ChannelResource(APIResource):
         """
         url = self.channels_url / str(channel_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -189,7 +189,7 @@ class ChannelResource(APIResource):
         """
         url = self.channels_url / str(channel_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -216,7 +216,7 @@ class ChannelResource(APIResource):
             permission_data: The data to update the permissions with.
             reason: Reason for updating the permissions.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -244,7 +244,7 @@ class ChannelResource(APIResource):
             overwrite_id: Role or user id.
             reason: Reason for deleting the permission.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -290,7 +290,7 @@ class ChannelResource(APIResource):
         """
         url = self.channels_url / str(channel_id) / 'invites'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

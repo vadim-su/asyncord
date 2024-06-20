@@ -1,3 +1,4 @@
+import datetime
 import random
 
 import pytest
@@ -8,6 +9,8 @@ from asyncord.client.guilds.models.requests import (
     CreateGuildRequest,
     OnboardingPrompt,
     OnboardingPromptOption,
+    PruneRequest,
+    UpdateAutoModerationRuleRequest,
     UpdateOnboardingRequest,
     UpdateWelcomeScreenRequest,
     UpdateWidgetSettingsRequest,
@@ -77,6 +80,22 @@ async def test_get_prune_count(
     assert prune_count.pruned is not None
 
 
+@pytest.mark.limited()
+async def test_begin_prune(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test beginning a prune."""
+    prune_obj = await guilds_res.begin_prune(
+        guild_id=integration_data.guild_id,
+        prune_data=PruneRequest(
+            days=1,
+            compute_prune_count=True,
+        ),
+    )
+    assert prune_obj.pruned is not None
+
+
 async def test_get_voice_regions(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
@@ -119,11 +138,23 @@ async def test_get_audit_log(
     assert await guilds_res.get_audit_log(integration_data.guild_id)
 
 
-async def test_create_get_delete_auto_moderation_rule(
+async def test_get_list_auto_moderation_rules(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting the auto moderation rules."""
+    rules = await guilds_res.get_list_auto_moderation_rules(
+        integration_data.guild_id,
+    )
+    assert isinstance(rules, list)
+
+
+async def test_auto_moderation_rule_management(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
 ) -> None:
     """Test creating an auto moderation rule."""
+    # create rule
     rule = await guilds_res.create_auto_moderation_rule(
         integration_data.guild_id,
         CreateAutoModerationRuleRequest(
@@ -141,29 +172,31 @@ async def test_create_get_delete_auto_moderation_rule(
             enabled=True,
         ),
     )
+    assert rule.id
 
-    assert rule
-
-    rule_response = await guilds_res.get_auto_moderation_rule(
+    # get rule
+    assert await guilds_res.get_auto_moderation_rule(
         integration_data.guild_id,
         rule.id,
     )
 
-    assert rule.name == rule_response.name
+    # update rule
+    updated_rule = await guilds_res.update_auto_moderation_rule(
+        guild_id=integration_data.guild_id,
+        rule_id=rule.id,
+        rule=UpdateAutoModerationRuleRequest(
+            name='Updated Rule',
+            enabled=False,
+        ),
+    )
 
+    assert updated_rule.name == 'Updated Rule'
+    assert not updated_rule.enabled
+
+    # delete rule
     await guilds_res.delete_auto_moderation_rule(
         integration_data.guild_id,
         rule.id,
-    )
-
-
-async def test_get_list_auto_moderation_rules(
-    guilds_res: GuildResource,
-    integration_data: IntegrationTestData,
-) -> None:
-    """Test getting the auto moderation rules."""
-    assert await guilds_res.get_list_auto_moderation_rules(
-        integration_data.guild_id,
     )
 
 
@@ -288,6 +321,55 @@ async def test_welcome_screen_management(
             description=None,
         ),
     )
+
+
+@pytest.mark.skip('Should be tested when bot connected to voice channel')
+@pytest.mark.parametrize('suppress', [True, False])
+@pytest.mark.parametrize('with_request_to_speak_timestamp', [True, False])
+async def test_update_current_user_voice_state(
+    suppress: bool,
+    with_request_to_speak_timestamp: bool,
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test updating the current user's voice state."""
+    if with_request_to_speak_timestamp:
+        request_to_speak_timestamp = datetime.datetime.now(datetime.UTC)
+    else:
+        request_to_speak_timestamp = None
+
+    await guilds_res.update_current_user_voice_state(
+        integration_data.guild_id,
+        suppress=suppress,
+        request_to_speak_timestamp=request_to_speak_timestamp,
+    )
+
+    await guilds_res.update_current_user_voice_state(
+        integration_data.guild_id,
+        suppress=False,
+    )
+
+
+async def test_update_current_user_voice_state_without_connection(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test updating the current user's voice state."""
+    with pytest.raises(errors.ClientError, match='Unknown Voice State'):
+        await guilds_res.update_current_user_voice_state(integration_data.guild_id, suppress=True)
+
+
+async def test_update_user_voice_state(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test updating the current user's voice state."""
+    with pytest.raises(errors.ClientError, match='Unknown Voice State'):
+        await guilds_res.update_user_voice_state(
+            integration_data.guild_id,
+            integration_data.user_id,
+            suppress=True,
+        )
 
 
 async def test_update_mfa_level(

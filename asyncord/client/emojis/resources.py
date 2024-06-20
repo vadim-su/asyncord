@@ -76,7 +76,7 @@ class EmojiResource(APIResource):
         Reference:
         https://discord.com/developers/docs/resources/emoji#create-guild-emoji
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -101,7 +101,7 @@ class EmojiResource(APIResource):
         Reference:
         https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -125,7 +125,7 @@ class EmojiResource(APIResource):
         Reference:
         https://discord.com/developers/docs/resources/emoji#delete-guild-emoji
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

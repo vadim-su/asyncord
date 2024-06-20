@@ -300,7 +300,7 @@ class PruneResponse(BaseModel):
     https://discord.com/developers/docs/resources/guild#get-guild-prune-count
     """
 
-    pruned: int
+    pruned: int | None
     """Number of members pruned."""
 
 

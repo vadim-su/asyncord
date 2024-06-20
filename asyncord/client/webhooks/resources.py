@@ -115,7 +115,7 @@ class WebhooksResource(APIResource):
         """
         url = self.channel_url / str(channel_id) / 'webhooks'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -152,7 +152,7 @@ class WebhooksResource(APIResource):
             if 'channel_id' in payload:
                 del payload['channel_id']
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -181,7 +181,7 @@ class WebhooksResource(APIResource):
         if webhook_token is not None:
             url /= str(webhook_token)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

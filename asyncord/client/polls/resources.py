@@ -61,10 +61,7 @@ class PollsResource(APIResource):
         resp = await self._http_client.get(url=url)
         return GetAnswerVotersResponse.model_validate(resp.body)
 
-    async def end_poll(
-        self,
-        message_id: SnowflakeInputType,
-    ) -> MessageResponse:
+    async def end_poll(self, message_id: SnowflakeInputType) -> MessageResponse:
         """Immediately end a poll.
 
         You can't end polls from other users.

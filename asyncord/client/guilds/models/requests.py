@@ -3,7 +3,6 @@
 from collections.abc import Sequence
 from typing import Annotated, Any, Self
 
-from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel, Field, field_serializer, field_validator, model_validator
 
 from asyncord.base64_image import Base64ImageInputType
@@ -207,36 +206,37 @@ class UpdateAutoModerationRuleRequest(BaseModel):
     https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule-json-params
     """
 
-    name: str
+    name: str | None = None
     """Name of the rule."""
 
-    event_type: FallbackAdapter[AutoModerationRuleEventType]
+    event_type: AutoModerationRuleEventType | None = None
     """Rule event type."""
 
     trigger_metadata: TriggerMetadata | None = None
     """Rule trigger metadata.
 
     Required, but can be omited based on trigger type.
+
     Reference:
     https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
     """
 
-    actions: list[RuleAction]
+    actions: list[RuleAction] | None = None
     """Actions which will execute when the rule is triggered."""
 
-    enabled: bool
+    enabled: bool | None = None
     """Whether the rule is enabled.
 
     False by default.
     """
 
-    exempt_roles: list[SnowflakeInputType] = Field(max_length=20)
+    exempt_roles: Annotated[list[SnowflakeInputType], Field(max_length=20)] | None = None
     """Role ids that should not be affected by the rule.
 
     Maximum of 20.
     """
 
-    exempt_channels: list[SnowflakeInputType] = Field(max_length=50)
+    exempt_channels: Annotated[list[SnowflakeInputType], Field(max_length=50)] | None = None
     """Channel ids that should not be affected by the rule.
 
     Maximum of 50.
@@ -394,7 +394,7 @@ class PruneRequest(BaseModel):
     """
 
     days: int
-    """Number of days to prune members for ."""
+    """Number of days to prune members for."""
 
     compute_prune_count: bool | None = None
     """Whether to compute the number of pruned members."""

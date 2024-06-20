@@ -129,7 +129,7 @@ class StickersResource(APIResource):
         """
         url = self.guild_url / str(guild_id) / 'stickers'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -172,7 +172,7 @@ class StickersResource(APIResource):
         """
         url = self.guild_url / str(guild_id) / 'stickers' / str(sticker_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -201,7 +201,7 @@ class StickersResource(APIResource):
         """
         url = self.guild_url / str(guild_id) / 'stickers' / str(sticker_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

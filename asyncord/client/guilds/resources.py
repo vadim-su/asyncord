@@ -233,7 +233,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         if include_roles is not None:
             url_params['include_roles'] = ','.join(map(str, include_roles))
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -272,7 +272,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         payload = prune_data.model_dump(mode='json', exclude_unset=True)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -413,7 +413,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'widget'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -477,7 +477,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'onboarding'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -523,7 +523,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'welcome-screen'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

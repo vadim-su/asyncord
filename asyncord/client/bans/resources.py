@@ -95,7 +95,7 @@ class BanResource(APIResource):
         """
         url = self.bans_url / str(user_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -117,7 +117,7 @@ class BanResource(APIResource):
             user_id: ID of the user to unban.
             reason: Reason for unbanning the user. Defaults to None.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -143,7 +143,7 @@ class BanResource(APIResource):
         """
         url = self.guilds_url / str(self.guild_id) / 'bulk-ban'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

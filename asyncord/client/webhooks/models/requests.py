@@ -11,7 +11,7 @@ from asyncord.client.messages.models.requests.components import Component
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import BaseMessage
 from asyncord.client.models.attachments import Attachment, AttachmentContentType
-from asyncord.client.polls.models.requests import PollRequest
+from asyncord.client.polls.models.requests import Poll
 from asyncord.snowflake import SnowflakeInputType
 
 __ALL__ = (
@@ -109,7 +109,7 @@ class ExecuteWebhookRequest(BaseMessage):
     (requires the webhook channel to be a forum or media channel).
     """
 
-    poll: PollRequest | None = None
+    poll: Poll | None = None
     """A poll."""
 
 

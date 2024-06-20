@@ -24,7 +24,7 @@ from asyncord.client.messages.models.common import AllowedMentionType, MessageFl
 from asyncord.client.messages.models.requests.components import ActionRow, Component
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.models.attachments import Attachment, AttachmentContentType
-from asyncord.client.polls.models.requests import PollRequest
+from asyncord.client.polls.models.requests import Poll
 from asyncord.snowflake import SnowflakeInputType
 
 __ALL__ = (
@@ -381,7 +381,7 @@ class CreateMessageRequest(BaseMessage):
     I set it to True because it will be default behavior in the near future.
     """
 
-    poll: PollRequest | None = None
+    poll: Poll | None = None
     """A poll."""
 
 

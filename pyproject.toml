@@ -64,16 +64,10 @@ branch = true
 exclude_also = [
     "if TYPE_CHECKING:",
     "^class .*\\(Protocol\\):$",
-    "if reason is not None:",
+    "if reason:",
     "@overload",
     "NotImplementedError",
 ]
-
-[tool.isort]
-line_length = 110
-multi_line_output = 3
-include_trailing_comma = true
-length_sort = true
 
 [tool.ruff]
 line-length = 120

@@ -81,7 +81,7 @@ class ScheduledEventsResource(APIResource):
         Returns:
             Created event.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

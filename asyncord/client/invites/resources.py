@@ -75,7 +75,7 @@ class InvitesResource(APIResource):
         Reference:
         https://discord.com/developers/docs/resources/invite#delete-invite
         """
-        if reason is not None:
+        if reason:
             headers = {'X-Audit-Log-Reason': reason}
         else:
             headers = {}

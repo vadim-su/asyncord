@@ -140,7 +140,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
             thread_data: Data to create the thread with.
             reason: Reason for creating the thread.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -157,7 +157,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
             thread_data: Data to create the thread with.
             reason: Reason for creating the thread.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -178,7 +178,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
             thread_data: Data to create the thread with.
             reason: Reason for creating the thread.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -201,7 +201,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
         """
         url = self.channels_url / str(thread_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -361,7 +361,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
         """
         url = self.channels_url / str(thread_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

@@ -125,7 +125,7 @@ class MessageResource(APIResource):
         """
         url = self.messages_url / str(message_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -146,7 +146,7 @@ class MessageResource(APIResource):
         url = self.messages_url / 'bulk-delete'
         payload = {'messages': [str(message_id) for message_id in message_ids]}
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -196,7 +196,7 @@ class MessageResource(APIResource):
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -217,7 +217,7 @@ class MessageResource(APIResource):
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

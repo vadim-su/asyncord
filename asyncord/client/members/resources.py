@@ -118,7 +118,7 @@ class MemberResource(APIResource):
             The updated member.
         """
         url = self.members_url / str(user_id)
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -144,7 +144,7 @@ class MemberResource(APIResource):
             The updated member.
         """
         url = self.members_url / '@me'
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -167,7 +167,7 @@ class MemberResource(APIResource):
             reason: Reason for adding the role to the member. Defaults to None.
         """
         url = self.members_url / str(user_id) / 'roles' / str(role_id)
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -188,7 +188,7 @@ class MemberResource(APIResource):
             reason: Reason for removing the role from the member. Defaults to None.
         """
         url = self.members_url / str(user_id) / 'roles' / str(role_id)
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -202,7 +202,7 @@ class MemberResource(APIResource):
             reason: Reason for kicking the member. Defaults to None.
         """
         url = self.members_url / str(user_id)
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
