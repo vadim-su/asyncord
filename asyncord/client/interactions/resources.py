@@ -6,14 +6,13 @@ provide any other actions for interactions.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from asyncord.client.interactions.models.requests import (
-    INTERACTIONS_CAN_CONTAIN_FILES,
     InteractionRespPongRequest,
     RootInteractionResponse,
 )
-from asyncord.client.models.attachments import make_attachment_payload
+from asyncord.client.models.attachments import Attachment, make_payload_with_attachments
 from asyncord.client.resources import APIResource
 from asyncord.snowflake import SnowflakeInputType
 from asyncord.urls import REST_API_URL
@@ -45,15 +44,24 @@ class InteractionResource(APIResource):
         """
         url = self.interactions_url / str(interaction_id) / interaction_token / 'callback'
         if isinstance(interaction_response, InteractionRespPongRequest):
-            # Pong response doesn't have a data key
-            wraped_model = interaction_response
+            # Pong response doesn't have a data key, only type
+            # It's already as a root model, but without data key
+            root_model = interaction_response
         else:
-            wraped_model = RootInteractionResponse(data=interaction_response)
+            root_model = RootInteractionResponse(data=interaction_response)
 
-        if isinstance(interaction_response, INTERACTIONS_CAN_CONTAIN_FILES):
-            payload = make_attachment_payload(interaction_response, wraped_model)
-        else:
-            payload = interaction_response.model_dump(mode='json')
+        # if we have any attachments, we need to send them as form
+        # Attachment after model mapping is a list of Attachment objects alwayszs or None
+        attachments = cast(
+            list[Attachment] | None,
+            getattr(interaction_response, 'attachments', None),
+        )
+        payload = make_payload_with_attachments(
+            root_model,
+            attachments=attachments,
+            exclude_unset=False,
+            exclude_none=True,
+        )
 
         await self._http_client.post(url=url, payload=payload)
 

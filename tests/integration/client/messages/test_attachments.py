@@ -10,12 +10,12 @@ from asyncord.client.messages.models.requests.embeds import (
     EmbedThumbnail,
 )
 from asyncord.client.messages.models.requests.messages import (
-    Attachment,
     CreateMessageRequest,
     UpdateMessageRequest,
 )
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
+from asyncord.client.models.attachments import Attachment
 
 TEST_FILE_NAMES = ['test_image_1.png', 'test_image_2.png']
 

@@ -9,8 +9,8 @@ from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.messages.models.common import AllowedMentionType, MessageFlags
 from asyncord.client.messages.models.requests.components import Component
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import Attachment, BaseMessage
-from asyncord.client.models.attachments import AttachmentContentType
+from asyncord.client.messages.models.requests.messages import BaseMessage
+from asyncord.client.models.attachments import Attachment, AttachmentContentType
 from asyncord.client.polls.models.requests import PollRequest
 from asyncord.snowflake import SnowflakeInputType
 
@@ -81,10 +81,10 @@ class ExecuteWebhookRequest(BaseMessage):
     allowed_mentions: AllowedMentionType | None = None
     """Allowed mentions for the message."""
 
-    components: Sequence[Component] | None = None
+    components: Component | Sequence[Component] | None = None
     """The components to include with the message."""
 
-    attachments: list[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
     """List of attachment object.
 
     See Uploading Files:
@@ -129,10 +129,10 @@ class UpdateWebhookMessageRequest(BaseMessage):
     allowed_mentions: AllowedMentionType | None = None
     """Allowed mentions for the message."""
 
-    components: Sequence[Component] | None = None
+    components: Component | Sequence[Component] | None = None
     """The components to include with the message."""
 
-    attachments: list[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
     """List of attachment object.
 
     See Uploading Files:

@@ -99,7 +99,7 @@ class UpdateApplicationRequest(BaseModel):
     interactions_endpoint_url: str | None = None
     """Interactions endpoint URL for the app."""
 
-    tags: list[str] | None = None
+    tags: set[str] | None = None
     """List of tags describing the content and functionality of the app.
 
     Maximum of 5 tags.

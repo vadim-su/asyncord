@@ -363,10 +363,10 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'integrations' / str(integration_id)
 
-        if reason is None:
-            headers = {}
-        else:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
 
         await self._http_client.delete(url=url, headers=headers)
 

@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.models.responses.messages import MessageResponse
-from asyncord.client.models.attachments import make_attachment_payload
+from asyncord.client.models.attachments import Attachment, make_payload_with_attachments
 from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.resources import APIResource
 from asyncord.typedefs import list_model
@@ -93,7 +93,8 @@ class MessageResource(APIResource):
             Created message object.
         """
         url = self.messages_url
-        payload = make_attachment_payload(message_data)
+        attachments = cast(list[Attachment] | None, message_data.attachments)
+        payload = make_payload_with_attachments(message_data, attachments=attachments)
         resp = await self._http_client.post(url=url, payload=payload)
 
         return MessageResponse.model_validate(resp.body)
@@ -109,7 +110,8 @@ class MessageResource(APIResource):
             Updated message object.
         """
         url = self.messages_url / str(message_id)
-        payload = make_attachment_payload(message_data)
+        attachments = cast(list[Attachment] | None, message_data.attachments)
+        payload = make_payload_with_attachments(message_data, attachments)
         resp = await self._http_client.patch(url=url, payload=payload)
 
         return MessageResponse(**resp.body)

@@ -6,11 +6,11 @@ https://discord.com/developers/docs/resources/webhook
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.models.responses.messages import MessageResponse
-from asyncord.client.models.attachments import make_attachment_payload
+from asyncord.client.models.attachments import Attachment, make_payload_with_attachments
 from asyncord.client.resources import APIResource
 from asyncord.client.webhooks.models.responces import (
     WebhookResponse,
@@ -215,7 +215,8 @@ class WebhooksResource(APIResource):
             params['thread_id'] = thread_id
 
         url = self.webhooks_url / str(webhook_id) / str(webhook_token) % params
-        payload = make_attachment_payload(execute_data)
+        attachments = cast(list[Attachment] | None, execute_data.attachments)
+        payload = make_payload_with_attachments(execute_data, attachments=attachments)
 
         message = await self._http_client.post(url=url, payload=payload)
 
@@ -275,7 +276,8 @@ class WebhooksResource(APIResource):
             params = {'thread_id': str(thread_id)}
             url %= params
 
-        payload = make_attachment_payload(update_data)
+        attachments = cast(list[Attachment] | None, update_data.attachments)
+        payload = make_payload_with_attachments(update_data, attachments=attachments)
         resp = await self._http_client.patch(url=url, payload=payload)
 
         return MessageResponse.model_validate(resp.body)

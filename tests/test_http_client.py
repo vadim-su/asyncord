@@ -53,7 +53,7 @@ from asyncord.client.http.request_handler import AiohttpRequestHandler
         ),
     ],
 )
-async def test_http_client_general_methods(
+async def test_http_methods(
     session: Mock | None,
     method: str,
     url: str,
@@ -61,7 +61,7 @@ async def test_http_client_general_methods(
     payload: dict[str, str] | None,
     mocker: MockFixture,
 ) -> None:
-    """Complete test for the HTTP client general methods.
+    """Test calling HTTP methods.
 
     This test looks complex, but it's actually quite simple. It's not super necessary
     to test every single method of the HTTP client, but it's good to have a test that
@@ -88,10 +88,10 @@ async def test_http_client_general_methods(
         method=method,
         url=url,
         headers=headers,
-        data=ANY,  # Check data later.
+        data=ANY,  # Check data later
     )
 
-    # Some methods don't have payloads, so we need to check if the payload is correct.
+    # Some methods don't have payloads, so we need to check if the payload is correct
     if payload is not None:
         data_arg = request_mock.call_args.kwargs['data']
         assert json.loads(data_arg._value) == payload
@@ -126,6 +126,30 @@ async def test_extract_body_not_json() -> None:
     resp = Mock(status=HTTPStatus.OK, headers=CIMultiDict({'Content-Type': 'text/plain'}))
     result = await AiohttpRequestHandler._extract_body_from_response(resp)
     assert result == {}
+
+
+async def test_add_middleware() -> None:
+    """Test adding middleware to the HTTP client."""
+    client = HttpClient()
+    middleware = Mock()
+    assert middleware not in client.middlewares
+
+    client.add_middleware(middleware)
+    assert middleware in client.middlewares
+
+
+async def test_skip_middleware() -> None:
+    """Test skipping middleware in a request."""
+    client = HttpClient(request_handler=AsyncMock())
+    middleware = AsyncMock()
+    client.system_middlewares = []
+    client.middlewares = [middleware]
+
+    await client.request(Mock(), skip_middleware=True)
+    middleware.assert_not_called()
+
+    await client.request(Mock())
+    middleware.assert_called_once()
 
 
 async def test_apply_middleware(mocker: MockFixture) -> None:
@@ -166,3 +190,9 @@ async def test_apply_middleware(mocker: MockFixture) -> None:
 
     raw_request_mock.assert_called_once_with(request_mock)
     assert middleware1.call_order < middleware2.call_order < system_middleware.call_order
+
+
+async def test_init_with_both_request_handler_and_session() -> None:
+    """Test initializing the HTTP client with both a request handler and a session."""
+    with pytest.warns(UserWarning, match=r'.* should not provide both .*'):
+        HttpClient(request_handler=Mock(), session=Mock())

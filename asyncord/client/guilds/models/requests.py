@@ -1,9 +1,10 @@
 """Request models for guilds."""
 
-from typing import Annotated, Self
+from collections.abc import Sequence
+from typing import Annotated, Any, Self
 
 from fbenum.adapter import FallbackAdapter
-from pydantic import BaseModel, Field, field_serializer, model_validator
+from pydantic import BaseModel, Field, field_serializer, field_validator, model_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.channels.models.requests.creation import CreateChannelRequestType
@@ -128,7 +129,7 @@ class UpdateWelcomeScreenRequest(BaseModel):
     enabled: bool | None = None
     """Whether the welcome screen is enabled."""
 
-    welcome_channels: list[WelcomeScreenChannel] | None = Field(None, max_length=5)
+    welcome_channels: Annotated[list[WelcomeScreenChannel], Field(max_length=5)] | None = None
     """Channels shown in the welcome screen.
 
     Up to 5 channels can be specified.
@@ -263,13 +264,19 @@ class OnboardingPromptOption(BaseModel):
     https://discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-option-structure
     """
 
-    id: SnowflakeInputType
+    id: SnowflakeInputType | None = None
     """Id of the prompt option."""
 
-    channel_ids: list[SnowflakeInputType]
+    title: str = Field(min_length=1, max_length=50)
+    """Title of the option."""
+
+    description: Annotated[str, Field(max_length=100)] | None = None
+    """Description of the option."""
+
+    channel_ids: list[SnowflakeInputType] | None = None
     """Id for channels a member is added to when the option is selected."""
 
-    role_ids: list[SnowflakeInputType]
+    role_ids: set[SnowflakeInputType] | None = None
     """Id for roles assigned to a member when the option is selected."""
 
     emoji_id: SnowflakeInputType | None = None
@@ -281,11 +288,25 @@ class OnboardingPromptOption(BaseModel):
     emoji_animated: bool | None = None
     """Whether the emoji is animated."""
 
-    title: str
-    """Title of the option."""
+    @model_validator(mode='after')
+    def validate_emoji(self) -> Self:
+        """Check if emoji_id or emoji_name is provided, but not both."""
+        if self.emoji_id and self.emoji_name:
+            raise ValueError('Emoji ID and name cannot be provided together.')
 
-    description: str | None = None
-    """Description of the option."""
+        if self.emoji_animated and not self.emoji_id:
+            raise ValueError('Emoji animated cannot be provided without emoji ID.')
+
+        return self
+
+    @field_validator('channel_ids', 'role_ids', mode='before')
+    @classmethod
+    def validate_channel_role_ids(cls, channel_or_role_list: list[SnowflakeInputType]) -> list[SnowflakeInputType]:
+        """Validate channels and roles."""
+        if not channel_or_role_list:
+            raise ValueError('Channel or role ids must be provided.')
+
+        return channel_or_role_list
 
 
 class OnboardingPrompt(BaseModel):
@@ -295,28 +316,28 @@ class OnboardingPrompt(BaseModel):
     https://discord.com/developers/docs/resources/guild#guild-onboarding-object-onboarding-prompt-structure
     """
 
-    id: SnowflakeInputType
+    id: SnowflakeInputType | None = None
     """ID of the prompt."""
 
-    type: OnboardingPromptType
+    type: OnboardingPromptType | None = None
     """Type of prompt."""
 
-    options: list[OnboardingPromptOption]
-    """Options available within the prompt."""
-
-    title: str
+    title: str = Field(min_length=1, max_length=100)
     """Title of the prompt."""
 
-    single_select: bool
+    options: list[OnboardingPromptOption] = Field(min_length=1, max_length=50)
+    """Options available within the prompt."""
+
+    single_select: bool | None = None
     """Indicates whether users are limited to selecting one option for the prompt."""
 
-    required: bool
+    required: bool | None = None
     """Indicates whether the prompt is required.
 
     Before a user completes the onboarding flow.
     """
 
-    in_boarding: bool
+    in_onboarding: bool | None = None
     """Indicates whether the prompt is present in the onboarding flow.
 
     If false, the prompt will only appear in the Channels & Roles tab.
@@ -327,20 +348,42 @@ class UpdateOnboardingRequest(BaseModel):
     """Update onboarding settings.
 
     Reference:
-    https://discord.com/developers/docs/resources/guild#modify-guild-onboarding-json-params
+    https: // discord.com / developers / docs / resources / guild  # modify-guild-onboarding-json-params
     """
 
-    prompts: list[OnboardingPrompt]
-    """Prompts shown during onboarding and in customize community."""
+    prompts: list[OnboardingPrompt] | None = None
+    """Prompts shown during onboarding and in customize community.
 
-    default_channel_ids: list[SnowflakeInputType]
+    If prompt has no ID, it will be set automatically to dummy because
+    the API requires it.
+    """
+
+    default_channel_ids: list[SnowflakeInputType] | None = None
     """Channel IDs that members get opted into automatically"""
 
-    enabled: bool
+    enabled: bool | None = None
     """Whether onboarding is enabled."""
 
-    mode: OnboardingMode
+    mode: OnboardingMode | None = None
     """Current mode of onboarding."""
+
+    @field_validator('prompts', mode='before')
+    @classmethod
+    def validate_prompts(
+        cls,
+        prompts: Sequence[OnboardingPrompt | dict[str, Any]],
+    ) -> Sequence[OnboardingPrompt | dict[str, Any]]:
+        """Set prompt ID if not set."""
+        counter = 0
+        for prompt in prompts:
+            if isinstance(prompt, dict):
+                if prompt.get('id'):
+                    prompt['id'] = counter
+            elif not prompt.id:
+                prompt.id = counter
+
+            counter += 1  # noqa: SIM113
+        return prompts
 
 
 class PruneRequest(BaseModel):
@@ -351,7 +394,7 @@ class PruneRequest(BaseModel):
     """
 
     days: int
-    """Number of days to prune members for."""
+    """Number of days to prune members for ."""
 
     compute_prune_count: bool | None = None
     """Whether to compute the number of pruned members."""

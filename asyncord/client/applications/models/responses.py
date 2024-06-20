@@ -278,7 +278,7 @@ class ApplicationOut(BaseModel):
     role_connections_verification_url: AnyHttpUrl | None = None
     """Application's default role connection verification url."""
 
-    tags: list[str] = Field(default_factory=list, max_length=5)
+    tags: set[str] = Field(default_factory=list, max_length=5)
     """Tags describing the content and functionality of the application.
 
     Maximum of 5 tags.

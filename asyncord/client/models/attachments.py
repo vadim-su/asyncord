@@ -3,19 +3,16 @@
 from __future__ import annotations
 
 import enum
+from collections.abc import Sequence
 from io import BufferedReader, IOBase
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, cast
+from typing import Annotated, Any
 
 from pydantic import AnyHttpUrl, BaseModel, Field
 
 from asyncord.client.http.client import make_payload_form
 from asyncord.client.http.models import FormField, FormPayload
 from asyncord.snowflake import SnowflakeInputType
-
-if TYPE_CHECKING:
-    # It fixes the circular import issue
-    from asyncord.client.messages.models.requests.messages import BaseMessage
 
 __ALL__ = (
     'AttachmentContentType',
@@ -117,30 +114,38 @@ class Attachment(BaseModel, arbitrary_types_allowed=True):
     """
 
 
-def make_attachment_payload(
-    attachment_model_data: BaseMessage,
-    root_payload: BaseModel | None = None,
+def make_payload_with_attachments(
+    json_payload: BaseModel | dict[str, Any],
+    attachments: Sequence[Attachment] | None = None,
+    exclude_unset: bool = True,
+    exclude_none: bool = False,
 ) -> FormPayload | dict[str, Any]:
-    """Convert message model data with attachments to a payload.
+    """Prepare a payload with possible attachments.
+
+    !!! WARNING
+        `json_payload` will be converted from model **excluding unset fields**!
+        It means that if you want to send a message with saved unset values,
+        you should pass the message already dumped to json or set `exclude_unset` to False.
+        Be creful!
 
     If attachments are present in the message model data, the attachments will be converted
     to form fields and the message model data will be converted to a json payload field.
     Otherwise, the message model data will be converted to a json payload - dict.
 
     Args:
-        attachment_model_data: Message model data with attachments.
-        root_payload: Root payload model data which will be sent as json payload.
-            It will replace the attachment content in the payload. But the attachment
-            will still be sent as a form field.
+        json_payload: Base message model or raw dict data which will be sent as json payload.
+        attachments: List of attachments to be sent with the message.
+        exclude_unset: Whether to exclude unset fields from the json payload. Defaults to True.
+        exclude_none: Whether to exclude None fields from the json payload. Defaults to False.
     """
-    payload_model_data = root_payload or attachment_model_data
-    json_payload = payload_model_data.model_dump(mode='json', exclude_unset=True)
-    if not attachment_model_data.attachments:  # type: ignore
+    if isinstance(json_payload, BaseModel):
+        json_payload = json_payload.model_dump(
+            mode='json',
+            exclude_unset=exclude_unset,
+            exclude_none=exclude_none,
+        )
+    if not attachments:  # type: ignore
         return json_payload
-
-    # All base message models have attachments attribute.
-    # We can safely cast it to a list of attachments.
-    attachments = cast(list[Attachment], attachment_model_data.attachments)  # type: ignore
 
     file_form_fields = {
         f'files[{attachment.id}]': FormField(

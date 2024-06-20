@@ -17,7 +17,7 @@ async def test_update_application(applications_res: ApplicationResource) -> None
     presaved_tags = app.tags
 
     new_description = 'This is a test description'
-    new_tags = ['test', 'tags']
+    new_tags = {'test', 'tags'}
     app = await applications_res.update_application(
         UpdateApplicationRequest(
             description=new_description,

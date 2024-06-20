@@ -2,10 +2,14 @@ import random
 
 import pytest
 
-from asyncord.client.guilds.models.common import MFALevel, WidgetStyleOptions
+from asyncord.client.guilds.models.common import MFALevel, OnboardingMode, OnboardingPromptType, WidgetStyleOptions
 from asyncord.client.guilds.models.requests import (
     CreateAutoModerationRuleRequest,
     CreateGuildRequest,
+    OnboardingPrompt,
+    OnboardingPromptOption,
+    UpdateOnboardingRequest,
+    UpdateWelcomeScreenRequest,
     UpdateWidgetSettingsRequest,
 )
 from asyncord.client.guilds.resources import GuildResource
@@ -188,7 +192,7 @@ async def test_get_widget(
 
 @pytest.mark.parametrize('style', [None] + [style for style in WidgetStyleOptions])
 async def test_get_widget_image(
-    style: WidgetStyleOptions,
+    style: WidgetStyleOptions | None,
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
 ) -> None:
@@ -205,8 +209,85 @@ async def test_get_onboarding(
     integration_data: IntegrationTestData,
 ) -> None:
     """Test getting and updating the onboarding."""
-    onboarding = await guilds_res.get_onboarding(integration_data.guild_id)
-    assert onboarding
+    assert await guilds_res.get_onboarding(integration_data.guild_id)
+
+
+async def test_update_onboarding(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test updating the onboarding."""
+    onboarding = await guilds_res.update_onboarding(
+        integration_data.guild_id,
+        UpdateOnboardingRequest(
+            prompts=[
+                OnboardingPrompt(
+                    type=OnboardingPromptType.DROPDOWN,
+                    title='Select a channel to get started!',
+                    options=[
+                        OnboardingPromptOption(
+                            channel_ids=[integration_data.channel_id],
+                            title='Welcome to the server!',
+                        ),
+                    ],
+                    single_select=False,
+                    required=True,
+                    in_onboarding=True,
+                ),
+                OnboardingPrompt(
+                    type=OnboardingPromptType.DROPDOWN,
+                    title='Select a channel to get started 2!',
+                    options=[
+                        OnboardingPromptOption(
+                            role_ids={integration_data.role_id},
+                            title='Welcome to the server 2!',
+                        ),
+                    ],
+                    single_select=False,
+                ),
+            ],
+            default_channel_ids=[],
+            enabled=False,
+            mode=OnboardingMode.ONBOARDING_DEFAULT,
+        ),
+    )
+    assert onboarding.enabled is False
+    assert onboarding.mode == OnboardingMode.ONBOARDING_DEFAULT
+    assert len(onboarding.prompts) == 2
+    assert onboarding.prompts[0].id
+
+    onboarding = await guilds_res.update_onboarding(
+        integration_data.guild_id,
+        UpdateOnboardingRequest(
+            prompts=[],
+            default_channel_ids=[],
+        ),
+    )
+    assert not onboarding.prompts
+    assert not onboarding.default_channel_ids
+
+
+async def test_welcome_screen_management(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test updating and getting welcome screen."""
+    assert await guilds_res.update_welcome_screen(
+        integration_data.guild_id,
+        UpdateWelcomeScreenRequest(
+            enabled=True,
+            description='Welcome to the server!',
+        ),
+    )
+    assert await guilds_res.get_welcome_screen(integration_data.guild_id)
+
+    assert await guilds_res.update_welcome_screen(
+        integration_data.guild_id,
+        UpdateWelcomeScreenRequest(
+            enabled=False,
+            description=None,
+        ),
+    )
 
 
 async def test_update_mfa_level(
@@ -222,6 +303,18 @@ async def test_update_mfa_level(
         await guilds_res.update_mfa(
             integration_data.guild_id,
             level=MFALevel.NONE,
+        )
+
+
+async def test_delete_integration(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test deleting an integration."""
+    with pytest.raises(errors.ClientError, match='Unknown Integration'):
+        assert await guilds_res.delete_integration(
+            integration_data.guild_id,
+            '34124324134',
         )
 
 

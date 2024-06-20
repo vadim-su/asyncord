@@ -9,8 +9,8 @@ from asyncord.client.channels.models.common import MAX_RATELIMIT
 from asyncord.client.messages.models.common import MessageFlags
 from asyncord.client.messages.models.requests.components import Component
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import AllowedMentions, Attachment, BaseMessage
-from asyncord.client.models.attachments import AttachmentContentType
+from asyncord.client.messages.models.requests.messages import AllowedMentions, BaseMessage
+from asyncord.client.models.attachments import Attachment, AttachmentContentType
 from asyncord.client.threads.models.common import ThreadType
 from asyncord.snowflake import SnowflakeInputType
 
@@ -77,7 +77,7 @@ class CreateThreadFromMessageRequest(BaseModel):
 class ThreadMessage(BaseMessage):
     """Message model for a media/forum thread."""
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
     embeds: list[Embed] | None = None

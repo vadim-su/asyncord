@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import Counter
 from collections.abc import Sequence
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Literal, Self
 from typing import get_args as get_typing_args
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
@@ -39,16 +39,23 @@ MAX_BUTTONS_IN_ACTION_ROW = 5
 class BaseComponent(BaseModel):
     """Base component class."""
 
-    type: ComponentType
-    """Type of the component."""
+    type: ComponentType = None  # type: ignore
+    """Type of the component.
 
-    def __init__(self, **data: Any) -> None:  # noqa: ANN401
-        """Initialize the component."""
-        super().__init__(**data)
-        # Add `type` to `model_fields_set` to make `dict(exclude_unset)` work properly.
-        # We don't need to set 'type' field because it's already set in a component class,
-        # but we need to send it to Discord excluding another unset fields.
+    None value just helps to avoid a warning about the required field.
+    This field must be set in subclasses.
+    """
+
+    @model_validator(mode='after')
+    def set_type_field_set(self) -> Self:
+        """Set `type` field in `model_fields_set`.
+
+        Add `type` to `model_fields_set` to make `dict(exclude_unset)` work properly.
+        We don't need to set 'type' field because it's already set in a component subclasses class,
+        but we need to send it to Discord excluding another unset fields.
+        """
         self.model_fields_set.add('type')
+        return self
 
 
 class ComponentEmoji(BaseModel):
@@ -90,7 +97,7 @@ class Button(BaseComponent):
     https://discord.com/developers/docs/interactions/message-components#buttons
     """
 
-    type: Literal[ComponentType.BUTTON] = ComponentType.BUTTON
+    type: Literal[ComponentType.BUTTON] = ComponentType.BUTTON  # type: ignore
     """Type of the component.
 
     Only `ComponentType.BUTTON` is allowed.
@@ -197,7 +204,7 @@ class SelectMenu(BaseComponent):
     https://discord.com/developers/docs/interactions/message-components#select-menus
     """
 
-    type: Literal[SelectComponentType] = ComponentType.STRING_SELECT
+    type: Literal[SelectComponentType] = ComponentType.STRING_SELECT  # type: ignore
     """Type of the component of select menu."""
 
     custom_id: str = Field(None, max_length=100)
@@ -313,7 +320,7 @@ class TextInput(BaseComponent):
     https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-structure
     """
 
-    type: Literal[ComponentType.TEXT_INPUT] = ComponentType.TEXT_INPUT
+    type: Literal[ComponentType.TEXT_INPUT] = ComponentType.TEXT_INPUT  # type: ignore
     """Type of the component.
 
     Only `ComponentType.TEXT_INPUT` is allowed.
@@ -334,13 +341,13 @@ class TextInput(BaseComponent):
     Max 45 characters.
     """
 
-    min_length: int | None = Field(None, ge=0, le=4000)
+    min_length: Annotated[int, Field(ge=0, le=4000)] | None = None
     """Minimum length of the text input.
 
     Max 4000 characters.
     """
 
-    max_length: int | None = Field(None, ge=1, le=4000)
+    max_length: Annotated[int, Field(ge=1, le=4000)] | None = None
     """Maximum length of the text input.
 
     Max 4000 characters.
@@ -349,22 +356,28 @@ class TextInput(BaseComponent):
     required: bool = True
     """Whether the text input is required to be filled."""
 
-    value: str | None = Field(None, max_length=4000)
+    value: Annotated[str, Field(max_length=4000)] | None = None
     """Pre-filled value for this component.
 
     Max 4000 characters.
     """
 
-    placeholder: str | None = Field(None, max_length=100)
+    placeholder: Annotated[str, Field(max_length=100)] | None = None
     """Placeholder text.
 
     Max 100 characters.
     """
 
-    def __init__(self, **data: Any) -> None:  # noqa: ANN401
-        """Create a new text input component."""
-        super().__init__(**data)  # type: ignore
+    @model_validator(mode='after')
+    def set_style_field_set(self) -> Self:
+        """Set `style` field in `model_fields_set`.
+
+        Add `style` to `model_fields_set` to make `dict(exclude_unset)` work properly.
+        We don't need to set 'style' field because it's already set in a component subclasses class,
+        but we need to send it to Discord excluding another unset fields.
+        """
         self.model_fields_set.add('style')
+        return self
 
     @field_validator('max_length')
     def validate_length(cls, max_length: int | None, field_info: ValidationInfo) -> int | None:
@@ -423,9 +436,9 @@ class ActionRow(BaseComponent):
         Args:
             components: Components in the action row.
         """
-        super().__init__(components=components)
+        super().__init__(components=components)  # type: ignore
 
-    type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW
+    type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW  # type: ignore
     """Type of the component."""
 
     components: Annotated[Sequence[Component | TextInput], Field(min_length=1, max_length=5)] | Component | TextInput

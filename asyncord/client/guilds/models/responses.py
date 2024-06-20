@@ -882,7 +882,7 @@ class OnboardingPromptOut(BaseModel):
     Before a user completes the onboarding flow.
     """
 
-    in_boarding: bool
+    in_onboarding: bool
     """Indicates whether the prompt is present in the onboarding flow.
 
     If false, the prompt will only appear in the Channels & Roles tab.

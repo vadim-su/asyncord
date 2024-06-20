@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from io import BufferedReader, IOBase
 from pathlib import Path
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
     BaseModel,
@@ -48,8 +48,27 @@ class BaseMessage(BaseModel):
     Contains axillary validation methods.
     """
 
-    @model_validator(mode='before')
-    def has_any_content(cls, values: dict[str, Any]) -> dict[str, Any]:
+    content: Annotated[str | None, Field(max_length=2000)] = None
+    """Message content."""
+
+    embeds: list[Embed] | None = None
+    """Embedded rich content."""
+
+    components: Sequence[Component] | Component | None = None
+    """Components to include with the message."""
+
+    sticker_ids: list[SnowflakeInputType] | None = None
+    """Sticker ids to include with the message."""
+
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    """List of attachment object.
+
+    Reference:
+    https://discord.com/developers/docs/reference#uploading-files
+    """
+
+    @model_validator(mode='after')
+    def has_any_content(self) -> Self:
         """Validate message content.
 
         Reference:
@@ -64,20 +83,22 @@ class BaseMessage(BaseModel):
         Raises:
             ValueError: If the message has no content or embeds.
         """
+        # fmt: off
         has_any_content = bool(
-            values.get('content', False)
-            or values.get('embeds', False)
-            or values.get('sticker_ids', False)
-            or values.get('components', False)
-            or values.get('attachments', False),
+            self.content
+            or self.embeds
+            or self.sticker_ids
+            or self.components
+            or self.attachments,
         )
+        # fmt: on
 
         if not has_any_content:
             raise ValueError(
                 'Message must have content, embeds, stickers, components or files.',
             )
 
-        return values
+        return self
 
     @field_validator('embeds', check_fields=False)
     def validate_embeds(cls, embeds: list[Embed] | None) -> list[Embed] | None:
@@ -110,7 +131,7 @@ class BaseMessage(BaseModel):
         return embeds
 
     @field_validator('attachments', mode='before', check_fields=False)
-    def convert_files_to_attachments(
+    def convert_attachments(
         cls,
         attachments: Sequence[Attachment | AttachmentContentType],
     ) -> list[Attachment]:
@@ -163,7 +184,12 @@ class BaseMessage(BaseModel):
                 raise ValueError('Do not attach attachments must have content')
 
             if attachment.id is None:
-                attachment.id = index
+                # we do not want to modify the original attachment
+                # it helps to use the same object in many requests
+                # otherwise, this object can be conflicting with other because
+                # it will have the id after the first request
+                new_attachment_obj_with_id = attachment.model_copy(update={'id': index})
+                attachments[index] = new_attachment_obj_with_id
 
         return attachments
 
@@ -335,7 +361,7 @@ class CreateMessageRequest(BaseMessage):
     sticker_ids: list[SnowflakeInputType] | None = None
     """Sticker ids to include with the message."""
 
-    attachments: list[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
     """List of attachment object.
 
     Reference:
