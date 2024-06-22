@@ -202,6 +202,9 @@ class PermissionFlag(enum.IntFlag):
     ) -> CoreSchema:
         """Pydantic auxiliary method to get schema.
 
+        Can be converted from string, int, or PermissionFlag.
+        Serializes to string.
+
         Args:
             _source: Source of schema.
             _handler: Handler of schema.

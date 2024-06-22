@@ -2,34 +2,16 @@ from collections.abc import AsyncGenerator
 
 import pytest
 
-from asyncord.client.channels.models.requests.creation import CreateStageChannelRequest
 from asyncord.client.channels.models.responses import ChannelResponse
-from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.stage_instances.models.requests import CreateStageInstanceRequest, UpdateStageInstanceRequest
 from asyncord.client.stage_instances.models.responses import StageInstanceResponse
 from asyncord.client.stage_instances.resources import StageInstancesResource
-from tests.conftest import IntegrationTestData
-
-
-@pytest.fixture()
-async def stage_channel(
-    channel_res: ChannelResource,
-    integration_data: IntegrationTestData,
-) -> AsyncGenerator[ChannelResponse, None]:
-    """Fixture for creating channel and deleting it after test."""
-    channel = await channel_res.create_channel(
-        integration_data.guild_id,
-        CreateStageChannelRequest(name='Test stage channel'),
-    )
-    yield channel
-    await channel_res.delete(channel.id)
 
 
 @pytest.fixture()
 async def stage(
     stage_channel: ChannelResponse,
     stage_instances_res: StageInstancesResource,
-    integration_data: IntegrationTestData,
 ) -> AsyncGenerator[StageInstanceResponse, None]:
     """Fixture for creating stage instance and deleting it after test."""
     stage = await stage_instances_res.create_stage_instance(
@@ -42,7 +24,7 @@ async def stage(
     await stage_instances_res.delete(stage_channel.id)
 
 
-async def test_stage_instance_lifecicle(
+async def test_stage_instance_lifecycle(
     stage_channel: ChannelResponse,
     stage: StageInstanceResponse,
     stage_instances_res: StageInstancesResource,

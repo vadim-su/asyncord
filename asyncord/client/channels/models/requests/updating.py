@@ -6,7 +6,7 @@ https://discord.com/developers/docs/resources/channel
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_serializer, field_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.channels.models.common import (
@@ -24,6 +24,7 @@ from asyncord.client.channels.models.requests.creation import (
     Overwrite,
     Tag,
 )
+from asyncord.client.models.permissions import PermissionFlag
 from asyncord.snowflake import SnowflakeInputType
 
 __all__ = (
@@ -387,17 +388,33 @@ class UpdateChannelPermissionsRequest(BaseModel):
     https://discord.com/developers/docs/resources/channel#edit-channel-permissions
     """
 
-    allow: str | None = None
-    """The bitwise value of all allowed permissions."""
+    type: Literal['role', 'member']
+    """Type of the permission overwrite."""
 
-    deny: str | None = None
-    """The bitwise value of all disallowed permissions."""
+    allow: PermissionFlag | None = None
+    """The bitwise value of all allowed permissions.
 
-    type: Literal[0, 1] | None = None
-    """Type of the permission overwrite.
+    Default to None.
 
-    0 for role, 1 for member.
+    If None, the value will be set 0 at discord's end.
     """
+
+    deny: PermissionFlag | None = None
+    """The bitwise value of all disallowed permissions.
+
+    Default to None.
+
+    If None, the value will be set 0 at discord's end.
+    """
+
+    @field_serializer('type', when_used='json')
+    @classmethod
+    def serialize_type(cls, type_value: Literal['role', 'member']) -> int:
+        """Serialize type to number for JSON.
+
+        0 if role, 1 if member.
+        """
+        return int(type_value == 'member')
 
 
 class UpdateChannelPositionRequest(BaseModel):

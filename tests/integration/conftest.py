@@ -4,6 +4,8 @@ import pytest
 
 from asyncord.client.applications.resources import ApplicationResource
 from asyncord.client.bans.resources import BanResource
+from asyncord.client.channels.models.requests.creation import CreateAnoncementChannelRequest, CreateStageChannelRequest
+from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.emojis.resources import EmojiResource
@@ -220,3 +222,33 @@ async def thread(thread_res: ThreadResource) -> AsyncGenerator[ThreadResponse, N
     )
     yield thread
     await thread_res.delete(thread.id)
+
+
+@pytest.fixture()
+async def stage_channel(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> AsyncGenerator[ChannelResponse, None]:
+    """Fixture for creating channel and deleting it after test."""
+    channel = await channel_res.create_channel(
+        integration_data.guild_id,
+        CreateStageChannelRequest(name='Test stage channel'),
+    )
+    yield channel
+    await channel_res.delete(channel.id)
+
+
+@pytest.fixture()
+async def announcement_channel(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> AsyncGenerator[ChannelResponse, None]:
+    """Get the announcement channel."""
+    channel = await channel_res.create_channel(
+        guild_id=integration_data.guild_id,
+        channel_data=CreateAnoncementChannelRequest(name='test-announcement'),
+    )
+
+    yield channel
+
+    await channel_res.delete(channel.id)

@@ -7,7 +7,6 @@ from collections.abc import AsyncGenerator
 
 import pytest
 
-from asyncord.client.channels.models.requests.creation import CreateAnoncementChannelRequest
 from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.http.errors import NotFoundError
@@ -15,22 +14,6 @@ from asyncord.client.messages.models.requests.messages import CreateMessageReque
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
 from tests.conftest import IntegrationTestData
-
-
-@pytest.fixture()
-async def announcement_channel(
-    channel_res: ChannelResource,
-    integration_data: IntegrationTestData,
-) -> AsyncGenerator[ChannelResponse, None]:
-    """Get the announcement channel."""
-    channel = await channel_res.create_channel(
-        guild_id=integration_data.guild_id,
-        channel_data=CreateAnoncementChannelRequest(name='test-announcement'),
-    )
-
-    yield channel
-
-    await channel_res.delete(channel.id)
 
 
 @pytest.fixture()
