@@ -61,8 +61,10 @@ async def test_create_and_delete_message_with_poll(poll_message: MessageResponse
     assert poll.expiry
 
 
+@pytest.mark.parametrize('after', [None, 10])
 @pytest.mark.parametrize('limit', [None, 10])
 async def test_get_voters_for_answer(
+    after: int | None,
     limit: int | None,
     poll_message: MessageResponse,
     polls_res: PollsResource,
@@ -76,6 +78,7 @@ async def test_get_voters_for_answer(
     voters = await polls_res.get_answer_voters(
         message_id=poll_message.id,
         answer_id=answer_id,
+        after=after,
         limit=limit,
     )
     assert not voters.users

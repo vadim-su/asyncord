@@ -7,6 +7,7 @@ https://discord.com/developers/docs/resources/guild
 from __future__ import annotations
 
 import datetime
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from asyncord.base64_image import Base64Image
@@ -210,7 +211,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         self,
         guild_id: SnowflakeInputType,
         days: int | None = None,
-        include_roles: list[SnowflakeInputType] | None = None,
+        include_roles: Sequence[SnowflakeInputType] | None = None,
         reason: str | None = None,
     ) -> PruneResponse:
         """Get the number of members that would be removed from a guild if pruned.

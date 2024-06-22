@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 from asyncord.client.bans.models.responses import BanResponse, BulkBanResponse
@@ -126,7 +127,7 @@ class BanResource(APIResource):
 
     async def bulk_ban(
         self,
-        user_ids: list[SnowflakeInputType],
+        user_ids: Sequence[SnowflakeInputType],
         delete_message_seconds: int | None = None,
         reason: str | None = None,
     ) -> BulkBanResponse:

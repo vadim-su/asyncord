@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
@@ -134,7 +135,7 @@ class MessageResource(APIResource):
 
     async def bulk_delete(
         self,
-        message_ids: list[SnowflakeInputType],
+        message_ids: Sequence[SnowflakeInputType],
         reason: str | None = None,
     ) -> None:
         """Delete multiple messages.

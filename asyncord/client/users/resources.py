@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from asyncord.client.channels.models.responses import ChannelResponse
@@ -149,7 +150,7 @@ class UserResource(APIResource):
         resp = await self._http_client.post(url=url, payload=payload)
         return ChannelResponse.model_validate(resp.body)
 
-    async def create_group_dm(self, user_ids: list[SnowflakeInputType]) -> ChannelResponse:
+    async def create_group_dm(self, user_ids: Sequence[SnowflakeInputType]) -> ChannelResponse:
         """Create a group DM.
 
         This endpoint was intended to be used with the now-deprecated GameBridge SDK.

@@ -71,26 +71,37 @@ async def test_create_delete_guild(
     await guilds_res.delete(guild.id)
 
 
+@pytest.mark.parametrize('days', [None, 1])
+@pytest.mark.parametrize('is_include_roles', [False, True])
 async def test_get_prune_count(
+    days: int | None,
+    is_include_roles: bool,
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
 ) -> None:
     """Test getting the prune count."""
-    prune_count = await guilds_res.get_prune_count(integration_data.guild_id)
+    if is_include_roles:
+        include_roles = [integration_data.role_to_prune]
+    else:
+        include_roles = None
+    prune_count = await guilds_res.get_prune_count(integration_data.guild_id, days=days, include_roles=include_roles)
     assert prune_count.pruned is not None
 
 
-@pytest.mark.limited()
+# @pytest.mark.limited()
 async def test_begin_prune(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
 ) -> None:
     """Test beginning a prune."""
+    include_roles = [integration_data.role_to_prune]
+
     prune_obj = await guilds_res.begin_prune(
         guild_id=integration_data.guild_id,
         prune_data=PruneRequest(
             days=1,
             compute_prune_count=True,
+            include_roles=include_roles,
         ),
     )
     assert prune_obj.pruned is not None
@@ -130,12 +141,22 @@ async def test_get_integrations(
     assert await guilds_res.get_integrations(integration_data.guild_id)
 
 
+@pytest.mark.parametrize('is_user_id', [False, True])
+@pytest.mark.parametrize('limit', [None, 10])
 async def test_get_audit_log(
+    is_user_id: bool,
+    limit: int | None,
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
 ) -> None:
     """Test getting the audit log."""
-    assert await guilds_res.get_audit_log(integration_data.guild_id)
+    query_params = {}
+    if is_user_id is not None:
+        query_params['user_id'] = integration_data.user_id
+
+    if limit is not None:
+        query_params['limit'] = limit
+    assert await guilds_res.get_audit_log(integration_data.guild_id, **query_params)
 
 
 async def test_get_list_auto_moderation_rules(

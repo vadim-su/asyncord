@@ -5,7 +5,7 @@ https://discord.com/developers/docs/resources/channel
 """
 
 import logging
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -131,20 +131,20 @@ class BaseCreateChannel(BaseModel):
 class CreateCategoryChannelRequest(BaseCreateChannel):
     """Data to create a guild category with."""
 
-    type: Literal[ChannelType.GUILD_CATEGORY] = ChannelType.GUILD_CATEGORY
+    type: Literal[ChannelType.GUILD_CATEGORY] = ChannelType.GUILD_CATEGORY  # type: ignore
     """Type of channel."""
 
 
 class CreateTextChannelRequest(BaseCreateChannel):
     """Data to create a text channel with."""
 
-    type: Literal[ChannelType.GUILD_TEXT] = ChannelType.GUILD_TEXT
+    type: Literal[ChannelType.GUILD_TEXT] = ChannelType.GUILD_TEXT  # type: ignore
     """Type of channel."""
 
-    topic: str | None = Field(None, max_length=1024)
+    topic: Annotated[str | None, Field(max_length=1024)] = None
     """Channel topic."""
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -164,7 +164,7 @@ class CreateTextChannelRequest(BaseCreateChannel):
     after recent activity.
     """
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -175,10 +175,10 @@ class CreateTextChannelRequest(BaseCreateChannel):
 class CreateAnoncementChannelRequest(BaseCreateChannel):
     """Data to create an announcement channel with."""
 
-    type: Literal[ChannelType.GUILD_ANNOUNCEMENT] = ChannelType.GUILD_ANNOUNCEMENT
+    type: Literal[ChannelType.GUILD_ANNOUNCEMENT] = ChannelType.GUILD_ANNOUNCEMENT  # type: ignore
     """Type of channel."""
 
-    topic: str | None = Field(None, max_length=1024)
+    topic: Annotated[str | None, Field(max_length=1024)] = None
     """Channel topic."""
 
     parent_id: SnowflakeInputType | None = None
@@ -194,7 +194,7 @@ class CreateAnoncementChannelRequest(BaseCreateChannel):
     after recent activity.
     """
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -205,13 +205,13 @@ class CreateAnoncementChannelRequest(BaseCreateChannel):
 class CreateForumChannelRequest(BaseCreateChannel):
     """Data to create a forum channel with."""
 
-    type: Literal[ChannelType.GUILD_FORUM] = ChannelType.GUILD_FORUM
+    type: Literal[ChannelType.GUILD_FORUM] = ChannelType.GUILD_FORUM  # type: ignore
     """Type of channel."""
 
-    topic: str | None = Field(None, max_length=1024)
+    topic: Annotated[str | None, Field(max_length=1024)] = None
     """Channel topic."""
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -236,7 +236,7 @@ class CreateForumChannelRequest(BaseCreateChannel):
     default_forum_layout: DefaultForumLayoutType | None = None
     """Default layout for the forum channel."""
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -247,13 +247,13 @@ class CreateForumChannelRequest(BaseCreateChannel):
 class CreateMediaChannelRequest(BaseCreateChannel):
     """Data to create a media channel with."""
 
-    type: Literal[ChannelType.GUILD_MEDIA] = ChannelType.GUILD_MEDIA
+    type: Literal[ChannelType.GUILD_MEDIA] = ChannelType.GUILD_MEDIA  # type: ignore
     """Type of channel."""
 
-    topic: str | None = Field(None, max_length=1024)
+    topic: Annotated[str | None, Field(max_length=1024)] = None
     """Channel topic."""
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -272,7 +272,7 @@ class CreateMediaChannelRequest(BaseCreateChannel):
     available_tags: list[Tag] | None = None
     """List of available tags for the media channel."""
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -283,10 +283,10 @@ class CreateMediaChannelRequest(BaseCreateChannel):
 class CreateVoiceChannelRequest(BaseCreateChannel):
     """Data to create a voice channel with."""
 
-    type: Literal[ChannelType.GUILD_VOICE] = ChannelType.GUILD_VOICE
+    type: Literal[ChannelType.GUILD_VOICE] = ChannelType.GUILD_VOICE  # type: ignore
     """Type of channel."""
 
-    bitrate: int | None = Field(None, ge=MIN_BITRATE, le=MAX_BITRATE)
+    bitrate: Annotated[int | None, Field(ge=MIN_BITRATE, le=MAX_BITRATE)] = None
     """Bitrate (in bits) of the voice channel.
 
     For voice channels, normal servers can set bitrate up to 96000.
@@ -296,13 +296,13 @@ class CreateVoiceChannelRequest(BaseCreateChannel):
     Bitrate can be set up to 64000.
     """
 
-    user_limit: int | None = Field(None, ge=0, le=99)
+    user_limit: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """User limit of the voice channel.
 
     No limit if set to 0.
     """
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -328,10 +328,10 @@ class CreateVoiceChannelRequest(BaseCreateChannel):
 class CreateStageChannelRequest(BaseCreateChannel):
     """Data to create a stage channel with."""
 
-    type: Literal[ChannelType.GUILD_STAGE_VOICE] = ChannelType.GUILD_STAGE_VOICE
+    type: Literal[ChannelType.GUILD_STAGE_VOICE] = ChannelType.GUILD_STAGE_VOICE  # type: ignore
     """Type of channel."""
 
-    bitrate: int | None = Field(None, ge=MIN_BITRATE, le=MAX_BITRATE)
+    bitrate: Annotated[int | None, Field(ge=MIN_BITRATE, le=MAX_BITRATE)] = None
     """Bitrate (in bits) of the voice channel.
 
     For voice channels, normal servers can set bitrate up to 96000.
@@ -340,13 +340,13 @@ class CreateStageChannelRequest(BaseCreateChannel):
     feature can set up to 384000. For stage channels.
     """
 
-    user_limit: int | None = Field(None, ge=0, le=99)
+    user_limit: Annotated[int | None, Field(ge=0, le=99)] = None
     """User limit of the voice channel.
 
     No limit if set to 0.
     """
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int | None, Field(ge=0, le=MAX_RATELIMIT)] = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -376,10 +376,10 @@ class ChannelInviteRequest(BaseModel):
     https://discord.com/developers/docs/resources/channel#create-channel-invite-json-params
     """
 
-    max_age: int | None = Field(None, le=604800)
+    max_age: Annotated[int | None, Field(le=604800)] = None
     """Duration of invite in seconds before expiry, or 0 for never."""
 
-    max_uses: int | None = Field(None, ge=0, le=100)
+    max_uses: Annotated[int | None, Field(ge=0, le=100)] = None
     """Max number of uses or 0 for unlimited."""
 
     temporary: bool | None = None

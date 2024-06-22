@@ -393,13 +393,13 @@ class PruneRequest(BaseModel):
     https://discord.com/developers/docs/resources/guild#begin-guild-prune
     """
 
-    days: int
+    days: int | None = None
     """Number of days to prune members for."""
 
     compute_prune_count: bool | None = None
     """Whether to compute the number of pruned members."""
 
-    include_roles: set[SnowflakeInputType] | None = None
+    include_roles: Sequence[SnowflakeInputType] | None = None
     """Roles to include in the prune."""
 
     @field_serializer('include_roles', when_used='json-unless-none', return_type=str)
