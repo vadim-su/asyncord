@@ -1,4 +1,6 @@
+import asyncio
 import os
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Final
 
@@ -6,6 +8,14 @@ import pytest
 from pydantic import BaseModel, SecretStr
 
 INTEGRATION_TEST_DIR: Final[Path] = Path(__file__).parent / 'integration'
+
+
+@pytest.fixture(scope='module')
+def event_loop(request: pytest.FixtureRequest) -> Iterator[asyncio.AbstractEventLoop]:
+    """Create an instance of the default event loop for each test module."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 class IntegrationTestData(BaseModel):

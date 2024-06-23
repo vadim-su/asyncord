@@ -78,7 +78,7 @@ class WebhooksResource(APIResource):
     async def get_webhook(
         self,
         webhook_id: SnowflakeInputType,
-        webhook_token: str | None = None,
+        token: str | None = None,
     ) -> WebhookResponse:
         """Returns a new webhook object.
 
@@ -87,12 +87,12 @@ class WebhooksResource(APIResource):
 
         Args:
             webhook_id: ID of the webhook to get.
-            webhook_token: Token of the webhook.
+            token: Token of the webhook.
         """
         url = self.webhooks_url / str(webhook_id)
 
-        if webhook_token is not None:
-            url /= str(webhook_token)
+        if token is not None:
+            url /= str(token)
 
         resp = await self._http_client.get(url=url)
         return WebhookResponse.model_validate(resp.body)
@@ -126,9 +126,10 @@ class WebhooksResource(APIResource):
 
     async def update_webhook(
         self,
+        *,
         webhook_id: SnowflakeInputType,
         update_data: UpdateWebhookRequest,
-        webhook_token: str | None = None,
+        token: str | None = None,
         reason: str | None = None,
     ) -> WebhookResponse:
         """Modify a webhook with a token.
@@ -140,17 +141,18 @@ class WebhooksResource(APIResource):
         Args:
             webhook_id: ID of the webhook to modify.
             update_data: Webhook data.
-            webhook_token: Token of the webhook.
+            token: Token of the webhook.
             reason: Reason for updating the webhook.
         """
+        if update_data.channel_id and token:
+            raise ValueError('`channel_id` cannot be set when updating a webhook with a token')
+
         url = self.webhooks_url / str(webhook_id)
 
-        payload = update_data.model_dump(mode='json', exclude_unset=True)
+        if token:
+            url /= str(token)
 
-        if webhook_token is not None:
-            url /= str(webhook_token)
-            if 'channel_id' in payload:
-                del payload['channel_id']
+        payload = update_data.model_dump(mode='json', exclude_unset=True)
 
         if reason:
             headers = {AUDIT_LOG_REASON: reason}
@@ -163,7 +165,7 @@ class WebhooksResource(APIResource):
     async def delete_webhook(
         self,
         webhook_id: SnowflakeInputType,
-        webhook_token: str | None = None,
+        token: str | None = None,
         reason: str | None = None,
     ) -> None:
         """Delete a webhook.
@@ -174,12 +176,12 @@ class WebhooksResource(APIResource):
 
         Args:
             webhook_id: ID of the webhook to delete.
-            webhook_token: Token of the webhook.
+            token: Token of the webhook.
             reason: Reason for deleting the webhook.
         """
         url = self.webhooks_url / str(webhook_id)
-        if webhook_token is not None:
-            url /= str(webhook_token)
+        if token is not None:
+            url /= str(token)
 
         if reason:
             headers = {AUDIT_LOG_REASON: reason}
@@ -190,11 +192,12 @@ class WebhooksResource(APIResource):
 
     async def execute_webhook(
         self,
+        *,
         webhook_id: SnowflakeInputType,
-        webhook_token: str,
-        execute_data: ExecuteWebhookRequest,
-        wait: bool | None = None,
+        token: str,
+        execution_data: ExecuteWebhookRequest,
         thread_id: SnowflakeInputType | None = None,
+        wait: bool = True,
     ) -> MessageResponse | None:
         """Execute a webhook.
 
@@ -203,32 +206,33 @@ class WebhooksResource(APIResource):
 
         Args:
             webhook_id: ID of the webhook to execute.
-            webhook_token: Token of the webhook.
-            execute_data: Webhook data.
-            wait: Waits for server confirmation.
+            token: Token of the webhook.
+            execution_data: Data to execute the webhook with.
             thread_id: Send the message to the specified thread.
+            wait: Whether to wait for the message to be sent.
         """
         params = {}
-        if wait is not None:
-            params['wait'] = str(wait)
         if thread_id is not None:
-            params['thread_id'] = thread_id
+            params['thread_id'] = str(thread_id)
+        if wait:
+            params['wait'] = str(True)
 
-        url = self.webhooks_url / str(webhook_id) / str(webhook_token) % params
-        attachments = cast(list[Attachment] | None, execute_data.attachments)
-        payload = make_payload_with_attachments(execute_data, attachments=attachments)
+        url = self.webhooks_url / str(webhook_id) / str(token) % params
+        attachments = cast(list[Attachment] | None, execution_data.attachments)
+        payload = make_payload_with_attachments(execution_data, attachments=attachments)
 
         message = await self._http_client.post(url=url, payload=payload)
 
         if wait:
             return MessageResponse.model_validate(message.body)
-
+        # If wait is False, discord will return a 204 No Content response
         return None
 
     async def get_webhook_message(
         self,
+        *,
         webhook_id: SnowflakeInputType,
-        webhook_token: str,
+        token: str,
         message_id: SnowflakeInputType,
         thread_id: SnowflakeInputType | None = None,
     ) -> MessageResponse:
@@ -239,11 +243,11 @@ class WebhooksResource(APIResource):
 
         Args:
             webhook_id: ID of the webhook.
-            webhook_token: Token of the webhook.
+            token: Token of the webhook.
             message_id: ID of the message.
             thread_id: ID of the thread.
         """
-        url = self.webhooks_url / str(webhook_id) / str(webhook_token) / 'messages' / str(message_id)
+        url = self.webhooks_url / str(webhook_id) / str(token) / 'messages' / str(message_id)
         if thread_id is not None:
             params = {'thread_id': str(thread_id)}
             url %= params
@@ -253,8 +257,9 @@ class WebhooksResource(APIResource):
 
     async def update_webhook_message(
         self,
+        *,
         webhook_id: SnowflakeInputType,
-        webhook_token: str,
+        token: str,
         message_id: SnowflakeInputType,
         update_data: UpdateWebhookMessageRequest,
         thread_id: SnowflakeInputType | None = None,
@@ -266,12 +271,12 @@ class WebhooksResource(APIResource):
 
         Args:
             webhook_id: ID of the webhook.
-            webhook_token: Token of the webhook.
+            token: Token of the webhook.
             message_id: ID of the message.
             update_data: Message data.
             thread_id: ID of the thread.
         """
-        url = self.webhooks_url / str(webhook_id) / str(webhook_token) / 'messages' / str(message_id)
+        url = self.webhooks_url / str(webhook_id) / str(token) / 'messages' / str(message_id)
         if thread_id is not None:
             params = {'thread_id': str(thread_id)}
             url %= params
@@ -284,8 +289,9 @@ class WebhooksResource(APIResource):
 
     async def delete_webhook_message(
         self,
+        *,
         webhook_id: SnowflakeInputType,
-        webhook_token: str,
+        token: str,
         message_id: SnowflakeInputType,
         thread_id: SnowflakeInputType | None = None,
     ) -> None:
@@ -296,11 +302,11 @@ class WebhooksResource(APIResource):
 
         Args:
             webhook_id: ID of the webhook.
-            webhook_token: Token of the webhook.
+            token: Token of the webhook.
             message_id: ID of the message.
             thread_id: ID of the thread.
         """
-        url = self.webhooks_url / str(webhook_id) / str(webhook_token) / 'messages' / str(message_id)
+        url = self.webhooks_url / str(webhook_id) / str(token) / 'messages' / str(message_id)
         if thread_id is not None:
             params = {'thread_id': str(thread_id)}
             url %= params

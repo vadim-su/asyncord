@@ -88,7 +88,7 @@ async def test_get_prune_count(
     assert prune_count.pruned is not None
 
 
-# @pytest.mark.limited()
+@pytest.mark.limited()
 async def test_begin_prune(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,

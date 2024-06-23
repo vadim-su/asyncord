@@ -79,7 +79,7 @@ class WebhookResponse(BaseModel):
     token: str | None = None
     """The secure token of the webhook.
 
-    (returned for Incoming Webhooks).
+    Returned only for incoming webhook type.
     """
 
     application_id: Snowflake | None = None
