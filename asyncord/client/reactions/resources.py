@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from asyncord.client.resources import APIResource
 from asyncord.client.users.models.responses import UserResponse
-from asyncord.typedefs import list_model
+from asyncord.typedefs import CURRENT_USER, list_model
 from asyncord.urls import REST_API_URL
 
 if TYPE_CHECKING:
@@ -69,22 +69,13 @@ class ReactionResource(APIResource):
         Args:
             emoji: Emoji to react with.
         """
-        url = self.reactions_url / emoji / '@me'
+        url = self.reactions_url / emoji / CURRENT_USER
         await self._http_client.put(url=url)
-
-    async def delete_own_reaction(self, emoji: str) -> None:
-        """Delete a reaction the current user made for the message.
-
-        Args:
-            emoji: Emoji to delete the reaction for.
-        """
-        url = self.reactions_url / emoji / '@me'
-        await self._http_client.delete(url=url)
 
     async def delete(
         self,
         emoji: str | None = None,
-        user_id: SnowflakeInputType | None = None,
+        user_id: SnowflakeInputType | Literal['@me'] | None = None,
     ) -> None:
         """Delete a reaction a user made for the message.
 
@@ -93,7 +84,7 @@ class ReactionResource(APIResource):
             user_id: ID of the user to delete the reaction for.
         """
         if user_id and not emoji:
-            raise ValueError('If user_id is specified, emoji must be specified too.')
+            raise ValueError('Cannot delete a reaction for a user without an emoji.')
 
         url = self.reactions_url
         if emoji is not None:

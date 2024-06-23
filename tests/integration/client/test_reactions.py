@@ -1,79 +1,65 @@
+import pytest
+
+from asyncord.client.messages.models.responses.messages import MessageResponse
+from asyncord.client.messages.resources import MessageResource
 from asyncord.client.reactions.resources import ReactionResource
 from tests.conftest import IntegrationTestData
 
+TEST_EMOJI1 = '👍'
+TEST_EMOJI2 = '👎'
 
-async def test_add_and_get_reactions(
+
+@pytest.fixture()
+async def reactions_res(
+    message: MessageResponse,
+    messages_res: MessageResource,
+) -> ReactionResource:
+    """Get reactions resource for the message."""
+    resource = messages_res.reactions(message.id)
+    await resource.add(TEST_EMOJI1)
+    await resource.add(TEST_EMOJI2)
+    return resource
+
+
+async def test_get_reactions(
     reactions_res: ReactionResource,
     integration_data: IntegrationTestData,
 ) -> None:
     """Test adding and getting reactions."""
-    test_emoji1 = '👍'
-    test_emoji2 = '👎'
-
-    await reactions_res.add(test_emoji1)
-    await reactions_res.add(test_emoji2)
-
-    assert (await reactions_res.get(test_emoji1))[0].id == integration_data.member_id
-    assert (await reactions_res.get(test_emoji2))[0].id == integration_data.member_id
+    assert (await reactions_res.get(TEST_EMOJI1))[0].id == integration_data.member_id
+    assert (await reactions_res.get(TEST_EMOJI2))[0].id == integration_data.member_id
 
 
-async def test_delete_own_reaction(reactions_res: ReactionResource) -> None:
+@pytest.mark.parametrize('user_id', [None, 'member_id', '@me'])
+async def test_delete_reaction(
+    user_id: str | None,
+    reactions_res: ReactionResource,
+    integration_data: IntegrationTestData,
+) -> None:
     """Test deleting own reaction."""
-    test_emoji = '👍'
-    await reactions_res.add(test_emoji)
-    assert await reactions_res.get(test_emoji)
+    if user_id == 'member_id':
+        user_id = integration_data.member_id
 
-    await reactions_res.delete_own_reaction(test_emoji)
-    assert not await reactions_res.get(test_emoji)
+    await reactions_res.delete(TEST_EMOJI1, user_id=user_id)
 
-
-async def test_delete_user_reaction(reactions_res: ReactionResource, integration_data: IntegrationTestData) -> None:
-    """Test deleting user reaction."""
-    test_emoji = '👍'
-    await reactions_res.add(test_emoji)
-    assert await reactions_res.get(test_emoji)
-
-    await reactions_res.delete(test_emoji, integration_data.member_id)
-    assert not await reactions_res.get(test_emoji)
+    assert not await reactions_res.get(TEST_EMOJI1)
 
 
 async def test_delete_all_reactions(reactions_res: ReactionResource) -> None:
     """Test deleting all reactions."""
-    test_emoji1 = '👍'
-    test_emoji2 = '👎'
-
-    await reactions_res.add(test_emoji1)
-    await reactions_res.add(test_emoji2)
-    assert await reactions_res.get(test_emoji1)
-    assert await reactions_res.get(test_emoji2)
-
     await reactions_res.delete()
-    assert not await reactions_res.get(test_emoji1)
-    assert not await reactions_res.get(test_emoji2)
+    assert not await reactions_res.get(TEST_EMOJI1)
+    assert not await reactions_res.get(TEST_EMOJI2)
 
 
 async def test_delete_all_reactions_for_emoji(reactions_res: ReactionResource) -> None:
     """Test deleting all reactions for an emoji."""
-    test_emoji1 = '👍'
-    test_emoji2 = '👎'
-
-    await reactions_res.add(test_emoji1)
-    await reactions_res.add(test_emoji2)
-    assert await reactions_res.get(test_emoji1)
-    assert await reactions_res.get(test_emoji2)
-
-    await reactions_res.delete(test_emoji1)
-    assert not await reactions_res.get(test_emoji1)
-    assert await reactions_res.get(test_emoji2)
+    await reactions_res.delete(TEST_EMOJI1)
+    assert not await reactions_res.get(TEST_EMOJI1)
+    assert await reactions_res.get(TEST_EMOJI2)
 
 
-async def test_add_and_delete(
-    reactions_res: ReactionResource,
-    integration_data: IntegrationTestData,
-) -> None:
-    """Test adding and deleting reactions."""
-    await reactions_res.add(integration_data.custom_emoji)
-    assert await reactions_res.get(integration_data.custom_emoji)
-
-    await reactions_res.delete(integration_data.custom_emoji)
-    assert not await reactions_res.get(integration_data.custom_emoji)
+async def test_delete_fail_on_user_id_without_emoji(reactions_res: ReactionResource) -> None:
+    """Test deleting a reaction with a user id but no emoji."""
+    with pytest.raises(ValueError, match='Cannot delete a reaction for a user without an emoji.'):
+        await reactions_res.delete(user_id='123')

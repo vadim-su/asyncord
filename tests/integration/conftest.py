@@ -22,7 +22,6 @@ from asyncord.client.messages.models.requests.messages import CreateMessageReque
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.polls.resources import PollsResource
-from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
@@ -169,15 +168,6 @@ async def events_res(
 ) -> ScheduledEventsResource:
     """Get events resource for the guild."""
     return guilds_res.events(integration_data.guild_id)
-
-
-@pytest.fixture()
-async def reactions_res(
-    message: MessageResponse,
-    messages_res: MessageResource,
-) -> ReactionResource:
-    """Get reactions resource for the message."""
-    return messages_res.reactions(message.id)
 
 
 @pytest.fixture()
