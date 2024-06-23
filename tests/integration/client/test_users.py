@@ -70,7 +70,7 @@ async def test_create_group_dm(
 ) -> None:
     """Test creating a group DM.
 
-    Just a smoke test.
+    Just a smoke test to test some models.
     """
     with pytest.raises(errors.ClientError, match='CHANNEL_RECIPIENT_REQUIRED'):
         await users_res.create_group_dm([integration_data.user_id])

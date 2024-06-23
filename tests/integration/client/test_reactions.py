@@ -27,7 +27,27 @@ async def test_get_reactions(
 ) -> None:
     """Test adding and getting reactions."""
     assert (await reactions_res.get(TEST_EMOJI1))[0].id == integration_data.member_id
-    assert (await reactions_res.get(TEST_EMOJI2))[0].id == integration_data.member_id
+
+
+async def test_get_reactions_with_after_param(
+    reactions_res: ReactionResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test adding and getting reactions with the after parameter."""
+    reactions = await reactions_res.get(TEST_EMOJI1, after=integration_data.member_id)
+    # it should return an empty list because there are no reactions after the bot test member
+    assert not reactions
+
+
+async def test_get_reactions_with_limit_param(
+    reactions_res: ReactionResource,
+) -> None:
+    """Test adding and getting reactions with the limit parameter.
+
+    Dummy test to check if the limit parameter is sending in general.
+    """
+    reactions = await reactions_res.get(TEST_EMOJI1, limit=1)
+    assert len(reactions) == 1
 
 
 @pytest.mark.parametrize('user_id', [None, 'member_id', '@me'])

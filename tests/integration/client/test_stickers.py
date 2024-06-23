@@ -1,5 +1,9 @@
+from collections.abc import AsyncGenerator
 from pathlib import Path
 
+import pytest
+
+from asyncord.client.models.stickers import Sticker
 from asyncord.client.stickers.models.requests import (
     CreateGuildStickerRequest,
     UpdateGuildStickerRequest,
@@ -10,43 +14,75 @@ from tests.conftest import IntegrationTestData
 TEST_STICKER = Path('tests/data/test_sticker.png')
 
 
-async def test_sticker_cycle(
+@pytest.fixture()
+async def sticker(
     stickers_res: StickersResource,
     integration_data: IntegrationTestData,
-) -> None:
-    """Test create, get, update, delete sticker."""
-    created_sticker = await stickers_res.create_guild_sticker(
+) -> AsyncGenerator[Sticker, None]:
+    """Create a sticker and delete it after the test."""
+    sticker = await stickers_res.create_guild_sticker(
         integration_data.guild_id,
         CreateGuildStickerRequest(
-            name='test_sticker',
-            description='test_sticker_description',
-            tags='test_sticker_tags',
+            name='TestSticker',
+            description='Test sticker description',
+            tags='test sticker tags',
             image_data=TEST_STICKER,
         ),
     )
-    try:
-        sticker = await stickers_res.get_guild_sticker(
-            integration_data.guild_id,
-            created_sticker.id,
-        )
+    yield sticker
+    await stickers_res.delete_guild_sticker(
+        integration_data.guild_id,
+        sticker.id,
+    )
 
-        assert sticker.id == created_sticker.id
-        assert sticker.name == 'test_sticker'
 
-        updated_sticker = await stickers_res.update_guild_sticker(
-            integration_data.guild_id,
-            created_sticker.id,
-            UpdateGuildStickerRequest(
-                name='test_sticker_updated',
-                description='test_sticker_description_updated',
-                tags='test_sticker_tags_updated',
-            ),
-        )
+async def test_get_sticker(sticker: Sticker, stickers_res: StickersResource) -> None:
+    """Test getting a sticker."""
+    assert await stickers_res.get_sticker(sticker.id)
 
-        assert updated_sticker.name == 'test_sticker_updated'
 
-    finally:
-        await stickers_res.delete_guild_sticker(
-            integration_data.guild_id,
-            created_sticker.id,
-        )
+async def test_get_sticker_pack_list(stickers_res: StickersResource) -> None:
+    """Test getting a list of sticker packs."""
+    assert await stickers_res.get_sticker_pack_list()
+
+
+async def test_get_guild_stickers_list(
+    stickers_res: StickersResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting a list of stickers in a guild."""
+    stickers = await stickers_res.get_guild_stickers_list(integration_data.guild_id)
+    assert isinstance(stickers, list)
+
+
+async def test_get_guild_sticker(
+    sticker: Sticker,
+    stickers_res: StickersResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting a sticker in a guild."""
+    guild_sticker = await stickers_res.get_guild_sticker(
+        integration_data.guild_id,
+        sticker.id,
+    )
+    assert guild_sticker.id == sticker.id
+
+
+async def test_update_guild_sticker(
+    sticker: Sticker,
+    stickers_res: StickersResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test updating a sticker in a guild."""
+    updated_sticker = await stickers_res.update_guild_sticker(
+        integration_data.guild_id,
+        sticker.id,
+        UpdateGuildStickerRequest(
+            name='UpdatedSticker',
+            description='Updated sticker description',
+            tags='updated sticker tags',
+        ),
+    )
+    assert updated_sticker.name == 'UpdatedSticker'
+    assert updated_sticker.description == 'Updated sticker description'
+    assert updated_sticker.tags == 'updated sticker tags'

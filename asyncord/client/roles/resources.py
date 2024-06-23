@@ -6,13 +6,14 @@ from typing import TYPE_CHECKING
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import APIResource
+from asyncord.client.roles.models.requests import RolePositionRequest
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
 
 if TYPE_CHECKING:
     from asyncord.client.http.client import HttpClient
-    from asyncord.client.roles.models.requests import CreateRoleRequest, RolePositionRequest, UpdateRoleRequest
+    from asyncord.client.roles.models.requests import CreateRoleRequest, UpdateRoleRequest
     from asyncord.snowflake import SnowflakeInputType
 
 __all__ = ('RoleResource',)
@@ -83,7 +84,9 @@ class RoleResource(APIResource):
         Returns:
             List of roles in the guild.
         """
-        resp = await self._http_client.patch(url=self.roles_url, payload=role_positions)
+        payload = list_model(RolePositionRequest).dump_python(role_positions, mode='json')
+
+        resp = await self._http_client.patch(url=self.roles_url, payload=payload)
         return list_model(RoleResponse).validate_python(resp.body)
 
     async def update_role(self, role_id: SnowflakeInputType, role_data: UpdateRoleRequest) -> RoleResponse:

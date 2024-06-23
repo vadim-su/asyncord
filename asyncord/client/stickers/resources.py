@@ -53,9 +53,7 @@ class StickersResource(APIResource):
 
         return Sticker.model_validate(resp.body)
 
-    async def get_sticker_pack_list(
-        self,
-    ) -> StickerPackListResponse:
+    async def get_sticker_pack_list(self) -> StickerPackListResponse:
         """Returns a list of available sticker packs.
 
         Reference:
@@ -67,10 +65,7 @@ class StickersResource(APIResource):
 
         return StickerPackListResponse.model_validate(resp.body)
 
-    async def get_guild_stickers_list(
-        self,
-        guild_id: SnowflakeInputType,
-    ) -> list[Sticker]:
+    async def get_guild_stickers_list(self, guild_id: SnowflakeInputType) -> list[Sticker]:
         """Returns array of sticker objects foriven guild.
 
         Reference:

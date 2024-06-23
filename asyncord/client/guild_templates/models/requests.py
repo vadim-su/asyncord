@@ -1,5 +1,7 @@
 """Models for guild template requests."""
 
+from typing import Annotated
+
 from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInputType
@@ -18,10 +20,10 @@ class CreateGuildFromTemplateRequest(BaseModel):
     https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template-json-params
     """
 
-    name: str = Field(None, min_length=2, max_length=100)
+    name: str | None = Field(min_length=2, max_length=100)
     """Name of the guild (2-100 characters)."""
 
-    icon: Base64ImageInputType | None
+    icon: Base64ImageInputType | None = None
     """Base64 encoded 128x128 image for the guild icon."""
 
 
@@ -32,10 +34,10 @@ class CreateGuildTemplateRequest(BaseModel):
     https://discord.com/developers/docs/resources/guild-template#create-guild-template-json-params
     """
 
-    name: str = Field(None, min_length=1, max_length=100)
+    name: str = Field(min_length=1, max_length=100)
     """Name of the template (1-100 characters)."""
 
-    description: str | None = Field(None, max_length=120)
+    description: Annotated[str, Field(max_length=120)] | None = None
     """Description for the template (0-120 characters)."""
 
 
@@ -46,8 +48,8 @@ class UpdateGuildTemplateRequest(BaseModel):
     https://discord.com/developers/docs/resources/guild-template#modify-guild-template-json-params
     """
 
-    name: str | None = Field(None, min_length=1, max_length=100)
+    name: Annotated[str, Field(min_length=1, max_length=100)] | None = None
     """Name of the template (1-100 characters)."""
 
-    description: str | None = Field(None, max_length=120)
+    description: Annotated[str, Field(max_length=120)] | None = None
     """Description for the template (0-120 characters)."""

@@ -54,6 +54,7 @@ class GuildTemplatesResource(APIResource):
             template_code: The template code.
         """
         url = self.guilds_url / 'templates' / str(template_code)
+
         resp = await self._http_client.get(url=url)
         return GuildTemplateResponse.model_validate(resp.body)
 
@@ -80,9 +81,11 @@ class GuildTemplatesResource(APIResource):
         Reference:
         https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template
         """
-        url = self.templates_url / str(template_code)
-        payload = create_data.model_dump(mode='json', exclude_unset=True)
+        url = self.guilds_url / 'templates' / str(template_code)
+
+        payload = create_data.model_dump(mode='json', exclude_none=True)
         resp = await self._http_client.post(url=url, payload=payload)
+
         return GuildResponse.model_validate(resp.body)
 
     async def create_guild_template(
@@ -98,6 +101,7 @@ class GuildTemplatesResource(APIResource):
             template_data: The template data.
         """
         payload = template_data.model_dump(mode='json', exclude_unset=True)
+
         resp = await self._http_client.post(url=self.templates_url, payload=payload)
         return GuildTemplateResponse.model_validate(resp.body)
 
@@ -114,6 +118,7 @@ class GuildTemplatesResource(APIResource):
             template_code: The template code.
         """
         url = self.templates_url / str(template_code)
+
         resp = await self._http_client.put(url=url)
         return GuildTemplateResponse.model_validate(resp.body)
 
@@ -132,7 +137,9 @@ class GuildTemplatesResource(APIResource):
             template_data: The template data.
         """
         url = self.templates_url / str(template_code)
+
         payload = template_data.model_dump(mode='json', exclude_unset=True)
+
         resp = await self._http_client.patch(url=url, payload=payload)
         return GuildTemplateResponse.model_validate(resp.body)
 
@@ -151,5 +158,6 @@ class GuildTemplatesResource(APIResource):
             template_code: The template code.
         """
         url = self.templates_url / str(template_code)
+
         resp = await self._http_client.delete(url=url)
         return GuildTemplateResponse.model_validate(resp.body)
