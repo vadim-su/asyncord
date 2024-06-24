@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import pytest
+
+from asyncord.client.applications.models.common import ApplicationFlag
 from asyncord.client.applications.models.requests import (
     UpdateApplicationRequest,
 )
@@ -61,3 +64,35 @@ async def test_get_application_role_metadata(
     )
 
     assert isinstance(metadata_records, list)
+
+
+@pytest.mark.parametrize(
+    ('flags', 'should_fail'),
+    [
+        pytest.param(None, False, id='no_flags'),
+        pytest.param(ApplicationFlag.GATEWAY_PRESENCE_LIMITED, False, id='valid_flag'),
+        pytest.param(
+            ApplicationFlag.GATEWAY_MESSAGE_CONTENT_LIMITED | ApplicationFlag.GATEWAY_PRESENCE_LIMITED,
+            False,
+            id='valid_flags',
+        ),
+        pytest.param(ApplicationFlag(ApplicationFlag.EMBEDDED), True, id='invalid_flag'),
+        pytest.param(ApplicationFlag.EMBEDDED | ApplicationFlag.APPLICATION_COMMAND_BADGE, True, id='invalid_flags'),
+        pytest.param(
+            ApplicationFlag.GATEWAY_PRESENCE_LIMITED | ApplicationFlag.EMBEDDED,
+            True,
+            id='invalid_with_valid_flag',
+        ),
+    ],
+)
+async def test_application_flag_validatior(flags: ApplicationFlag | None, should_fail: bool) -> None:
+    """Test application flag validator."""
+    if should_fail:
+        with pytest.raises(ValueError, match='Invalid flag'):
+            UpdateApplicationRequest(
+                flags=flags,
+            )
+    else:
+        assert UpdateApplicationRequest(
+            flags=flags,
+        )

@@ -10,13 +10,11 @@ from asyncord.client.guild_templates.models.requests import (
 from asyncord.client.guild_templates.models.responses import GuildTemplateResponse
 from asyncord.client.guild_templates.resources import GuildTemplatesResource
 from asyncord.client.guilds.resources import GuildResource
-from tests.conftest import IntegrationTestData
 
 
 @pytest.fixture()
 async def guild_templates(
     guild_templates_res: GuildTemplatesResource,
-    integration_data: IntegrationTestData,
 ) -> AsyncGenerator[GuildTemplateResponse, None]:
     """Create a guild template and delete it after the test."""
     template = await guild_templates_res.create_guild_template(
