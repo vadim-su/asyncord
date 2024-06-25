@@ -245,4 +245,5 @@ class PermissionFlag(enum.IntFlag):
             case int():
                 return cls(value)
 
-        raise ValueError('Invalid value type for PermissionFlags')
+        # This should never happen because of the pydantic schema
+        raise ValueError('Invalid value type for PermissionFlags')  # pragma: no cover
