@@ -111,3 +111,14 @@ class StrFlag(str, enum.Enum):  # noqa: UP042
     def __or__(self, other: StrFlag) -> StrFlag:
         """Returns the union of the two scopes."""
         return self.__class__(self._value_ | other._value_)
+
+    def __eq__(self, other: StrFlag | object) -> bool:
+        """Compare two flags."""
+        if isinstance(other, StrFlag):
+            return sorted(self._value_) == sorted(other._value_)
+
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        """Return the hash value of the flag."""
+        return hash(self.value)
