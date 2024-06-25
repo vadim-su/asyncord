@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from asyncord.client.emojis.models.responses import EmojiResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
-from asyncord.client.models.emoji import Emoji
 from asyncord.client.resources import APIResource
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
@@ -40,7 +40,7 @@ class EmojiResource(APIResource):
     async def get_guild_emoji(
         self,
         emoji_id: SnowflakeInputType,
-    ) -> Emoji:
+    ) -> EmojiResponse:
         """Returns an emoji object for the given guild.
 
         Args:
@@ -51,22 +51,22 @@ class EmojiResource(APIResource):
         """
         url = self.emojis_url / str(emoji_id)
         resp = await self._http_client.get(url=url)
-        return Emoji.model_validate(resp.body)
+        return EmojiResponse.model_validate(resp.body)
 
-    async def get_guild_emojis(self) -> list[Emoji]:
+    async def get_guild_emojis(self) -> list[EmojiResponse]:
         """Returns a list of emoji objects for the given guild.
 
         Reference:
         https://discord.com/developers/docs/resources/emoji#list-guild-emojis
         """
         resp = await self._http_client.get(url=self.emojis_url)
-        return list_model(Emoji).validate_python(resp.body)
+        return list_model(EmojiResponse).validate_python(resp.body)
 
     async def create_guild_emoji(
         self,
         emoji_data: CreateEmojiRequest,
         reason: str | None = None,
-    ) -> Emoji:
+    ) -> EmojiResponse:
         """Create a new emoji for the guild.
 
         Args:
@@ -83,14 +83,14 @@ class EmojiResource(APIResource):
 
         payload = emoji_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.post(url=self.emojis_url, payload=payload, headers=headers)
-        return Emoji.model_validate(resp.body)
+        return EmojiResponse.model_validate(resp.body)
 
     async def update_guild_emoji(
         self,
         emoji_id: SnowflakeInputType,
         emoji_data: UpdateEmojiRequest,
         reason: str | None = None,
-    ) -> Emoji:
+    ) -> EmojiResponse:
         """Update the given emoji.
 
         Args:
@@ -109,7 +109,7 @@ class EmojiResource(APIResource):
         payload = emoji_data.model_dump(mode='json', exclude_unset=True)
         url = self.emojis_url / str(emoji_id)
         resp = await self._http_client.patch(url=url, payload=payload, headers=headers)
-        return Emoji.model_validate(resp.body)
+        return EmojiResponse.model_validate(resp.body)
 
     async def delete_guild_emoji(
         self,

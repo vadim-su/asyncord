@@ -7,7 +7,7 @@ from typing import Self
 from pydantic import BaseModel, Field, SerializerFunctionWrapHandler, field_serializer, model_validator
 
 from asyncord.client.polls.models.common import PollLayoutType
-from asyncord.snowflake import Snowflake
+from asyncord.snowflake import SnowflakeInputType
 
 __all__ = (
     'Answer',
@@ -23,7 +23,7 @@ class PollEmoji(BaseModel):
     https://discord.com/developers/docs/resources/emoji#emoji-object
     """
 
-    id: Snowflake | None = None
+    id: SnowflakeInputType | None = None
     """Emoji id."""
 
     name: str | None = None

@@ -3,9 +3,9 @@
 from datetime import datetime
 from typing import Any
 
+from asyncord.client.emojis.models.responses import EmojiResponse
 from asyncord.client.guilds.resources import GuildResponse
 from asyncord.client.members.models.responses import MemberResponse
-from asyncord.client.models.emoji import Emoji
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.gateway.events.base import GatewayEvent
@@ -143,7 +143,7 @@ class GuildEmojisUpdateEvent(GatewayEvent):
     guild_id: Snowflake
     """Guild id."""
 
-    emojis: list[Emoji]
+    emojis: list[EmojiResponse]
     """List of emojis."""
 
 
@@ -219,16 +219,16 @@ class GuildMemberUpdateEvent(GatewayEvent, MemberResponse):
     avatar: str | None = None
     """Member's guild avatar hash."""
 
-    joined_at: datetime | None = None
+    joined_at: datetime | None = None  # type: ignore
     """When the user joined the guild."""
 
     premium_since: datetime | None = None
     """When the user started boosting the guild."""
 
-    deaf: bool | None = None
+    deaf: bool | None = None  # type: ignore
     """Whether the user is deafened in voice channels."""
 
-    mute: bool | None = None
+    mute: bool | None = None  # type: ignore
     """Whether the user is muted in voice channels."""
 
     pending: bool | None  # type: ignore

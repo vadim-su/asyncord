@@ -94,3 +94,18 @@ async def test_end_poll(poll_message: MessageResponse, polls_res: PollsResource)
     # We doesn't check finalization because it's not guaranteed that the poll
     # will be finalized after ending.
     # Read how to pool working at: https://discord.com/developers/docs/resources/poll#poll-results-object
+
+
+async def test_poll_emoji_cant_contain_id_and_name() -> None:
+    """Test that a poll emoji can't contain an id and a name at the same time."""
+    with pytest.raises(ValueError, match='Only one of id or name'):
+        PollEmoji(
+            name='👍',
+            id=123,
+        )
+
+
+async def test_poll_emoji_must_contain_id_or_name() -> None:
+    """Test that a poll emoji must contain an id or a name."""
+    with pytest.raises(ValueError, match='Either id or name must be set'):
+        PollEmoji()

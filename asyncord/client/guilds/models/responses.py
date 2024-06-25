@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.responses import ApplicationCommandResponse
+from asyncord.client.emojis.models.responses import EmojiResponse
 from asyncord.client.guilds.models.common import (
     AuditLogEvents,
     ExpireBehaviorOut,
@@ -17,7 +18,6 @@ from asyncord.client.guilds.models.common import (
     OnboardingPromptType,
 )
 from asyncord.client.models.automoderation import AutoModerationRule
-from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.scheduled_events.models.responses import ScheduledEventResponse
@@ -153,7 +153,7 @@ class GuildResponse(BaseModel):
     roles: list[RoleResponse] | None = None
     """Roles in the guild."""
 
-    emojis: list[Emoji] | None = None
+    emojis: list[EmojiResponse] | None = None
     """Custom guild emojis."""
 
     features: list[str]
@@ -271,7 +271,7 @@ class GuildPreviewResponse(BaseModel):
     Only present for guilds with the "DISCOVERABLE" feature.
     """
 
-    emojis: list[Emoji] | None = None
+    emojis: list[EmojiResponse] | None = None
     """Custom guild emojis."""
 
     features: list[str]
@@ -845,7 +845,7 @@ class OnboardingPromptOptionOut(BaseModel):
     role_ids: list[Snowflake]
     """Id for roles assigned to a member when the option is selected."""
 
-    emoji: Emoji | None = None
+    emoji: EmojiResponse | None = None
     """Emoji of the option."""
 
     title: str
