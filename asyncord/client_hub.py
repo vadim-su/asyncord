@@ -53,10 +53,10 @@ class ClientHub:
         """
         if session:
             self.session = session
-            self._outer_session = True
+            self._is_outer_session = True
         else:
             self.session = aiohttp.ClientSession()
-            self._outer_session = False
+            self._is_outer_session = False
 
         self.heartbeat_factory = heartbeat_factory_type()
         self.client_groups: dict[str, ClientGroup] = {}  # Added type annotation
@@ -168,7 +168,7 @@ class ClientHub:
         for client in self.client_groups.values():
             await client.close()
         self.heartbeat_factory.stop()
-        if not self._outer_session:
+        if not self._is_outer_session:
             await self.session.close()
         logger.info(':wave: Shutdown complete', extra={'markup': True})
 

@@ -5,7 +5,9 @@ from typing import Any
 
 from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel
+from yarl import URL
 
+from asyncord import urls
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.responses import ApplicationCommandResponse
 from asyncord.client.emojis.models.responses import EmojiResponse
@@ -448,6 +450,11 @@ class InviteResponse(BaseModel):
     Return from get_invite endpoint only when `guild_scheduled_event_id` is not None
     and contains a valid id.
     """
+
+    @property
+    def url(self) -> URL:
+        """Invite URL."""
+        return urls.INVITE_BASE_URL / self.code
 
 
 class IntegrationAccountOut(BaseModel):

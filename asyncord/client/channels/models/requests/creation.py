@@ -388,7 +388,7 @@ class ChannelInviteRequest(BaseModel):
     unique: bool | None = None
     """If true, don't try to reuse a similar invite.
 
-    (useful for creating many unique one time use invites).
+    Useful for creating many unique one time use invites.
     """
 
     target_type: InviteTargetType | None = None
@@ -397,13 +397,13 @@ class ChannelInviteRequest(BaseModel):
     target_user_id: SnowflakeInputType | None = None
     """Id of the user whose stream to display for this invite.
 
-    Required if target_type is 1.
+    Required if target_type is `InviteTargetType.STREAM`.
     """
 
     target_application_id: SnowflakeInputType | None = None
     """Id of the embedded application to open for this invite.
 
-    Required if target_type is 2.
+    Required if target_type is `InviteTargetType.EMBEDDED_APPLICATION`.
     """
 
     @model_validator(mode='after')

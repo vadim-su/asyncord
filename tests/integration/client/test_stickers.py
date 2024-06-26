@@ -1,4 +1,4 @@
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Callable, Iterable
 from pathlib import Path
 
 import pytest
@@ -86,3 +86,41 @@ async def test_update_guild_sticker(
     assert updated_sticker.name == 'UpdatedSticker'
     assert updated_sticker.description == 'Updated sticker description'
     assert updated_sticker.tags == 'updated sticker tags'
+
+
+@pytest.mark.parametrize(
+    'iterable_type',
+    [
+        set,
+        list,
+        tuple,
+        iter,
+    ],
+)
+def test_tags_can_be_iterable(iterable_type: Callable[[Iterable[str]], None]) -> None:
+    """Test tags can be an iterable."""
+    tags = iterable_type(['updated', 'sticker', 'tags'])
+    model = UpdateGuildStickerRequest(tags=tags)
+    assert model.tags == {'updated', 'sticker', 'tags'}
+
+
+@pytest.mark.parametrize(
+    'tags',
+    [
+        'updated, sticker, tags',
+        'updated  , sticker, tags',
+        '  updated,   sticker , \ntags   ',
+    ],
+)
+def test_tags_can_be_str(tags: str) -> None:
+    """Test tags can be a string with comma-separated values."""
+    model = UpdateGuildStickerRequest(
+        tags=tags,
+    )
+    assert model.tags == {'updated', 'sticker', 'tags'}
+
+
+def test_tags_too_long() -> None:
+    """Test tags cannot be too long."""
+    with pytest.raises(ValueError, match='length must be less than'):
+        UpdateGuildStickerRequest(tags='a' * 201)
