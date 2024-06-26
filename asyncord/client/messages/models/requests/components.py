@@ -61,7 +61,7 @@ class BaseComponent(BaseModel):
 class ComponentEmoji(BaseModel):
     """Emoji to be displayed on the button.
 
-    At least one of `name` or `id` must be provided.
+    At least one of `name` or `id` must be provided, and it can be only one of them.
     Name is used for unicode emojis,
     Id is a snowflake of custom emojis.
     """
@@ -80,6 +80,9 @@ class ComponentEmoji(BaseModel):
         """Check that `name` or `id` is set."""
         if not self.name and not self.id:
             raise ValueError('At least one of `name` or `id` must be provided')
+
+        if self.name and self.id:
+            raise ValueError('Only one of `name` or `id` must be provided')
 
         return self
 
@@ -236,10 +239,10 @@ class SelectMenu(BaseComponent):
     Number of default values must be in the range defined by min_values and max_values.
     """
 
-    min_values: int = Field(1, ge=0, le=25)
+    min_values: Annotated[int, Field(ge=0, le=25)] = 1
     """Minimum number of items that must be chosen; default 1, min 0, max 25."""
 
-    max_values: int = Field(1, ge=0, le=25)
+    max_values: Annotated[int, Field(ge=0, le=25)] = 1
     """Maximum number of items that can be chosen; default 1, max 25."""
 
     disabled: bool = False
