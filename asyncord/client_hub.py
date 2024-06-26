@@ -161,7 +161,7 @@ class ClientHub:
             await asyncio.gather(*tasks)
         except (KeyboardInterrupt, asyncio.CancelledError):
             logger.info('Shutting down...')
-            await asyncio.gather(*tasks, return_exceptions=True)
+            await self.stop()
 
     async def stop(self) -> None:
         """Stop the client hub."""
