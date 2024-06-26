@@ -290,10 +290,10 @@ class AllowedMentions(BaseModel):
     parse: list[AllowedMentionType] | None = None
     """Array of allowed mention types to parse from the content."""
 
-    roles: list[SnowflakeInputType] | None = Field(None, max_length=100)
+    roles: Annotated[list[SnowflakeInputType], Field(max_length=100)] | None = None
     """Array of role IDs to mention."""
 
-    users: list[SnowflakeInputType] | None = Field(None, max_length=100)
+    users: Annotated[list[SnowflakeInputType], Field(max_length=100)] | None = None
     """Array of user IDs to mention."""
 
     replied_user: bool | None = None

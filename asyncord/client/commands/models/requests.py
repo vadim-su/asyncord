@@ -36,10 +36,6 @@ __all__ = (
     'CreateApplicationCommandRequest',
 )
 
-_APP_COMMAND_NAME_PATTERN: Final[str] = r'^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$'
-_NameAnnotation = Annotated[str, Field(min_length=1, max_length=32, pattern=_APP_COMMAND_NAME_PATTERN)]
-_DescriptionAnnotation = Annotated[str, Field(min_length=1, max_length=100)]
-
 
 class ApplicationCommandOptionChoice(BaseModel):
     """Represents an option choice for a Discord application command.
@@ -103,7 +99,7 @@ class ApplicationCommandSubCommandOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.SUB_COMMAND] = AppCommandOptionType.SUB_COMMAND
+    type: Literal[AppCommandOptionType.SUB_COMMAND] = AppCommandOptionType.SUB_COMMAND  # type: ignore
 
     options: list[ApplicationCommandOption] | None = None
     """List of options for subcommand and subcommand group types."""
@@ -116,7 +112,7 @@ class ApplicationCommandSubCommandGroupOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.SUB_COMMAND_GROUP] = AppCommandOptionType.SUB_COMMAND_GROUP
+    type: Literal[AppCommandOptionType.SUB_COMMAND_GROUP] = AppCommandOptionType.SUB_COMMAND_GROUP  # type: ignore
 
     options: list[ApplicationCommandOption] | None = None
     """List of options for subcommand and subcommand group types."""
@@ -129,18 +125,18 @@ class ApplicationCommandStringOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.STRING] = AppCommandOptionType.STRING
+    type: Literal[AppCommandOptionType.STRING] = AppCommandOptionType.STRING  # type: ignore
 
-    choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
+    choices: _ChoiceType | None = None
     """List of choices for string and number types.
 
     Max length is 25.
     """
 
-    min_length: int | None = Field(None, ge=0, le=6000)
+    min_length: Annotated[int | None, Field(ge=0, le=6000)] = None
     """Minimum length for the option."""
 
-    max_length: int | None = Field(None, ge=0, le=6000)
+    max_length: Annotated[int | None, Field(ge=0, le=6000)] = None
     """Maximum length for the option."""
 
     autocomplete: bool | None = None
@@ -157,9 +153,9 @@ class ApplicationCommandIntegerOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.INTEGER] = AppCommandOptionType.INTEGER
+    type: Literal[AppCommandOptionType.INTEGER] = AppCommandOptionType.INTEGER  # type: ignore
 
-    choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
+    choices: _ChoiceType | None = None
     """List of choices for string and number types.
 
     Max length is 25.
@@ -185,7 +181,7 @@ class ApplicationCommandBooleanOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.BOOLEAN] = AppCommandOptionType.BOOLEAN
+    type: Literal[AppCommandOptionType.BOOLEAN] = AppCommandOptionType.BOOLEAN  # type: ignore
 
 
 class ApplicationCommandUserOption(BaseApplicationCommandOption):
@@ -195,7 +191,7 @@ class ApplicationCommandUserOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.USER] = AppCommandOptionType.USER
+    type: Literal[AppCommandOptionType.USER] = AppCommandOptionType.USER  # type: ignore
 
 
 class ApplicationCommandChannelOption(BaseApplicationCommandOption):
@@ -205,7 +201,7 @@ class ApplicationCommandChannelOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.CHANNEL] = AppCommandOptionType.CHANNEL
+    type: Literal[AppCommandOptionType.CHANNEL] = AppCommandOptionType.CHANNEL  # type: ignore
 
     channel_types: list[ChannelType] | None = None
     """List of available channel types if the option type is a `CHANNEL`."""
@@ -218,7 +214,7 @@ class ApplicationCommandRoleOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.ROLE] = AppCommandOptionType.ROLE
+    type: Literal[AppCommandOptionType.ROLE] = AppCommandOptionType.ROLE  # type: ignore
 
 
 class ApplicationCommandMentionableOption(BaseApplicationCommandOption):
@@ -228,7 +224,7 @@ class ApplicationCommandMentionableOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.MENTIONABLE] = AppCommandOptionType.MENTIONABLE
+    type: Literal[AppCommandOptionType.MENTIONABLE] = AppCommandOptionType.MENTIONABLE  # type: ignore
 
 
 class ApplicationCommandNumberOption(BaseApplicationCommandOption):
@@ -238,9 +234,9 @@ class ApplicationCommandNumberOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.NUMBER] = AppCommandOptionType.NUMBER
+    type: Literal[AppCommandOptionType.NUMBER] = AppCommandOptionType.NUMBER  # type: ignore
 
-    choices: list[ApplicationCommandOptionChoice] | None = Field(None, max_length=25)
+    choices: _ChoiceType | None = None
     """List of choices for string and number types.
 
     Max length is 25.
@@ -266,7 +262,7 @@ class ApplicationCommandAttachmentOption(BaseApplicationCommandOption):
     https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
     """
 
-    type: Literal[AppCommandOptionType.ATTACHMENT] = AppCommandOptionType.ATTACHMENT
+    type: Literal[AppCommandOptionType.ATTACHMENT] = AppCommandOptionType.ATTACHMENT  # type: ignore
 
 
 class CreateApplicationCommandRequest(BaseModel):
@@ -300,7 +296,7 @@ class CreateApplicationCommandRequest(BaseModel):
     description_localizations: dict[LocaleInputType, _DescriptionAnnotation] | None = None
     """Dictionary of language codes to localized descriptions. Defaults to None."""
 
-    options: list[ApplicationCommandOption] | None = Field(None, max_length=25)
+    options: Annotated[list[ApplicationCommandOption], Field(max_length=25)] | None = None
     """List of options for the command.
 
     Must be 0-25 long. Defaults to None.
@@ -350,3 +346,17 @@ type ApplicationCommandOption = (
     | ApplicationCommandNumberOption
     | ApplicationCommandAttachmentOption
 )
+
+
+_APP_COMMAND_NAME_PATTERN: Final[str] = r'^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$'
+"""Pattern for the application command name.
+
+The name must be 1-32 characters long.
+It can contain letters, numbers, and the following characters: `-`, `_`.
+"""
+_NameAnnotation = Annotated[str, Field(min_length=1, max_length=32, pattern=_APP_COMMAND_NAME_PATTERN)]
+"""Annotated name field for application commands."""
+_DescriptionAnnotation = Annotated[str, Field(min_length=1, max_length=100)]
+"""Annotated description field for application commands."""
+_ChoiceType = Annotated[list[ApplicationCommandOptionChoice], Field(max_length=25)]
+"""Annotated choice type for application commands."""

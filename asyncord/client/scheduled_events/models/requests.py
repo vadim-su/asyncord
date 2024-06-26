@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Self
+from typing import Annotated, Self
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -24,7 +24,7 @@ class EventEntityMetadata(BaseModel):
     https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata
     """
 
-    location: str | None = Field(None, min_length=1, max_length=100)
+    location: Annotated[str, Field(min_length=1, max_length=100)] | None = None
     """Location of the event."""
 
 

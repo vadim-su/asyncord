@@ -41,7 +41,7 @@ class CreateThreadRequest(BaseModel):
     Only available when creating a private thread.
     """
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -66,7 +66,7 @@ class CreateThreadFromMessageRequest(BaseModel):
     auto_archive_duration: Literal[60, 1440, 4320, 10080] | None = None
     """Duration in minutes to automatically archive the thread after recent activity."""
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -115,7 +115,7 @@ class CreateMediaForumThreadRequest(BaseModel):
     auto_archive_duration: Literal[60, 1440, 4320, 10080] | None = None
     """Duration in minutes to automatically archive the thread after recent activity."""
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -132,7 +132,7 @@ class CreateMediaForumThreadRequest(BaseModel):
 class UpdateThreadRequest(BaseModel):
     """Request model for updating a thread."""
 
-    name: str | None = Field(None, min_length=1, max_length=100)
+    name: Annotated[str, Field(min_length=1, max_length=100)] | None = None
     """Thread name."""
 
     archived: bool | None = None
@@ -150,7 +150,7 @@ class UpdateThreadRequest(BaseModel):
     auto_archive_duration: Literal[60, 1440, 4320, 10080] | None = None
     """Duration in minutes to automatically archive the thread after recent activity."""
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission

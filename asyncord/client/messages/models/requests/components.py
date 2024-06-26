@@ -106,7 +106,7 @@ class Button(BaseComponent):
     style: ButtonStyle = ButtonStyle.PRIMARY
     """Style of the button."""
 
-    label: str | None = Field(None, max_length=80)
+    label: Annotated[str, Field(max_length=80)] | None = None
     """Text to be displayed on the button.
 
     Max 80 characters.
@@ -115,7 +115,7 @@ class Button(BaseComponent):
     emoji: ComponentEmoji | None = None
     """Emoji to be displayed on the button."""
 
-    custom_id: str | None = Field(None, max_length=100)
+    custom_id: Annotated[str, Field(max_length=100)] | None = None
     """Developer-defined identifier for the button.
 
     Max 100 characters.
@@ -166,7 +166,7 @@ class SelectMenuOption(BaseModel):
     Max 100 characters.
     """
 
-    description: str | None = Field(None, max_length=100)
+    description: Annotated[str, Field(max_length=100)] | None = None
     """Additional description of the option.
 
     Max 100 characters.
@@ -207,7 +207,7 @@ class SelectMenu(BaseComponent):
     type: Literal[SelectComponentType] = ComponentType.STRING_SELECT  # type: ignore
     """Type of the component of select menu."""
 
-    custom_id: str = Field(None, max_length=100)
+    custom_id: Annotated[str, Field(max_length=100)] | None = None
     """Developer-defined identifier for the select menu.
 
     Max 100 characters.
@@ -223,7 +223,7 @@ class SelectMenu(BaseComponent):
     channel_types: list[ChannelType] = Field(default_factory=list)
     """List of channel types to include in the channel select component"""
 
-    placeholder: str | None = Field(None, max_length=150)
+    placeholder: Annotated[str, Field(max_length=150)] | None = None
     """Placeholder text if nothing is selected; max 150 characters."""
 
     default_values: list[SelectDefaultValue] | None = None

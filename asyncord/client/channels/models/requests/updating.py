@@ -4,7 +4,7 @@ Reference:
 https://discord.com/developers/docs/resources/channel
 """
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, ValidationInfo, field_serializer, field_validator
 
@@ -47,7 +47,7 @@ __all__ = (
 class BaseUpdateChannel(BaseModel):
     """Data to create a channel with."""
 
-    name: str | None = Field(None, min_length=1, max_length=100)
+    name: Annotated[str, Field(min_length=1, max_length=100)] | None = None
     """Channel name."""
 
     position: int | None = None
@@ -75,20 +75,20 @@ class UpdateChannelRequest(BaseUpdateChannel):
     with the "NEWS" feature.
     """
 
-    topic: str | None = Field(None, max_length=1024)
+    topic: Annotated[str, Field(max_length=1024)] | None = None
     """Character channel topic."""
 
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
     manage_messages or manage_channel, are unaffected.
     """
 
-    bitrate: int | None = Field(None, ge=MIN_BITRATE, le=MAX_BITRATE)
+    bitrate: Annotated[int, Field(ge=MIN_BITRATE, le=MAX_BITRATE)] | None = None
     """Bitrate (in bits) of the voice channel.
 
     For voice channels, normal servers can set bitrate up to 96000.
@@ -97,7 +97,7 @@ class UpdateChannelRequest(BaseUpdateChannel):
     feature can set up to 384000. For stage channels.
     """
 
-    user_limit: int | None = Field(None, ge=0, le=99)
+    user_limit: Annotated[int, Field(ge=0, le=99)] | None = None
     """User limit of the voice channel.
 
     No limit if set to 0.
@@ -131,7 +131,7 @@ class UpdateChannelRequest(BaseUpdateChannel):
     default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the forum channel."""
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -167,7 +167,7 @@ class UpdateGroupDMChannelRequest(BaseModel):
     https://discord.com/developers/docs/resources/channel#modify-channel-json-params-group-dm
     """
 
-    name: str | None = Field(None, min_length=1, max_length=100)
+    name: Annotated[str, Field(min_length=1, max_length=100)] | None = None
     """Character channel name."""
 
     icon: Base64ImageInputType | None = None
@@ -200,7 +200,7 @@ class UpdateTextChannelRequest(BaseUpdateChannel):
     after recent activity.
     """
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -298,7 +298,7 @@ class UpdateMediaChannelRequest(BaseUpdateChannel):
     default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the forum channel."""
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission

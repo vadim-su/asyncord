@@ -1,5 +1,7 @@
 """This module contains the request models for the user endpoints."""
 
+from typing import Annotated
+
 from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInputType
@@ -33,10 +35,10 @@ class UpdateApplicationRoleConnectionRequest(BaseModel):
     https://discord.com/developers/docs/resources/user#update-current-user-application-role-connection-json-params
     """
 
-    platform_name: str | None = Field(None, max_length=50)
+    platform_name: Annotated[str, Field(max_length=50)] | None = None
     """Vanity name of the platform a bot has connected"""
 
-    platform_username: str | None = Field(None, max_length=100)
+    platform_username: Annotated[str, Field(max_length=100)] | None = None
     """Username of the platform a bot has connected"""
 
     metadata: dict[str, str] | None = None
