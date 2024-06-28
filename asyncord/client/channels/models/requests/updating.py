@@ -4,9 +4,9 @@ Reference:
 https://discord.com/developers/docs/resources/channel
 """
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_serializer, field_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.channels.models.common import (
@@ -24,6 +24,7 @@ from asyncord.client.channels.models.requests.creation import (
     Overwrite,
     Tag,
 )
+from asyncord.client.models.permissions import PermissionFlag
 from asyncord.snowflake import SnowflakeInputType
 
 __all__ = (
@@ -46,7 +47,7 @@ __all__ = (
 class BaseUpdateChannel(BaseModel):
     """Data to create a channel with."""
 
-    name: str | None = Field(None, min_length=1, max_length=100)
+    name: Annotated[str, Field(min_length=1, max_length=100)] | None = None
     """Channel name."""
 
     position: int | None = None
@@ -74,20 +75,20 @@ class UpdateChannelRequest(BaseUpdateChannel):
     with the "NEWS" feature.
     """
 
-    topic: str | None = Field(None, max_length=1024)
+    topic: Annotated[str, Field(max_length=1024)] | None = None
     """Character channel topic."""
 
     nsfw: bool | None = None
     """Whether the channel is nsfw."""
 
-    rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
     manage_messages or manage_channel, are unaffected.
     """
 
-    bitrate: int | None = Field(None, ge=MIN_BITRATE, le=MAX_BITRATE)
+    bitrate: Annotated[int, Field(ge=MIN_BITRATE, le=MAX_BITRATE)] | None = None
     """Bitrate (in bits) of the voice channel.
 
     For voice channels, normal servers can set bitrate up to 96000.
@@ -96,7 +97,7 @@ class UpdateChannelRequest(BaseUpdateChannel):
     feature can set up to 384000. For stage channels.
     """
 
-    user_limit: int | None = Field(None, ge=0, le=99)
+    user_limit: Annotated[int, Field(ge=0, le=99)] | None = None
     """User limit of the voice channel.
 
     No limit if set to 0.
@@ -130,7 +131,7 @@ class UpdateChannelRequest(BaseUpdateChannel):
     default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the forum channel."""
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -166,7 +167,7 @@ class UpdateGroupDMChannelRequest(BaseModel):
     https://discord.com/developers/docs/resources/channel#modify-channel-json-params-group-dm
     """
 
-    name: str | None = Field(None, min_length=1, max_length=100)
+    name: Annotated[str, Field(min_length=1, max_length=100)] | None = None
     """Character channel name."""
 
     icon: Base64ImageInputType | None = None
@@ -199,7 +200,7 @@ class UpdateTextChannelRequest(BaseUpdateChannel):
     after recent activity.
     """
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -297,7 +298,7 @@ class UpdateMediaChannelRequest(BaseUpdateChannel):
     default_reaction_emoji: DefaultReaction | None = None
     """Default reaction emoji for the forum channel."""
 
-    default_thread_rate_limit_per_user: int | None = Field(None, ge=0, le=MAX_RATELIMIT)
+    default_thread_rate_limit_per_user: Annotated[int, Field(ge=0, le=MAX_RATELIMIT)] | None = None
     """Amount of seconds a user has to wait before sending another message in a thread.
 
     Should be between 0 and 21600. Bots, as well as users with the permission
@@ -387,17 +388,33 @@ class UpdateChannelPermissionsRequest(BaseModel):
     https://discord.com/developers/docs/resources/channel#edit-channel-permissions
     """
 
-    allow: str | None = None
-    """The bitwise value of all allowed permissions."""
+    type: Literal['role', 'member']
+    """Type of the permission overwrite."""
 
-    deny: str | None = None
-    """The bitwise value of all disallowed permissions."""
+    allow: PermissionFlag | None = None
+    """The bitwise value of all allowed permissions.
 
-    type: Literal[0, 1] | None = None
-    """Type of the permission overwrite.
+    Default to None.
 
-    0 for role, 1 for member.
+    If None, the value will be set 0 at discord's end.
     """
+
+    deny: PermissionFlag | None = None
+    """The bitwise value of all disallowed permissions.
+
+    Default to None.
+
+    If None, the value will be set 0 at discord's end.
+    """
+
+    @field_serializer('type', when_used='json')
+    @classmethod
+    def serialize_type(cls, type_value: Literal['role', 'member']) -> int:
+        """Serialize type to number for JSON.
+
+        0 if role, 1 if member.
+        """
+        return int(type_value == 'member')
 
 
 class UpdateChannelPositionRequest(BaseModel):

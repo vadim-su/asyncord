@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from asyncord.client.channels.models.requests.updating import UpdateChannelPermissionsRequest
 from asyncord.client.channels.models.responses import ChannelResponse, FollowedChannelResponse
 from asyncord.client.guilds.models.responses import InviteResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
@@ -24,7 +25,6 @@ if TYPE_CHECKING:
         CreateChannelRequestType,
     )
     from asyncord.client.channels.models.requests.updating import (
-        UpdateChannelPermissionsRequest,
         UpdateChannelPositionRequest,
         UpdateChannelRequestType,
     )
@@ -111,7 +111,7 @@ class ChannelResource(APIResource):
         """
         url = REST_API_URL / 'guilds' / str(guild_id) / 'channels'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -142,7 +142,7 @@ class ChannelResource(APIResource):
         """
         url = self.channels_url / str(channel_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -189,7 +189,7 @@ class ChannelResource(APIResource):
         """
         url = self.channels_url / str(channel_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -199,7 +199,7 @@ class ChannelResource(APIResource):
     async def update_permissions(
         self,
         channel_id: SnowflakeInputType,
-        overwrite_id: SnowflakeInputType,
+        role_or_user_id: SnowflakeInputType,
         permission_data: UpdateChannelPermissionsRequest,
         reason: str | None = None,
     ) -> None:
@@ -212,19 +212,18 @@ class ChannelResource(APIResource):
 
         Args:
             channel_id: Channel id.
-            overwrite_id: Role or user id.
+            role_or_user_id: Role or user id.
             permission_data: The data to update the permissions with.
             reason: Reason for updating the permissions.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
 
         payload = permission_data.model_dump(mode='json', exclude_unset=True)
 
-        url = self.channels_url / str(channel_id) / 'permissions' / str(overwrite_id)
-
+        url = self.channels_url / str(channel_id) / 'permissions' / str(role_or_user_id)
         await self._http_client.put(
             url=url,
             payload=payload,
@@ -234,22 +233,22 @@ class ChannelResource(APIResource):
     async def delete_permission(
         self,
         channel_id: SnowflakeInputType,
-        overwrite_id: SnowflakeInputType,
+        role_or_user_id: SnowflakeInputType,
         reason: str | None = None,
     ) -> None:
         """Delete a channel permission overwrite for a user or role in a channel.
 
         Args:
             channel_id: Channel id.
-            overwrite_id: Role or user id.
+            role_or_user_id: Role or user id.
             reason: Reason for deleting the permission.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
 
-        url = self.channels_url / str(channel_id) / 'permissions' / str(overwrite_id)
+        url = self.channels_url / str(channel_id) / 'permissions' / str(role_or_user_id)
 
         await self._http_client.delete(url=url, headers=headers)
 
@@ -272,7 +271,7 @@ class ChannelResource(APIResource):
     async def create_channel_invite(
         self,
         channel_id: SnowflakeInputType,
-        invite_request: ChannelInviteRequest | None = None,
+        invite_data: ChannelInviteRequest | None = None,
         reason: str | None = None,
     ) -> InviteResponse:
         """Create a new invite for a channel.
@@ -282,7 +281,8 @@ class ChannelResource(APIResource):
 
         Args:
             channel_id: Channel id.
-            invite_request: Data for creating the invite.
+            invite_data: Data for creating the invite. Default is None.
+                If None, a default invite will be created.
             reason: Reason for creating the invite.
 
         Returns:
@@ -290,15 +290,15 @@ class ChannelResource(APIResource):
         """
         url = self.channels_url / str(channel_id) / 'invites'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
 
         payload = {}
 
-        if invite_request:
-            payload = invite_request.model_dump(mode='json', exclude_unset=True)
+        if invite_data:
+            payload = invite_data.model_dump(mode='json', exclude_unset=True)
 
         resp = await self._http_client.post(url=url, payload=payload, headers=headers)
         return InviteResponse.model_validate(resp.body)
@@ -306,9 +306,13 @@ class ChannelResource(APIResource):
     async def follow_announcement_channel(
         self,
         channel_id: SnowflakeInputType,
-        webhook_channel_id: SnowflakeInputType,
+        target_channel_id: SnowflakeInputType,
     ) -> FollowedChannelResponse:
         """Follow an Announcement channel to send messages to a target channel.
+
+        Args:
+            channel_id: Channel id.
+            target_channel_id: Channel id to send messages to.
 
         Reference:
         https://discord.com/developers/docs/resources/channel#follow-announcement-channel
@@ -316,7 +320,7 @@ class ChannelResource(APIResource):
         url = self.channels_url / str(channel_id) / 'followers'
 
         payload = {
-            'webhook_channel_id': str(webhook_channel_id),
+            'webhook_channel_id': str(target_channel_id),
         }
 
         resp = await self._http_client.post(url=url, payload=payload)

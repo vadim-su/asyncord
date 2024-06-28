@@ -1,8 +1,10 @@
 """This module contains the permission flags used by many Discord models."""
 
+from __future__ import annotations
+
 import enum
 from collections.abc import Callable
-from typing import Any, Self
+from typing import Any
 
 from pydantic import BaseModel
 from pydantic_core import CoreSchema, core_schema
@@ -200,6 +202,9 @@ class PermissionFlag(enum.IntFlag):
     ) -> CoreSchema:
         """Pydantic auxiliary method to get schema.
 
+        Can be converted from string, int, or PermissionFlag.
+        Serializes to string.
+
         Args:
             _source: Source of schema.
             _handler: Handler of schema.
@@ -220,7 +225,7 @@ class PermissionFlag(enum.IntFlag):
         )
 
     @classmethod
-    def _validate(cls, value: str | int | Self) -> Self:
+    def _validate(cls, value: str | int | PermissionFlag) -> PermissionFlag:
         """Pydantic auxiliary validation method.
 
         Args:
@@ -233,11 +238,12 @@ class PermissionFlag(enum.IntFlag):
             Validated permission flags.
         """
         match value:
+            case PermissionFlag():
+                return value
             case str():
                 return cls(int(value))
             case int():
                 return cls(value)
-            case Self():
-                return value
 
-        raise ValueError('Invalid value type for PermissionFlags')
+        # This should never happen because of the pydantic schema
+        raise ValueError('Invalid value type for PermissionFlags')  # pragma: no cover

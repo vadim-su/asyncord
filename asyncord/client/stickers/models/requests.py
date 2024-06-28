@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from collections.abc import Set as AbstractSet
 from typing import Annotated
 
 from pydantic import (
@@ -67,7 +66,7 @@ class UpdateGuildStickerRequest(BaseModel):
     """Autocomplete/suggestion tags for the sticker."""
 
 
-def _validate_tags(tags: Sequence[str] | AbstractSet[str] | str) -> set[str]:
+def _validate_tags(tags: Sequence[str] | set[str] | str) -> set[str]:
     """Validate tags length.
 
     On serialization, tags converted to a string with a comma and space separator.
@@ -78,7 +77,7 @@ def _validate_tags(tags: Sequence[str] | AbstractSet[str] | str) -> set[str]:
     if isinstance(tags, str):
         tags = set(tag.strip() for tag in tags.split(','))
     else:
-        tags = set(tag.lower() for tag in tags)
+        tags = set(tag for tag in tags)
 
     total_tags_length = (
         sum(len(tag) for tag in tags)  # total length of all tags
@@ -102,10 +101,10 @@ def _serialize_tags_to_string(
 
 
 type TagsType = Annotated[
-    set[str] | str,
+    Sequence[str] | set[str] | str,
     BeforeValidator(_validate_tags),
     WrapSerializer(_serialize_tags_to_string),
-    set[str],  # after all validators, tags must be a set, pydantic will check it
+    set[str],
 ]
 """Type for tags field in sticker requests.
 

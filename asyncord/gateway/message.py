@@ -4,6 +4,7 @@ import enum
 from typing import Annotated, Any, Literal
 
 from fbenum.adapter import FallbackAdapter
+from fbenum.enum import FallbackEnum
 from pydantic import BaseModel, Field, TypeAdapter
 
 __all__ = (
@@ -45,7 +46,7 @@ class GatewayCommandOpcode(enum.IntEnum):
 
 
 @enum.unique
-class GatewayMessageOpcode(enum.IntEnum):
+class GatewayMessageOpcode(enum.IntEnum, FallbackEnum):
     """Gateway message opcodes."""
 
     DISPATCH = 0
@@ -64,7 +65,7 @@ class GatewayMessageOpcode(enum.IntEnum):
     """Sent in response to receiving a heartbeat to acknowledge that it has been received."""
 
 
-class BaseGatewayMessage(BaseModel):
+class BaseGatewayMessage(BaseModel, frozen=True):
     """Base gateway message model."""
 
     opcode: GatewayMessageOpcode = Field(alias='op')
@@ -77,7 +78,7 @@ class BaseGatewayMessage(BaseModel):
     """Message trace information."""
 
 
-class DispatchMessage(BaseGatewayMessage):
+class DispatchMessage(BaseGatewayMessage, frozen=True):
     """Dispatch message model."""
 
     opcode: Literal[GatewayMessageOpcode.DISPATCH] = Field(GatewayMessageOpcode.DISPATCH, alias='op')
@@ -110,7 +111,7 @@ class HelloMessageData(BaseModel):
     """Interval (in milliseconds) the client should heartbeat with."""
 
 
-class HelloMessage(BaseGatewayMessage):
+class HelloMessage(BaseGatewayMessage, frozen=True):
     """Hello message model."""
 
     opcode: Literal[GatewayMessageOpcode.HELLO] = Field(GatewayMessageOpcode.HELLO, alias='op')
@@ -120,7 +121,7 @@ class HelloMessage(BaseGatewayMessage):
     """Hello message data."""
 
 
-class InvalidSessionMessage(BaseGatewayMessage):
+class InvalidSessionMessage(BaseGatewayMessage, frozen=True):
     """Invalid session message model."""
 
     opcode: Literal[GatewayMessageOpcode.INVALID_SESSION] = Field(GatewayMessageOpcode.INVALID_SESSION, alias='op')
@@ -130,15 +131,18 @@ class InvalidSessionMessage(BaseGatewayMessage):
     """Whether the session can be resumed."""
 
 
-class DatalessMessage(BaseGatewayMessage):
+class DatalessMessage(BaseGatewayMessage, frozen=True):
     """Other gateway messages that do not have data."""
 
+    data: Annotated[None, Field(alias='d')] = None
+    """Message data."""
 
-class FallbackGatewayMessage(BaseGatewayMessage):
+
+class FallbackGatewayMessage(BaseGatewayMessage, frozen=True):
     """Gateway message model."""
 
     opcode: Annotated[GatewayMessageOpcode, FallbackAdapter] = Field(alias='op')
-    data: Any = Field(alias='d')
+    data: Annotated[Any, Field(alias='d')] = None
 
 
 type GatewayMessageType = (

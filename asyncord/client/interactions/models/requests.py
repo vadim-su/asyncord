@@ -22,10 +22,10 @@ from asyncord.client.interactions.models.common import InteractionResponseType
 from asyncord.client.messages.models.common import MessageFlags
 from asyncord.client.messages.models.requests.components import ActionRow, Component, TextInput
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import AllowedMentions, Attachment, BaseMessage
+from asyncord.client.messages.models.requests.messages import AllowedMentions, BaseMessage
+from asyncord.client.models.attachments import Attachment, AttachmentContentType
 
 __all__ = (
-    'INTERACTIONS_CAN_CONTAIN_FILES',
     'InteractionRespAutocompleteRequest',
     'InteractionRespDeferredMessageRequest',
     'InteractionRespMessageRequest',
@@ -63,10 +63,10 @@ class InteractionRespMessageRequest(BaseMessage):
 
     """
 
-    tts: bool = False
+    tts: bool | None = None
     """True if this is a TTS message."""
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
     embeds: list[Embed] | None = None
@@ -84,7 +84,7 @@ class InteractionRespMessageRequest(BaseMessage):
     components: Sequence[Component] | Component | None = None
     """List of components included in the message.."""
 
-    attachments: list[Attachment] | None = None
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
     """List of attachment objects with filename and description.
 
     Reference:
@@ -103,10 +103,10 @@ class InteractionRespUpdateMessageRequest(BaseMessage):
 
     """
 
-    tts: bool = False
+    tts: bool | None = None
     """True if this is a TTS message."""
 
-    content: str | None = Field(None, max_length=2000)
+    content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
     embeds: list[Embed] | None = None
@@ -124,7 +124,7 @@ class InteractionRespUpdateMessageRequest(BaseMessage):
     components: Sequence[Component] | Component | None = None
     """List of components included in the message.."""
 
-    attachments: list[Attachment] | None = None
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
     """List of attachment objects with filename and description.
 
     Reference:
@@ -142,7 +142,7 @@ class InteractionRespDeferredMessageRequest(BaseMessage):
     https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
     """
 
-    tts: bool = False
+    tts: bool | None = None
     """True if this is a TTS message."""
 
     content: Annotated[str | None, Field(max_length=2000)] = None
@@ -163,7 +163,7 @@ class InteractionRespDeferredMessageRequest(BaseMessage):
     components: Sequence[Component] | Component | None = None
     """List of components."""
 
-    attachments: list[Attachment] | None = None
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
     """Attachment objects with filename and description.
 
     Reference:
@@ -200,7 +200,7 @@ class InteractionRespUpdateDeferredMessageRequest(BaseMessage):
     components: Sequence[Component] | Component | None = None
     """List of components."""
 
-    attachments: list[Attachment] | None = None
+    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
     """Attachment objects with filename and description.
 
     Reference:
@@ -305,14 +305,6 @@ The possible types are:
 - InteractionRespModalRequest: A request model for sending a Modal interaction response.
 """
 
-INTERACTIONS_CAN_CONTAIN_FILES = (
-    InteractionRespMessageRequest
-    | InteractionRespUpdateMessageRequest
-    | InteractionRespDeferredMessageRequest
-    | InteractionRespUpdateDeferredMessageRequest
-)
-"""Interaction response types that can contain files."""
-
 
 class RootInteractionResponse(BaseModel):
     """Root interaction response request data.
@@ -324,23 +316,26 @@ class RootInteractionResponse(BaseModel):
     data: InteractionResponseRequestType
     """Interaction response data."""
 
-    type: InteractionResponseType | None = None
+    type: Annotated[InteractionResponseType | None, Field(validate_default=True)] = None
     """Interaction response type.
 
     This field always has a value, but it is not required to be provided.
     """
 
-    @field_validator('type')
+    @field_validator('type', mode='before')
     @classmethod
     def validate_type(
         cls,
-        type_value: InteractionResponseType | None,
+        type_value: int | InteractionResponseType | None,
         field_info: ValidationInfo,
     ) -> InteractionResponseType:
         """Validate the type of interaction response request.
 
         If type is not provided, extract it from data.
         """
+        if type_value is not None:
+            type_value = InteractionResponseType(type_value)
+
         data_value = cast(InteractionResponseRequestType, field_info.data.get('data'))
         calculated_type = cls._calculate_data_type(data_value)
 
@@ -350,6 +345,9 @@ class RootInteractionResponse(BaseModel):
         if type_value != calculated_type:
             raise ValueError('Provided type is not valid for the given data')
 
+        # type was set correctly by user, just return it
+        # it's very rare event that we reach here
+        # because user shouldn't set type of root model and shouldn't use it in general
         return type_value
 
     @classmethod
@@ -360,6 +358,8 @@ class RootInteractionResponse(BaseModel):
         match data_value:
             case InteractionRespMessageRequest():
                 calculated_type = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+            case InteractionRespUpdateMessageRequest():
+                calculated_type = InteractionResponseType.UPDATE_MESSAGE
             case InteractionRespDeferredMessageRequest():
                 calculated_type = InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
             case InteractionRespUpdateDeferredMessageRequest():

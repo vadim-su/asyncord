@@ -1,18 +1,27 @@
+import asyncio
 import os
-from dataclasses import dataclass
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Final
 
 import pytest
+from pydantic import BaseModel, SecretStr
 
 INTEGRATION_TEST_DIR: Final[Path] = Path(__file__).parent / 'integration'
 
 
-@dataclass
-class IntegrationTestData:
+@pytest.fixture(scope='module')
+def event_loop(request: pytest.FixtureRequest) -> Iterator[asyncio.AbstractEventLoop]:
+    """Create an instance of the default event loop for each test module."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+class IntegrationTestData(BaseModel):
     """Data to perform integration tests."""
 
-    token: str
+    token: SecretStr
     channel_id: str
     voice_channel_id: str
     guild_id: str
@@ -24,7 +33,7 @@ class IntegrationTestData:
     app_id: str
     role_id: str
     user_to_ban: str
-    stage_id: str
+    role_to_prune: str
 
 
 @pytest.fixture(scope='session')
@@ -34,7 +43,7 @@ def integration_data() -> IntegrationTestData:
     if token is None:
         raise RuntimeError('ASYNCORD_TEST_TOKEN env variable is not set')
     return IntegrationTestData(
-        token=token,
+        token=token,  # type: ignore
         channel_id=os.environ['ASYNCORD_TEST_CHANNEL_ID'],
         voice_channel_id=os.environ['ASYNCORD_TEST_VOICE_CHANNEL_ID'],
         guild_id=os.environ['ASYNCORD_TEST_GUILD_ID'],
@@ -46,14 +55,14 @@ def integration_data() -> IntegrationTestData:
         app_id=os.environ['ASYNCORD_TEST_APP_ID'],
         role_id=os.environ['ASYNCORD_TEST_ROLE_ID'],
         user_to_ban=os.environ['ASYNCORD_TEST_USER_TO_BAN'],
-        stage_id=os.environ['ASYNCORD_TEST_STAGE_ID'],
+        role_to_prune=os.environ['ASYNCORD_TEST_ROLE_TO_PRUNE'],
     )
 
 
 @pytest.fixture(scope='session')
 def token(integration_data: IntegrationTestData) -> str:
     """Get token to perform integration tests."""
-    return integration_data.token
+    return integration_data.token.get_secret_value()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

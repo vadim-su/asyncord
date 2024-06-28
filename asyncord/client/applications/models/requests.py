@@ -1,8 +1,9 @@
 """This module contains models related to Discord applications."""
 
 from enum import IntEnum
+from typing import Annotated
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, HttpUrl, field_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.applications.models.common import (
@@ -12,6 +13,22 @@ from asyncord.client.applications.models.common import (
 from asyncord.client.auth.models import OAuthScope
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.locale import LocaleInputType
+
+__all__ = (
+    'ApplicationIntegrationType',
+    'ApplicationIntegrationTypeConfig',
+    'InstallParams',
+    'UpdateApplicationRequest',
+    'UpdateApplicationRoleConnectionMetadataRequest',
+)
+
+APPLICATION_ALLOWED_TYPES = (
+    ApplicationFlag.GATEWAY_PRESENCE_LIMITED
+    | ApplicationFlag.GATEWAY_GUILD_MEMBERS_LIMITED
+    | ApplicationFlag.GATEWAY_MESSAGE_CONTENT_LIMITED
+)
+
+"""Allowed application uodate flags."""
 
 
 class InstallParams(BaseModel):
@@ -73,13 +90,7 @@ class UpdateApplicationRequest(BaseModel):
     install_params: InstallParams | None = None
     """Settings for the app's default in-app authorization link, if enabled."""
 
-    integration_types_config: (
-        dict[
-            ApplicationIntegrationType,
-            ApplicationIntegrationTypeConfig,
-        ]
-        | None
-    ) = None
+    integration_types_config: dict[ApplicationIntegrationType, ApplicationIntegrationTypeConfig] | None = None
     """Default scopes and permissions for each supported installation context.
 
     Value for each key is an integration type configuration object.
@@ -94,53 +105,40 @@ class UpdateApplicationRequest(BaseModel):
     cover_image: Base64ImageInputType | None = None
     """Default rich presence invite cover image for the app."""
 
-    interactions_endpoint_url: str | None = None
+    interactions_endpoint_url: HttpUrl | None = None
     """Interactions endpoint URL for the app."""
 
-    tags: list[str] | None = None
+    tags: (
+        Annotated[
+            set[Annotated[str, Field(max_length=20)]],
+            Field(max_length=5),
+        ]
+        | None
+    ) = None
     """List of tags describing the content and functionality of the app.
 
     Maximum of 5 tags.
     Maximum of 20 characters per tag.
     """
 
-    @field_validator('tags')
-    @classmethod
-    def validate_tags(
-        cls,
-        tags: list[str] | None,
-        field_info: ValidationInfo,
-    ) -> list[str] | None:
-        """Ensures that the length of tags is less than or equal to 5.
-
-        And each tag is less than or equal to 20 characters.
-        """
-        max_tags = 5
-        max_tag_length = 20
-
-        if tags is not None:
-            if len(tags) > max_tags:
-                raise ValueError('Maximum of 5 tags allowed.')
-            for tag in tags:
-                if len(tag) > max_tag_length:
-                    raise ValueError('Maximum of 20 characters per tag allowed.')
-        return tags
-
     @field_validator('flags')
     @classmethod
-    def validate_flags(
-        cls,
-        tags: ApplicationFlag | None,
-    ) -> ApplicationFlag:
-        """Ensures that the flag is valid."""
-        if tags is not None:
-            if tags not in {
-                ApplicationFlag.GATEWAY_PRESENCE_LIMITED,
-                ApplicationFlag.GATEWAY_GUILD_MEMBERS_LIMITED,
-                ApplicationFlag.GATEWAY_MESSAGE_CONTENT_LIMITED,
-            }:
-                raise ValueError('Invalid flag.')
-        return tags
+    def validate_flags(cls, flags: ApplicationFlag | None) -> ApplicationFlag | None:
+        """Ensures that the flag is one of the allowed types."""
+        if not flags:
+            return None
+
+        if (flags & APPLICATION_ALLOWED_TYPES) != flags:
+            err_msg = 'Invalid flag. Must be one of the following: ' + ', '.join(
+                [
+                    'GATEWAY_PRESENCE_LIMITED',
+                    'GATEWAY_GUILD_MEMBERS_LIMITED',
+                    'GATEWAY_MESSAGE_CONTENT_LIMITED',
+                ],
+            )
+            raise ValueError(err_msg)
+
+        return flags
 
 
 class UpdateApplicationRoleConnectionMetadataRequest(BaseModel):
@@ -153,48 +151,20 @@ class UpdateApplicationRoleConnectionMetadataRequest(BaseModel):
     type: ApplicationRoleConnectionMetadataType
     """Type of metadata value."""
 
-    key: str
+    key: Annotated[str, Field(min_length=1, max_length=50, pattern=r'^[a-z0-9_]{1,50}$')]
     """Dictionary key for the metadata field.
 
-    Must be a - z, 0 - 9, or _ characters;
+    Must be a - z, 0 - 9, or _ characters.
     1 - 50 characters.
     """
 
-    name: str = Field(None, min_length=1, max_length=100)
-    """Name of the metadata field.
-
-    (1 - 100 characters).
-    """
+    name: Annotated[str, Field(min_length=1, max_length=100)]
+    """Name of the metadata field."""
 
     name_localizations: dict[LocaleInputType, str] | None = None
     """Translations of the name."""
 
-    description: str = Field(None, min_length=1, max_length=200)
-    """Description of the metadata field.
-
-    (1 - 200 characters).
-    """
+    description: Annotated[str, Field(min_length=1, max_length=200)]
+    """Description of the metadata field."""
     description_localizations: dict[LocaleInputType, str] | None = None
     """Translations of the description."""
-
-    @field_validator('key')
-    @classmethod
-    def validate_key(
-        cls,
-        key: str,
-        field_info: ValidationInfo,
-    ) -> list[str] | None:
-        """Ensures that the length of key is 1 - 50 characters.
-
-        And a - z, 0 - 9, or _ characters.
-        """
-        max_length = 50
-        allowed_symbols = set('abcdefghijklmnopqrstuvwxyz0123456789_')
-
-        if not 1 <= len(key) <= max_length:
-            raise ValueError('Key length must be between 1 and 50 characters.')
-
-        if not set(key).issubset(allowed_symbols):
-            raise ValueError('Key must contain only a - z, 0 - 9, or _ characters.')
-
-        return key

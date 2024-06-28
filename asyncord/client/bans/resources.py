@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
+
 from asyncord.client.bans.models.responses import BanResponse, BulkBanResponse
-from asyncord.client.http.client import HttpClient
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
 from asyncord.typedefs import list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.http.client import HttpClient
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('BanResource',)
 
 
 class BanResource(APIResource):
@@ -73,7 +80,7 @@ class BanResource(APIResource):
     async def ban(
         self,
         user_id: SnowflakeInputType,
-        delete_message_days: int | None = None,
+        delete_message_seconds: int | None = None,
         reason: str | None = None,
     ) -> None:
         """Ban a user from a guild.
@@ -83,19 +90,19 @@ class BanResource(APIResource):
 
         Args:
             user_id: ID of a user to ban.
-            delete_message_days: Number of days to delete messages for.
-                Should be between 0 and 7. Defaults to 0.
+            delete_message_seconds: number of seconds to delete messages for.
+                between 0 and 604800 (7 days). Defaults to 0.
             reason: Reason for banning the user. Defaults to None.
         """
         url = self.bans_url / str(user_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
 
-        if delete_message_days is not None:
-            payload = {'delete_message_days': delete_message_days}
+        if delete_message_seconds is not None:
+            payload = {'delete_message_seconds': delete_message_seconds}
         else:
             payload = None
 
@@ -111,7 +118,7 @@ class BanResource(APIResource):
             user_id: ID of the user to unban.
             reason: Reason for unbanning the user. Defaults to None.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -120,7 +127,7 @@ class BanResource(APIResource):
 
     async def bulk_ban(
         self,
-        user_ids: list[SnowflakeInputType],
+        user_ids: Sequence[SnowflakeInputType],
         delete_message_seconds: int | None = None,
         reason: str | None = None,
     ) -> BulkBanResponse:
@@ -135,20 +142,19 @@ class BanResource(APIResource):
                 between 0 and 604800 (7 days). Defaults to 0.
             reason: Reason for banning the users. Defaults to None.
         """
-        url = self.bans_url
+        url = self.guilds_url / str(self.guild_id) / 'bulk-ban'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
 
-        payload = {}
-        payload['user_ids'] = user_ids
+        payload: dict[str, Any] = {
+            'user_ids': user_ids,
+        }
 
         if delete_message_seconds is not None:
             payload['delete_message_seconds'] = delete_message_seconds
-        else:
-            payload = None
 
         resp = await self._http_client.post(
             url=url,

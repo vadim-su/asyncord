@@ -10,6 +10,12 @@ from pydantic import BaseModel
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.typedefs import StrFlag
 
+__all__ = (
+    'AuthorizationInfoApplication',
+    'AuthorizationInfoResponse',
+    'OAuthScope',
+)
+
 
 @enum.unique
 class OAuthScope(StrFlag):

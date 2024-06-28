@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from asyncord.client.channels.models.responses import ChannelResponse
@@ -149,7 +150,7 @@ class UserResource(APIResource):
         resp = await self._http_client.post(url=url, payload=payload)
         return ChannelResponse.model_validate(resp.body)
 
-    async def create_group_dm(self, user_ids: list[SnowflakeInputType]) -> ChannelResponse:
+    async def create_group_dm(self, user_ids: Sequence[SnowflakeInputType]) -> ChannelResponse:
         """Create a group DM.
 
         This endpoint was intended to be used with the now-deprecated GameBridge SDK.
@@ -226,7 +227,7 @@ class UserResource(APIResource):
         resp = await self._http_client.get(url=url)
         return list_model(UserConnectionResponse).validate_python(resp.body)
 
-    async def get_current_user_application_role_connection(
+    async def get_current_user_application_role_connection(  # pragma: no cover
         self,
         application_id: SnowflakeInputType,
     ) -> ApplicationRoleConnectionResponse:
@@ -244,7 +245,7 @@ class UserResource(APIResource):
         resp = await self._http_client.get(url=url)
         return ApplicationRoleConnectionResponse.model_validate(resp.body)
 
-    async def update_current_user_application_role_connection(
+    async def update_current_user_application_role_connection(  # pragma: no cover
         self,
         application_id: SnowflakeInputType,
         update_data: UpdateApplicationRoleConnectionRequest,

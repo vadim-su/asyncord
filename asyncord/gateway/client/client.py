@@ -10,7 +10,7 @@ import asyncio
 import logging
 from collections.abc import Mapping
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 import aiohttp
 from pydantic import BaseModel
@@ -79,7 +79,10 @@ class GatewayClient:
         self.session = session
         self.conn_data = conn_data or ConnectionData(token=token)
         self.intents = intents
-        self.heartbeat = heartbeat_class(self, self.conn_data)
+        if isinstance(heartbeat_class, HeartbeatFactoryProtocol):
+            self.heartbeat = heartbeat_class.create(self, self.conn_data)
+        else:
+            self.heartbeat = heartbeat_class(self, self.conn_data)
         self.dispatcher = dispatcher or EventDispatcher()
 
         self.is_started = False
@@ -112,13 +115,15 @@ class GatewayClient:
     async def close(self) -> None:
         """Stop the client."""
         self.logger.info('Closing gateway client')
-        if not self.is_started or not self._ws:
+        if not self.is_started and not self._ws:
             return
 
         self.is_started = False
         self._need_restart.set()
         self.heartbeat.stop()
-        await self._ws.close()
+        if self._ws:
+            await self._ws.close()
+        self._ws = None
         self.logger.info('Gateway client closed')
 
     async def send_command(self, opcode: GatewayCommandOpcode, data: Any) -> None:  # noqa: ANN401
@@ -221,12 +226,13 @@ class GatewayClient:
 
             need_restart_task.cancel()
             message = await msg_task
+            # when get ending message, message is None
             if message:
                 await self._handle_message(message)
 
-    async def _get_message(self, ws: aiohttp.ClientWebSocketResponse) -> GatewayMessageType | None:
+    async def _get_message(self, ws_resp: aiohttp.ClientWebSocketResponse) -> GatewayMessageType | None:
         """Get a message from the websocket."""
-        msg = await ws.receive()
+        msg = await ws_resp.receive()
         if msg.type is aiohttp.WSMsgType.TEXT:
             data = msg.json()
             return GatewayMessageAdapter.validate_python(data)
@@ -295,8 +301,10 @@ class HeartbeatProtocol(Protocol):
         """Stop the heartbeat."""
 
 
+@runtime_checkable
 class HeartbeatFactoryProtocol(Protocol):
     """Protocol for the heartbeat factory class."""
 
-    def __call__(self, client: GatewayClient, conn_data: ConnectionData) -> HeartbeatProtocol:  # type: ignore
-        """Create a heartbeat for the client."""
+    def create(self, client: GatewayClient, conn_data: ConnectionData) -> HeartbeatProtocol:
+        """Create a heartbeat instance."""
+        ...

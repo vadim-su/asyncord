@@ -1,7 +1,9 @@
 from pathlib import Path
+from typing import Literal
 
 import pytest
 
+from asyncord.client.http import errors
 from asyncord.client.users.models.requests import UpdateUserRequest
 from asyncord.client.users.resources import UserResource
 from tests.conftest import IntegrationTestData
@@ -37,14 +39,44 @@ async def test_update_current_user(users_res: UserResource) -> None:
     assert await users_res.update_user(user_data)
 
 
-async def test_get_guilds(users_res: UserResource) -> None:
+@pytest.mark.parametrize('after', [None, 'from_config'])
+@pytest.mark.parametrize('before', [None, 'from_config'])
+@pytest.mark.parametrize('limit', [None, 1])
+async def test_get_guilds(
+    limit: int | None,
+    before: Literal['from_config'] | int | None,
+    after: Literal['from_config'] | int | None,
+    users_res: UserResource,
+    integration_data: IntegrationTestData,
+) -> None:
     """Test getting the current user's guilds."""
-    guilds = await users_res.get_guilds()
-    assert len(guilds)
-    assert guilds[0].id
+    if before == 'from_config':
+        before = int(integration_data.guild_id)
+
+    if after == 'from_config':
+        after = int(integration_data.guild_id)
+
+    guilds = await users_res.get_guilds(
+        limit=limit,
+        before=before,
+        after=after,
+    )
+    assert isinstance(guilds, list)
 
 
-@pytest.mark.skip(reason='Skip the test because bots cannot use this endpoint')
+async def test_create_group_dm(
+    users_res: UserResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test creating a group DM.
+
+    Just a smoke test to test some models.
+    """
+    with pytest.raises(errors.ClientError, match='CHANNEL_RECIPIENT_REQUIRED'):
+        await users_res.create_group_dm([integration_data.user_id])
+
+
+@pytest.mark.skip(reason='Bot cannot use this endpoint')
 async def test_get_current_user_guild_member(
     users_res: UserResource,
     integration_data: IntegrationTestData,

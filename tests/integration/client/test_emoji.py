@@ -1,56 +1,56 @@
-from asyncord.client.emojis.resources import EmojiResource
+from collections.abc import AsyncGenerator
+from pathlib import Path
+
+import pytest
 
 from asyncord.client.emojis.models.requests import CreateEmojiRequest, UpdateEmojiRequest
+from asyncord.client.emojis.models.responses import EmojiResponse
+from asyncord.client.emojis.resources import EmojiResource
+
+EMOJI_PATH = Path('tests/data/test_emoji.png')
 
 
-from tests.conftest import IntegrationTestData
-
-TEST_EMOJI = {
-    'name': 'test_emoji',
-    'path': 'test_emoji.png',
-}
-
-
-async def test_guild_emoji_lifecycle(
-    emoji_res: EmojiResource,
-) -> None:
-    """Test the lifecycle (create, get, modify, delete) of a guild emoji."""
-    with open(f'tests/data/{TEST_EMOJI['path']}', 'rb') as f:
-        emoji_data = f.read()
-
-    # Check initial state
-    initial_emojis = await emoji_res.get_guild_emojis()
-    assert TEST_EMOJI['name'] not in [emoji.name for emoji in initial_emojis]
-
-    # Create the emoji
+@pytest.fixture()
+async def emoji(emoji_res: EmojiResource) -> AsyncGenerator[EmojiResponse, None]:
+    """Fixture to create a guild emojim and remove it after the test."""
     emoji = await emoji_res.create_guild_emoji(
         CreateEmojiRequest(
-            name=TEST_EMOJI['name'],
-            image=emoji_data,
+            name='test_emoji',
+            image=EMOJI_PATH,
         ),
     )
-    assert emoji.name == TEST_EMOJI['name']
+    yield emoji
+    await emoji_res.delete_guild_emoji(emoji.id)  # type: ignore (id should be set after creation)
 
-    # Check that the emoji exists in the guild
-    emojis_after_creation = await emoji_res.get_guild_emojis()
-    assert TEST_EMOJI['name'] in [emoji.name for emoji in emojis_after_creation]
 
-    # Modify the emoji
+async def test_get_guild_emoji(
+    emoji: EmojiResponse,
+    emoji_res: EmojiResource,
+) -> None:
+    """Test getting a guild emoji."""
+    emoji = await emoji_res.get_guild_emoji(emoji.id)  # type: ignore
+    assert emoji.id == emoji.id
+    assert emoji.name == emoji.name
+
+
+async def test_get_guild_emojis(
+    emoji: EmojiResponse,
+    emoji_res: EmojiResource,
+) -> None:
+    """Test getting all guild emojis."""
+    emojis = await emoji_res.get_guild_emojis()
+    assert emoji.id in [emoji.id for emoji in emojis]
+
+
+async def test_update_guild_emoji(
+    emoji: EmojiResponse,
+    emoji_res: EmojiResource,
+) -> None:
+    """Test updating a guild emoji."""
     updated_emoji = await emoji_res.update_guild_emoji(
-        emoji.id,
+        emoji.id,  # type: ignore
         UpdateEmojiRequest(
-            name=f'{TEST_EMOJI['name']}_updated',
+            name='updated_emoji',
         ),
     )
-    assert TEST_EMOJI['name'] != updated_emoji.name
-
-    # Check that the updated emoji exists in the guild
-    emojis_after_modification = await emoji_res.get_guild_emojis()
-    assert f'{TEST_EMOJI['name']}_updated' in [emoji.name for emoji in emojis_after_modification]
-
-    # Delete the emoji
-    await emoji_res.delete_guild_emoji(emoji.id)
-
-    # Check that the emoji no longer exists in the guild
-    emojis_after_deletion = await emoji_res.get_guild_emojis()
-    assert f'{TEST_EMOJI['name']}_updated' not in [emoji.name for emoji in emojis_after_deletion]
+    assert updated_emoji.name == 'updated_emoji'

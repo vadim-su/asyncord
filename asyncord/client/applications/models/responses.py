@@ -20,6 +20,20 @@ from asyncord.color import ColorInput
 from asyncord.locale import LocaleInputType
 from asyncord.snowflake import Snowflake
 
+__all__ = (
+    'ApplicationCommandPermissionOut',
+    'ApplicationOut',
+    'ApplicationRoleConnectionMetadataOut',
+    'ApplicationUserOut',
+    'BotApplicationOut',
+    'GuildApplicationCommandPermissionsOut',
+    'InstallParamsOut',
+    'InviteCreateEventApplication',
+    'TeamMemberOut',
+    'TeamMemberUserOut',
+    'TeamOut',
+)
+
 
 class InstallParamsOut(BaseModel):
     """Application install parameters.
@@ -264,7 +278,7 @@ class ApplicationOut(BaseModel):
     role_connections_verification_url: AnyHttpUrl | None = None
     """Application's default role connection verification url."""
 
-    tags: list[str] = Field(default_factory=list, max_length=5)
+    tags: set[str] = Field(default_factory=list, max_length=5)
     """Tags describing the content and functionality of the application.
 
     Maximum of 5 tags.

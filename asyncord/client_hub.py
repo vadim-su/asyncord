@@ -53,10 +53,10 @@ class ClientHub:
         """
         if session:
             self.session = session
-            self._outer_session = True
+            self._is_outer_session = True
         else:
             self.session = aiohttp.ClientSession()
-            self._outer_session = False
+            self._is_outer_session = False
 
         self.heartbeat_factory = heartbeat_factory_type()
         self.client_groups: dict[str, ClientGroup] = {}  # Added type annotation
@@ -161,14 +161,15 @@ class ClientHub:
             await asyncio.gather(*tasks)
         except (KeyboardInterrupt, asyncio.CancelledError):
             logger.info('Shutting down...')
-            await asyncio.gather(*tasks, return_exceptions=True)
+            await self.stop()
 
     async def stop(self) -> None:
         """Stop the client hub."""
         for client in self.client_groups.values():
             await client.close()
         self.heartbeat_factory.stop()
-        await self.session.close()
+        if not self._is_outer_session:
+            await self.session.close()
         logger.info(':wave: Shutdown complete', extra={'markup': True})
 
     async def __aenter__(self) -> Self:
@@ -218,7 +219,7 @@ class ClientHub:
             gateway_client = GatewayClient(
                 token=auth,
                 session=self.session,
-                heartbeat_class=self.heartbeat_factory.create,
+                heartbeat_class=self.heartbeat_factory,
                 dispatcher=dispatcher,
                 name=group_name,
             )

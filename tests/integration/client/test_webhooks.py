@@ -1,107 +1,165 @@
-"""Contains webhook tests."""
+import pytest
 
-from asyncord.client.messages.models.requests.embeds import (
-    Embed,
-)
+from asyncord.client.http.errors import NotFoundError
+from asyncord.client.messages.models.responses.messages import MessageResponse
+from asyncord.client.rest import RestClient
 from asyncord.client.webhooks.models.requests import (
-    CreateWebhookRequest,
     ExecuteWebhookRequest,
     UpdateWebhookMessageRequest,
     UpdateWebhookRequest,
 )
+from asyncord.client.webhooks.models.responces import WebhookResponse
 from asyncord.client.webhooks.resources import WebhooksResource
 from tests.conftest import IntegrationTestData
 
-# FIXME: Add more tests.
+
+@pytest.fixture(scope='module')
+async def module_webhook_res(module_client: RestClient) -> WebhooksResource:
+    """Get webhooks resource for the module."""
+    return module_client.webhooks
 
 
-async def test_webhook_cycle(
+@pytest.fixture(scope='module')
+async def webhook_message(
+    webhook: WebhookResponse,
+    module_webhook_res: WebhooksResource,
+) -> MessageResponse:
+    """Create a webhook message."""
+    return await module_webhook_res.execute_webhook(
+        webhook_id=webhook.id,
+        token=webhook.token,  # type: ignore
+        execution_data=ExecuteWebhookRequest(content='Hello World'),
+    )
+
+
+async def test_get_channel_webhooks(
     webhooks_res: WebhooksResource,
     integration_data: IntegrationTestData,
 ) -> None:
-    """Test.
+    """Test getting all webhooks in a channel."""
+    webhooks = await webhooks_res.get_channel_webhooks(integration_data.channel_id)
+    assert isinstance(webhooks, list)
 
-    Create webhook.
-    Get channel webhooks.
-    Get guild webhooks.
 
-    Update webhook.
+async def test_get_guild_webhooks(
+    webhooks_res: WebhooksResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting all webhooks in a guild."""
+    webhooks = await webhooks_res.get_guild_webhooks(integration_data.guild_id)
+    assert isinstance(webhooks, list)
 
-    Execute webhook(send message).
 
-    Get webhook message.
-    Update webhook message.
-    Delete webhook message.
+@pytest.mark.parametrize('with_token', [False, True])
+async def test_get_webhook(
+    with_token: bool,
+    webhooks_res: WebhooksResource,
+    webhook: WebhookResponse,
+) -> None:
+    """Test getting a webhook by its id."""
+    if with_token:
+        token = webhook.token  # type: ignore
+    else:
+        token = None
+    new_webhook_obj = await webhooks_res.get_webhook(webhook.id, token=token)
+    assert new_webhook_obj.id == webhook.id
 
-    Delete webhook.
-    """
-    webhook = await webhooks_res.create_webhook(
-        integration_data.channel_id,
-        create_data=CreateWebhookRequest(
-            name='Test Webhook',
-            avatar=None,
-        ),
-    )
-    assert webhook
-    assert webhook.token
 
-    webhook_channel_resp = await webhooks_res.get_channel_webhooks(
-        integration_data.channel_id,
-    )
+async def test_update_with_token_and_channel_forbidden(webhooks_res: WebhooksResource) -> None:
+    """Test updating a webhook with token and channel_id."""
+    with pytest.raises(ValueError, match='`channel_id` cannot be set'):
+        await webhooks_res.update_webhook(
+            webhook_id='webhook_id',
+            update_data=UpdateWebhookRequest(name='Updated Webhook', channel_id=123),
+            token='token',  # noqa: S106
+        )
 
-    webhook_guild_resp = await webhooks_res.get_guild_webhooks(
-        integration_data.guild_id,
-    )
 
-    updated_webhook = await webhooks_res.update_webhook(
-        webhook.id,
-        update_data=UpdateWebhookRequest(
-            name='Updated Test Webhook',
-            avatar=None,
-        ),
-    )
-
-    created_message = await webhooks_res.execute_webhook(
+async def test_update_webhook(
+    webhook: WebhookResponse,
+    module_webhook_res: WebhooksResource,
+) -> None:
+    """Test updating a webhook."""
+    update_data = UpdateWebhookRequest(name='Updated Webhook')
+    webhook = await module_webhook_res.update_webhook(
         webhook_id=webhook.id,
-        webhook_token=webhook.token,
-        execute_data=ExecuteWebhookRequest(
-            embeds=[
-                Embed(
-                    title='Webhook Test',
-                    description='This is a test webhook',
-                ),
-            ],
-        ),
-        wait=True,
+        update_data=update_data,
     )
+    assert webhook.name == 'Updated Webhook'
 
-    assert created_message
 
-    message = await webhooks_res.get_webhook_message(
-        webhook.id,
-        webhook.token,
-        created_message.id,
+@pytest.mark.parametrize(
+    'wait',
+    [False, True],
+)
+async def test_execute_webhook(
+    wait: bool,
+    webhook: WebhookResponse,
+    module_webhook_res: WebhooksResource,
+) -> None:
+    """Test executing a webhook."""
+    message = await module_webhook_res.execute_webhook(
+        webhook_id=webhook.id,
+        token=webhook.token,  # type: ignore
+        execution_data=ExecuteWebhookRequest(content='Hello World'),
+        wait=wait,
     )
+    assert bool(message) is wait
 
-    updated_message = await webhooks_res.update_webhook_message(
-        webhook.id,
-        webhook.token,
-        created_message.id,
-        UpdateWebhookMessageRequest(
-            embeds=[
-                Embed(
-                    title='Updated Webhook Test',
-                    description='This is an updated test webhook',
-                ),
-            ],
-        ),
+    if not message:
+        return
+
+    assert message.content == 'Hello World'
+
+
+async def test_get_webhook_message(
+    webhook_message: MessageResponse,
+    webhook: WebhookResponse,
+    module_webhook_res: WebhooksResource,
+) -> None:
+    """Test getting a webhook message."""
+    token: str = webhook.token  # type: ignore
+    retrieved_message = await module_webhook_res.get_webhook_message(
+        webhook_id=webhook.id,
+        token=token,
+        message_id=webhook_message.id,
     )
+    assert webhook_message.id == retrieved_message.id
 
-    await webhooks_res.delete_webhook_message(webhook.id, webhook.token, created_message.id)
-    await webhooks_res.delete_webhook(webhook.id)
 
-    assert message
-    assert updated_webhook.name != webhook.name
-    assert updated_message
-    assert webhook_channel_resp is not None
-    assert webhook_guild_resp is not None
+async def test_update_webhook_message(
+    webhook_message: MessageResponse,
+    webhook: WebhookResponse,
+    module_webhook_res: WebhooksResource,
+) -> None:
+    """Test updating a webhook message."""
+    token: str = webhook.token  # type: ignore
+    updated_message = await module_webhook_res.update_webhook_message(
+        webhook_id=webhook.id,
+        token=token,
+        message_id=webhook_message.id,
+        update_data=UpdateWebhookMessageRequest(content='updated'),
+    )
+    assert updated_message.content == 'updated'
+
+
+async def test_delete_webhook_message(
+    webhook_message: MessageResponse,
+    webhook: WebhookResponse,
+    module_webhook_res: WebhooksResource,
+) -> None:
+    """Test deleting a webhook message."""
+    token: str = webhook.token  # type: ignore
+
+    await module_webhook_res.delete_webhook_message(
+        webhook_id=webhook.id,
+        token=token,
+        message_id=webhook_message.id,
+    )
+    # Assert deletion by trying to fetch the deleted message
+    with pytest.raises(NotFoundError):
+        await module_webhook_res.get_webhook_message(
+            webhook_id=webhook.id,
+            token=token,
+            message_id=webhook_message.id,
+        )

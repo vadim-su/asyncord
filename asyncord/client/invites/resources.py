@@ -57,8 +57,8 @@ class InvitesResource(APIResource):
             query_param['with_counts'] = str(with_counts)
         if with_expiration is not None:
             query_param['with_expiration'] = str(with_expiration)
-        if guild_scheduled_event_id is not None:
-            query_param['guild_scheduled_event_id'] = guild_scheduled_event_id
+        if guild_scheduled_event_id:
+            query_param['guild_scheduled_event_id'] = str(guild_scheduled_event_id)
 
         url = self.invites_url / str(invite_code) % query_param
 
@@ -75,7 +75,7 @@ class InvitesResource(APIResource):
         Reference:
         https://discord.com/developers/docs/resources/invite#delete-invite
         """
-        if reason is not None:
+        if reason:
             headers = {'X-Audit-Log-Reason': reason}
         else:
             headers = {}

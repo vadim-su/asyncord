@@ -11,7 +11,7 @@ import datetime
 import logging
 import random
 import threading
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from asyncord.gateway.client.client import ConnectionData, GatewayClient
@@ -59,14 +59,14 @@ class Heartbeat:
         self._task = None
         self._cleanup()
 
-    def __repr__(self) -> str:
-        """Return the representation of the heartbeat."""
-        return f'<Heartbeat interval={self._interval}>'
-
     @property
     def is_running(self) -> bool:
         """Whether the heartbeat is running."""
         return self._task is not None
+
+    def __repr__(self) -> str:
+        """Return the representation of the heartbeat."""
+        return f'<Heartbeat interval={self._interval}>'
 
     def _cleanup(self) -> None:
         """Cleanup the heartbeat."""
@@ -91,8 +91,13 @@ class Heartbeat:
             logger.debug('Keep interval: %i', keep_interval.total_seconds())
             try:
                 await asyncio.wait_for(self._wait_heartbeat_ack(), timeout=keep_interval.total_seconds())
-                logger.debug('Heartbeat ack received.')
             except TimeoutError:
+                logger.error('Heartbeat ack not received in time. Reconnecting...')
+                self.client.reconnect()
+                self._task = None
+                break
+            except Exception as e:
+                logger.error('An unexpected error occurred: %s', e)
                 self.client.reconnect()
                 self._task = None
                 break
@@ -101,15 +106,16 @@ class Heartbeat:
         """Wait for a heartbeat ack."""
         for _ in range(100):
             await self.client.send_heartbeat(seq=self.conn_data.seq)
-            logger.debug('Heartbeat sent.')
+            logger.debug('Heartbeat sent')
             try:
                 await asyncio.wait_for(self._ack_event.wait(), timeout=5)
+                logger.debug('Heartbeat ack received')
                 return
             except TimeoutError:
                 pass
-            logger.warning('Heartbeat ack not received.')
+            logger.debug('Heartbeat ack not received')
 
-        logger.error('Heartbeat ack not received after 100 attempts. Looks weird.')
+        logger.error('Heartbeat ack not received after 100 attempts. Looks weird')
 
     @property
     def _jittered_sleep_duration(self) -> float:
@@ -125,9 +131,6 @@ class Heartbeat:
 class HeartbeatFactory:
     """Factory for creating heartbeats."""
 
-    HEARTBEAT_CLASS: ClassVar[type[Heartbeat]] = Heartbeat
-    """Heartbeat class to create."""
-
     def __init__(self) -> None:
         """Initialize the factory."""
         self.loop = asyncio.new_event_loop()
@@ -135,7 +138,7 @@ class HeartbeatFactory:
 
     def create(self, client: GatewayClient, conn_data: ConnectionData) -> Heartbeat:
         """Create a heartbeat."""
-        return self.HEARTBEAT_CLASS(client=client, conn_data=conn_data, _loop=self.loop)
+        return Heartbeat(client=client, conn_data=conn_data, _loop=self.loop)
 
     def start(self) -> None:
         """Start the heartbeat."""

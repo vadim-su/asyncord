@@ -13,6 +13,11 @@ def color() -> Color:
     return Color(0xAABBCC)
 
 
+def test_rgb_repr() -> None:
+    """Test the string representation of an RGB object."""
+    assert repr(RGB(170, 187, 204)) == 'RGB(170, 187, 204)'
+
+
 def test_create_color_from_constructor(color: Color) -> None:
     """Test creating a color from the constructor."""
     assert Color(0xAABBCC).value == DECIMAL_VALUE
@@ -67,6 +72,11 @@ def test_color_to_rgb(color: Color) -> None:
     assert color.to_rgb() == RGB(170, 187, 204)
 
 
+def test_color_repr(color: Color) -> None:
+    """Test the string representation of a color."""
+    assert repr(color) == f'Color({hex(DECIMAL_VALUE)})'
+
+
 @pytest.mark.parametrize(
     'color_value',
     [
@@ -77,6 +87,7 @@ def test_color_to_rgb(color: Color) -> None:
         '#aabbcc',
         (170, 187, 204),
         RGB(170, 187, 204),
+        Color(DECIMAL_VALUE),
     ],
     ids=[
         'int',
@@ -86,6 +97,7 @@ def test_color_to_rgb(color: Color) -> None:
         'web hex str',
         'rgb tuple',
         'RGB class',
+        'Color class',
     ],
 )
 def test_color_in_models(

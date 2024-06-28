@@ -297,4 +297,4 @@ class FollowedChannelResponse(BaseModel):
     """Source channel id."""
 
     webhook_id: Snowflake
-    """Created target webhook id."""
+    """Created webhook id."""

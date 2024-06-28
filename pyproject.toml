@@ -14,7 +14,6 @@ license = { text = "MIT" }
 requires-python = ">=3.12.0"
 dependencies = [
     "yarl>=1.8.1",
-    "sentinel>=1.0.0",
     "rich>=12.5.1",
     "pydantic>=2.4.2",
     "aiohttp<4",
@@ -32,7 +31,7 @@ dev = [
 ]
 testing = [
     "pytest>=7.3.1",
-    "pytest-asyncio>=0.19.0",
+    "pytest-asyncio>=0.19.0,<0.23.0", # 0.23.0 has a bugs with scopes
     "pytest-pretty>=1.2.0",
     "pytest-mock>=3.12.0",
     "pytest-xdist>=3.6.1",
@@ -48,20 +47,27 @@ source = "call"
 getter = "scritps.version:get_version"
 
 [tool.pdm.scripts]
+coverage = "pytest --cov=asyncord --cov-report html --cov-append -n auto tests"
 docs = "mkdocs serve -f docs/mkdocs.yml"
 build-docs = "mkdocs build -f docs/mkdocs.yml"
 
 [tool.pytest.ini_options]
 minversion = "6.2"
-addopts = "-ra --color=yes"
+addopts = "-ra --dist=loadscope --color=yes"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 
-[tool.isort]
-line_length = 110
-multi_line_output = 3
-include_trailing_comma = true
-length_sort = true
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "^class .*\\(Protocol\\):$",
+    "if reason:",
+    "@overload",
+    "NotImplementedError",
+]
 
 [tool.ruff]
 line-length = 120

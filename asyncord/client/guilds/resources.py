@@ -7,6 +7,7 @@ https://discord.com/developers/docs/resources/guild
 from __future__ import annotations
 
 import datetime
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from asyncord.base64_image import Base64Image
@@ -35,7 +36,7 @@ from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.resources import APIResource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
-from asyncord.typedefs import list_model
+from asyncord.typedefs import CURRENT_USER, list_model
 from asyncord.urls import REST_API_URL
 
 if TYPE_CHECKING:
@@ -203,14 +204,14 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'mfa'
         payload = {'level': level}
-        resp = await self._http_client.patch(url=url, payload=payload)
+        resp = await self._http_client.post(url=url, payload=payload)
         return MFALevel(int(resp.raw_body))
 
     async def get_prune_count(
         self,
         guild_id: SnowflakeInputType,
         days: int | None = None,
-        include_roles: list[SnowflakeInputType] | None = None,
+        include_roles: Sequence[SnowflakeInputType] | None = None,
         reason: str | None = None,
     ) -> PruneResponse:
         """Get the number of members that would be removed from a guild if pruned.
@@ -233,7 +234,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         if include_roles is not None:
             url_params['include_roles'] = ','.join(map(str, include_roles))
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -272,7 +273,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         payload = prune_data.model_dump(mode='json', exclude_unset=True)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -363,10 +364,10 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'integrations' / str(integration_id)
 
-        if reason is None:
-            headers = {}
-        else:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
+        else:
+            headers = {}
 
         await self._http_client.delete(url=url, headers=headers)
 
@@ -413,7 +414,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'widget'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -477,7 +478,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'onboarding'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -523,7 +524,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
         """
         url = self.guilds_url / str(guild_id) / 'welcome-screen'
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -550,7 +551,7 @@ class GuildResource(APIResource):  # noqa: PLR0904
             suppress: Whether the current user should be suppressed.
             request_to_speak_timestamp: Time at which the current user requested to speak.
         """
-        url = self.guilds_url / str(guild_id) / 'voice-states' / '@me'
+        url = self.guilds_url / str(guild_id) / 'voice-states' / CURRENT_USER
 
         payload = {}
         if channel_id is not None:

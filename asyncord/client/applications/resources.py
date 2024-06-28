@@ -1,15 +1,23 @@
 """This module contains the applications resource for the client."""
 
-from asyncord.client.applications.models.requests import (
-    UpdateApplicationRequest,
-    UpdateApplicationRoleConnectionMetadataRequest,
-)
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from asyncord.client.applications.models.responses import ApplicationOut, ApplicationRoleConnectionMetadataOut
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.resources import APIResource
-from asyncord.snowflake import SnowflakeInputType
-from asyncord.typedefs import list_model
+from asyncord.typedefs import CURRENT_USER, list_model
 from asyncord.urls import REST_API_URL
+
+if TYPE_CHECKING:
+    from asyncord.client.applications.models.requests import (
+        UpdateApplicationRequest,
+        UpdateApplicationRoleConnectionMetadataRequest,
+    )
+    from asyncord.snowflake import SnowflakeInputType
+
+__all__ = ('ApplicationResource',)
 
 
 class ApplicationResource(APIResource):
@@ -38,7 +46,7 @@ class ApplicationResource(APIResource):
         Returns:
             Application object.
         """
-        resp = await self._http_client.get(url=self.apps_url / '@me')
+        resp = await self._http_client.get(url=self.apps_url / CURRENT_USER)
         return ApplicationOut.model_validate(resp.body)
 
     async def update_application(
@@ -55,7 +63,7 @@ class ApplicationResource(APIResource):
         """
         payload = application_data.model_dump(mode='json', exclude_unset=True)
         resp = await self._http_client.patch(
-            url=self.apps_url / '@me',
+            url=self.apps_url / CURRENT_USER,
             payload=payload,
         )
         return ApplicationOut.model_validate(resp.body)

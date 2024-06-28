@@ -4,6 +4,12 @@ import pytest
 
 from asyncord.client.applications.resources import ApplicationResource
 from asyncord.client.bans.resources import BanResource
+from asyncord.client.channels.models.requests.creation import (
+    CreateAnoncementChannelRequest,
+    CreateStageChannelRequest,
+    CreateTextChannelRequest,
+)
+from asyncord.client.channels.models.responses import ChannelResponse
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.commands.resources import CommandResource
 from asyncord.client.emojis.resources import EmojiResource
@@ -16,7 +22,6 @@ from asyncord.client.messages.models.requests.messages import CreateMessageReque
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.polls.resources import PollsResource
-from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.rest import RestClient
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
@@ -27,6 +32,8 @@ from asyncord.client.threads.models.requests import CreateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.client.threads.resources import ThreadResource
 from asyncord.client.users.resources import UserResource
+from asyncord.client.webhooks.models.requests import CreateWebhookRequest
+from asyncord.client.webhooks.models.responces import WebhookResponse
 from asyncord.client.webhooks.resources import WebhooksResource
 from tests.conftest import IntegrationTestData
 
@@ -164,15 +171,6 @@ async def events_res(
 
 
 @pytest.fixture()
-async def reactions_res(
-    message: MessageResponse,
-    messages_res: MessageResource,
-) -> ReactionResource:
-    """Get reactions resource for the message."""
-    return messages_res.reactions(message.id)
-
-
-@pytest.fixture()
 async def commands_res(
     client: RestClient,
     integration_data: IntegrationTestData,
@@ -220,3 +218,77 @@ async def thread(thread_res: ThreadResource) -> AsyncGenerator[ThreadResponse, N
     )
     yield thread
     await thread_res.delete(thread.id)
+
+
+@pytest.fixture()
+async def channel(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> AsyncGenerator[ChannelResponse, None]:
+    """Fixture for creating channel and deleting it after test."""
+    channel = await channel_res.create_channel(
+        guild_id=integration_data.guild_id,
+        channel_data=CreateTextChannelRequest(name='test-channel'),
+    )
+
+    yield channel
+    await channel_res.delete(channel.id)
+
+
+@pytest.fixture()
+async def stage_channel(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> AsyncGenerator[ChannelResponse, None]:
+    """Fixture for creating channel and deleting it after test."""
+    channel = await channel_res.create_channel(
+        integration_data.guild_id,
+        CreateStageChannelRequest(name='Test stage channel'),
+    )
+    yield channel
+    await channel_res.delete(channel.id)
+
+
+@pytest.fixture()
+async def announcement_channel(
+    channel_res: ChannelResource,
+    integration_data: IntegrationTestData,
+) -> AsyncGenerator[ChannelResponse, None]:
+    """Get the announcement channel."""
+    channel = await channel_res.create_channel(
+        guild_id=integration_data.guild_id,
+        channel_data=CreateAnoncementChannelRequest(name='test-announcement'),
+    )
+
+    yield channel
+
+    await channel_res.delete(channel.id)
+
+
+@pytest.fixture(scope='module')
+async def module_client(token: str) -> RestClient:
+    """Get new rest client."""
+    return RestClient(
+        token,
+        ratelimit_strategy=BackoffRateLimitStrategy(
+            max_retries=10,
+            min_wait_time=2,
+            max_wait_time=60,
+        ),
+    )
+
+
+@pytest.fixture(scope='module')
+async def webhook(
+    module_client: RestClient,
+    integration_data: IntegrationTestData,
+) -> AsyncGenerator[WebhookResponse, None]:
+    """Get new webhook for module."""
+    webhook = await module_client.webhooks.create_webhook(
+        integration_data.channel_id,
+        CreateWebhookRequest(name='Test Webhook'),
+    )
+
+    yield webhook
+
+    await module_client.webhooks.delete_webhook(webhook.id)

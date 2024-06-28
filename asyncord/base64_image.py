@@ -61,8 +61,6 @@ class Base64Image:
         encoded_image = base64.b64encode(image_data).decode()
         return cls(f'data:{image_type};base64, {encoded_image}')
 
-        raise ValueError('Invalid image data type')
-
     @classmethod
     def from_file(cls, file_path: str | Path) -> Self:
         """Build Base64Image from file path.
@@ -92,13 +90,17 @@ class Base64Image:
         Raises:
             ValueError: If value is not
         """
-        if isinstance(value, bytes | str):
-            return cls.build(value)
-
         if isinstance(value, cls):
             return value
 
-        raise ValueError('Invalid value type')
+        if isinstance(value, bytes | str):
+            return cls.build(value)
+
+        if isinstance(value, Path):
+            return cls.from_file(value)
+
+        # This should never happen because of the pydantic schema
+        raise ValueError('Invalid value type')  # pragma: no cover
 
     @classmethod
     def __get_pydantic_core_schema__(
@@ -118,6 +120,7 @@ class Base64Image:
         schema = core_schema.union_schema([
             core_schema.bytes_schema(),
             core_schema.str_schema(),
+            core_schema.is_instance_schema(Path),
             core_schema.is_instance_schema(cls),
         ])
 
@@ -143,7 +146,7 @@ class Base64Image:
         return self.image_data
 
 
-Base64ImageInputType = Annotated[Base64Image | bytes | str, Base64Image]
+Base64ImageInputType = Annotated[Base64Image | bytes | str | Path, Base64Image]
 """Base64Image input type for pydantic models.
 
 Base64ImageInput must validate and convert other types to Base64Image.

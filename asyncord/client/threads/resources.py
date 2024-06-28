@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from asyncord.client.channels.models.responses import ThreadMemberResponse
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.resources import MessageResource
-from asyncord.client.models.attachments import make_attachment_payload
+from asyncord.client.models.attachments import Attachment, make_payload_with_attachments
 from asyncord.client.resources import APIResource
 from asyncord.client.threads.models.requests import UpdateThreadRequest
 from asyncord.client.threads.models.responses import ThreadResponse, ThreadsResponse
@@ -140,7 +140,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
             thread_data: Data to create the thread with.
             reason: Reason for creating the thread.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -157,7 +157,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
             thread_data: Data to create the thread with.
             reason: Reason for creating the thread.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -178,12 +178,12 @@ class ThreadResource(APIResource):  # noqa: PLR0904
             thread_data: Data to create the thread with.
             reason: Reason for creating the thread.
         """
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
-
-        payload = make_attachment_payload(thread_data.message, root_payload=thread_data)
+        attachments = cast(list[Attachment] | None, thread_data.message.attachments)
+        payload = make_payload_with_attachments(thread_data, attachments=attachments)
 
         resp = await self._http_client.post(
             url=self.threads_url,
@@ -201,7 +201,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
         """
         url = self.channels_url / str(thread_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -361,7 +361,7 @@ class ThreadResource(APIResource):  # noqa: PLR0904
         """
         url = self.channels_url / str(thread_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, cast
 
 from asyncord.client.http.headers import AUDIT_LOG_REASON
 from asyncord.client.messages.models.responses.messages import MessageResponse
-from asyncord.client.models.attachments import make_attachment_payload
+from asyncord.client.models.attachments import Attachment, make_payload_with_attachments
 from asyncord.client.reactions.resources import ReactionResource
 from asyncord.client.resources import APIResource
 from asyncord.typedefs import list_model
@@ -93,7 +94,8 @@ class MessageResource(APIResource):
             Created message object.
         """
         url = self.messages_url
-        payload = make_attachment_payload(message_data)
+        attachments = cast(list[Attachment] | None, message_data.attachments)
+        payload = make_payload_with_attachments(message_data, attachments=attachments)
         resp = await self._http_client.post(url=url, payload=payload)
 
         return MessageResponse.model_validate(resp.body)
@@ -109,7 +111,8 @@ class MessageResource(APIResource):
             Updated message object.
         """
         url = self.messages_url / str(message_id)
-        payload = make_attachment_payload(message_data)
+        attachments = cast(list[Attachment] | None, message_data.attachments)
+        payload = make_payload_with_attachments(message_data, attachments)
         resp = await self._http_client.patch(url=url, payload=payload)
 
         return MessageResponse(**resp.body)
@@ -123,7 +126,7 @@ class MessageResource(APIResource):
         """
         url = self.messages_url / str(message_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -132,7 +135,7 @@ class MessageResource(APIResource):
 
     async def bulk_delete(
         self,
-        message_ids: list[SnowflakeInputType],
+        message_ids: Sequence[SnowflakeInputType],
         reason: str | None = None,
     ) -> None:
         """Delete multiple messages.
@@ -144,7 +147,7 @@ class MessageResource(APIResource):
         url = self.messages_url / 'bulk-delete'
         payload = {'messages': [str(message_id) for message_id in message_ids]}
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -194,7 +197,7 @@ class MessageResource(APIResource):
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}
@@ -215,7 +218,7 @@ class MessageResource(APIResource):
         """
         url = self.channels_url / str(channel_id) / 'pins' / str(message_id)
 
-        if reason is not None:
+        if reason:
             headers = {AUDIT_LOG_REASON: reason}
         else:
             headers = {}

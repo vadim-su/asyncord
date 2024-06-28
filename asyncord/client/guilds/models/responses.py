@@ -5,9 +5,12 @@ from typing import Any
 
 from fbenum.adapter import FallbackAdapter
 from pydantic import BaseModel
+from yarl import URL
 
+from asyncord import urls
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.responses import ApplicationCommandResponse
+from asyncord.client.emojis.models.responses import EmojiResponse
 from asyncord.client.guilds.models.common import (
     AuditLogEvents,
     ExpireBehaviorOut,
@@ -17,7 +20,6 @@ from asyncord.client.guilds.models.common import (
     OnboardingPromptType,
 )
 from asyncord.client.models.automoderation import AutoModerationRule
-from asyncord.client.models.emoji import Emoji
 from asyncord.client.models.stickers import Sticker
 from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.scheduled_events.models.responses import ScheduledEventResponse
@@ -153,7 +155,7 @@ class GuildResponse(BaseModel):
     roles: list[RoleResponse] | None = None
     """Roles in the guild."""
 
-    emojis: list[Emoji] | None = None
+    emojis: list[EmojiResponse] | None = None
     """Custom guild emojis."""
 
     features: list[str]
@@ -271,7 +273,7 @@ class GuildPreviewResponse(BaseModel):
     Only present for guilds with the "DISCOVERABLE" feature.
     """
 
-    emojis: list[Emoji] | None = None
+    emojis: list[EmojiResponse] | None = None
     """Custom guild emojis."""
 
     features: list[str]
@@ -300,7 +302,7 @@ class PruneResponse(BaseModel):
     https://discord.com/developers/docs/resources/guild#get-guild-prune-count
     """
 
-    pruned: int
+    pruned: int | None
     """Number of members pruned."""
 
 
@@ -448,6 +450,11 @@ class InviteResponse(BaseModel):
     Return from get_invite endpoint only when `guild_scheduled_event_id` is not None
     and contains a valid id.
     """
+
+    @property
+    def url(self) -> URL:
+        """Invite URL."""
+        return urls.INVITE_BASE_URL / self.code
 
 
 class IntegrationAccountOut(BaseModel):
@@ -845,7 +852,7 @@ class OnboardingPromptOptionOut(BaseModel):
     role_ids: list[Snowflake]
     """Id for roles assigned to a member when the option is selected."""
 
-    emoji: Emoji | None = None
+    emoji: EmojiResponse | None = None
     """Emoji of the option."""
 
     title: str
@@ -882,7 +889,7 @@ class OnboardingPromptOut(BaseModel):
     Before a user completes the onboarding flow.
     """
 
-    in_boarding: bool
+    in_onboarding: bool
     """Indicates whether the prompt is present in the onboarding flow.
 
     If false, the prompt will only appear in the Channels & Roles tab.
