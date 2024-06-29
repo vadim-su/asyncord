@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator
 from asyncord.client.commands.models.requests import ApplicationCommandOptionChoice
 from asyncord.client.interactions.models.common import InteractionResponseType
 from asyncord.client.messages.models.common import MessageFlags
-from asyncord.client.messages.models.requests.components import ActionRow, Component, TextInput
+from asyncord.client.messages.models.requests.components import ActionRow, MessageComponentType, TextInput
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import AllowedMentions, BaseMessage
 from asyncord.client.models.attachments import Attachment, AttachmentContentType
@@ -81,7 +81,7 @@ class InteractionRespMessageRequest(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS and MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: Sequence[Component] | Component | None = None
+    components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """List of components included in the message.."""
 
     attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
@@ -121,7 +121,7 @@ class InteractionRespUpdateMessageRequest(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS and MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: Sequence[Component] | Component | None = None
+    components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """List of components included in the message.."""
 
     attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
@@ -160,7 +160,7 @@ class InteractionRespDeferredMessageRequest(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS and MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: Sequence[Component] | Component | None = None
+    components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """List of components."""
 
     attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
@@ -197,7 +197,7 @@ class InteractionRespUpdateDeferredMessageRequest(BaseMessage):
     Only MessageFlags.SUPPRESS_EMBEDS can be set.
     """
 
-    components: Sequence[Component] | Component | None = None
+    components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """List of components."""
 
     attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
@@ -264,7 +264,7 @@ class InteractionRespModalRequest(BaseModel):
         if isinstance(components[0], TextInput):
             # If the first component is a TextInput
             # (pydantic garuntees that all components are the same type), wrap it in an ActionRow.
-            text_inputs = cast(list[Component | TextInput], components)
+            text_inputs = cast(list[MessageComponentType | TextInput], components)
             components = [ActionRow(components=text_inputs)]
 
         components = cast(list[ActionRow], components)

@@ -2,10 +2,10 @@ from collections.abc import Sequence
 
 import pytest
 
+from asyncord.client.messages.models.common import ButtonStyle
 from asyncord.client.messages.models.requests.components import (
     ActionRow,
     Button,
-    ButtonStyle,
     SelectMenu,
     SelectMenuOption,
 )

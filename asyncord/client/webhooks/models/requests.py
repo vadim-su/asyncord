@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.messages.models.common import AllowedMentionType, MessageFlags
-from asyncord.client.messages.models.requests.components import Component
+from asyncord.client.messages.models.requests.components import MessageComponentType
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import BaseMessage
 from asyncord.client.models.attachments import Attachment, AttachmentContentType
@@ -81,7 +81,7 @@ class ExecuteWebhookRequest(BaseMessage):
     allowed_mentions: AllowedMentionType | None = None
     """Allowed mentions for the message."""
 
-    components: Component | Sequence[Component] | None = None
+    components: MessageComponentType | Sequence[MessageComponentType] | None = None
     """The components to include with the message."""
 
     attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
@@ -129,7 +129,7 @@ class UpdateWebhookMessageRequest(BaseMessage):
     allowed_mentions: AllowedMentionType | None = None
     """Allowed mentions for the message."""
 
-    components: Component | Sequence[Component] | None = None
+    components: MessageComponentType | Sequence[MessageComponentType] | None = None
     """The components to include with the message."""
 
     attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None

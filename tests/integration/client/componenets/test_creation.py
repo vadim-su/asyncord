@@ -7,21 +7,21 @@ from asyncord.client.interactions.models.requests import (
     InteractionRespMessageRequest,
     InteractionRespUpdateMessageRequest,
 )
+from asyncord.client.messages.models.common import ButtonStyle
 from asyncord.client.messages.models.requests.components import (
     ActionRow,
     Button,
-    ButtonStyle,
-    ComponentType,
 )
+from asyncord.client.messages.models.requests.components.action_row import MessageComponentType
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest, UpdateMessageRequest
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.threads.models.requests import ThreadMessage
 
 
 class _Container(Protocol):
-    components: Sequence[ComponentType] | ComponentType | None
+    components: Sequence[MessageComponentType] | MessageComponentType | None
 
-    def __call__(self, components: Sequence[ComponentType] | ComponentType | None) -> Self:  # type: ignore
+    def __call__(self, components: Sequence[MessageComponentType] | MessageComponentType | None) -> Self:  # type: ignore
         """Initialize the container with components."""
 
 
@@ -38,7 +38,7 @@ class _Container(Protocol):
 def test_wrap_component_to_list_and_action_row(container: _Container) -> None:
     """Test that components are wrapped in an ActionRow."""
     request = container(
-        components=Button(
+        Button(
             custom_id='button_0',
             label='Button',
             style=ButtonStyle.PRIMARY,
@@ -57,36 +57,34 @@ def test_wrap_component_to_list_and_action_row(container: _Container) -> None:
 
 async def test_create_message_with_buttons(messages_res: MessageResource) -> None:
     """Test creating a message with buttons."""
-    components: Sequence[ComponentType] = [
-        ActionRow(
-            components=[
-                Button(
-                    label='Primary',
-                    style=ButtonStyle.PRIMARY,
-                    custom_id='primary',
-                ),
-                Button(
-                    label='Secondary',
-                    style=ButtonStyle.SECONDARY,
-                    custom_id='secondary',
-                ),
-                Button(
-                    label='Success',
-                    style=ButtonStyle.SUCCESS,
-                    custom_id='success',
-                ),
-                Button(
-                    label='Danger',
-                    style=ButtonStyle.DANGER,
-                    custom_id='danger',
-                ),
-                Button(
-                    label='Link',
-                    style=ButtonStyle.LINK,
-                    url='https://discord.com',
-                ),
-            ],
-        ),
+    components: Sequence[MessageComponentType] = [
+        ActionRow([
+            Button(
+                label='Primary',
+                style=ButtonStyle.PRIMARY,
+                custom_id='primary',
+            ),
+            Button(
+                label='Secondary',
+                style=ButtonStyle.SECONDARY,
+                custom_id='secondary',
+            ),
+            Button(
+                label='Success',
+                style=ButtonStyle.SUCCESS,
+                custom_id='success',
+            ),
+            Button(
+                label='Danger',
+                style=ButtonStyle.DANGER,
+                custom_id='danger',
+            ),
+            Button(
+                label='Link',
+                style=ButtonStyle.LINK,
+                url='https://discord.com',
+            ),
+        ]),
     ]
     message = await messages_res.create(
         CreateMessageRequest(
