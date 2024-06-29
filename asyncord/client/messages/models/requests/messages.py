@@ -224,7 +224,8 @@ class BaseMessage(BaseModel):
 
     @field_validator('components', check_fields=False)
     def validate_components(
-        cls, components: Sequence[MessageComponentType] | MessageComponentType | None
+        cls,
+        components: Sequence[MessageComponentType] | MessageComponentType | None,
     ) -> Sequence[MessageComponentType] | None:
         """Validate components.
 

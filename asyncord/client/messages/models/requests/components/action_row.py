@@ -9,7 +9,7 @@ from pydantic import Field, field_validator
 
 from asyncord.client.messages.models.common import ComponentType, SelectComponentType
 from asyncord.client.messages.models.requests.components.base import BaseComponent
-from asyncord.client.messages.models.requests.components.buttons import Button
+from asyncord.client.messages.models.requests.components.buttons import ButtonComponentType
 from asyncord.client.messages.models.requests.components.selects import SelectMenu
 from asyncord.client.messages.models.requests.components.text_input import TextInput
 
@@ -32,7 +32,7 @@ class ActionRow(BaseComponent):
 
     def __init__(
         self,
-        components: Sequence[MessageComponentType | TextInput] | MessageComponentType | TextInput,
+        components: Sequence[RowComponentType] | RowComponentType,
     ) -> None:
         """Create a new action row.
 
@@ -70,11 +70,7 @@ class ActionRow(BaseComponent):
     type: Literal[ComponentType.ACTION_ROW] = ComponentType.ACTION_ROW  # type: ignore
     """Type of the component."""
 
-    components: (
-        Annotated[Sequence[MessageComponentType | TextInput], Field(min_length=1, max_length=5)]
-        | MessageComponentType
-        | TextInput
-    )
+    components: Annotated[Sequence[RowComponentType], Field(min_length=1, max_length=5)] | RowComponentType
     """Components in the action row.
 
     Text input components are not allowed in action rows.
@@ -83,10 +79,10 @@ class ActionRow(BaseComponent):
     @field_validator('components')
     def validate_components(
         cls,
-        components: list[MessageComponentType | TextInput] | MessageComponentType | TextInput,
-    ) -> list[MessageComponentType | TextInput]:
+        components: Sequence[RowComponentType] | RowComponentType,
+    ) -> Sequence[RowComponentType]:
         """Validate the components in the action row."""
-        if not isinstance(components, list):
+        if not isinstance(components, Sequence):
             components = [components]
 
         component_counts = Counter(component.type for component in components)
@@ -116,11 +112,17 @@ class ActionRow(BaseComponent):
         return components
 
 
-type MessageComponentType = Annotated[ActionRow | Button | SelectMenu, Field(discriminator='type')]
+type MessageComponentType = Annotated[ActionRow | ButtonComponentType | SelectMenu, Field(discriminator='type')]
 """Type hint for the message component type.
 
 It doens't include `TextInput` because it's not a general component.
 It can be used only in modals and accepted only in `ActionRow` components.
+"""
+
+type RowComponentType = MessageComponentType | TextInput
+"""Type hint for the message component type with text input.
+
+General use case for the ActionRow components.
 """
 
 ActionRow.model_rebuild()

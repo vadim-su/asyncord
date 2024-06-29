@@ -7,12 +7,15 @@ from asyncord.client.interactions.models.requests import (
     InteractionRespMessageRequest,
     InteractionRespUpdateMessageRequest,
 )
-from asyncord.client.messages.models.common import ButtonStyle
-from asyncord.client.messages.models.requests.components import (
-    ActionRow,
-    Button,
+from asyncord.client.messages.models.requests.components.action_row import ActionRow, MessageComponentType
+from asyncord.client.messages.models.requests.components.buttons import (
+    AnyButtonWithCustomId,
+    DangerButton,
+    LinkButton,
+    PrimaryButton,
+    SecondaryButton,
+    SuccessButton,
 )
-from asyncord.client.messages.models.requests.components.action_row import MessageComponentType
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest, UpdateMessageRequest
 from asyncord.client.messages.resources import MessageResource
 from asyncord.client.threads.models.requests import ThreadMessage
@@ -38,10 +41,9 @@ class _Container(Protocol):
 def test_wrap_component_to_list_and_action_row(container: _Container) -> None:
     """Test that components are wrapped in an ActionRow."""
     request = container(
-        Button(
+        components=PrimaryButton(
             custom_id='button_0',
             label='Button',
-            style=ButtonStyle.PRIMARY,
         ),
     )
 
@@ -52,6 +54,7 @@ def test_wrap_component_to_list_and_action_row(container: _Container) -> None:
     assert isinstance(request.components[0].components, Sequence)
     assert len(request.components[0].components) == 1
     assert not isinstance(request.components[0].components[0], ActionRow)
+    assert isinstance(request.components[0].components[0], AnyButtonWithCustomId)
     assert request.components[0].components[0].custom_id == 'button_0'
 
 
@@ -59,29 +62,24 @@ async def test_create_message_with_buttons(messages_res: MessageResource) -> Non
     """Test creating a message with buttons."""
     components: Sequence[MessageComponentType] = [
         ActionRow([
-            Button(
+            PrimaryButton(
                 label='Primary',
-                style=ButtonStyle.PRIMARY,
                 custom_id='primary',
             ),
-            Button(
+            SecondaryButton(
                 label='Secondary',
-                style=ButtonStyle.SECONDARY,
                 custom_id='secondary',
             ),
-            Button(
+            SuccessButton(
                 label='Success',
-                style=ButtonStyle.SUCCESS,
                 custom_id='success',
             ),
-            Button(
+            DangerButton(
                 label='Danger',
-                style=ButtonStyle.DANGER,
                 custom_id='danger',
             ),
-            Button(
+            LinkButton(
                 label='Link',
-                style=ButtonStyle.LINK,
                 url='https://discord.com',
             ),
         ]),
@@ -106,10 +104,9 @@ def test_components_can_be_max_5() -> None:
     # fmt: off
     components = [
         ActionRow([
-            Button(
+            PrimaryButton(
                 custom_id=f'button_{i}',
                 label=f'Button {i}',
-                style=ButtonStyle.PRIMARY,
             ),
         ])
         for i in range(6)
@@ -123,7 +120,7 @@ def test_wrap_components_in_action_row() -> None:
     """Test that components are wrapped in an ActionRow implicitly."""
     # fmt: off
     components = [
-        Button(custom_id=f'button_{i}', label=f'Button {i}', style=ButtonStyle.PRIMARY)
+        PrimaryButton(custom_id=f'button_{i}', label=f'Button {i}')
         for i in range(5)
     ]
     # fmt: on
@@ -137,7 +134,7 @@ def test_wrap_components_in_action_row() -> None:
     assert isinstance(request.components[0].components, Sequence)
     assert len(request.components[0].components) == 5
 
-    assert isinstance(request.components[0].components[0], Button)
+    assert isinstance(request.components[0].components[0], AnyButtonWithCustomId)
     assert request.components[0].components[0].custom_id == 'button_0'
-    assert isinstance(request.components[0].components[4], Button)
+    assert isinstance(request.components[0].components[4], AnyButtonWithCustomId)
     assert request.components[0].components[4].custom_id == 'button_4'

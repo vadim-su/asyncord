@@ -21,6 +21,7 @@ from asyncord.client.commands.models.requests import ApplicationCommandOptionCho
 from asyncord.client.interactions.models.common import InteractionResponseType
 from asyncord.client.messages.models.common import MessageFlags
 from asyncord.client.messages.models.requests.components import ActionRow, MessageComponentType, TextInput
+from asyncord.client.messages.models.requests.components.action_row import RowComponentType
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import AllowedMentions, BaseMessage
 from asyncord.client.models.attachments import Attachment, AttachmentContentType
@@ -264,8 +265,8 @@ class InteractionRespModalRequest(BaseModel):
         if isinstance(components[0], TextInput):
             # If the first component is a TextInput
             # (pydantic garuntees that all components are the same type), wrap it in an ActionRow.
-            text_inputs = cast(list[MessageComponentType | TextInput], components)
-            components = [ActionRow(components=text_inputs)]
+            text_inputs = cast(Sequence[RowComponentType], components)
+            components = [ActionRow(text_inputs)]
 
         components = cast(list[ActionRow], components)
         for action_row in components:
