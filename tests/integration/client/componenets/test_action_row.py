@@ -4,20 +4,24 @@ import pytest
 
 from asyncord.client.messages.models.requests.components import (
     ActionRow,
-    Button,
-    ButtonStyle,
     SelectMenu,
     SelectMenuOption,
 )
+from asyncord.client.messages.models.requests.components.buttons import AnyButtonWithCustomId, PrimaryButton
 
 
 def test_wrap_component_to_list_in_action_row() -> None:
     """Test that components are wrapped in an ActionRow."""
-    request = ActionRow([Button(custom_id='button_0', label='Button', style=ButtonStyle.PRIMARY)])
+    request = ActionRow([
+        PrimaryButton(
+            custom_id='button_0',
+            label='Button',
+        ),
+    ])
 
     assert isinstance(request.components, Sequence)
     assert len(request.components) == 1
-    assert isinstance(request.components[0], Button)
+    assert isinstance(request.components[0], AnyButtonWithCustomId)
     assert request.components[0].custom_id == 'button_0'
 
 
@@ -33,10 +37,9 @@ def test_action_row_can_have_max_5_components() -> None:
     with pytest.raises(ValueError, match='Value should have at most 5 items'):
         # fmt: off
         ActionRow([
-            Button(
+            PrimaryButton(
                 custom_id=f'button_{i}',
                 label=f'Button {i}',
-                style=ButtonStyle.PRIMARY,
             )
             for i in range(6)
         ])
@@ -49,7 +52,10 @@ def test_dont_create_message_with_button_and_select_menu() -> None:
     with pytest.raises(ValueError, match=exc_text):
         ActionRow(
             components=[
-                Button(custom_id='custom_id', label='Button'),
+                PrimaryButton(
+                    custom_id='custom_id',
+                    label='Button',
+                ),
                 SelectMenu(
                     custom_id='custom',
                     options=[

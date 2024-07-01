@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from asyncord.client.channels.models.common import MAX_RATELIMIT
 from asyncord.client.messages.models.common import MessageFlags
-from asyncord.client.messages.models.requests.components import Component
+from asyncord.client.messages.models.requests.components import MessageComponentType
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.messages.models.requests.messages import AllowedMentions, BaseMessage
 from asyncord.client.models.attachments import Attachment, AttachmentContentType
@@ -86,7 +86,7 @@ class ThreadMessage(BaseMessage):
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions for the message."""
 
-    components: Sequence[Component] | Component | None = None
+    components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """Components to include with the message."""
 
     sticker_ids: list[SnowflakeInputType] | None = None

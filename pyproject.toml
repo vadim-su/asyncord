@@ -169,6 +169,8 @@ ignore = [
     "SIM108",
     # Use a single `if` statement instead of nested `if` statementsRuff
     "SIM102",
+    # allow rename imported module to the same name to allow unused imports in __init__.py
+    "PLC0414",
 ]
 
 [tool.ruff.lint.per-file-ignores]

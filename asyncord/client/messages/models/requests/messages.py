@@ -21,7 +21,7 @@ from pydantic import (
 )
 
 from asyncord.client.messages.models.common import AllowedMentionType, MessageFlags
-from asyncord.client.messages.models.requests.components import ActionRow, Component
+from asyncord.client.messages.models.requests.components import ActionRow, MessageComponentType
 from asyncord.client.messages.models.requests.embeds import Embed
 from asyncord.client.models.attachments import Attachment, AttachmentContentType
 from asyncord.client.polls.models.requests import Poll
@@ -54,7 +54,7 @@ class BaseMessage(BaseModel):
     embeds: list[Embed] | None = None
     """Embedded rich content."""
 
-    components: Sequence[Component] | Component | None = None
+    components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """Components to include with the message."""
 
     sticker_ids: list[SnowflakeInputType] | None = None
@@ -223,7 +223,10 @@ class BaseMessage(BaseModel):
         return next_serializer(attachments)
 
     @field_validator('components', check_fields=False)
-    def validate_components(cls, components: Sequence[Component] | Component | None) -> Sequence[Component] | None:
+    def validate_components(
+        cls,
+        components: Sequence[MessageComponentType] | MessageComponentType | None,
+    ) -> Sequence[MessageComponentType] | None:
         """Validate components.
 
         Args:
@@ -355,7 +358,7 @@ class CreateMessageRequest(BaseMessage):
     message_reference: MessageReference | None = None
     """Reference data sent with crossposted messages."""
 
-    components: Sequence[Component] | Component | None = None
+    components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """Components to include with the message."""
 
     sticker_ids: list[SnowflakeInputType] | None = None
@@ -407,7 +410,7 @@ class UpdateMessageRequest(BaseMessage):
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions for the message."""
 
-    components: Sequence[Component] | Component | None = None
+    components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """Components to include with the message."""
 
     attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None

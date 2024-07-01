@@ -1,8 +1,6 @@
 import pytest
 
-from asyncord.client.messages.models.requests.components import (
-    ComponentEmoji,
-)
+from asyncord.client.messages.models.requests.components import ComponentEmoji
 
 
 def test_emoji_fail_with_both_name_and_id() -> None:
