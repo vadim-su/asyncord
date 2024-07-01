@@ -14,7 +14,11 @@ from asyncord.client.applications.models.common import (
     ApplicationFlag,
     ApplicationRoleConnectionMetadataType,
 )
+from asyncord.client.emojis.models.responses import EmojiResponse
+from asyncord.client.guilds.models.responses import WelcomeScreenResponse
 from asyncord.client.models.permissions import PermissionFlag
+from asyncord.client.models.stickers import Sticker
+from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.users.models.responses import PremiumType, UserFlags
 from asyncord.color import ColorInput
 from asyncord.locale import LocaleInputType
@@ -60,38 +64,41 @@ class ApplicationUserOut(BaseModel):
     """
 
     id: Snowflake
-    """The user's id."""
+    """User's id."""
 
     username: str
-    """The user's username, not unique across the platform."""
+    """User's username, not unique across the platform."""
 
     discriminator: str
-    """The user's 4 - digit discord-tag."""
+    """User's 4 - digit discord-tag."""
 
     avatar: str | None
-    """The user's avatar hash."""
+    """User's avatar hash."""
 
     flags: UserFlags | None
-    """The flags on a user's account."""
+    """Flags on a user's account."""
 
 
 class TeamMemberUserOut(BaseModel):
     """Represents a Discord team member user.
 
     It's a subset of the `asyncord.client.models.users.User` model.
+
+    Reference:
+    https://discord.com/developers/docs/topics/teams#data-models-team-member-object
     """
 
     id: Snowflake
-    """The user's id."""
+    """User's id."""
 
     username: str
-    """The user's username, not unique across the platform."""
+    """User's username, not unique across the platform."""
 
     discriminator: str
-    """The user's 4 - digit discord-tag."""
+    """User's 4 - digit discord-tag."""
 
     avatar: str | None
-    """The user's avatar hash."""
+    """User's avatar hash."""
 
 
 class TeamMemberOut(BaseModel):
@@ -102,16 +109,16 @@ class TeamMemberOut(BaseModel):
     """
 
     membership_state: int
-    """the membership state of the user on the team"""
+    """Membership state of the user on the team"""
 
     permissions: list[str]
-    """the permissions of the team member in the team"""
+    """Permissions of the team member in the team"""
 
     team_id: Snowflake
-    """the id of the team"""
+    """Id of the team"""
 
     user: TeamMemberUserOut
-    """the user that is a member of the team"""
+    """User that is a member of the team"""
 
 
 class TeamOut(BaseModel):
@@ -122,19 +129,19 @@ class TeamOut(BaseModel):
     """
 
     id: Snowflake
-    """the unique id of the team"""
+    """Unique id of the team"""
 
     name: str
-    """the name of the team"""
+    """Name of the team"""
 
     icon: str | None
-    """the icon hash of the team"""
+    """Icon hash of the team"""
 
     owner_user_id: Snowflake
-    """the id of the current team owner"""
+    """Id of the current team owner"""
 
     members: list[TeamMemberOut]
-    """the members of the team"""
+    """Members of the team"""
 
 
 class BotApplicationOut(BaseModel):
@@ -162,7 +169,7 @@ class BotApplicationOut(BaseModel):
     """
 
     avatar: str | None = None
-    """The user's avatar hash."""
+    """User's avatar hash."""
 
     bot: bool | None = None
     """Whether the user belongs to an OAuth2 application."""
@@ -205,6 +212,163 @@ class BotApplicationOut(BaseModel):
     """
 
 
+class ApplicationGuildOut(BaseModel):
+    """Partial object of the associated guild.
+
+    Structure is unclear. A copy of guild model with all fields optional.
+
+    Reference:
+    https://discord.com/developers/docs/resources/application#application-object-application-structure
+    """
+
+    id: Snowflake | None = None
+    """Guild ID."""
+
+    name: str | None = None
+    """Guild name.
+
+    Should be between 2 and 100 characters excluding trailing and leading whitespace.
+    """
+
+    icon: str | None = None
+    """Guild icon hash."""
+
+    icon_hash: str | None = None
+    """Icon hash, returned when in the template object."""
+
+    splash: str | None
+    """Splash hash."""
+
+    discovery_splash: str | None
+    """Discovery splash hash, only present for guilds with the "DISCOVERABLE" feature."""
+
+    owner: bool | None = None
+    """True if the user is the owner of the guild."""
+
+    owner_id: Snowflake | None = None
+    """ID of owner."""
+
+    permissions: str | None = None
+    """Total permissions for the user in the guild (excludes overwrites)."""
+
+    region: str | None = None
+    """Voice region ID for the guild (deprecated)."""
+
+    afk_channel_id: Snowflake | None = None
+    """ID of AFK channel."""
+
+    afk_timeout: int | None = None
+    """AFK timeout in seconds."""
+
+    widget_enabled: bool | None = None
+    """True if the server widget is enabled."""
+
+    widget_channel_id: Snowflake | None = None
+    """Channel ID that the widget will generate an invite to, or null if set to no invite."""
+
+    verification_level: int | None = None
+    """Verification level required for the guild."""
+
+    default_message_notifications: int | None = None
+    """Default message notifications level."""
+
+    explicit_content_filter: int | None = None
+    """Explicit content filter level."""
+
+    roles: list[RoleResponse] | None = None
+    """Roles in the guild."""
+
+    emojis: list[EmojiResponse] | None = None
+    """Custom guild emojis."""
+
+    features: list[str] | None = None
+    """Allowed guild features.
+
+    Replaced by str because it often changes without any notifications.
+    """
+
+    mfa_level: int | None = None
+    """Required MFA level for the guild."""
+
+    application_id: Snowflake | None
+    """Application ID of the guild creator if it is bot-created."""
+
+    system_channel_id: Snowflake | None
+    """ID of the channel where guild notices such as welcome messages and boost events are posted."""
+
+    system_channel_flags: int | None = None
+    """System channel flags."""
+
+    rules_channel_id: Snowflake | None
+    """ID of the channel where Community guilds can display rules and/or guidelines."""
+
+    max_presences: int | None = None
+    """Maximum number of presences for the guild (null is always returned, apart from the largest of guilds)."""
+
+    max_members: int | None = None
+    """Maximum number of members for the guild."""
+
+    vanity_url_code: str | None
+    """Vanity URL code for the guild."""
+
+    description: str | None
+    """Guild description (0-1000 characters)."""
+
+    banner: str | None
+    """Guild banner hash."""
+
+    premium_tier: int | None = None
+    """Premium tier (Server Boost level)."""
+
+    premium_subscription_count: int | None = None
+    """Number of boosts this guild currently has."""
+
+    preferred_locale: str | None = None
+    """Preferred locale of a Community guild used in server discovery and notices
+
+    Sent in interactions. Defaults to "en-US".
+    """
+
+    public_updates_channel_id: Snowflake | None
+    """ID of the channel where admins and moderators of Community guilds receive notices from Discord."""
+
+    max_video_channel_users: int | None = None
+    """Maximum amount of users in a video channel."""
+
+    max_stage_video_channel_users: int | None = None
+    """Maximum amount of users in a stage video channel."""
+
+    approximate_member_count: int | None = None
+    """Approximate number of members in this guild.
+
+    Returned from the GET /guilds/<id> endpoint when with_counts is true.
+    """
+
+    approximate_presence_count: int | None = None
+    """Approximate number of non-offline members in this guild.
+
+    Returned when with_counts is true.
+    """
+
+    welcome_screen: WelcomeScreenResponse | None = None
+    """Welcome screen of a Community guild.
+
+    Shown to new members, returned in an Invite's guild object.
+    """
+
+    nsfw_level: int | None = None
+    """Guild NSFW level."""
+
+    stickers: list[Sticker] | None = None
+    """custom guild stickers"""
+
+    premium_progress_bar_enabled: bool | None = None
+    """Whether the guild has the boost progress bar enabled."""
+
+    safety_alerts_channel_id: Snowflake | None
+    """ID of the channel where admins and moderators of Community guilds receive safety alerts from Discord."""
+
+
 class ApplicationOut(BaseModel):
     """Represents a Discord application.
 
@@ -213,16 +377,16 @@ class ApplicationOut(BaseModel):
     """
 
     id: Snowflake
-    """the id of the app"""
+    """Id of the app"""
 
     name: str
-    """the name of the app"""
+    """Name of the app"""
 
     icon: str | None
-    """the icon hash of the app"""
+    """Icon hash of the app"""
 
     description: str
-    """the description of the app"""
+    """Description of the app"""
 
     rpc_origins: list[str] | None = None
     """rpc origin urls, if rpc is enabled"""
@@ -237,34 +401,37 @@ class ApplicationOut(BaseModel):
     """Partial user object for the bot user associated with the app"""
 
     terms_of_service_url: str | None = None
-    """the url of the app's terms of service"""
+    """Url of the app's terms of service"""
 
     privacy_policy_url: str | None = None
-    """the url of the app's privacy policy"""
+    """Url of the app's privacy policy"""
 
     owner: ApplicationUserOut | None = None
-    """the owner of the application"""
+    """Owner of the application"""
 
     verify_key: str | None = None
-    """the hex encoded key for verification in interactions and the `GameSDK's GetTicket`"""
+    """Hex encoded key for verification in interactions and the `GameSDK's GetTicket`"""
 
     team: TeamOut | None
-    """the app's team"""
+    """App's team"""
 
     guild_id: Snowflake | None = None
-    """the id of the app's guild"""
+    """Id of the app's guild"""
+
+    guild: ApplicationGuildOut | None = None
+    """Partial object of the associated guild."""
 
     primary_sku_id: Snowflake | None = None
-    """the id of the app's primary sku"""
+    """Id of the app's primary sku"""
 
     slug: str | None = None
-    """the app's slug"""
+    """App's slug"""
 
     cover_image: str | None = None
-    """the app's default rich presence invite cover image hash"""
+    """App's default rich presence invite cover image hash"""
 
     flags: FallbackAdapter[ApplicationFlag] | None = None
-    """the application's public flags"""
+    """Application's public flags"""
 
     approximate_guild_count: int | None = None
     """Approximate count of guilds the app has been added to"""
@@ -385,16 +552,16 @@ class InviteCreateEventApplication(BaseModel):
     """
 
     id: Snowflake | None = None
-    """the id of the app"""
+    """Id of the app"""
 
     name: str | None = None
-    """the name of the app"""
+    """Name of the app"""
 
     icon: str | None
-    """the icon hash of the app"""
+    """Icon hash of the app"""
 
     description: str | None = None
-    """the description of the app"""
+    """Description of the app"""
 
     rpc_origins: list[str] | None = None
     """rpc origin urls, if rpc is enabled"""
@@ -409,34 +576,37 @@ class InviteCreateEventApplication(BaseModel):
     """Partial user object for the bot user associated with the app"""
 
     terms_of_service_url: str | None = None
-    """the url of the app's terms of service"""
+    """Url of the app's terms of service"""
 
     privacy_policy_url: str | None = None
-    """the url of the app's privacy policy"""
+    """Url of the app's privacy policy"""
 
     owner: ApplicationUserOut | None = None
-    """the owner of the application"""
+    """Owner of the application"""
 
     verify_key: str | None = None
-    """the hex encoded key for verification in interactions and the `GameSDK's GetTicket`"""
+    """Hex encoded key for verification in interactions and the `GameSDK's GetTicket`"""
 
     team: TeamOut | None
-    """the app's team"""
+    """App's team"""
+
+    guild: ApplicationGuildOut | None = None
+    """Partial object of the associated guild."""
 
     guild_id: Snowflake | None = None
-    """the id of the app's guild"""
+    """Id of the app's guild"""
 
     primary_sku_id: Snowflake | None = None
-    """the id of the app's primary sku"""
+    """Id of the app's primary sku"""
 
     slug: str | None = None
-    """the app's slug"""
+    """App's slug"""
 
     cover_image: str | None = None
-    """the app's default rich presence invite cover image hash"""
+    """App's default rich presence invite cover image hash"""
 
     flags: FallbackAdapter[ApplicationFlag] | None = None
-    """the application's public flags"""
+    """Application's public flags"""
 
     approximate_guild_count: int | None = None
     """Approximate count of guilds the app has been added to"""
