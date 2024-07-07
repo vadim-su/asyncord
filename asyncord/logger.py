@@ -2,6 +2,8 @@
 
 import logging
 from collections.abc import MutableMapping
+from logging.handlers import QueueHandler, QueueListener
+from queue import Queue
 from typing import Any
 
 import pydantic
@@ -14,14 +16,20 @@ def setup_logging(name: str) -> None:
     Args:
         name: Name of the logger.
     """
-    base_logger = logging.getLogger(name)
-    base_logger.addHandler(
-        RichHandler(
-            rich_tracebacks=True,
-            keywords=[],
-            tracebacks_suppress=[pydantic],
-        ),
+    log_queue = Queue()
+    queue_handler = QueueHandler(log_queue)
+
+    rich_handler = RichHandler(
+        rich_tracebacks=True,
+        keywords=[],
+        tracebacks_suppress=[pydantic],
     )
+
+    listener = QueueListener(log_queue, rich_handler)
+    listener.start()
+    base_logger = logging.getLogger(name)
+
+    base_logger.addHandler(queue_handler)
     base_logger.setLevel(logging.INFO)
 
 
