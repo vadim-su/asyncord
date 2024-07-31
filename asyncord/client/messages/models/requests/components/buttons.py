@@ -2,7 +2,7 @@
 
 from typing import Annotated, Literal, Self
 
-from pydantic import AnyHttpUrl, Field, field_validator, model_validator
+from pydantic import AnyHttpUrl, Field, model_validator
 
 from asyncord.client.messages.models.common import ButtonStyle, ComponentType
 from asyncord.client.messages.models.requests.components.base import BaseComponent
@@ -27,15 +27,6 @@ class BaseButton(BaseComponent):
 
     style: ButtonStyle = ButtonStyle.PRIMARY
     """Style of the button."""
-
-    label: Annotated[str, Field(max_length=80)] | None = None
-    """Text to be displayed on the button.
-
-    Max 80 characters.
-    """
-
-    emoji: ComponentEmoji | None = None
-    """Emoji to be displayed on the button."""
 
     disabled: bool = False
     """Whether the button is disabled."""
@@ -67,6 +58,15 @@ class LinkButton(BaseButton):
     Only `ButtonStyle.LINK` is allowed.
     """
 
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
+
     url: Annotated[str, AnyHttpUrl]
     """URL for link-style buttons."""
 
@@ -81,24 +81,10 @@ class PremiumButton(BaseButton):
     https://discord.com/developers/docs/interactions/message-components#buttons
     """
 
+    style: Literal[ButtonStyle.PREMIUM] = ButtonStyle.PREMIUM  # type: ignore
+
     sku_id: SnowflakeInputType
     """Identifier for a purchasable SKU."""
-
-    @field_validator('emoji')
-    @classmethod
-    def validate_emoji(cls, value: ComponentEmoji | None) -> ComponentEmoji | None:
-        """Raise an error if `emoji` is provided."""
-        if value:
-            raise ValueError('Premium buttons cannot have an emoji.')
-        return value
-
-    @field_validator('label')
-    @classmethod
-    def validate_label(cls, value: str | None) -> str | None:
-        """Raise an error if `label` is provided."""
-        if value:
-            raise ValueError('Premium buttons cannot have a label.')
-        return value
 
 
 class AnyButtonWithCustomId(BaseButton):
@@ -115,6 +101,15 @@ class AnyButtonWithCustomId(BaseButton):
 
     Max 100 characters.
     """
+
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
 
 
 class PrimaryButton(AnyButtonWithCustomId):
@@ -138,6 +133,15 @@ class PrimaryButton(AnyButtonWithCustomId):
     Max 100 characters.
     """
 
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
+
 
 class SecondaryButton(AnyButtonWithCustomId):
     """Secondary-style buttons are interactive components that render in messages.
@@ -159,6 +163,15 @@ class SecondaryButton(AnyButtonWithCustomId):
 
     Max 100 characters.
     """
+
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
 
 
 class SuccessButton(AnyButtonWithCustomId):
@@ -182,6 +195,15 @@ class SuccessButton(AnyButtonWithCustomId):
     Max 100 characters.
     """
 
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
+
 
 class DangerButton(AnyButtonWithCustomId):
     """Danger-style buttons are interactive components that render in messages.
@@ -203,6 +225,15 @@ class DangerButton(AnyButtonWithCustomId):
 
     Max 100 characters.
     """
+
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
 
 
 type ButtonComponentType = Annotated[
