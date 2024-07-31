@@ -277,6 +277,12 @@ class ButtonStyle(enum.IntEnum):
     Reqired `url`.
     """
 
+    PREMIUM = 6
+    """Blurple color.
+
+    Reqired `sku_id`.
+    """
+
 
 class TextInputStyle(enum.IntEnum):
     """Text input styles.

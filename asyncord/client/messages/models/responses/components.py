@@ -94,6 +94,9 @@ class ButtonOut(BaseComponentOut):
     url: str | None = None
     """URL for link-style buttons."""
 
+    sku_id: Snowflake | None = None
+    """Identifier for a purchasable SKU."""
+
     disabled: bool = False
     """Whether the button is disabled."""
 

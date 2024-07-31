@@ -1,10 +1,13 @@
+"""Button components for messages."""
+
 from typing import Annotated, Literal, Self
 
-from pydantic import AnyHttpUrl, Field, model_validator
+from pydantic import AnyHttpUrl, Field, field_validator, model_validator
 
 from asyncord.client.messages.models.common import ButtonStyle, ComponentType
 from asyncord.client.messages.models.requests.components.base import BaseComponent
 from asyncord.client.messages.models.requests.components.emoji import ComponentEmoji
+from asyncord.snowflake import SnowflakeInputType
 
 
 class BaseButton(BaseComponent):
@@ -66,6 +69,36 @@ class LinkButton(BaseButton):
 
     url: Annotated[str, AnyHttpUrl]
     """URL for link-style buttons."""
+
+
+class PremiumButton(BaseButton):
+    """Premium buttons are interactive components that render in messages.
+
+    Premium buttons must contain a sku_id, and cannot have a custom_id, label, url, or emoji.
+    Premium buttons do not send an interaction to your app when clicked
+
+    Reference:
+    https://discord.com/developers/docs/interactions/message-components#buttons
+    """
+
+    sku_id: SnowflakeInputType
+    """Identifier for a purchasable SKU."""
+
+    @field_validator('emoji')
+    @classmethod
+    def validate_emoji(cls, value: ComponentEmoji | None) -> ComponentEmoji | None:
+        """Raise an error if `emoji` is provided."""
+        if value:
+            raise ValueError('Premium buttons cannot have an emoji.')
+        return value
+
+    @field_validator('label')
+    @classmethod
+    def validate_label(cls, value: str | None) -> str | None:
+        """Raise an error if `label` is provided."""
+        if value:
+            raise ValueError('Premium buttons cannot have a label.')
+        return value
 
 
 class AnyButtonWithCustomId(BaseButton):
