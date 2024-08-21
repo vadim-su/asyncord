@@ -8,11 +8,13 @@ from io import BufferedReader, IOBase
 from pathlib import Path
 from typing import Annotated, Any
 
-from pydantic import AnyHttpUrl, BaseModel, Field
+from pydantic import BaseModel, Field
+from yarl import URL
 
 from asyncord.client.http.client import make_payload_form
 from asyncord.client.http.models import FormField, FormPayload
 from asyncord.snowflake import SnowflakeInputType
+from asyncord.yarl_url import HttpYarlUrl
 
 __ALL__ = (
     'AttachmentContentType',
@@ -22,7 +24,7 @@ __ALL__ = (
 )
 
 
-type AttachmentContentType = bytes | bytearray | memoryview | BufferedReader | IOBase | Path
+AttachmentContentType = bytes | bytearray | memoryview | BufferedReader | IOBase | Path
 """Attachment content type.
 
 It can be raw data, a file-like object, or a path to a file.
@@ -66,10 +68,10 @@ class Attachment(BaseModel, arbitrary_types_allowed=True):
     size: int | None = None
     """Size of the file in bytes."""
 
-    url: AnyHttpUrl | None = None
+    url: HttpYarlUrl | None = None
     """Source URL of the file."""
 
-    proxy_url: AnyHttpUrl | None = None
+    proxy_url: HttpYarlUrl | None = None
     """Proxied URL of the file."""
 
     height: int | None = None
@@ -112,6 +114,19 @@ class Attachment(BaseModel, arbitrary_types_allowed=True):
     If set to True, the file will not be attached as an image or video and will be sent as a raw file.
     You can use this to send files without embedding them.
     """
+
+    def make_path(self) -> URL | None:
+        """Get the file path URL.
+
+        It is necessary to relate the file to the message in some cases.
+        For instance, when sending a message with an image embed, the image URL must be 'attachment://filename'.
+
+        If file name is present, it will return the 'attachment://filename' URL.
+        Otherwise, it will return none.
+        """
+        if self.filename:
+            return URL(f'attachment://{self.filename}')
+        return None
 
 
 def make_payload_with_attachments(

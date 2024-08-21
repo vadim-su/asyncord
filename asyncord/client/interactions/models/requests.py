@@ -20,11 +20,11 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator
 from asyncord.client.commands.models.requests import ApplicationCommandOptionChoice
 from asyncord.client.interactions.models.common import InteractionResponseType
 from asyncord.client.messages.models.common import MessageFlags
+from asyncord.client.messages.models.requests.base_message import BaseMessage, ListAttachmentType, SingleAttachmentType
 from asyncord.client.messages.models.requests.components import ActionRow, MessageComponentType, TextInput
 from asyncord.client.messages.models.requests.components.action_row import RowComponentType
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import AllowedMentions, BaseMessage
-from asyncord.client.models.attachments import Attachment, AttachmentContentType
+from asyncord.client.messages.models.requests.messages import AllowedMentions
 
 __all__ = (
     'InteractionRespAutocompleteRequest',
@@ -70,8 +70,8 @@ class InteractionRespMessageRequest(BaseMessage):
     content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
-    embeds: list[Embed] | None = None
-    """List of embeds included in the message."""
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
+    """Embedded rich content."""
 
     allowed_mentions: AllowedMentions | None = None
     """Object specifying which mentions are allowed in the message."""
@@ -85,8 +85,11 @@ class InteractionRespMessageRequest(BaseMessage):
     components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """List of components included in the message.."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
-    """List of attachment objects with filename and description.
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
+    """List of attachment object.
 
     Reference:
     https://discord.com/developers/docs/reference#uploading-files
@@ -110,8 +113,8 @@ class InteractionRespUpdateMessageRequest(BaseMessage):
     content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
-    embeds: list[Embed] | None = None
-    """List of embeds included in the message."""
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
+    """Embedded rich content."""
 
     allowed_mentions: AllowedMentions | None = None
     """Object specifying which mentions are allowed in the message."""
@@ -125,8 +128,11 @@ class InteractionRespUpdateMessageRequest(BaseMessage):
     components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """List of components included in the message.."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
-    """List of attachment objects with filename and description.
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
+    """List of attachment object.
 
     Reference:
     https://discord.com/developers/docs/reference#uploading-files
@@ -149,8 +155,8 @@ class InteractionRespDeferredMessageRequest(BaseMessage):
     content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
-    embeds: list[Embed] | None = None
-    """List of embeds."""
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
+    """Embedded rich content."""
 
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions object."""
@@ -164,8 +170,11 @@ class InteractionRespDeferredMessageRequest(BaseMessage):
     components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """List of components."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
-    """Attachment objects with filename and description.
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
+    """List of attachment object.
 
     Reference:
     https://discord.com/developers/docs/reference#uploading-files
@@ -186,8 +195,8 @@ class InteractionRespUpdateDeferredMessageRequest(BaseMessage):
     content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
-    embeds: list[Embed] | None = None
-    """List of embeds."""
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
+    """Embedded rich content."""
 
     allowed_mentions: AllowedMentions | None = None
     """Allowed mentions object."""
@@ -201,8 +210,11 @@ class InteractionRespUpdateDeferredMessageRequest(BaseMessage):
     components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """List of components."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
-    """Attachment objects with filename and description.
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
+    """List of attachment object.
 
     Reference:
     https://discord.com/developers/docs/reference#uploading-files

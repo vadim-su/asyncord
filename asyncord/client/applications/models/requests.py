@@ -3,7 +3,7 @@
 from enum import IntEnum
 from typing import Annotated
 
-from pydantic import BaseModel, Field, HttpUrl, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.applications.models.common import (
@@ -13,6 +13,7 @@ from asyncord.client.applications.models.common import (
 from asyncord.client.auth.models import OAuthScope
 from asyncord.client.models.permissions import PermissionFlag
 from asyncord.locale import LocaleInputType
+from asyncord.yarl_url import HttpYarlUrl
 
 __all__ = (
     'ApplicationIntegrationType',
@@ -105,7 +106,7 @@ class UpdateApplicationRequest(BaseModel):
     cover_image: Base64ImageInputType | None = None
     """Default rich presence invite cover image for the app."""
 
-    interactions_endpoint_url: HttpUrl | None = None
+    interactions_endpoint_url: HttpYarlUrl | None = None
     """Interactions endpoint URL for the app."""
 
     tags: (

@@ -7,10 +7,9 @@ from pydantic import BaseModel, Field
 
 from asyncord.base64_image import Base64ImageInputType
 from asyncord.client.messages.models.common import AllowedMentionType, MessageFlags
+from asyncord.client.messages.models.requests.base_message import BaseMessage, ListAttachmentType, SingleAttachmentType
 from asyncord.client.messages.models.requests.components import MessageComponentType
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import BaseMessage
-from asyncord.client.models.attachments import Attachment, AttachmentContentType
 from asyncord.client.polls.models.requests import Poll
 from asyncord.snowflake import SnowflakeInputType
 
@@ -75,7 +74,7 @@ class ExecuteWebhookRequest(BaseMessage):
     tts: bool | None = None
     """True if this is a TTS message."""
 
-    embeds: Annotated[list[Embed] | None, Field(max_length=10)] = None
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
     """Embedded rich content."""
 
     allowed_mentions: AllowedMentionType | None = None
@@ -84,7 +83,10 @@ class ExecuteWebhookRequest(BaseMessage):
     components: MessageComponentType | Sequence[MessageComponentType] | None = None
     """The components to include with the message."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
     """List of attachment object.
 
     See Uploading Files:
@@ -123,7 +125,7 @@ class UpdateWebhookMessageRequest(BaseMessage):
     content: Annotated[str | None, Field(max_length=2000)] = None
     """The message contents (up to 2000 characters)."""
 
-    embeds: Annotated[list[Embed], Field(max_length=10)] | None = None
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
     """Embedded rich content."""
 
     allowed_mentions: AllowedMentionType | None = None
@@ -132,7 +134,10 @@ class UpdateWebhookMessageRequest(BaseMessage):
     components: MessageComponentType | Sequence[MessageComponentType] | None = None
     """The components to include with the message."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
     """List of attachment object.
 
     See Uploading Files:

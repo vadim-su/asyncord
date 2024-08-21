@@ -19,7 +19,6 @@ from asyncord.client.messages.models.requests.embeds import (
     EmbedField,
     EmbedFooter,
     EmbedImage,
-    EmbedThumbnail,
 )
 from asyncord.client.rest import RestClient
 from asyncord.gateway.client.client import GatewayClient
@@ -131,7 +130,7 @@ class WeatherCommand(ChatCommand):
                     inline=True,
                 ),
             ],
-            thumbnail=EmbedThumbnail(
+            thumbnail=EmbedImage(
                 url=f'https:{weather.current.condition.icon}',
             ),
             timestamp=datetime.datetime.now(),  # noqa

@@ -89,7 +89,7 @@ class ChannelResource(APIResource):
         """
         url = self.channels_url / str(channel_id)
         resp = await self._http_client.get(url=url)
-        return ChannelResponse(**resp.body)
+        return ChannelResponse.model_validate(resp.body)
 
     async def create_channel(
         self,

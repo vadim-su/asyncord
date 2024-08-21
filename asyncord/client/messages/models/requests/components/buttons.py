@@ -1,10 +1,13 @@
+"""Button components for messages."""
+
 from typing import Annotated, Literal, Self
 
-from pydantic import AnyHttpUrl, Field, model_validator
+from pydantic import Field, model_validator
 
 from asyncord.client.messages.models.common import ButtonStyle, ComponentType
 from asyncord.client.messages.models.requests.components.base import BaseComponent
 from asyncord.client.messages.models.requests.components.emoji import ComponentEmoji
+from asyncord.yarl_url import HttpYarlUrl
 
 
 class BaseButton(BaseComponent):
@@ -64,7 +67,7 @@ class LinkButton(BaseButton):
     Only `ButtonStyle.LINK` is allowed.
     """
 
-    url: Annotated[str, AnyHttpUrl]
+    url: HttpYarlUrl
     """URL for link-style buttons."""
 
 

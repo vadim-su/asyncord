@@ -6,7 +6,9 @@ from typing import Annotated
 from pydantic import BaseModel, Field
 
 from asyncord.client.messages.models.common import EmbedType
+from asyncord.client.models.attachments import Attachment, AttachmentContentType
 from asyncord.color import ColorInput
+from asyncord.yarl_url import AttachmentUrl, HttpYarlUrl
 
 __all__ = (
     'Embed',
@@ -15,7 +17,6 @@ __all__ = (
     'EmbedFooter',
     'EmbedImage',
     'EmbedProvider',
-    'EmbedThumbnail',
     'EmbedVideo',
 )
 
@@ -24,7 +25,7 @@ class EmbedFooter(BaseModel):
     """Object representing footer of an embed.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
+    https://discord.com/developers/docs/resources/message#embed-object-embed-footer-structure
     """
 
     text: str = Field(max_length=2048)
@@ -41,11 +42,17 @@ class EmbedImage(BaseModel):
     """Object representing image in an embed.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+    https://discord.com/developers/docs/resources/message#embed-object-embed-image-structure
     """
 
-    url: str
-    """Source URL of image (only supports http(s) and attachments)."""
+    url: HttpYarlUrl | AttachmentUrl | None = None
+    """Source URL of image (only supports http(s) and attachments).
+
+    Example:
+    https://cdn.discordapp.com/emojis/someemoji.png
+    https://example.com/someimage.png
+    attachment://someimage.png  # Check that you add the file with the same name as the attachment
+    """
 
     proxy_url: str | None = None
     """Proxied URL of image."""
@@ -57,26 +64,6 @@ class EmbedImage(BaseModel):
     """Width of image."""
 
 
-class EmbedThumbnail(BaseModel):
-    """Object representing thumbnail in an embed.
-
-    Reference:
-    https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
-    """
-
-    url: str
-    """Source URL of thumbnail (only supports http(s) and attachments)."""
-
-    proxy_url: str | None = None
-    """Proxied URL of thumbnail."""
-
-    height: int | None = None
-    """Height of thumbnail."""
-
-    width: int | None = None
-    """Width of thumbnail."""
-
-
 class EmbedVideo(BaseModel):
     """Object representing video in an embed.
 
@@ -84,7 +71,7 @@ class EmbedVideo(BaseModel):
     Discord API will ignore it if provided.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
+    https://discord.com/developers/docs/resources/message#embed-object-embed-video-structure
     """
 
     url: str | None = None
@@ -104,7 +91,7 @@ class EmbedProvider(BaseModel):
     """Object representing the provider of an embed.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
+    https://discord.com/developers/docs/resources/message#embed-object-embed-provider-structure
     """
 
     name: str | None = None
@@ -118,7 +105,7 @@ class EmbedAuthor(BaseModel):
     """Object representing the author of an embed.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
+    https://discord.com/developers/docs/resources/message#embed-object-embed-author-structure
     """
 
     name: str = Field(max_length=256)
@@ -138,7 +125,7 @@ class EmbedField(BaseModel):
     """Embed field object.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
+    https://discord.com/developers/docs/resources/message#embed-object-embed-field-structure
     """
 
     name: str = Field(max_length=256)
@@ -151,14 +138,14 @@ class EmbedField(BaseModel):
     """Whether or not this field should display inline."""
 
 
-class Embed(BaseModel):
+class Embed(BaseModel, arbitrary_types_allowed=True):
     """Embed object.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#embed-object
+    https://discord.com/developers/docs/resources/message#embed-object
     """
 
-    title: Annotated[str | None, Field(max_length=256)] = None
+    title: Annotated[str, Field(max_length=256)] | None = None
     """Title of the embed."""
 
     type: EmbedType | None = None
@@ -167,7 +154,7 @@ class Embed(BaseModel):
     Always "rich" for webhook embeds.
     """
 
-    description: Annotated[str | None, Field(max_length=4096)] = None
+    description: Annotated[str, Field(max_length=4096)] | None = None
     """Description of the embed."""
 
     url: str | None = None
@@ -182,11 +169,21 @@ class Embed(BaseModel):
     footer: EmbedFooter | None = None
     """Footer information."""
 
-    image: EmbedImage | None = None
-    """Image information."""
+    image: EmbedImage | Attachment | AttachmentContentType | None = None
+    """Image information.
 
-    thumbnail: EmbedThumbnail | None = None
-    """Thumbnail information."""
+    API doesn't support attachments for this field, but I add it as sugar to
+    make it easier to use. Under the hood, it will be converted to a EmbedImage object
+    and an attachment object on the message level.
+    """
+
+    thumbnail: EmbedImage | Attachment | AttachmentContentType | None = None
+    """Thumbnail information.
+
+    API doesn't support attachments for this field, but I add it as sugar to
+    make it easier to use. Under the hood, it will be converted to a EmbedImage object
+    and an attachment object on the message level.
+    """
 
     video: EmbedVideo | None = None
     """Video information.

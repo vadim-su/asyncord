@@ -7,7 +7,7 @@ https://discord.com/developers/docs/resources/application
 from __future__ import annotations
 
 from fbenum.adapter import FallbackAdapter
-from pydantic import AnyHttpUrl, BaseModel, Field
+from pydantic import BaseModel, Field
 
 from asyncord.client.applications.models.common import (
     ApplicationCommandPermissionType,
@@ -19,6 +19,7 @@ from asyncord.client.users.models.responses import PremiumType, UserFlags
 from asyncord.color import ColorInput
 from asyncord.locale import LocaleInputType
 from asyncord.snowflake import Snowflake
+from asyncord.yarl_url import HttpYarlUrl
 
 __all__ = (
     'ApplicationCommandPermissionOut',
@@ -269,13 +270,13 @@ class ApplicationOut(BaseModel):
     approximate_guild_count: int | None = None
     """Approximate count of guilds the app has been added to"""
 
-    redirect_uris: list[AnyHttpUrl] | None = None
+    redirect_uris: list[HttpYarlUrl] | None = None
     """Array of redirect URIs for the app"""
 
-    interactions_endpoint_url: AnyHttpUrl | None = None
+    interactions_endpoint_url: HttpYarlUrl | None = None
     """Interactions endpoint URL for the app"""
 
-    role_connections_verification_url: AnyHttpUrl | None = None
+    role_connections_verification_url: HttpYarlUrl | None = None
     """Application's default role connection verification url."""
 
     tags: set[str] = Field(default_factory=list, max_length=5)
@@ -287,7 +288,7 @@ class ApplicationOut(BaseModel):
     install_params: InstallParamsOut | None = None
     """Settings for the application's default in-app authorization link."""
 
-    custom_install_url: AnyHttpUrl | None = None
+    custom_install_url: HttpYarlUrl | None = None
     """Application's default custom authorization link"""
 
 
@@ -441,13 +442,13 @@ class InviteCreateEventApplication(BaseModel):
     approximate_guild_count: int | None = None
     """Approximate count of guilds the app has been added to"""
 
-    redirect_uris: list[AnyHttpUrl] | None = None
+    redirect_uris: list[HttpYarlUrl] | None = None
     """Array of redirect URIs for the app"""
 
-    interactions_endpoint_url: AnyHttpUrl | None = None
+    interactions_endpoint_url: HttpYarlUrl | None = None
     """Interactions endpoint URL for the app"""
 
-    role_connections_verification_url: AnyHttpUrl | None = None
+    role_connections_verification_url: HttpYarlUrl | None = None
     """Application's default role connection verification url."""
 
     tags: list[str] = Field(default_factory=list, max_length=5)
@@ -459,5 +460,5 @@ class InviteCreateEventApplication(BaseModel):
     install_params: InstallParamsOut | None = None
     """Settings for the application's default in-app authorization link."""
 
-    custom_install_url: AnyHttpUrl | None = None
+    custom_install_url: HttpYarlUrl | None = None
     """Application's default custom authorization link"""
