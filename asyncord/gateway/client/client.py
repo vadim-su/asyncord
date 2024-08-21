@@ -51,7 +51,7 @@ class GatewayClient:
     It's main entity used to connect to the Discord gateway and send/proccess messages.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         *,
         token: str | BotTokenAuthStrategy,

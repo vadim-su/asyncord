@@ -1,3 +1,9 @@
+"""This module defines the base component class for the application.
+
+References:
+    https://discord.com/developers/docs/interactions/message-components#message-components
+"""
+
 from typing import Self
 
 from pydantic import BaseModel, model_validator

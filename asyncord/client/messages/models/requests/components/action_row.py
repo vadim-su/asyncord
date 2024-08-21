@@ -1,3 +1,9 @@
+"""This module defines the `ActionRow` class, which groups components in a row.
+
+References:
+    https://discord.com/developers/docs/interactions/message-components#action-rows
+"""
+
 from __future__ import annotations
 
 from collections import Counter
