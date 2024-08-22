@@ -98,7 +98,7 @@ class InteractionResource(APIResource):
             interaction_response=InteractionRespPongRequest(),
         )
 
-    async def get_original_interaction_response(
+    async def get_original_response(
         self,
         application_id: SnowflakeInputType,
         interaction_token: str,
@@ -114,13 +114,13 @@ class InteractionResource(APIResource):
         Returns:
             Original interaction response.
         """
-        return await self.get_interaction_response(
+        return await self.get_response(
             application_id=application_id,
             interaction_token=interaction_token,
             message_id='@original',
         )
 
-    async def get_interaction_response(
+    async def get_response(
         self,
         application_id: SnowflakeInputType,
         interaction_token: str,
@@ -140,7 +140,7 @@ class InteractionResource(APIResource):
         response = await self._http_client.get(url=url)
         return MessageResponse.model_validate(response)
 
-    async def update_original_interaction_response(
+    async def update_original_response(
         self,
         application_id: SnowflakeInputType,
         interaction_token: str,
@@ -156,14 +156,14 @@ class InteractionResource(APIResource):
         Returns:
             Updated interaction response message.
         """
-        return await self.update_interaction_response(
+        return await self.update_response(
             application_id=application_id,
             interaction_token=interaction_token,
             message_id='@original',
             update_data=update_data,
         )
 
-    async def update_interaction_response(
+    async def update_response(
         self,
         application_id: SnowflakeInputType,
         interaction_token: str,
@@ -188,7 +188,7 @@ class InteractionResource(APIResource):
         response = await self._http_client.patch(url=url, payload=payload)
         return MessageResponse.model_validate(response)
 
-    async def delete_original_interaction_response(
+    async def delete_original_response(
         self,
         application_id: SnowflakeInputType,
         interaction_token: str,
@@ -199,13 +199,13 @@ class InteractionResource(APIResource):
             application_id: Application ID.
             interaction_token: Interaction token.
         """
-        await self.delete_interaction_response(
+        await self.delete_response(
             application_id=application_id,
             interaction_token=interaction_token,
             message_id='@original',
         )
 
-    async def delete_interaction_response(
+    async def delete_response(
         self,
         application_id: SnowflakeInputType,
         interaction_token: str,
