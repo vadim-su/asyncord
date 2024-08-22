@@ -138,7 +138,7 @@ class InteractionResource(APIResource):
         """
         url = self.webhook_url / str(application_id) / interaction_token / 'messages' / str(message_id)
         response = await self._http_client.get(url=url)
-        return MessageResponse.model_validate(response)
+        return MessageResponse.model_validate(response.body)
 
     async def update_original_response(
         self,
@@ -186,7 +186,7 @@ class InteractionResource(APIResource):
         attachments = cast(list[Attachment] | None, update_data.attachments)
         payload = make_payload_with_attachments(update_data, attachments=attachments)
         response = await self._http_client.patch(url=url, payload=payload)
-        return MessageResponse.model_validate(response)
+        return MessageResponse.model_validate(response.body)
 
     async def delete_original_response(
         self,

@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from asyncord.client.http.headers import JSON_CONTENT_TYPE
-from asyncord.client.http.models import FormPayload, JsonField
+from asyncord.client.http.models import FormPayload, JsonField, Response
 from asyncord.client.interactions.models.common import InteractionResponseType
 from asyncord.client.interactions.models.requests import (
     InteractionRespAutocompleteRequest,
@@ -27,27 +27,33 @@ from asyncord.client.webhooks.models.requests import UpdateWebhookMessageRequest
 TEST_ATTACHMENTS = [Attachment(content=b'png:...')]
 
 
-_MOCK_RESP = MessageResponse(
-    id='1234567890',  # type: ignore
-    channel_id='1234567890',  # type: ignore
-    author=UserResponse(
+_MOCK_RESP = Response(
+    status=200,
+    raw_body=b'{}',
+    headers={},
+    raw_response=AsyncMock(),
+    body=MessageResponse(
         id='1234567890',  # type: ignore
-        username='username',
-        discriminator='1234',
-        global_name='global_name',
-        avatar=None,
-    ),
-    content='Hello, World!',
-    timestamp='2021-10-10T10:10:10.000000+00:00',  # type: ignore
-    tts=False,
-    mention_everyone=False,
-    mentions=[],
-    mention_roles=[],
-    attachments=[],
-    embeds=[],
-    pinned=False,
-    type=0,  # type: ignore
-    flags=0,  # type: ignore
+        channel_id='1234567890',  # type: ignore
+        author=UserResponse(
+            id='1234567890',  # type: ignore
+            username='username',
+            discriminator='1234',
+            global_name='global_name',
+            avatar=None,
+        ),
+        content='Hello, World!',
+        timestamp='2021-10-10T10:10:10.000000+00:00',  # type: ignore
+        tts=False,
+        mention_everyone=False,
+        mentions=[],
+        mention_roles=[],
+        attachments=[],
+        embeds=[],
+        pinned=False,
+        type=0,  # type: ignore
+        flags=0,  # type: ignore
+    ).model_dump(mode='json'),
 )
 
 
@@ -115,7 +121,7 @@ async def test_get_original_response(interaction_res: InteractionResource) -> No
     interaction_token = 'token'  # noqa: S105
 
     method_caller = cast(AsyncMock, interaction_res._http_client.get)
-    method_caller.return_value = _MOCK_RESP.model_dump(mode='json')
+    method_caller.return_value = _MOCK_RESP
 
     await interaction_res.get_original_response(application_id, interaction_token)
     method_caller.assert_called_once()
@@ -131,7 +137,7 @@ async def test_get_response(interaction_res: InteractionResource) -> None:
     interaction_token = 'token'  # noqa: S105
 
     method_caller = cast(AsyncMock, interaction_res._http_client.get)
-    method_caller.return_value = _MOCK_RESP.model_dump(mode='json')
+    method_caller.return_value = _MOCK_RESP
 
     await interaction_res.get_response(application_id, interaction_token, '1234567890')
     method_caller.assert_called_once()
@@ -147,7 +153,7 @@ async def test_update_origin_response(interaction_res: InteractionResource) -> N
     interaction_token = 'token'  # noqa: S105
 
     method_caller = cast(AsyncMock, interaction_res._http_client.patch)
-    method_caller.return_value = _MOCK_RESP.model_dump(mode='json')
+    method_caller.return_value = _MOCK_RESP
 
     await interaction_res.update_original_response(
         application_id,
@@ -167,7 +173,7 @@ async def test_update_response(interaction_res: InteractionResource) -> None:
     interaction_token = 'token'  # noqa: S105
 
     method_caller = cast(AsyncMock, interaction_res._http_client.patch)
-    method_caller.return_value = _MOCK_RESP.model_dump(mode='json')
+    method_caller.return_value = _MOCK_RESP
 
     await interaction_res.update_response(
         application_id,
