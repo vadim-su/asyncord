@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import enum
+import logging
+import mimetypes
 from collections.abc import Sequence
 from io import BufferedReader, IOBase
 from pathlib import Path
 from typing import Annotated, Any
 
+import filetype
 from pydantic import BaseModel, Field
 from yarl import URL
 
@@ -22,6 +25,8 @@ __ALL__ = (
     'Attachment',
     'make_attachment_payload',
 )
+
+logger = logging.getLogger(__name__)
 
 
 AttachmentContentType = bytes | bytearray | memoryview | BufferedReader | IOBase | Path
@@ -165,10 +170,35 @@ def make_payload_with_attachments(
     file_form_fields = {
         f'files[{attachment.id}]': FormField(
             value=attachment.content,
-            content_type=attachment.content_type,
+            content_type=attachment.content_type or _get_content_type(attachment),
             filename=attachment.filename,
         )
         for attachment in attachments
         if attachment.content is not None
     }
     return make_payload_form(json_payload=json_payload, **file_form_fields)
+
+
+def _get_content_type(attachment: Attachment) -> str | None:
+    """Guess the content type of the attachment.
+
+    Args:
+        attachment: Attachment object.
+
+    Returns:
+        The guessed content type.
+    """
+    if attachment.content_type:
+        return attachment.content_type
+
+    if attachment.filename:
+        return mimetypes.guess_type(attachment.filename)[0]
+
+    if isinstance(attachment.content, bytes | bytearray | memoryview | str | Path):
+        return filetype.guess_mime(attachment.content)
+
+    logger.warning(
+        'Could not guess content type for attachment %s',
+        attachment.id or attachment.filename,
+    )
+    return None
