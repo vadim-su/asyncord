@@ -192,10 +192,14 @@ def _get_content_type(attachment: Attachment) -> str | None:
         return attachment.content_type
 
     if attachment.filename:
-        return mimetypes.guess_type(attachment.filename)[0]
+        mime_type = mimetypes.guess_type(attachment.filename)[0]
+        if mime_type:
+            return mime_type
 
     if isinstance(attachment.content, bytes | bytearray | memoryview | str | Path):
-        return filetype.guess_mime(attachment.content)
+        mime_type = filetype.guess_mime(attachment.content)
+        if mime_type:
+            return mime_type
 
     logger.warning(
         'Could not guess content type for attachment %s',
