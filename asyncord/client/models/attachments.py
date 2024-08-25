@@ -170,7 +170,7 @@ def make_payload_with_attachments(
     file_form_fields = {
         f'files[{attachment.id}]': FormField(
             value=attachment.content,
-            content_type=attachment.content_type or _get_content_type(attachment),
+            content_type=attachment.content_type,
             filename=attachment.filename,
         )
         for attachment in attachments
@@ -179,7 +179,7 @@ def make_payload_with_attachments(
     return make_payload_form(json_payload=json_payload, **file_form_fields)
 
 
-def _get_content_type(attachment: Attachment) -> str | None:
+def get_content_mime(attachment: Attachment) -> str | None:
     """Guess the content type of the attachment.
 
     Args:
@@ -196,10 +196,59 @@ def _get_content_type(attachment: Attachment) -> str | None:
         if mime_type:
             return mime_type
 
-    if isinstance(attachment.content, bytes | bytearray | memoryview | str | Path):
+    if isinstance(attachment.content, bytes | bytearray | str | Path):
         mime_type = filetype.guess_mime(attachment.content)
         if mime_type:
             return mime_type
+
+    logger.warning(
+        'Could not guess content type for attachment %s',
+        attachment.id or attachment.filename,
+    )
+    return None
+
+
+def get_content_extension(attachment: Attachment) -> str | None:
+    """Get the extension of the content type.
+
+    Args:
+        attachment: Attachment object.
+
+    Returns:
+        The extension of the content type.
+    """
+    if attachment.content_type:
+        extension = mimetypes.guess_extension(attachment.content_type)
+        if extension:
+            return extension
+
+    if isinstance(attachment.content, bytes | bytearray | str | Path):
+        extension = filetype.guess_extension(attachment.content)
+        if extension:
+            return extension
+
+    logger.warning('Could not guess extension for content type %s', attachment.id or attachment.filename)
+    return None
+
+
+def get_content_type(attachment: Attachment) -> tuple[str, str] | None:
+    """Guess the content type of the attachment.
+
+    Args:
+        attachment: Attachment object.
+
+    Returns:
+        The guessed content type.
+    """
+    if attachment.content_type:
+        extension = mimetypes.guess_extension(attachment.content_type)
+        if extension:
+            return attachment.content_type, extension
+
+    if attachment.content:
+        kind = filetype.guess(attachment.content)
+        if kind:
+            return kind.mime, kind.extension
 
     logger.warning(
         'Could not guess content type for attachment %s',
