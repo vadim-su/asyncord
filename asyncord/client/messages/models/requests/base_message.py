@@ -18,7 +18,7 @@ from pydantic import (
 
 from asyncord.client.messages.models.requests.components.action_row import ActionRow, MessageComponentType
 from asyncord.client.messages.models.requests.embeds import Embed, EmbedImage
-from asyncord.client.models.attachments import Attachment, AttachmentContentType
+from asyncord.client.models.attachments import Attachment, AttachmentContentType, get_content_type
 from asyncord.snowflake import SnowflakeInputType
 
 __all__ = (
@@ -122,6 +122,12 @@ class BaseMessage(BaseModel):
 
                 if not attachment.filename:
                     attachment.filename = f'{embed_field_name}_{len(attachments)}'
+
+                    mime_and_ext = get_content_type(attachment)
+                    if mime_and_ext:
+                        if not attachment.content_type:
+                            attachment.content_type = mime_and_ext[0]
+                        attachment.filename = f'{attachment.filename}.{mime_and_ext[1]}'
 
                 attachments.append(attachment)
                 attachment_url = attachment.make_path()
