@@ -1,0 +1,34 @@
+name: Publish package to PyPI
+
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-tests:
+    uses: vadim-su/asyncord/.github/workflows/tests.yml@main
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: run-tests
+
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python with PDM
+        uses: pdm-project/setup-pdm@v3
+        with:
+          cache: true
+
+      - name: Publish package distributions to PyPI
+        run: pdm publish
