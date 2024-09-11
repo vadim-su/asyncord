@@ -12,7 +12,7 @@ from asyncord.client.polls.models.requests import Answer, Poll, PollEmoji
 from asyncord.client.polls.resources import PollsResource
 
 
-@pytest.fixture()
+@pytest.fixture
 async def poll_message(messages_res: MessageResource) -> AsyncGenerator[MessageResponse, None]:
     """Create a message with a poll.
 

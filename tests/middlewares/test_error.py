@@ -8,7 +8,7 @@ from asyncord.client.http.middleware.errors import ErrorHandlerMiddleware
 from asyncord.client.http.models import Request, Response
 
 
-@pytest.fixture()
+@pytest.fixture
 def headers() -> dict[str, str]:
     """Return a dictionary of headers."""
     return {
@@ -20,7 +20,7 @@ def headers() -> dict[str, str]:
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def err_middleware() -> ErrorHandlerMiddleware:
     """Return an instance of the error handler middleware."""
     return ErrorHandlerMiddleware()

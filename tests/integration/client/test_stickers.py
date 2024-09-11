@@ -14,7 +14,7 @@ from tests.conftest import IntegrationTestData
 TEST_STICKER = Path('tests/data/test_sticker.png')
 
 
-@pytest.fixture()
+@pytest.fixture
 async def sticker(
     stickers_res: StickersResource,
     integration_data: IntegrationTestData,

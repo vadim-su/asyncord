@@ -11,13 +11,13 @@ from asyncord.client.http.middleware.ratelimit import BackoffRateLimitStrategy, 
 from asyncord.client.http.models import RatelimitResponse, Request, Response
 
 
-@pytest.fixture()
+@pytest.fixture
 def rate_limit_strategy() -> BackoffRateLimitStrategy:
     """Return an instance of the BackoffRateLimitStrategy."""
     return BackoffRateLimitStrategy(max_retries=1, min_wait_time=0, max_wait_time=1)
 
 
-@pytest.fixture()
+@pytest.fixture
 def ratelimit_error() -> RateLimitError:
     """Return an instance of the RateLimitError."""
     raw_body = b"""{

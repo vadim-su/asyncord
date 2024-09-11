@@ -16,7 +16,7 @@ from asyncord.gateway.events.base import ReadyEvent
 from asyncord.gateway.message import DispatchMessage
 
 
-@pytest.fixture()
+@pytest.fixture
 def client() -> Mock:
     """Return a mock client."""
     client = AsyncMock()

@@ -38,7 +38,7 @@ from asyncord.client.webhooks.resources import WebhooksResource
 from tests.conftest import IntegrationTestData
 
 
-@pytest.fixture()
+@pytest.fixture
 async def client(token: str) -> RestClient:
     """Get a rest client."""
     return RestClient(
@@ -51,7 +51,7 @@ async def client(token: str) -> RestClient:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 async def applications_res(
     client: RestClient,
 ) -> ApplicationResource:
@@ -59,7 +59,7 @@ async def applications_res(
     return client.applications
 
 
-@pytest.fixture()
+@pytest.fixture
 async def stickers_res(
     client: RestClient,
 ) -> StickersResource:
@@ -67,7 +67,7 @@ async def stickers_res(
     return client.stickers
 
 
-@pytest.fixture()
+@pytest.fixture
 async def webhooks_res(
     client: RestClient,
 ) -> WebhooksResource:
@@ -75,7 +75,7 @@ async def webhooks_res(
     return client.webhooks
 
 
-@pytest.fixture()
+@pytest.fixture
 async def stage_instances_res(
     client: RestClient,
 ) -> StageInstancesResource:
@@ -83,13 +83,13 @@ async def stage_instances_res(
     return client.stage_instances
 
 
-@pytest.fixture()
+@pytest.fixture
 async def channel_res(client: RestClient) -> ChannelResource:
     """Get channels resource for the client."""
     return client.channels
 
 
-@pytest.fixture()
+@pytest.fixture
 async def messages_res(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
@@ -98,7 +98,7 @@ async def messages_res(
     return channel_res.messages(integration_data.channel_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def polls_res(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
@@ -107,25 +107,25 @@ async def polls_res(
     return channel_res.polls(integration_data.channel_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def guilds_res(client: RestClient) -> GuildResource:
     """Get guilds resource for the client."""
     return client.guilds
 
 
-@pytest.fixture()
+@pytest.fixture
 async def invite_res(client: RestClient) -> InvitesResource:
     """Get invites resource for the client."""
     return client.invites
 
 
-@pytest.fixture()
+@pytest.fixture
 async def users_res(client: RestClient) -> UserResource:
     """Get users resource for the client."""
     return client.users
 
 
-@pytest.fixture()
+@pytest.fixture
 async def members_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
@@ -134,7 +134,7 @@ async def members_res(
     return guilds_res.members(integration_data.guild_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def guild_templates_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
@@ -143,7 +143,7 @@ async def guild_templates_res(
     return guilds_res.guild_templates(integration_data.guild_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def roles_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
@@ -152,7 +152,7 @@ async def roles_res(
     return guilds_res.roles(integration_data.guild_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def emoji_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
@@ -161,7 +161,7 @@ async def emoji_res(
     return guilds_res.emojis(integration_data.guild_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def events_res(
     guilds_res: GuildResource,
     integration_data: IntegrationTestData,
@@ -170,7 +170,7 @@ async def events_res(
     return guilds_res.events(integration_data.guild_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def commands_res(
     client: RestClient,
     integration_data: IntegrationTestData,
@@ -179,7 +179,7 @@ async def commands_res(
     return client.applications.commands(integration_data.app_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def thread_res(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
@@ -188,7 +188,7 @@ async def thread_res(
     return channel_res.threads(integration_data.channel_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def ban_managment(
     client: RestClient,
     integration_data: IntegrationTestData,
@@ -197,7 +197,7 @@ async def ban_managment(
     return client.guilds.ban_managment(integration_data.guild_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def message(messages_res: MessageResource) -> AsyncGenerator[MessageResponse, None]:
     """Fixture that creates a message and deletes it after the test."""
     message = await messages_res.create(
@@ -207,7 +207,7 @@ async def message(messages_res: MessageResource) -> AsyncGenerator[MessageRespon
     await messages_res.delete(message.id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def thread(thread_res: ThreadResource) -> AsyncGenerator[ThreadResponse, None]:
     """Fixture that creates a thread and deletes it after the test."""
     thread = await thread_res.create_thread(
@@ -220,7 +220,7 @@ async def thread(thread_res: ThreadResource) -> AsyncGenerator[ThreadResponse, N
     await thread_res.delete(thread.id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def channel(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
@@ -235,7 +235,7 @@ async def channel(
     await channel_res.delete(channel.id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def stage_channel(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,
@@ -249,7 +249,7 @@ async def stage_channel(
     await channel_res.delete(channel.id)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def announcement_channel(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,

@@ -10,19 +10,19 @@ from asyncord.gateway.client.client import ConnectionData, GatewayClient
 from asyncord.gateway.client.heartbeat import HeartbeatFactory
 
 
-@pytest.fixture()
+@pytest.fixture
 def gw_client() -> GatewayClient:
     """Return a mock client."""
     return Mock(spec=GatewayClient)
 
 
-@pytest.fixture()
+@pytest.fixture
 def conn_data() -> ConnectionData:
     """Return a mock connection data."""
     return Mock(spec=ConnectionData)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def factory() -> AsyncGenerator[HeartbeatFactory, None]:
     """Return a heartbeat factory."""
     factory = HeartbeatFactory()

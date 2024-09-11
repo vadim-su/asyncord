@@ -6,7 +6,7 @@ import pytest
 from asyncord.gateway.dispatcher import EventDispatcher, GatewayEvent
 
 
-@pytest.fixture()
+@pytest.fixture
 def dispatcher() -> EventDispatcher:
     """Return an event dispatcher."""
     return EventDispatcher()
