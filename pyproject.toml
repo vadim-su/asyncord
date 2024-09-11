@@ -37,10 +37,6 @@ testing = [
     "pytest-xdist>=3.6.1",
     "pytest-cov>=5.0.0",
 ]
-docs = [
-    "mkdocs-material>=9.5.23",
-    "mkdocstrings[python]>=0.25.1",
-]
 
 [tool.pdm.version]
 source = "call"
