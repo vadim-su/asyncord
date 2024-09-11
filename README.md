@@ -1,5 +1,9 @@
 # Asyncord 🚀
 
+<p align="center">
+  <img src="assets/logo_thumbnail.png" alt="Asyncord Logo">
+</p>
+
 ## Introduction 📚
 
 Welcome to Asyncord, the next-generation library for building powerful and efficient Discord bots with Python!
