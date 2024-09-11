@@ -49,7 +49,7 @@ def test_error_if_handler_is_not_callable(dispatcher: EventDispatcher) -> None:
     with pytest.raises(TypeError, match='must be Callable'):
         dispatcher.add_handler(CustomEvent, 'must be Callable')  # type: ignore
 
-    with pytest.raises(TypeError, match='must be Callable'):
+    with pytest.raises(TypeError, match=r'Event handler must be specified.*'):
         dispatcher.add_handler('must be Callable')  # type: ignore
 
 
@@ -61,10 +61,10 @@ def test_error_if_event_type_is_not_a_type(dispatcher: EventDispatcher) -> None:
 
 def test_add_handler_with_no_event_type(dispatcher: EventDispatcher) -> None:
     """Test adding a handler with no event type."""
-    with pytest.raises(ValueError, match='Event handler must have at least one argument'):
+    with pytest.raises(TypeError, match='Event handler must have at least one argument'):
         dispatcher.add_handler(lambda: None)  # type: ignore
 
-    with pytest.raises(ValueError, match='Event handler must have at least one argument'):
+    with pytest.raises(TypeError, match='Event handler must have at least one argument'):
         dispatcher.add_handler(lambda _: None)  # type: ignore
 
 
@@ -74,7 +74,7 @@ def test_add_handler_with_invalid_event_type(dispatcher: EventDispatcher) -> Non
     async def handler(_: mock.Mock()) -> None:  # type: ignore
         pass
 
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r'Event type must be specified.*'):
         dispatcher.add_handler(str, handler)  # type: ignore
 
 

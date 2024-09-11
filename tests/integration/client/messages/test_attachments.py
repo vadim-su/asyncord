@@ -113,7 +113,7 @@ async def test_embed_attachment(
     assert len(message.embeds) == 1
     assert message.embeds[0].title == embed.title
     assert message.embeds[0].image
-    assert URL(message.embeds[0].image.url).path.endswith('image_0')
+    assert URL(message.embeds[0].image.url).path.endswith('image_0.png')
 
     await messages_res.delete(message.id)
 
@@ -137,7 +137,7 @@ async def test_single_embed_attachment(
     assert len(message.embeds) == 1
     assert message.embeds[0].title == embed.title
     assert message.embeds[0].image
-    assert URL(message.embeds[0].image.url).path.endswith('image_0')
+    assert URL(message.embeds[0].image.url).path.endswith('image_0.png')
 
     await messages_res.delete(message.id)
 
