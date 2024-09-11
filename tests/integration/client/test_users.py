@@ -22,7 +22,7 @@ async def test_get_user(users_res: UserResource) -> None:
     assert user.id == current_user.id
 
 
-@pytest.mark.limited()
+@pytest.mark.limited
 async def test_update_current_user(users_res: UserResource) -> None:
     """Test updating the current user."""
     with Path('tests/data/test_avatar.png').open('rb') as f:
