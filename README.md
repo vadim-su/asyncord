@@ -4,7 +4,7 @@
 
 Welcome to Asyncord, the next-generation library for building powerful and efficient Discord bots with Python!
 
-Asyncord is designed to make your bot development experience seamless and enjoyable. By closely following the official Discord API, it ensures your bots are not only fast but also highly responsive. Whether you're a seasoned developer or just starting out, Asyncord provides the tools and documentation you need to create amazing bots that can handle anything from simple commands to complex interactions.
+Asyncord makes bot development seamless and enjoyable by closely following the official Discord API. It ensures your bots are fast and responsive. Whether you're a seasoned developer or a beginner, Asyncord provides the tools and documentation to create bots that handle everything from simple commands to complex interactions.
 
 ### Key Features 🌟
 
