@@ -10,7 +10,7 @@ from typing import Literal
 from git import Repo
 
 VERSION_REGEX = re.compile(
-    r'v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?:dev(?P<dev>\d+)|b(?P<beta>\d+)|a(?P<alpha>\d+)|rc(?P<rc>\d+))?',
+    r'v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?P<suffix_name>((?:\.)?dev)|b|a|rc)(?P<suffix_value>\d+)?',
 )
 """Regex to match the version."""
 
@@ -81,13 +81,13 @@ def get_version() -> str:
 
 
 def bump_version(
-    part: Literal['major', 'minor', 'patch'] | None,
+    part_to_bump: Literal['major', 'minor', 'patch'] | None,
     suffix: Literal['dev', 'alpha', 'beta', 'rc'] | None,
 ) -> Version:
     """Bump the version of the package.
 
     Args:
-        part: The part of the version to bump.
+        part_to_bump: The part of the version to bump.
         suffix: The suffix of the version.
 
     Returns:
@@ -96,14 +96,22 @@ def bump_version(
     repo = Repo(search_parent_directories=True)
     version = _get_splite_version(repo)
 
-    if part is None and suffix:
-        _validate_suffix_bump(version, suffix)
-
-    if part:
-        version = _get_new_version(version, part)
-
     if suffix:
-        _update_suffix(version, suffix)
+        if suffix not in ALLOWED_SUFFIX:
+            raise ValueError(f'Invalid suffix: {suffix}')
+        prep_suffix = ALLOWED_SUFFIX[suffix]
+    else:
+        prep_suffix = None
+
+    if part_to_bump is None and prep_suffix:
+        _validate_suffix_bump(version, prep_suffix)
+
+    if part_to_bump:
+        version = _get_new_version(version, part_to_bump)
+
+    if prep_suffix:
+        version.suffix_name = prep_suffix  # type: ignore
+        version.suffix_value += 1
 
     repo.create_tag(str(version))
     return version
@@ -115,9 +123,9 @@ def _validate_suffix_bump(version: Version, suffix: str) -> None:
         raise ValueError(
             'Cannot bump suffix without bumping main version part when current version has no suffix.',
         )
-    if SUFFIX_RANK.get(suffix, -1) <= SUFFIX_RANK.get(version.suffix_name, -1):
+    if SUFFIX_RANK.get(suffix, -1) < SUFFIX_RANK.get(version.suffix_name, -1):
         raise ValueError(
-            f'Cannot bump to a lower or same rank suffix: {suffix} from {version.suffix_name}',
+            f'Cannot bump to a lower rank suffix: {suffix} from {version.suffix_name}',
         )
 
 
@@ -133,15 +141,6 @@ def _get_new_version(version: Version, part: str) -> Version:
     return Version(*increments[part])
 
 
-def _update_suffix(version: Version, suffix: str) -> None:
-    """Update the suffix of the version."""
-    if suffix not in ALLOWED_SUFFIX:
-        raise ValueError(f'Invalid suffix: {suffix}')
-
-    version.suffix_name = ALLOWED_SUFFIX[suffix]  # type: ignore
-    version.suffix_value += 1
-
-
 def _get_splite_version(repo: Repo) -> Version:
     """Get the version of the package using git describe.
 
@@ -150,34 +149,40 @@ def _get_splite_version(repo: Repo) -> Version:
     """
     current_tag = get_current_tag(repo)
     if current_tag:
-        return _split_version(current_tag)
+        return _extract_version(current_tag)
 
     try:
         tag_version = repo.git.describe(tags=True, abbrev=0, match=r'v[0-9]*')
     except Exception:
         return Version(0, 0, 0)
 
-    return _split_version(tag_version)
+    return _extract_version(tag_version)
 
 
-def _split_version(version: str) -> Version:
-    """Split the version into major, minor and patch.
+def _extract_version(version: str) -> Version:
+    """Extract the major, minor and patch version from the version.
 
     Args:
         version: The version to split.
 
     Returns:
-        The major, minor and patch version.
+        The version as a Version object.
     """
     match = VERSION_REGEX.match(version)
     if not match:
         raise ValueError(f'Invalid version: {version}')
 
-    return Version(
-        major=int(match.group('major')),
-        minor=int(match.group('minor')),
-        patch=int(match.group('patch')),
+    groups = match.groupdict()
+    version_obj = Version(
+        major=int(groups['major']),
+        minor=int(groups['minor']),
+        patch=int(groups['patch']),
     )
+    if groups['suffix_name']:
+        version_obj.suffix_name = groups['suffix_name']  # type: ignore
+        version_obj.suffix_value = int(groups['suffix_value'])
+
+    return version_obj
 
 
 def get_current_tag(repo: Repo) -> str | None:
