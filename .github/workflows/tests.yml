@@ -7,6 +7,10 @@ on:
   push:
     branches: ["main"]
 
+  workflow_call:
+  workflow_dispatch:
+
+
 
 concurrency:
   # The workflow run is canceled if a run on the same branch is in progress
