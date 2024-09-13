@@ -1,20 +1,27 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Run tests
+name: Test main code base
 
 on:
   push:
     branches: ["main"]
 
   workflow_call:
+    secrets:
+      TEST_TOKEN:
+        required: true
+        description: "Discord bot token for testing"
+
   workflow_dispatch:
 
 
+permissions:
+  contents: read
 
 concurrency:
   # The workflow run is canceled if a run on the same branch is in progress
-  group: "${{ github.workflow }} @ ${{ github.head_ref || github.ref }}"
+  group: "${{ github.workflow }} @ ${{ github.ref }}"
   cancel-in-progress: true
 
 
@@ -51,7 +58,7 @@ jobs:
 
       - name: Run pytest
         env:
-          ASYNCORD_TEST_TOKEN: ${{ secrets.ASYNCORD_TEST_TOKEN }}
+          ASYNCORD_TEST_TOKEN: ${{ secrets.TEST_TOKEN }}
           ASYNCORD_TEST_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_CHANNEL_ID }}
           ASYNCORD_TEST_VOICE_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_VOICE_CHANNEL_ID }}
           ASYNCORD_TEST_GUILD_ID: ${{ vars.ASYNCORD_TEST_GUILD_ID }}

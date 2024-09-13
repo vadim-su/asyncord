@@ -1,4 +1,4 @@
-name: Publish package to PyPI
+name: Release asyncord
 
 on:
   push:
@@ -6,12 +6,13 @@ on:
       - v*
   workflow_dispatch:
 
-permissions:
-  contents: read
 
 jobs:
   run-tests:
     uses: vadim-su/asyncord/.github/workflows/tests.yml@main
+    secrets:
+      TEST_TOKEN: ${{ secrets.TEST_TOKEN }}
+
 
   publish:
     runs-on: ubuntu-latest
