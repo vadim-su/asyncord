@@ -12,6 +12,7 @@ from asyncord.client.messages.models.requests.components.buttons import (
     AnyButtonWithCustomId,
     DangerButton,
     LinkButton,
+    PremiumButton,
     PrimaryButton,
     SecondaryButton,
     SuccessButton,
@@ -81,6 +82,31 @@ async def test_create_message_with_buttons(messages_res: MessageResource) -> Non
             LinkButton(
                 label='Link',
                 url='https://discord.com',
+            ),
+        ]),
+    ]
+    message = await messages_res.create(
+        CreateMessageRequest(
+            content='Test message with buttons',
+            components=components,
+        ),
+    )
+
+    try:
+        assert message.content == 'Test message with buttons'
+        assert isinstance(message.components, Sequence)
+        assert len(message.components) == len(components)
+    finally:
+        await messages_res.delete(message.id)
+
+
+@pytest.mark.skip(reason='Premium button requires a sku_id which we can not create.')
+async def test_create_message_with_premium_button(messages_res: MessageResource) -> None:
+    """Test creating a message with premium button."""
+    components: Sequence[MessageComponentType] = [
+        ActionRow([
+            PremiumButton(
+                sku_id='42',
             ),
         ]),
     ]

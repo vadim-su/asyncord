@@ -7,6 +7,7 @@ from pydantic import Field, model_validator
 from asyncord.client.messages.models.common import ButtonStyle, ComponentType
 from asyncord.client.messages.models.requests.components.base import BaseComponent
 from asyncord.client.messages.models.requests.components.emoji import ComponentEmoji
+from asyncord.snowflake import SnowflakeInputType
 from asyncord.yarl_url import HttpYarlUrl
 
 
@@ -27,15 +28,6 @@ class BaseButton(BaseComponent):
 
     style: ButtonStyle = ButtonStyle.PRIMARY
     """Style of the button."""
-
-    label: Annotated[str, Field(max_length=80)] | None = None
-    """Text to be displayed on the button.
-
-    Max 80 characters.
-    """
-
-    emoji: ComponentEmoji | None = None
-    """Emoji to be displayed on the button."""
 
     disabled: bool = False
     """Whether the button is disabled."""
@@ -67,8 +59,34 @@ class LinkButton(BaseButton):
     Only `ButtonStyle.LINK` is allowed.
     """
 
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
+
     url: HttpYarlUrl
+
     """URL for link-style buttons."""
+
+
+class PremiumButton(BaseButton):
+    """Premium buttons are interactive components that render in messages.
+
+    Premium buttons must contain a sku_id, and cannot have a custom_id, label, url, or emoji.
+    Premium buttons do not send an interaction to your app when clicked
+
+    Reference:
+    https://discord.com/developers/docs/interactions/message-components#buttons
+    """
+
+    style: Literal[ButtonStyle.PREMIUM] = ButtonStyle.PREMIUM  # type: ignore
+
+    sku_id: SnowflakeInputType
+    """Identifier for a purchasable SKU."""
 
 
 class AnyButtonWithCustomId(BaseButton):
@@ -85,6 +103,15 @@ class AnyButtonWithCustomId(BaseButton):
 
     Max 100 characters.
     """
+
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
 
 
 class PrimaryButton(AnyButtonWithCustomId):
@@ -108,6 +135,15 @@ class PrimaryButton(AnyButtonWithCustomId):
     Max 100 characters.
     """
 
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
+
 
 class SecondaryButton(AnyButtonWithCustomId):
     """Secondary-style buttons are interactive components that render in messages.
@@ -129,6 +165,15 @@ class SecondaryButton(AnyButtonWithCustomId):
 
     Max 100 characters.
     """
+
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
 
 
 class SuccessButton(AnyButtonWithCustomId):
@@ -152,6 +197,15 @@ class SuccessButton(AnyButtonWithCustomId):
     Max 100 characters.
     """
 
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
+
 
 class DangerButton(AnyButtonWithCustomId):
     """Danger-style buttons are interactive components that render in messages.
@@ -174,9 +228,18 @@ class DangerButton(AnyButtonWithCustomId):
     Max 100 characters.
     """
 
+    label: Annotated[str, Field(max_length=80)] | None = None
+    """Text to be displayed on the button.
+
+    Max 80 characters.
+    """
+
+    emoji: ComponentEmoji | None = None
+    """Emoji to be displayed on the button."""
+
 
 type ButtonComponentType = Annotated[
-    LinkButton | PrimaryButton | SecondaryButton | SuccessButton | DangerButton,
+    LinkButton | PrimaryButton | SecondaryButton | SuccessButton | DangerButton | PremiumButton,
     Field(discriminator='style'),
 ]
 """Type hint for button components."""
