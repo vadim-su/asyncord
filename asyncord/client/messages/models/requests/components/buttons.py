@@ -11,7 +11,6 @@ from asyncord.snowflake import SnowflakeInputType
 from asyncord.yarl_url import HttpYarlUrl
 
 
-
 class BaseButton(BaseComponent):
     """Buttons are interactive components that render in messages.
 
@@ -68,7 +67,6 @@ class LinkButton(BaseButton):
 
     emoji: ComponentEmoji | None = None
     """Emoji to be displayed on the button."""
-
 
     url: HttpYarlUrl
 
@@ -241,7 +239,7 @@ class DangerButton(AnyButtonWithCustomId):
 
 
 type ButtonComponentType = Annotated[
-    LinkButton | PrimaryButton | SecondaryButton | SuccessButton | DangerButton,
+    LinkButton | PrimaryButton | SecondaryButton | SuccessButton | DangerButton | PremiumButton,
     Field(discriminator='style'),
 ]
 """Type hint for button components."""

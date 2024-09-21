@@ -12,6 +12,7 @@ from asyncord.client.messages.models.requests.components.buttons import (
     AnyButtonWithCustomId,
     DangerButton,
     LinkButton,
+    PremiumButton,
     PrimaryButton,
     SecondaryButton,
     SuccessButton,
@@ -74,6 +75,8 @@ async def test_create_message_with_buttons(messages_res: MessageResource) -> Non
                 label='Success',
                 custom_id='success',
             ),
+        ]),
+        ActionRow([
             DangerButton(
                 label='Danger',
                 custom_id='danger',
@@ -81,6 +84,9 @@ async def test_create_message_with_buttons(messages_res: MessageResource) -> Non
             LinkButton(
                 label='Link',
                 url='https://discord.com',
+            ),
+            PremiumButton(
+                sku_id='42',
             ),
         ]),
     ]
