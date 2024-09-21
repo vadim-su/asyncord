@@ -7,7 +7,7 @@ DECIMAL_VALUE = 11189196
 """Decimal value of the color."""
 
 
-@pytest.fixture()
+@pytest.fixture
 def color() -> Color:
     """Return a color object."""
     return Color(0xAABBCC)

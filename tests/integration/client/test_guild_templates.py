@@ -12,7 +12,7 @@ from asyncord.client.guild_templates.resources import GuildTemplatesResource
 from asyncord.client.guilds.resources import GuildResource
 
 
-@pytest.fixture()
+@pytest.fixture
 async def guild_templates(
     guild_templates_res: GuildTemplatesResource,
 ) -> AsyncGenerator[GuildTemplateResponse, None]:

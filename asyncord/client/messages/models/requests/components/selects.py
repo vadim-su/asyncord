@@ -1,3 +1,9 @@
+"""This module defines models for Discord select menu components using Pydantic for data validation.
+
+References:
+    https://discord.com/developers/docs/interactions/message-components#select-menus
+"""
+
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator

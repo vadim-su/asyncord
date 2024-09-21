@@ -3,16 +3,21 @@
 from __future__ import annotations
 
 import enum
+import logging
+import mimetypes
 from collections.abc import Sequence
 from io import BufferedReader, IOBase
 from pathlib import Path
 from typing import Annotated, Any
 
-from pydantic import AnyHttpUrl, BaseModel, Field
+import filetype
+from pydantic import BaseModel, Field
+from yarl import URL
 
 from asyncord.client.http.client import make_payload_form
 from asyncord.client.http.models import FormField, FormPayload
 from asyncord.snowflake import SnowflakeInputType
+from asyncord.yarl_url import HttpYarlUrl
 
 __ALL__ = (
     'AttachmentContentType',
@@ -21,8 +26,10 @@ __ALL__ = (
     'make_attachment_payload',
 )
 
+logger = logging.getLogger(__name__)
 
-type AttachmentContentType = bytes | bytearray | memoryview | BufferedReader | IOBase | Path
+
+AttachmentContentType = bytes | bytearray | memoryview | BufferedReader | IOBase | Path
 """Attachment content type.
 
 It can be raw data, a file-like object, or a path to a file.
@@ -66,10 +73,10 @@ class Attachment(BaseModel, arbitrary_types_allowed=True):
     size: int | None = None
     """Size of the file in bytes."""
 
-    url: AnyHttpUrl | None = None
+    url: HttpYarlUrl | None = None
     """Source URL of the file."""
 
-    proxy_url: AnyHttpUrl | None = None
+    proxy_url: HttpYarlUrl | None = None
     """Proxied URL of the file."""
 
     height: int | None = None
@@ -112,6 +119,19 @@ class Attachment(BaseModel, arbitrary_types_allowed=True):
     If set to True, the file will not be attached as an image or video and will be sent as a raw file.
     You can use this to send files without embedding them.
     """
+
+    def make_path(self) -> URL | None:
+        """Get the file path URL.
+
+        It is necessary to relate the file to the message in some cases.
+        For instance, when sending a message with an image embed, the image URL must be 'attachment://filename'.
+
+        If file name is present, it will return the 'attachment://filename' URL.
+        Otherwise, it will return none.
+        """
+        if self.filename:
+            return URL(f'attachment://{self.filename}')
+        return None
 
 
 def make_payload_with_attachments(
@@ -157,3 +177,81 @@ def make_payload_with_attachments(
         if attachment.content is not None
     }
     return make_payload_form(json_payload=json_payload, **file_form_fields)
+
+
+def get_content_mime(attachment: Attachment) -> str | None:
+    """Guess the content type of the attachment.
+
+    Args:
+        attachment: Attachment object.
+
+    Returns:
+        The guessed content type.
+    """
+    if attachment.content_type:
+        return attachment.content_type
+
+    if attachment.filename:
+        mime_type = mimetypes.guess_type(attachment.filename)[0]
+        if mime_type:
+            return mime_type
+
+    if isinstance(attachment.content, bytes | bytearray | str | Path):
+        mime_type = filetype.guess_mime(attachment.content)
+        if mime_type:
+            return mime_type
+
+    logger.warning(
+        'Could not guess content type for attachment %s',
+        attachment.id or attachment.filename,
+    )
+    return None
+
+
+def get_content_extension(attachment: Attachment) -> str | None:
+    """Get the extension of the content type.
+
+    Args:
+        attachment: Attachment object.
+
+    Returns:
+        The extension of the content type.
+    """
+    if attachment.content_type:
+        extension = mimetypes.guess_extension(attachment.content_type)
+        if extension:
+            return extension
+
+    if isinstance(attachment.content, bytes | bytearray | str | Path):
+        extension = filetype.guess_extension(attachment.content)
+        if extension:
+            return extension
+
+    logger.warning('Could not guess extension for content type %s', attachment.id or attachment.filename)
+    return None
+
+
+def get_content_type(attachment: Attachment) -> tuple[str, str] | None:
+    """Guess the content type of the attachment.
+
+    Args:
+        attachment: Attachment object.
+
+    Returns:
+        The guessed content type.
+    """
+    if attachment.content_type:
+        extension = mimetypes.guess_extension(attachment.content_type)
+        if extension:
+            return attachment.content_type, extension
+
+    if attachment.content:
+        kind = filetype.guess(attachment.content)
+        if kind:
+            return kind.mime, kind.extension
+
+    logger.warning(
+        'Could not guess content type for attachment %s',
+        attachment.id or attachment.filename,
+    )
+    return None

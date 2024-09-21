@@ -15,7 +15,7 @@ from asyncord.client.scheduled_events.models.responses import ScheduledEventResp
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
 
 
-@pytest.fixture()
+@pytest.fixture
 async def event(events_res: ScheduledEventsResource) -> AsyncGenerator[ScheduledEventResponse, None]:
     """Fixture that creates a scheduled event and deletes it after the test."""
     creation_data = CreateScheduledEventRequest(

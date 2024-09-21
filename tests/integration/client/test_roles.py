@@ -7,7 +7,7 @@ from asyncord.client.roles.models.responses import RoleResponse
 from asyncord.client.roles.resources import RoleResource
 
 
-@pytest.fixture()
+@pytest.fixture
 async def role(roles_res: RoleResource) -> AsyncGenerator[RoleResponse, None]:
     """Create a role and delete it after the test."""
     role = await roles_res.create(CreateRoleRequest(name='TestRole'))

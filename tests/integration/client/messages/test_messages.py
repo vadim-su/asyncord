@@ -16,7 +16,7 @@ from asyncord.client.messages.resources import MessageResource
 from tests.conftest import IntegrationTestData
 
 
-@pytest.fixture()
+@pytest.fixture
 async def multiple_messages(messages_res: MessageResource) -> AsyncGenerator[list[MessageResponse], None]:
     """Create multiple messages for testing bulk delete.
 

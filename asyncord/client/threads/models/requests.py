@@ -7,10 +7,10 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from asyncord.client.channels.models.common import MAX_RATELIMIT
 from asyncord.client.messages.models.common import MessageFlags
+from asyncord.client.messages.models.requests.base_message import BaseMessage, ListAttachmentType, SingleAttachmentType
 from asyncord.client.messages.models.requests.components import MessageComponentType
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.messages.models.requests.messages import AllowedMentions, BaseMessage
-from asyncord.client.models.attachments import Attachment, AttachmentContentType
+from asyncord.client.messages.models.requests.messages import AllowedMentions
 from asyncord.client.threads.models.common import ThreadType
 from asyncord.snowflake import SnowflakeInputType
 
@@ -80,7 +80,7 @@ class ThreadMessage(BaseMessage):
     content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
-    embeds: list[Embed] | None = None
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
     """Embedded rich content."""
 
     allowed_mentions: AllowedMentions | None = None
@@ -92,7 +92,10 @@ class ThreadMessage(BaseMessage):
     sticker_ids: list[SnowflakeInputType] | None = None
     """Sticker ids to include with the message."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
     """List of attachment object.
 
     See Uploading Files:

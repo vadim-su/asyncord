@@ -1,0 +1,76 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Test main code base
+
+on:
+  push:
+    branches: ["main"]
+
+  workflow_call:
+    secrets:
+      TEST_TOKEN:
+        required: true
+        description: "Discord bot token for testing"
+
+  workflow_dispatch:
+
+
+permissions:
+  contents: read
+
+concurrency:
+  # The workflow run is canceled if a run on the same branch is in progress
+  group: "${{ github.workflow }} @ ${{ github.ref }}"
+  cancel-in-progress: true
+
+
+jobs:
+  code-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: chartboost/ruff-action@v1
+
+  tests:
+    runs-on: ubuntu-latest
+    environment: QA
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0 # fetch tags doesn't work without this (https://github.com/actions/checkout/issues/1748)
+          clean: false
+
+      - name: Set up pdm environment
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: true
+
+      - name: Install dependencies
+        run: pdm sync -G testing
+
+      - name: Run pytest
+        env:
+          ASYNCORD_TEST_TOKEN: ${{ secrets.TEST_TOKEN }}
+          ASYNCORD_TEST_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_CHANNEL_ID }}
+          ASYNCORD_TEST_VOICE_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_VOICE_CHANNEL_ID }}
+          ASYNCORD_TEST_GUILD_ID: ${{ vars.ASYNCORD_TEST_GUILD_ID }}
+          ASYNCORD_TEST_USER_ID: ${{ vars.ASYNCORD_TEST_USER_ID }}
+          ASYNCORD_TEST_MESSAGE_ID: ${{ vars.ASYNCORD_TEST_MESSAGE_ID }}
+          ASYNCORD_TEST_MEMBER_ID: ${{ vars.ASYNCORD_TEST_MEMBER_ID }}
+          ASYNCORD_TEST_CUSTOM_EMOJI: ${{ vars.ASYNCORD_TEST_CUSTOM_EMOJI }}
+          ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE: ${{ vars.ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE }}
+          ASYNCORD_TEST_APP_ID: ${{ vars.ASYNCORD_TEST_APP_ID }}
+          ASYNCORD_TEST_ROLE_ID: ${{ vars.ASYNCORD_TEST_ROLE_ID }}
+          ASYNCORD_TEST_USER_TO_BAN: ${{ vars.ASYNCORD_TEST_USER_TO_BAN }}
+          ASYNCORD_TEST_WORKERS: ${{ vars.ASYNCORD_TEST_WORKERS }}
+          ASYNCORD_TEST_ROLE_TO_PRUNE: ${{ vars.ASYNCORD_TEST_ROLE_TO_PRUNE }}
+
+        run: pdm run pytest -n $ASYNCORD_TEST_WORKERS

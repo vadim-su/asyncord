@@ -7,7 +7,6 @@ from asyncord.client.messages.models.requests.embeds import (
     EmbedAuthor,
     EmbedFooter,
     EmbedImage,
-    EmbedThumbnail,
 )
 from asyncord.client.messages.models.requests.messages import (
     CreateMessageRequest,
@@ -67,14 +66,14 @@ async def test_cteate_message_with_attachments(
     await messages_res.delete(message.id)
 
 
-async def test_cteate_message_with_attachment_in_embed(
+async def test_attachment_and_embeds(
     messages_res: MessageResource,
 ) -> None:
     """Test creating a message with attachments in an embed."""
     embed = Embed(
         title='Test embed with attachments',
         image=EmbedImage(url=f'attachment://{TEST_FILE_NAMES[0]}'),
-        thumbnail=EmbedThumbnail(url=f'attachment://{TEST_FILE_NAMES[1]}'),
+        thumbnail=EmbedImage(url=f'attachment://{TEST_FILE_NAMES[1]}'),
     )
 
     message = await messages_res.create(
@@ -91,6 +90,54 @@ async def test_cteate_message_with_attachment_in_embed(
     assert URL(message.embeds[0].image.url).path.endswith(TEST_FILE_NAMES[0])
     assert message.embeds[0].thumbnail
     assert URL(message.embeds[0].thumbnail.url).path.endswith(TEST_FILE_NAMES[1])
+
+    await messages_res.delete(message.id)
+
+
+async def test_embed_attachment(
+    messages_res: MessageResource,
+) -> None:
+    """Test creating a message with an attachment in an embed."""
+    embed = Embed(
+        title='Test embed with attachments',
+        image=Path(f'tests/data/{TEST_FILE_NAMES[0]}'),
+    )
+
+    message = await messages_res.create(
+        CreateMessageRequest(
+            embeds=[embed],
+        ),
+    )
+    assert not message.content
+
+    assert len(message.embeds) == 1
+    assert message.embeds[0].title == embed.title
+    assert message.embeds[0].image
+    assert URL(message.embeds[0].image.url).path.endswith('image_0.png')
+
+    await messages_res.delete(message.id)
+
+
+async def test_single_embed_attachment(
+    messages_res: MessageResource,
+) -> None:
+    """Test creating a message with a single attachment in an embed."""
+    embed = Embed(
+        title='Test embed with attachments',
+        image=Path(f'tests/data/{TEST_FILE_NAMES[0]}'),
+    )
+
+    message = await messages_res.create(
+        CreateMessageRequest(
+            embeds=embed,
+        ),
+    )
+    assert not message.content
+
+    assert len(message.embeds) == 1
+    assert message.embeds[0].title == embed.title
+    assert message.embeds[0].image
+    assert URL(message.embeds[0].image.url).path.endswith('image_0.png')
 
     await messages_res.delete(message.id)
 

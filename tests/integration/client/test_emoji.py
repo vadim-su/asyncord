@@ -10,7 +10,7 @@ from asyncord.client.emojis.resources import EmojiResource
 EMOJI_PATH = Path('tests/data/test_emoji.png')
 
 
-@pytest.fixture()
+@pytest.fixture
 async def emoji(emoji_res: EmojiResource) -> AsyncGenerator[EmojiResponse, None]:
     """Fixture to create a guild emojim and remove it after the test."""
     emoji = await emoji_res.create_guild_emoji(

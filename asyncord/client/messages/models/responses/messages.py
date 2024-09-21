@@ -7,7 +7,7 @@ import enum
 from collections.abc import Sequence
 
 from fbenum.adapter import FallbackAdapter
-from pydantic import AnyHttpUrl, BaseModel
+from pydantic import BaseModel
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.channels.models.responses import ChannelResponse
@@ -26,6 +26,7 @@ from asyncord.client.threads.models.responses import ThreadMetadataOut
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.color import Color
 from asyncord.snowflake import Snowflake
+from asyncord.yarl_url import HttpYarlUrl
 
 __all__ = (
     'AttachmentOut',
@@ -162,10 +163,10 @@ class AttachmentOut(BaseModel):
     size: int
     """Size of file in bytes."""
 
-    url: AnyHttpUrl
+    url: HttpYarlUrl
     """Source url of file."""
 
-    proxy_url: AnyHttpUrl
+    proxy_url: HttpYarlUrl
     """Proxied url of file."""
 
     height: int | None = None

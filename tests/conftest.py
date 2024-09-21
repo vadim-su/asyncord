@@ -40,7 +40,7 @@ class IntegrationTestData(BaseModel):
 def integration_data() -> IntegrationTestData:
     """Get data to perform integration tests."""
     token = os.environ.get('ASYNCORD_TEST_TOKEN')
-    if token is None:
+    if not token:
         raise RuntimeError('ASYNCORD_TEST_TOKEN env variable is not set')
     return IntegrationTestData(
         token=token,  # type: ignore

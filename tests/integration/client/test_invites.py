@@ -9,7 +9,7 @@ from asyncord.client.scheduled_events.models.responses import ScheduledEventResp
 from tests.conftest import IntegrationTestData
 
 
-@pytest.fixture()
+@pytest.fixture
 async def invite(
     channel_res: ChannelResource,
     invite_res: InvitesResource,

@@ -9,7 +9,7 @@ TEST_EMOJI1 = '👍'
 TEST_EMOJI2 = '👎'
 
 
-@pytest.fixture()
+@pytest.fixture
 async def reactions_res(
     message: MessageResponse,
     messages_res: MessageResource,

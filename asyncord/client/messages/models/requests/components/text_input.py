@@ -1,3 +1,9 @@
+"""This module defines the `TextInput` class, which represents a text input component.
+
+References:
+    https://discord.com/developers/docs/interactions/message-components#text-inputs
+"""
+
 from typing import Annotated, Literal, Self
 
 from pydantic import Field, ValidationInfo, field_validator, model_validator

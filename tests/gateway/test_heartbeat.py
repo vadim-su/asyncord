@@ -10,19 +10,19 @@ from asyncord.gateway.client.client import ConnectionData, GatewayClient
 from asyncord.gateway.client.heartbeat import Heartbeat
 
 
-@pytest.fixture()
+@pytest.fixture
 def gw_client() -> GatewayClient:
     """Return a mock client."""
     return Mock(spec=GatewayClient)
 
 
-@pytest.fixture()
+@pytest.fixture
 def conn_data() -> ConnectionData:
     """Return a mock connection data."""
     return Mock(spec=ConnectionData)
 
 
-@pytest.fixture()
+@pytest.fixture
 async def heartbeat(
     gw_client: GatewayClient,
     conn_data: ConnectionData,

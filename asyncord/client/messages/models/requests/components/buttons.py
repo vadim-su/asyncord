@@ -2,12 +2,14 @@
 
 from typing import Annotated, Literal, Self
 
-from pydantic import AnyHttpUrl, Field, model_validator
+from pydantic import Field, model_validator
 
 from asyncord.client.messages.models.common import ButtonStyle, ComponentType
 from asyncord.client.messages.models.requests.components.base import BaseComponent
 from asyncord.client.messages.models.requests.components.emoji import ComponentEmoji
 from asyncord.snowflake import SnowflakeInputType
+from asyncord.yarl_url import HttpYarlUrl
+
 
 
 class BaseButton(BaseComponent):
@@ -67,7 +69,9 @@ class LinkButton(BaseButton):
     emoji: ComponentEmoji | None = None
     """Emoji to be displayed on the button."""
 
-    url: Annotated[str, AnyHttpUrl]
+
+    url: HttpYarlUrl
+
     """URL for link-style buttons."""
 
 

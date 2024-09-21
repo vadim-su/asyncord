@@ -1,293 +1,39 @@
 """This module contains message models.
 
 Reference:
-https://discord.com/developers/docs/resources/channel#message-object
+https://discord.com/developers/docs/resources/message#message-object
 """
 
 from __future__ import annotations
 
 from collections.abc import Sequence
-from io import BufferedReader, IOBase
-from pathlib import Path
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Literal
 
 from pydantic import (
     BaseModel,
     Field,
-    SerializerFunctionWrapHandler,
-    field_serializer,
-    field_validator,
-    model_validator,
 )
 
 from asyncord.client.messages.models.common import AllowedMentionType, MessageFlags
-from asyncord.client.messages.models.requests.components import ActionRow, MessageComponentType
+from asyncord.client.messages.models.requests.base_message import BaseMessage, ListAttachmentType, SingleAttachmentType
+from asyncord.client.messages.models.requests.components import MessageComponentType
 from asyncord.client.messages.models.requests.embeds import Embed
-from asyncord.client.models.attachments import Attachment, AttachmentContentType
 from asyncord.client.polls.models.requests import Poll
 from asyncord.snowflake import SnowflakeInputType
 
 __ALL__ = (
-    'BaseMessage',
     'AllowedMentions',
     'MessageReference',
     'CreateMessageRequest',
     'UpdateMessageRequest',
 )
 
-MAX_COMPONENTS = 5
-"""Maximum number of components in a message."""
-
-MAX_EMBED_TEXT_LENGTH = 6000
-"""Maximum length of the embed text."""
-
-
-class BaseMessage(BaseModel):
-    """Base message data class used for message creation and editing.
-
-    Contains axillary validation methods.
-    """
-
-    content: Annotated[str | None, Field(max_length=2000)] = None
-    """Message content."""
-
-    embeds: list[Embed] | None = None
-    """Embedded rich content."""
-
-    components: Sequence[MessageComponentType] | MessageComponentType | None = None
-    """Components to include with the message."""
-
-    sticker_ids: list[SnowflakeInputType] | None = None
-    """Sticker ids to include with the message."""
-
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
-    """List of attachment object.
-
-    Reference:
-    https://discord.com/developers/docs/reference#uploading-files
-    """
-
-    @model_validator(mode='after')
-    def has_any_content(self) -> Self:
-        """Validate message content.
-
-        Reference:
-        https://discord.com/developers/docs/resources/channel#message-object-message-structure
-
-        Args:
-            values: Values to validate.
-
-        Returns:
-            Validated values.
-
-        Raises:
-            ValueError: If the message has no content or embeds.
-        """
-        # fmt: off
-        has_any_content = bool(
-            self.content
-            or self.embeds
-            or self.sticker_ids
-            or self.components
-            or self.attachments,
-        )
-        # fmt: on
-
-        if not has_any_content:
-            raise ValueError(
-                'Message must have content, embeds, stickers, components or files.',
-            )
-
-        return self
-
-    @field_validator('embeds', check_fields=False)
-    def validate_embeds(cls, embeds: list[Embed] | None) -> list[Embed] | None:
-        """Check total embed text length.
-
-        Reference:
-        https://discord.com/developers/docs/resources/channel#message-object-message-structure
-
-        Args:
-            embeds: Values to validate.
-
-        Raises:
-            ValueError: If the total embed text length is more than 6000 characters.
-
-        Returns:
-            Validated values.
-        """
-        if not embeds:
-            return embeds
-
-        total_embed_text_length = 0
-        for embed in embeds:
-            total_embed_text_length += cls._embed_text_length(embed)
-
-            if total_embed_text_length > MAX_EMBED_TEXT_LENGTH:
-                raise ValueError(
-                    'Total embed text length must be less than 6000 characters.',
-                )
-
-        return embeds
-
-    @field_validator('attachments', mode='before', check_fields=False)
-    def convert_attachments(
-        cls,
-        attachments: Sequence[Attachment | AttachmentContentType],
-    ) -> list[Attachment]:
-        """Convert files to attachments.
-
-        Args:
-            attachments: Attachments to convert.
-
-        Returns:
-            Converted attachments.
-        """
-        converted_attachments = []
-        for index, attachment in enumerate(attachments):
-            match attachment:
-                case Attachment():
-                    converted_attachments.append(attachment)
-
-                case bytes() | bytearray() | memoryview() | BufferedReader() | IOBase() | Path():
-                    converted_attachments.append(Attachment(id=index, content=attachment))
-
-                case _:
-                    raise ValueError(f'Invalid attachment type: {type(attachment)}')
-
-        return converted_attachments
-
-    @field_validator('attachments', check_fields=False)
-    def validate_attachments(cls, attachments: list[Attachment] | None) -> list[Attachment] | None:
-        """Validate attachments.
-
-        Args:
-            attachments: Attachments to validate.
-
-        Raises:
-            ValueError: If attachments have mixed ids.
-                All attachments must have ids or none of them.
-
-        Returns:
-            Validated attachments.
-        """
-        if not attachments:
-            return attachments
-
-        attachment_ids_is_not_none = [attach.id is not None for attach in attachments]
-
-        if any(attachment_ids_is_not_none) and not all(attachment_ids_is_not_none):
-            raise ValueError('Attachments must have all ids or none of them')
-
-        for index, attachment in enumerate(attachments):
-            if attachment.do_not_attach and not attachment.content:
-                raise ValueError('Do not attach attachments must have content')
-
-            if attachment.id is None:
-                # we do not want to modify the original attachment
-                # it helps to use the same object in many requests
-                # otherwise, this object can be conflicting with other because
-                # it will have the id after the first request
-                new_attachment_obj_with_id = attachment.model_copy(update={'id': index})
-                attachments[index] = new_attachment_obj_with_id
-
-        return attachments
-
-    @field_serializer('attachments', mode='wrap', when_used='json-unless-none', check_fields=False)
-    @classmethod
-    def serialize_attachments(
-        cls,
-        attachments: list[Attachment] | None,
-        next_serializer: SerializerFunctionWrapHandler,
-    ) -> list[dict[str, Any]] | None:
-        """Serialize attachments.
-
-        Args:
-            attachments: Attachments to serialize.
-            next_serializer: Next serializer in the chain.
-
-        Returns:
-            Serialized attachments.
-        """
-        if attachments is None:
-            return next_serializer(attachments)
-
-        # fmt: off
-        attachments = [
-            attachment
-            for attachment in attachments
-            if not attachment.do_not_attach
-        ]
-        # fmt: on
-
-        return next_serializer(attachments)
-
-    @field_validator('components', check_fields=False)
-    def validate_components(
-        cls,
-        components: Sequence[MessageComponentType] | MessageComponentType | None,
-    ) -> Sequence[MessageComponentType] | None:
-        """Validate components.
-
-        Args:
-            components: Components to validate.
-
-        Raises:
-            ValueError: If components have more than 5 action rows or are not wrapped in an ActionRow.
-
-        Returns:
-            Validated components.
-        """
-        if not components:
-            return components
-
-        if not isinstance(components, Sequence):
-            components = [components]
-
-        if len(components) > MAX_COMPONENTS:
-            raise ValueError('Components must have 5 or fewer action rows')
-
-        if all(isinstance(component, ActionRow) for component in components):
-            return components
-
-        if all(not isinstance(component, ActionRow) for component in components):
-            return [ActionRow(components=components)]
-
-        raise ValueError(
-            "All components must be wrapped on an ActionRow or don't wrap them at all",
-        )
-
-    @classmethod
-    def _embed_text_length(cls, embed: Embed) -> int:
-        """Get the length of the embed text.
-
-        Args:
-            embed: Embed to get the length of.
-
-        Returns:
-            Length of the embed text.
-        """
-        embed_text_length = len(embed.title or '')
-        embed_text_length += len(embed.description or '')
-
-        if embed.footer:
-            embed_text_length += len(embed.footer.text)
-
-        if embed.author:
-            embed_text_length += len(embed.author.name)
-
-        for field in embed.fields:
-            embed_text_length += len(field.name)
-            embed_text_length += len(field.value)
-
-        return embed_text_length
-
 
 class AllowedMentions(BaseModel):
     """Allowed mentions object.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#allowed-mentions-object
+    https://discord.com/developers/docs/resources/message#allowed-mentions-object
     """
 
     parse: list[AllowedMentionType] | None = None
@@ -307,7 +53,7 @@ class MessageReference(BaseModel):
     """Message reference object used for creating messages.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#message-reference-object
+    https://discord.com/developers/docs/resources/message#message-reference-object
     """
 
     message_id: SnowflakeInputType | None = None
@@ -334,7 +80,7 @@ class CreateMessageRequest(BaseMessage):
     """Data to create a message with.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#create-message
+    https://discord.com/developers/docs/resources/message#create-message
     """
 
     content: Annotated[str | None, Field(max_length=2000)] = None
@@ -349,7 +95,7 @@ class CreateMessageRequest(BaseMessage):
     tts: bool | None = None
     """True if this is a TTS message."""
 
-    embeds: list[Embed] | None = None
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
     """Embedded rich content."""
 
     allowed_mentions: AllowedMentions | None = None
@@ -364,7 +110,10 @@ class CreateMessageRequest(BaseMessage):
     sticker_ids: list[SnowflakeInputType] | None = None
     """Sticker ids to include with the message."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
     """List of attachment object.
 
     Reference:
@@ -392,13 +141,13 @@ class UpdateMessageRequest(BaseMessage):
     """Data to update a message with.
 
     Reference:
-    https://discord.com/developers/docs/resources/channel#edit-message
+    https://discord.com/developers/docs/resources/message#edit-message
     """
 
     content: Annotated[str | None, Field(max_length=2000)] = None
     """Message content."""
 
-    embeds: list[Embed] | None = None
+    embeds: Annotated[Embed | list[Embed], list[Embed], Field(max_length=10)] | None = None
     """Embedded rich content."""
 
     flags: Literal[MessageFlags.SUPPRESS_EMBEDS] | None = None
@@ -413,8 +162,15 @@ class UpdateMessageRequest(BaseMessage):
     components: Sequence[MessageComponentType] | MessageComponentType | None = None
     """Components to include with the message."""
 
-    attachments: Sequence[Annotated[Attachment | AttachmentContentType, Attachment]] | None = None
+    attachments: Annotated[
+        ListAttachmentType | SingleAttachmentType | None,
+        Field(validate_default=True),  # Necessary for the embedded attachment collection
+    ] = None
     """List of attachment object.
+
+    You can set this to any bytes-like object, a file-like object, or a path-like object.
+    Of course, you can also set it to an Attachment object and list of any of the above.
+    Full allowed types defined in `_SingleAttachmentType`.
 
     Reference:
     https://discord.com/developers/docs/reference#uploading-files

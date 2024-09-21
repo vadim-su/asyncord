@@ -31,7 +31,7 @@ skip_server_unsupported = pytest.mark.skip(
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 async def channel(
     channel_res: ChannelResource,
     integration_data: IntegrationTestData,

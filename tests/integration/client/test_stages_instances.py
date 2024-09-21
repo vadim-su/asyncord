@@ -8,7 +8,7 @@ from asyncord.client.stage_instances.models.responses import StageInstanceRespon
 from asyncord.client.stage_instances.resources import StageInstancesResource
 
 
-@pytest.fixture()
+@pytest.fixture
 async def stage(
     stage_channel: ChannelResponse,
     stage_instances_res: StageInstancesResource,

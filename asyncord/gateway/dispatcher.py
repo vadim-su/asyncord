@@ -62,6 +62,7 @@ class EventDispatcher:
     @overload
     def add_handler(self, event_type: EventHandlerType[EVENT_T]) -> None:
         ...
+    # fmt: on
 
     # fmt: on
     def add_handler(
@@ -82,24 +83,25 @@ class EventDispatcher:
             ValueError: If the event type is not specified and cannot be inferred.
         """
         if event_handler is None:
-            event_handler = cast(EventHandlerType[EVENT_T], event_type)
-            handler_arg_types = list(get_type_hints(event_handler).values())
-            if not handler_arg_types:
-                raise ValueError(
-                    'Event handler must have at least one argument for the event',
+            if callable(event_type):
+                if isinstance(event_type, type):
+                    event_handler = cast(EventHandlerType, event_type.__call__)
+                else:
+                    event_handler = cast(EventHandlerType, event_type)
+            else:
+                raise TypeError(
+                    'Event handler must be specified if the event type is not callable',
                 )
 
-            event_type = cast(type[EVENT_T], handler_arg_types[0])
+            event_type = self._infer_event_type(event_handler)
 
         if not isinstance(event_type, type) or not issubclass(event_type, GatewayEvent):
             raise TypeError(
                 'Event type must be specified if the event handler is not',
             )
 
-        if not isinstance(event_handler, Callable):
-            raise TypeError(
-                'Event handler must be Callable if the event type is not specified',
-            )
+        if not callable(event_handler):
+            raise TypeError('Event handler must be Callable')
 
         self._update_args_cache(event_handler)
         self._handlers[event_type].append(event_handler)
@@ -145,6 +147,18 @@ class EventDispatcher:
             if arg_name in self._args
         }
         # fmt: on
+
+    @classmethod
+    def _infer_event_type(cls, event_handler: EventHandlerType[EVENT_T]) -> type[EVENT_T]:
+        """Infer the event type from the type hints of an event handler."""
+        handler_arg_types = list(get_type_hints(event_handler).values())
+
+        if not handler_arg_types:
+            raise TypeError(
+                'Event handler must have at least one argument for the event',
+            )
+
+        return cast(type[EVENT_T], handler_arg_types[0])
 
 
 type _HandlersMutMapping[EVENT_T: GatewayEvent] = MutableMapping[

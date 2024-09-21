@@ -8,7 +8,7 @@ from asyncord.gateway.client.client import ConnectionData, GatewayClient
 from asyncord.gateway.client.heartbeat import Heartbeat
 
 
-@pytest.fixture()
+@pytest.fixture
 def gw_client(mocker: MockFixture) -> GatewayClient:
     """Create a GatewayClient instance."""
     return GatewayClient(

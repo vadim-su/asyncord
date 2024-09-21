@@ -7,13 +7,13 @@ from pydantic import BaseModel
 from asyncord.snowflake import Snowflake
 
 
-@pytest.fixture()
+@pytest.fixture
 def raw_snowflake() -> int:
     """Return a raw snowflake value."""
     return 175928847299117063
 
 
-@pytest.fixture()
+@pytest.fixture
 def snowflake(raw_snowflake: int) -> Snowflake:
     """Return a snowflake instance."""
     return Snowflake(raw_snowflake)
