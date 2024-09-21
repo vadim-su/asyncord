@@ -167,5 +167,6 @@ class UpdateApplicationRoleConnectionMetadataRequest(BaseModel):
 
     description: Annotated[str, Field(min_length=1, max_length=200)]
     """Description of the metadata field."""
+
     description_localizations: dict[LocaleInputType, str] | None = None
     """Translations of the description."""
