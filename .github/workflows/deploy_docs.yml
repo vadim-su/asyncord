@@ -1,0 +1,46 @@
+name: Deploy Docs
+
+on:
+  push:
+    branches:
+      - main
+      - docs
+  workflow_dispatch:
+
+jobs:
+  run-ansible:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0 # fetch tags doesn't work without this (https://github.com/actions/checkout/issues/1748)
+          clean: false
+
+      - name: Set up pdm environment
+        uses: pdm-project/setup-pdm@v4
+        with:
+          cache: true
+
+      - name: Install dependencies
+        run: |
+          pdm sync -G docs
+          sudo apt update
+          sudo apt install -y make
+
+      - name: Build docs
+        run: |
+          pdm run make dirhtml
+        working-directory: ./docs
+
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2
+
+        with:
+          playbook: docs/deploy/run_deploy.yaml
+          key: ${{ secrets.DEPLOY_KEY }}
+          options: |
+            --inventory docs/deploy/hosts.ini
+          requirements: docs/deploy/galaxy-requirements.yml
