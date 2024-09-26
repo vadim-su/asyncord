@@ -24,7 +24,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["pre-commit>=3.3.2", "ruff>=0.4.4", "gitpython>=3.1.43"]
+dev = ["pre-commit>=3.3.2", "ruff>=0.4.4"]
 testing = [
     "pytest>=7.3.1",
     "pytest-asyncio>=0.19.0,<0.23.0", # 0.23.0 has a bugs with scopes
@@ -32,6 +32,7 @@ testing = [
     "pytest-mock>=3.12.0",
     "pytest-xdist>=3.6.1",
     "pytest-cov>=5.0.0",
+    "sphinx-material>=0.0.36",
 ]
 
 [tool.pdm.version]
@@ -64,7 +65,14 @@ line-length = 120
 indent-width = 4
 target-version = "py312"
 
-extend-exclude = [".git", ".vscode", ".devcontainer", ".github", ".venv"]
+extend-exclude = [
+    ".devcontainer",
+    ".git",
+    ".github",
+    ".venv",
+    ".vscode",
+    "docs",
+]
 
 [tool.ruff.lint]
 preview = true
