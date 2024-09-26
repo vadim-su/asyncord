@@ -45,8 +45,3 @@ Contributions of all sizes are welcome. We appreciate any help, whether it's fix
 ==========
 
 This project is licensed under the MIT License. For more information, please refer to the `LICENSE <LICENSE>`_ file. 📄
-
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Contents:
