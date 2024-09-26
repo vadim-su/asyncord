@@ -3,119 +3,53 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Asyncord
-========
+🚀 Asyncord
+===========
 
-Introduction
-------------
+.. image:: ../../assets/logo_thumbnail.png
+   :alt: Asyncord Logo
+   :align: center
 
-This library offers a Python, asynchronous interface for the `Discord Bot API <https://discord.com/developers/docs/reference>`_. It's compatible with Python versions **3.12+**.
+📚 Introduction
+===============
 
-Key Features
-------------
+Welcome to Asyncord, the next-generation library for building powerful and efficient Discord bots with Python!
 
-- **GatewayClient**: Handles the WebSocket connection to Discord. This class is essential for managing real-time events such as messages, user updates, and server changes. Designed with asynchronous programming, it efficiently handles a high volume of events.
+Asyncord makes bot development seamless and enjoyable by closely following the official Discord API. It ensures your bots are fast and responsive. Whether you're a seasoned developer or a beginner, Asyncord provides the tools and documentation to create bots that handle everything from simple commands to complex interactions.
 
-- **RestClient**: Manages all HTTP requests to the Discord API. It's responsible for operations like sending messages or managing servers and users, ensuring smooth communication with Discord's API.
+🌟 Key Features
+===============
 
-Discord API support
--------------------
+- ⚡ **Fully Asynchronous**: Asyncord is built with asynchronous programming from the ground up.
 
-All types and methods of the Discord Bot API **10** are supported.
+- 📝 **Total type hints coverage**: The library is fully typed, with type hints for all functions and classes.
 
-Installing
-----------
+- ✅ **Complete Pydantic Schema Coverage**: Asyncord incorporates full pydantic schema coverage, ensuring robust data validation and management.
 
-You can install or upgrade ``asyncord`` via
+- 🛠️ **Full Discord Bot API Coverage**: The library offers complete coverage of the Discord Bot API, enabling access to all the functionalities that Discord provides for bots. This includes handling messages, managing servers, user interactions, and more.
 
-.. code-block:: sh
+- 📖 **Clarity and Comprehensibility**: Asyncord is designed to be more clear and understandable than other libraries, as it closely follows the official Discord API documentation. This adherence makes it easier for developers to implement and maintain their bots.
 
-    $ pip install asyncord --upgrade
+🛠️ Installing
+=============
 
-Quick Start
------------
+To install the library, run the following command::
 
-The followed example shows how to create a simple bot that responds to user messages.
-And has a status of "Playing with asyncord".
+    pip install asyncord
 
-.. code-block:: python
+That's it! You're ready to start building your Discord bot. 🤖
 
-    import aiohttp
+🤝 Contributing
+===============
 
-    from asyncord.client.models.activity import Activity, ActivityType
-    from asyncord.client.models.messages import CreateMessageData
-    from asyncord.client.rest import RestClient
-    from asyncord.gateway.client import GatewayClient
-    from asyncord.gateway.commands import PresenceUpdateData
-    from asyncord.gateway.events.base import ReadyEvent
-    from asyncord.gateway.events.messages import MessageCreateEvent
-    from asyncord.gateway.intents import Intent
+Contributions of all sizes are welcome. We appreciate any help, whether it's fixing a bug, improving the documentation, or adding a new feature. If you're interested in contributing, please read our `contributing guidelines <../../../CONTRIBUTING.md>`_ to get started. 🚀
 
-    API_TOKEN = 'YOUR_BOT_TOKEN'
-    APP_ID = 'YOUR_BOT_APP_ID'
+📜 License
+==========
 
-    DEFAULT_ACTIVITY = Activity(
-        type=ActivityType.GAME,
-        name='with asyncord',
-    )
+This project is licensed under the MIT License. For more information, please refer to the `LICENSE <../../../LICENSE>`_ file. 📄
 
-    async def main():
-        async with aiohttp.ClientSession() as session:
-            gw = GatewayClient(
-                API_TOKEN,
-                intents=Intent.GUILD_PRESENCES | Intent.GUILD_MESSAGES,
-                session=session,
-            )
-            client = RestClient(API_TOKEN)
-            client._http_client._session = session
-            gw.dispatcher.add_argument('client', client)
-
-            async def on_ready(
-                ready_event: ReadyEvent,
-                gateway: GatewayClient
-            ) -> None:
-                await gw.update_presence(PresenceUpdateData(
-                    activities=[DEFAULT_ACTIVITY],
-                ))
-
-            async def on_message(
-                message_create_event: MessageCreateEvent,
-                client: RestClient,
-            ) -> None:
-                if message_create_event.author.bot:
-                    return
-                await client.channels.messages(message_create_event.channel_id).create(
-                    CreateMessageData(
-                        content='Hello, World!'),
-                )
-
-            gw.add_handler(on_ready)
-            gw.add_handler(on_message)
-            await gw.start()
-
-    if __name__ == '__main__':
-        import asyncio
-        asyncio.run(main())
-
-Features
---------
-
-1. **Fully Asynchronous**: Asyncord is built with asynchronous programming from the ground up.
-
-2. **Full Discord Bot API Coverage**: The library offers complete coverage of the Discord Bot API, enabling access to all the functionalities that Discord provides for bots. This includes handling messages, managing servers, user interactions, and more.
-
-3. **Complete Pydantic Schema Coverage**: Asyncord incorporates full pydantic schema coverage, ensuring robust data validation and management.
-
-Contributing
-------------
-
-Contributions of all sizes are welcome.
-
-If you find a bug or have a feature request, please report an issue on GitHub.
-
-License
--------
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
