@@ -1,9 +1,11 @@
 🚀 Asyncord
 ===========
+.. Github hack to display the logo correctly
+.. raw:: html
 
-.. image:: assets/logo_thumbnail.png
-   :alt: Asyncord Logo
-   :align: center
+    <div align="center">
+        <img src="assets/logo_thumbnail.png" alt="Asyncord Logo">
+    </div>
 
 📚 Introduction
 ===============
