@@ -25,8 +25,11 @@ exclude_patterns = []
 
 html_theme = 'sphinx_material'
 html_theme_options = {
+    'nav_title': 'Asyncord',
+    'base_url': 'https://asyncord.dev',
     'color_primary': 'space-blue',
     'color_accent': 'vibran-orange',
     'repo_url': 'https://github.com/vadim-su/asyncord',
+    'repo_name': 'vadim-su/asyncord',
 }
 html_static_path = ['static']
