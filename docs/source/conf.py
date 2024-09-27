@@ -27,5 +27,6 @@ html_theme = 'sphinx_material'
 html_theme_options = {
     'color_primary': 'space-blue',
     'color_accent': 'vibran-orange',
+    'repo_url': 'https://github.com/vadim-su/asyncord',
 }
 html_static_path = ['static']
