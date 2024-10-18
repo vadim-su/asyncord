@@ -3,9 +3,26 @@
 {
 	"name": "Asyncord",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
+	"build": {
+        "dockerfile": "./Dockerfile",
+        "context": "."
+    },
 	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2":{
+            "installZsh": "true",
+            "username": "vscode",
+            "userUid": "1000",
+            "userGid": "1000",
+            "upgradePackages": "true"
+        },
+        "ghcr.io/devcontainers/features/python:1": "none",
+        "ghcr.io/devcontainers/features/node:1": "none",
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": "false"
+        },
 		"ghcr.io/devcontainers-contrib/features/pdm:2": {},
+		"ghcr.io/va-h/devcontainers-features/uv": {},
 		"ghcr.io/devcontainers-contrib/features/pre-commit": {}
 	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -33,7 +50,7 @@
 				"ms-python.autopep8"
 			]
 		}
-	}
+	},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	"remoteUser": "vscode"
 }
