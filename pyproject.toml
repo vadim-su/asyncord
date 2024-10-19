@@ -42,11 +42,6 @@ testing = [
 source = "call"
 getter = "scritps.version:get_version"
 
-[tool.pdm.scripts]
-coverage = "pytest --cov=asyncord --cov-report html --cov-append -n auto tests"
-docs = "mkdocs serve -f docs/mkdocs.yml"
-build-docs = "mkdocs build -f docs/mkdocs.yml"
-
 [tool.pytest.ini_options]
 minversion = "6.2"
 addopts = "-ra --dist=loadscope --color=yes"

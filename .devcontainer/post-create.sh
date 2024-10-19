@@ -2,7 +2,7 @@
 
 # This script runs after the container is created.
 
-pdm sync
+uv sync --all-extras
 pre-commit install
 
 # Activate pdm completion

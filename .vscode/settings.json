@@ -3,9 +3,6 @@
         "tests"
     ],
     "python.envFile": "${workspaceFolder}/.env",
-    "explorer.fileNesting.patterns": {
-        "pyproject.toml": "pdm.lock, .pdm-python, pdm.toml"
-    },
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "[python]": {
@@ -16,4 +13,7 @@
         },
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
+    "explorer.fileNesting.patterns": {
+        "pyproject.toml": "uv.lock"
+    }
 }

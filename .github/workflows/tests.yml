@@ -34,7 +34,21 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-    environment: QA
+    env:
+      ASYNCORD_TEST_TOKEN: ${{ secrets.ASYNCORD_TEST_TOKEN }}
+      ASYNCORD_TEST_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_CHANNEL_ID }}
+      ASYNCORD_TEST_VOICE_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_VOICE_CHANNEL_ID }}
+      ASYNCORD_TEST_GUILD_ID: ${{ vars.ASYNCORD_TEST_GUILD_ID }}
+      ASYNCORD_TEST_USER_ID: ${{ vars.ASYNCORD_TEST_USER_ID }}
+      ASYNCORD_TEST_MESSAGE_ID: ${{ vars.ASYNCORD_TEST_MESSAGE_ID }}
+      ASYNCORD_TEST_MEMBER_ID: ${{ vars.ASYNCORD_TEST_MEMBER_ID }}
+      ASYNCORD_TEST_CUSTOM_EMOJI: ${{ vars.ASYNCORD_TEST_CUSTOM_EMOJI }}
+      ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE: ${{ vars.ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE }}
+      ASYNCORD_TEST_APP_ID: ${{ vars.ASYNCORD_TEST_APP_ID }}
+      ASYNCORD_TEST_ROLE_ID: ${{ vars.ASYNCORD_TEST_ROLE_ID }}
+      ASYNCORD_TEST_USER_TO_BAN: ${{ vars.ASYNCORD_TEST_USER_TO_BAN }}
+      ASYNCORD_TEST_ROLE_TO_PRUNE: ${{ vars.ASYNCORD_TEST_ROLE_TO_PRUNE }}
+      ASYNCORD_TEST_WORKERS: ${{ vars.ASYNCORD_TEST_WORKERS }}
     strategy:
       fail-fast: false
       matrix:
@@ -47,30 +61,11 @@ jobs:
           fetch-depth: 0 # fetch tags doesn't work without this (https://github.com/actions/checkout/issues/1748)
           clean: false
 
-      - name: Set up pdm environment
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
 
-      - name: Install dependencies
-        run: pdm sync -G testing
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
 
-      - name: Run pytest
-        env:
-          ASYNCORD_TEST_TOKEN: ${{ secrets.TEST_TOKEN }}
-          ASYNCORD_TEST_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_CHANNEL_ID }}
-          ASYNCORD_TEST_VOICE_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_VOICE_CHANNEL_ID }}
-          ASYNCORD_TEST_GUILD_ID: ${{ vars.ASYNCORD_TEST_GUILD_ID }}
-          ASYNCORD_TEST_USER_ID: ${{ vars.ASYNCORD_TEST_USER_ID }}
-          ASYNCORD_TEST_MESSAGE_ID: ${{ vars.ASYNCORD_TEST_MESSAGE_ID }}
-          ASYNCORD_TEST_MEMBER_ID: ${{ vars.ASYNCORD_TEST_MEMBER_ID }}
-          ASYNCORD_TEST_CUSTOM_EMOJI: ${{ vars.ASYNCORD_TEST_CUSTOM_EMOJI }}
-          ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE: ${{ vars.ASYNCORD_TEST_GUILD_PREFIX_TO_DELETE }}
-          ASYNCORD_TEST_APP_ID: ${{ vars.ASYNCORD_TEST_APP_ID }}
-          ASYNCORD_TEST_ROLE_ID: ${{ vars.ASYNCORD_TEST_ROLE_ID }}
-          ASYNCORD_TEST_USER_TO_BAN: ${{ vars.ASYNCORD_TEST_USER_TO_BAN }}
-          ASYNCORD_TEST_WORKERS: ${{ vars.ASYNCORD_TEST_WORKERS }}
-          ASYNCORD_TEST_ROLE_TO_PRUNE: ${{ vars.ASYNCORD_TEST_ROLE_TO_PRUNE }}
-
-        run: pdm run pytest -n $ASYNCORD_TEST_WORKERS
+      - name: Run tests
+        run: uv run pytest tests -n $ASYNCORD_TEST_WORKERS
