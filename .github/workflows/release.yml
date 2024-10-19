@@ -10,7 +10,6 @@ on:
 jobs:
   run-tests:
     uses: vadim-su/asyncord/.github/workflows/tests.yml@main
-z
 
   publish:
     runs-on: ubuntu-latest
