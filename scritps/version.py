@@ -10,7 +10,7 @@ from typing import Literal
 from git import Repo
 
 VERSION_REGEX = re.compile(
-    r'v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?P<suffix_name>((?:\.)?dev)|b|a|rc)(?P<suffix_value>\d+)?',
+    r'v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(?P<suffix_name>((?:\.)?(dev|b|a|rc))(?P<suffix_value>\d+)?)?',
 )
 """Regex to match the version."""
 
