@@ -8,7 +8,7 @@ when a guild is updated.
 from __future__ import annotations
 
 import re
-from typing import NamedTuple
+from typing import Any, ClassVar, NamedTuple
 
 from pydantic import BaseModel, Field
 
@@ -26,31 +26,23 @@ __all__ = (
 )
 
 
-class GatewayEventMeta(type):
-    """Metaclass for gateway events."""
-
-    def __new__(mcs, name: str, bases: tuple[type, ...], attrs: dict[str, type]) -> object:  # noqa: N804
-        """Create a new class."""
-        cls = super().__new__(mcs, name, bases, attrs)
-        if not attrs.get('__event_name__'):
-            cls.__event_name__ = mcs._get_event_name(name)
-        return cls
-
-    @classmethod
-    def _get_event_name(mcs, cls_name: str) -> str:  # noqa: N804
-        """Name of the event.
-
-        Used for identifying the event.
-        """
-        # remove the suffix 'Event'
-        class_name_without_suffix = cls_name[:-5]
-        # make camel case into snake case
-        event_name = re.sub('(?<!^)(?=[A-Z])', '_', class_name_without_suffix)
-        return event_name.upper()
-
-
-class GatewayEvent(BaseModel, metav=GatewayEventMeta):
+class GatewayEvent(BaseModel):
     """Base class for all gateway events."""
+
+    __event_name__: ClassVar[str]
+
+    def __init_subclass__(cls, **kwargs: dict[str, Any]) -> None:
+        """Initialize the subclass."""
+        super().__init_subclass__(**kwargs)
+        if not getattr(cls, '__event_name__', None):
+            cls.__event_name__ = cls._get_event_name(cls.__name__)
+
+    @staticmethod
+    def _get_event_name(cls_name: str) -> str:
+        """Generate event name from class name."""
+        class_name_without_suffix = cls_name[:-5]  # Removes 'Event' suffix
+        event_name = re.sub(r'(?<!^)(?=[A-Z])', '_', class_name_without_suffix)
+        return event_name.upper()
 
 
 class Shard(NamedTuple):
