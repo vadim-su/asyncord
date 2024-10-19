@@ -26,20 +26,31 @@ __all__ = (
 )
 
 
-class GatewayEvent(BaseModel):
-    """Base class for all gateway events."""
+class GatewayEventMeta(type):
+    """Metaclass for gateway events."""
+
+    def __new__(mcs, name: str, bases: tuple[type, ...], attrs: dict[str, type]) -> object:  # noqa: N804
+        """Create a new class."""
+        cls = super().__new__(mcs, name, bases, attrs)
+        if not attrs.get('__event_name__'):
+            cls.__event_name__ = mcs._get_event_name(name)
+        return cls
 
     @classmethod
-    @property
-    def __event_name__(cls) -> str:  # noqa: PLW3201
+    def _get_event_name(mcs, cls_name: str) -> str:  # noqa: N804
         """Name of the event.
 
         Used for identifying the event.
         """
-        class_name_without_suffix = cls.__name__[:-5]
+        # remove the suffix 'Event'
+        class_name_without_suffix = cls_name[:-5]
         # make camel case into snake case
         event_name = re.sub('(?<!^)(?=[A-Z])', '_', class_name_without_suffix)
         return event_name.upper()
+
+
+class GatewayEvent(BaseModel, metav=GatewayEventMeta):
+    """Base class for all gateway events."""
 
 
 class Shard(NamedTuple):
