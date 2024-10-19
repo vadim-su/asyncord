@@ -9,7 +9,7 @@ on:
 
   workflow_call:
     secrets:
-      TEST_TOKEN:
+      ASYNCORD_TEST_TOKEN:
         required: true
         description: "Discord bot token for testing"
 

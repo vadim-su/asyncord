@@ -10,9 +10,7 @@ on:
 jobs:
   run-tests:
     uses: vadim-su/asyncord/.github/workflows/tests.yml@main
-    secrets:
-      TEST_TOKEN: ${{ secrets.ASYNCORD_TEST_TOKEN }}
-
+z
 
   publish:
     runs-on: ubuntu-latest
