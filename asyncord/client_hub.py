@@ -162,6 +162,7 @@ class ClientHub:
             await asyncio.gather(*tasks)
         except (KeyboardInterrupt, asyncio.CancelledError):
             logger.info('Shutting down...')
+        finally:
             await self.stop()
 
     async def stop(self) -> None:
@@ -172,6 +173,11 @@ class ClientHub:
         if not self._is_outer_session:
             await self.session.close()
         logger.info(':wave: Shutdown complete', extra={'markup': True})
+
+    def __del__(self) -> None:
+        """Log unclosed session for debugging."""
+        if not self.session.closed:
+            logger.warning('Unclosed client session detected', extra={'markup': True})
 
     async def __aenter__(self) -> Self:
         """Enter the context manager."""
