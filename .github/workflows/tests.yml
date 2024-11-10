@@ -9,7 +9,7 @@ on:
 
   workflow_call:
     secrets:
-      ASYNCORD_TEST_TOKEN:
+      PASSED_ASYNCORD_TEST_TOKEN:
         required: true
         description: "Discord bot token for testing"
 
@@ -35,7 +35,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      ASYNCORD_TEST_TOKEN: ${{ secrets.ASYNCORD_TEST_TOKEN }}
+      ASYNCORD_TEST_TOKEN: ${{ secrets.PASSED_ASYNCORD_TEST_TOKEN || secrets.ASYNCORD_TEST_TOKEN }}
       ASYNCORD_TEST_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_CHANNEL_ID }}
       ASYNCORD_TEST_VOICE_CHANNEL_ID: ${{ vars.ASYNCORD_TEST_VOICE_CHANNEL_ID }}
       ASYNCORD_TEST_GUILD_ID: ${{ vars.ASYNCORD_TEST_GUILD_ID }}
