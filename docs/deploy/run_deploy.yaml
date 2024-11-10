@@ -1,0 +1,19 @@
+---
+- name: Deploy docs
+  hosts: all
+
+  vars:
+    project_name: "asyncord_docs"
+    docs_build_dir: "../build/dirhtml"
+    project_dir: "{{ ansible_env.HOME }}/{{ project_name }}"
+
+  tasks:
+    - name: Ensure data directory exists
+      ansible.builtin.file:
+        path: "{{ project_dir }}"
+        state: directory
+
+    - name: Copy documentation
+      ansible.posix.synchronize:
+        src: "{{ docs_build_dir }}/"
+        dest: "{{ project_dir }}/"

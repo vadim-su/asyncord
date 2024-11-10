@@ -24,11 +24,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = [
-    "pre-commit>=3.3.2",
-    "ruff>=0.4.4",
-    "gitpython>=3.1.43",
-]
+dev = ["pre-commit>=3.3.2", "ruff>=0.4.4", "gitpython>=3.1.43"]
 testing = [
     "pytest>=7.3.1",
     "pytest-asyncio>=0.19.0,<0.23.0", # 0.23.0 has a bugs with scopes
@@ -64,13 +60,7 @@ exclude_also = [
 line-length = 120
 indent-width = 4
 target-version = "py312"
-extend-exclude = [
-    ".git",
-    ".vscode",
-    ".devcontainer",
-    ".github",
-    ".venv",
-]
+extend-exclude = [".git", ".vscode", ".devcontainer", ".github", ".venv"]
 
 [tool.ruff.lint]
 preview = true
@@ -177,7 +167,13 @@ ignore = [
     # We allow some magic values in the tests. It's acceptable
     "PLR2004",
     # We allow async function without await in tests
-    "RUF029"
+    "RUF029",
+]
+"docs/source/conf.py" = [
+    # Allow implicit namespace package
+    "INP001",
+
+    "D100",
 ]
 
 [tool.ruff.lint.flake8-quotes]
