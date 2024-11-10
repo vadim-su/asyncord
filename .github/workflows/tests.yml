@@ -49,8 +49,10 @@ jobs:
       ASYNCORD_TEST_USER_TO_BAN: ${{ vars.ASYNCORD_TEST_USER_TO_BAN }}
       ASYNCORD_TEST_ROLE_TO_PRUNE: ${{ vars.ASYNCORD_TEST_ROLE_TO_PRUNE }}
       ASYNCORD_TEST_WORKERS: ${{ vars.ASYNCORD_TEST_WORKERS }}
+
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         python-version: ["3.12", "3.13"]
 
