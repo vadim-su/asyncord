@@ -19,7 +19,7 @@ async def test_setup_single_client_group(mocker: MockerFixture) -> None:
     mock_gather = mocker.patch('asyncio.gather', new=mocker.async_stub('gather'))
     mock_client_group_class = mocker.patch('asyncord.client_hub.ClientGroup')
 
-    async with ClientHub.setup_single_client_group(auth='token', session=Mock()) as client_group:
+    async with ClientHub.connect(auth='token', session=Mock()) as client_group:
         mock_client_group_class.assert_called_once()
         mock_client_group = mock_client_group_class.return_value
         assert client_group is mock_client_group
@@ -31,7 +31,7 @@ async def test_setup_single_client_group(mocker: MockerFixture) -> None:
 async def test_setup_with_dispatcher(mocker: MockerFixture, caplog: pytest.LogCaptureFixture) -> None:
     """Test setup method with a dispatcher."""
     mock_gather = mocker.patch('asyncio.gather', new=mocker.async_stub('gather'))
-    hub_context = ClientHub.setup_single_client_group(auth='token', session=Mock(), dispatcher=Mock())
+    hub_context = ClientHub.connect(auth='token', session=Mock(), dispatcher=Mock())
     mocker.patch('asyncord.client_hub.ClientGroup')
     with caplog.at_level(logging.WARNING):
         async with hub_context:

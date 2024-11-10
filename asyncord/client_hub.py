@@ -65,7 +65,7 @@ class ClientHub:
 
     @classmethod
     @asynccontextmanager
-    async def setup_single_client_group(
+    async def connect(
         cls,
         auth: str | AuthStrategy | None = None,
         ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
@@ -76,6 +76,7 @@ class ClientHub:
         """Create a set of clients only for a single token.
 
         Use this method if you want to run only one application with a single token.
+        In general, it is what you need.
 
         Args:
             auth: Auth strategy to use for authentication.
