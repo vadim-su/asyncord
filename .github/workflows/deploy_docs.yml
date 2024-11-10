@@ -24,13 +24,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pdm sync -G docs
+          uv sync --extra docs
           sudo apt update
           sudo apt install -y make
 
       - name: Build docs
         run: |
-          pdm run make dirhtml
+          uv run make dirhtml
         working-directory: ./docs
 
       - name: Run playbook
