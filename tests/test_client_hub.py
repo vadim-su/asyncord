@@ -14,10 +14,11 @@ async def test_create_hub_without_session() -> None:
     assert hub.session
 
 
-async def test_setup_single_client_group(mocker: MockerFixture) -> None:
+async def test_connect(mocker: MockerFixture) -> None:
     """Test setup_single_client_group method."""
     mock_gather = mocker.patch('asyncio.gather', new=mocker.async_stub('gather'))
     mock_client_group_class = mocker.patch('asyncord.client_hub.ClientGroup')
+    mock_client_group_class.return_value.close = AsyncMock()
 
     async with ClientHub.connect(auth='token', session=Mock()) as client_group:
         mock_client_group_class.assert_called_once()
@@ -28,11 +29,13 @@ async def test_setup_single_client_group(mocker: MockerFixture) -> None:
     mock_client_group.connect.assert_called_once()
 
 
-async def test_setup_with_dispatcher(mocker: MockerFixture, caplog: pytest.LogCaptureFixture) -> None:
+async def test_connect_with_dispatcher(mocker: MockerFixture, caplog: pytest.LogCaptureFixture) -> None:
     """Test setup method with a dispatcher."""
     mock_gather = mocker.patch('asyncio.gather', new=mocker.async_stub('gather'))
     hub_context = ClientHub.connect(auth='token', session=Mock(), dispatcher=Mock())
-    mocker.patch('asyncord.client_hub.ClientGroup')
+    mock_client_group_class = mocker.patch('asyncord.client_hub.ClientGroup')
+    mock_client_group_class.return_value.close = AsyncMock()
+
     with caplog.at_level(logging.WARNING):
         async with hub_context:
             pass

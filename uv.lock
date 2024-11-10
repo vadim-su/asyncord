@@ -99,7 +99,7 @@ wheels = [
 
 [[package]]
 name = "asyncord"
-version = "0.13.5.dev10+ge0725e3"
+version = "0.13.7"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -129,6 +129,11 @@ testing = [
     { name = "pytest-xdist" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "python-git" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = "<4" },
@@ -149,6 +154,9 @@ requires-dist = [
     { name = "sphinx-material", marker = "extra == 'docs'", specifier = ">=0.0.36" },
     { name = "yarl", specifier = ">=1.8.1" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "python-git", specifier = ">=2018.2.1" }]
 
 [[package]]
 name = "attrs"
@@ -866,6 +874,18 @@ wheels = [
 ]
 
 [[package]]
+name = "python-git"
+version = "2018.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "send2trash" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a5/c6/645f405c8dd3094b85b0f01916517ba025ab8855b252e2a73fec51947f09/python-git-2018.2.1.tar.gz", hash = "sha256:2da0a75b562bc966d8a3bc1d6a2f8fd9f0fb3a3d3f2eff2239213bcc400bde82", size = 11761 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f0/6f/664d1dce126168f4fb91e74e8f7bd26db72f0b2a49b0fa1c9f9742daf1ca/python_git-2018.2.1-py3-none-any.whl", hash = "sha256:87ef4aef32a65f44e301cff42e5d5f660a2ba8d6b9d7c021faedbb9028a57ba9", size = 10453 },
+]
+
+[[package]]
 name = "python-slugify"
 version = "8.0.4"
 source = { registry = "https://pypi.org/simple" }
@@ -959,6 +979,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b0/5c/efdb4777686683a8edce94ffd812783bddcd3d2454d38c5ac193fef7c500/ruff-0.7.3-py3-none-win32.whl", hash = "sha256:4ba81a5f0c5478aa61674c5a2194de8b02652f17addf8dfc40c8937e6e7d79fc", size = 8611095 },
     { url = "https://files.pythonhosted.org/packages/bb/b8/28fbc6a4efa50178f973972d1c84b2d0a33cdc731588522ab751ac3da2f5/ruff-0.7.3-py3-none-win_amd64.whl", hash = "sha256:588a9ff2fecf01025ed065fe28809cd5a53b43505f48b69a1ac7707b1b7e4088", size = 9418283 },
     { url = "https://files.pythonhosted.org/packages/3f/77/b587cba6febd5e2003374f37eb89633f79f161e71084f94057c8653b7fb3/ruff-0.7.3-py3-none-win_arm64.whl", hash = "sha256:1713e2c5545863cdbfe2cbce21f69ffaf37b813bfd1fb3b90dc9a6f1963f5a8c", size = 8725228 },
+]
+
+[[package]]
+name = "send2trash"
+version = "1.8.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fd/3a/aec9b02217bb79b87bbc1a21bc6abc51e3d5dcf65c30487ac96c0908c722/Send2Trash-1.8.3.tar.gz", hash = "sha256:b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf", size = 17394 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/40/b0/4562db6223154aa4e22f939003cb92514c79f3d4dccca3444253fd17f902/Send2Trash-1.8.3-py3-none-any.whl", hash = "sha256:0c31227e0bd08961c7665474a3d1ef7193929fedda4233843689baa056be46c9", size = 18072 },
 ]
 
 [[package]]

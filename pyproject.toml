@@ -203,3 +203,8 @@ quote-style = "single"
 
 [tool.uv.workspace]
 members = ["examples/echo", "examples/levels"]
+
+[dependency-groups]
+dev = [
+    "python-git>=2018.2.1",
+]
