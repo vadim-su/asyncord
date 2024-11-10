@@ -200,3 +200,6 @@ max-args = 7
 [tool.ruff.format]
 preview = true
 quote-style = "single"
+
+[tool.uv.workspace]
+members = ["examples/echo"]
