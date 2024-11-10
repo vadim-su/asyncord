@@ -1,0 +1,9 @@
+[project]
+name = "levels"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12.0"
+dependencies = ["asyncord"]
+
+[tool.uv.sources]
+asyncord = { workspace = true }

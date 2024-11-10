@@ -202,4 +202,4 @@ preview = true
 quote-style = "single"
 
 [tool.uv.workspace]
-members = ["examples/echo"]
+members = ["examples/echo", "examples/levels"]

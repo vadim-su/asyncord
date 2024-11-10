@@ -15,5 +15,6 @@
     },
     "explorer.fileNesting.patterns": {
         "pyproject.toml": "uv.lock"
-    }
+    },
+    "python.analysis.typeCheckingMode": "basic"
 }
