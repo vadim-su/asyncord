@@ -41,7 +41,7 @@ testing = [
 docs = ["sphinx-material>=0.0.36", "sphinx>=8.0.2"]
 
 [tool.uv.workspace]
-members = ["examples/echo", "examples/levels"]
+members = ["examples/echo", "examples/levels", "examples/help_desk"]
 
 [tool.uv]
 default-groups = ["dev", "testing"]

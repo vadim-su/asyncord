@@ -9,6 +9,7 @@ resolution-markers = [
 members = [
     "asyncord",
     "echo",
+    "help-desk",
     "levels",
 ]
 
@@ -439,6 +440,21 @@ wheels = [
 ]
 
 [[package]]
+name = "help-desk"
+version = "0.1.0"
+source = { virtual = "examples/help_desk" }
+dependencies = [
+    { name = "asyncord" },
+    { name = "python-dotenv" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "asyncord", editable = "." },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+]
+
+[[package]]
 name = "identify"
 version = "2.6.2"
 source = { registry = "https://pypi.org/simple" }
@@ -492,10 +508,14 @@ version = "0.1.0"
 source = { virtual = "examples/levels" }
 dependencies = [
     { name = "asyncord" },
+    { name = "python-dotenv" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "asyncord", editable = "." }]
+requires-dist = [
+    { name = "asyncord", editable = "." },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
+]
 
 [[package]]
 name = "lxml"
