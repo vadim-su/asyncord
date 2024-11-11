@@ -24,7 +24,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --extra docs
+          uv sync --group docs
+
+      - name: Install make
+        run: |
           sudo apt update
           sudo apt install -y make
 

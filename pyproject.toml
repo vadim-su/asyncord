@@ -23,8 +23,13 @@ dependencies = [
 
 dynamic = ["version"]
 
-[project.optional-dependencies]
-dev = ["pre-commit>=3.3.2", "ruff>=0.4.4", "gitpython>=3.1.43"]
+[dependency-groups]
+dev = [
+    "python-git>=2018.2.1",
+    "pre-commit>=3.3.2",
+    "ruff>=0.4.4",
+    "gitpython>=3.1.43",
+]
 testing = [
     "pytest>=7.3.1",
     "pytest-asyncio>=0.19.0,<0.23.0", # 0.23.0 has a bugs with scopes
@@ -34,6 +39,12 @@ testing = [
     "pytest-cov>=5.0.0",
 ]
 docs = ["sphinx-material>=0.0.36", "sphinx>=8.0.2"]
+
+[tool.uv.workspace]
+members = ["examples/echo", "examples/levels"]
+
+[tool.uv]
+default-groups = ["dev", "testing"]
 
 [tool.pdm.version]
 source = "call"
@@ -200,11 +211,3 @@ max-args = 7
 [tool.ruff.format]
 preview = true
 quote-style = "single"
-
-[tool.uv.workspace]
-members = ["examples/echo", "examples/levels"]
-
-[dependency-groups]
-dev = [
-    "python-git>=2018.2.1",
-]

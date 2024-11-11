@@ -70,7 +70,7 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --extra testing
+        run: uv sync
 
       - name: Run tests
         run: uv run pytest tests -n $ASYNCORD_TEST_WORKERS
