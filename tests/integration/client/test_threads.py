@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from asyncord.client.channels.models.requests.creation import CreateForumChannelRequest, Tag
-from asyncord.client.channels.models.requests.updating import UpdateChannelRequest, UpdateForumChannelRequest
+from asyncord.client.channels.models.requests.updating import UpdateChannelRequest
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.http import errors
 from asyncord.client.messages.models.responses.messages import MessageResponse
@@ -213,7 +213,7 @@ async def test_add_tag_to_forum(
 
     channel = await channel_res.update(
         channel_id=channel.id,
-        channel_data=UpdateForumChannelRequest(  # type: ignore
+        channel_data=UpdateChannelRequest(  # type: ignore
             available_tags=[Tag(name='test')],
         ),
     )

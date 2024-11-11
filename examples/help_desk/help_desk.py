@@ -11,7 +11,7 @@ import os
 
 from dotenv import load_dotenv
 
-from asyncord.client.channels.models.requests.updating import UpdateForumChannelRequest
+from asyncord.client.channels.models.requests.updating import UpdateChannelRequest
 from asyncord.client.rest import RestClient
 from asyncord.client.threads.models.requests import UpdateThreadRequest
 from asyncord.client_hub import ClientHub
@@ -42,7 +42,7 @@ async def on_reaction(event: MessageReactionAddEvent, client: RestClient) -> Non
 
     await client.channels.update(
         event.channel_id,
-        channel_data=UpdateForumChannelRequest(
+        channel_data=UpdateChannelRequest(
             applied_tags=[FORUM_TAG_ID],  # type: ignore
         ),
     )

@@ -144,6 +144,9 @@ class UpdateChannelRequest(BaseUpdateChannel):
     default_forum_layout: DefaultForumLayoutType | None = None
     """Default layout for the forum channel."""
 
+    applied_tags: list[SnowflakeInputType] | None = None
+    """Set of tag ids that have been applied to a thread."""
+
     @field_validator('flags')
     @classmethod
     def validate_flags(cls, flags: ChannelFlag | None, field_info: ValidationInfo) -> ChannelFlag | None:
@@ -259,12 +262,6 @@ class UpdateForumChannelRequest(BaseUpdateChannel):
     That clients use to automatically archive newly created threads in the channel
     after recent activity.
     """
-
-    default_reaction_emoji: DefaultReaction | None = None
-    """Default reaction emoji for the forum channel."""
-
-    available_tags: list[Tag] | None = None
-    """List of available tags for the forum channel."""
 
     @field_validator('flags')
     @classmethod
