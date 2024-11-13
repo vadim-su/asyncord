@@ -9,6 +9,7 @@ resolution-markers = [
 members = [
     "asyncord",
     "echo",
+    "gallery",
     "help-desk",
     "levels",
 ]
@@ -100,7 +101,7 @@ wheels = [
 
 [[package]]
 name = "asyncord"
-version = "0.13.8"
+version = "0.13.10"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
@@ -414,6 +415,17 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/17/c4/b7db1206a3fea44bf3b838ca61deb6f74424a8a5db1dd53ecb21da669be6/frozenlist-1.5.0-cp313-cp313-win_amd64.whl", hash = "sha256:11aabdd62b8b9c4b84081a3c246506d1cddd2dd93ff0ad53ede5defec7886b28", size = 51167 },
     { url = "https://files.pythonhosted.org/packages/c6/c8/a5be5b7550c10858fcf9b0ea054baccab474da77d37f1e828ce043a3a5d4/frozenlist-1.5.0-py3-none-any.whl", hash = "sha256:d994863bba198a4a518b467bb971c56e1db3f180a25c6cf7bb1949c267f748c3", size = 11901 },
 ]
+
+[[package]]
+name = "gallery"
+version = "0.1.0"
+source = { virtual = "examples/gallery" }
+dependencies = [
+    { name = "asyncord" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "asyncord", editable = "." }]
 
 [[package]]
 name = "gitdb"
