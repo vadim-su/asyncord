@@ -21,6 +21,7 @@ from asyncord.client.channels.models.common import (
 )
 from asyncord.client.members.models.responses import MemberResponse
 from asyncord.client.models.permissions import PermissionFlag
+from asyncord.client.threads.models.common import ThreadType
 from asyncord.client.users.models.responses import UserResponse
 from asyncord.snowflake import Snowflake
 
@@ -31,6 +32,8 @@ __all__ = (
     'OverwriteOut',
     'TagOut',
     'ThreadMemberResponse',
+    'ThreadMetadataOut',
+    'ThreadResponse',
 )
 
 
@@ -105,6 +108,47 @@ class TagOut(BaseModel):
     """Unicode character of the emoji.
 
     At most one of emoji_id and emoji_name may be set.
+    """
+
+
+class ThreadMetadataOut(BaseModel):
+    """Thread metadata object.
+
+    Reference:
+    https://discord.com/developers/docs/resources/channel#thread-metadata-object
+    """
+
+    archived: bool
+    """Whether the thread is archived."""
+
+    auto_archive_duration: int
+    """Duration in minutes to automatically archive the thread after recent activity.
+
+    Can be set to: 60, 1440, 4320, 10080.
+    """
+
+    archive_timestamp: datetime.datetime
+    """Timestamp when the thread's archive status was last changed.
+
+    Used for calculating recent activity.
+    """
+
+    locked: bool
+    """Whether the thread is locked.
+
+    When a thread is locked, only users with `MANAGE_THREADS` can unarchive it.
+    """
+
+    invitable: bool | None = None
+    """Whether non-moderators can add other non-moderators to a thread.
+
+    Only available on private threads.
+    """
+
+    create_timestamp: datetime.datetime | None = None
+    """Timestamp when the thread was created.
+
+    Only populated for threads created after 2022-01-09.
     """
 
 
@@ -243,6 +287,24 @@ class ChannelResponse(BaseModel):
     video_quality_mode: FallbackAdapter[VideoQualityMode] | None = None
     """Camera video quality mode of the voice channel, 1 when not present."""
 
+    message_count: int | None = None
+    """Number of messages in a thread.
+
+    Not including the initial message or deleted messages.
+    """
+
+    member_count: int | None = None
+    """Approximate count of members in a thread.
+
+    Stops counting at 50.
+    """
+
+    thread_metadata: ThreadMetadataOut | None = None
+    """Thread metadata object for a thread channel."""
+
+    member: ThreadMemberResponse | None = None
+    """Thread member object for the current user."""
+
     default_auto_archive_duration: int | None = None
     """Default duration that the clients (not the API) will use for newly created threads.
 
@@ -261,8 +323,18 @@ class ChannelResponse(BaseModel):
     flags: ChannelFlag | None = None
     """Flags for the channel."""
 
+    total_message_sent: int | None = None
+    """Number of messages ever sent in a thread.
+
+    It's similar to message_count on message creation, but will not decrement
+    the number when a message is deleted.
+    """
+
     available_tags: list[TagOut] | None = None
     """Set of tags that can be used."""
+
+    applied_tags: list[Snowflake] | None = None
+    """Set of tag ids that have been applied to a thread."""
 
     default_reaction_emoji: DefaultReactionOut | None = None
     """Emoji to show in the add reaction button on a thread."""
@@ -283,6 +355,49 @@ class ChannelResponse(BaseModel):
     """Default forum layout view used to display posts in GUILD_FORUM channels.
 
     Defaults to 0, which indicates a layout view has not been set by a channel admin.
+    """
+
+    def to_thread(self) -> ThreadResponse:
+        """Convert channel response to thread response object."""
+        return ThreadResponse.model_validate(self)
+
+
+class ThreadResponse(ChannelResponse):
+    """Auxiliary channel object for threads.
+
+    In general, this object is identical to a channel object, but it makes some
+    fields required.
+
+    Member and applied tags are not included in this object because they are
+    can be ommited for threads too.
+    """
+
+    type: FallbackAdapter[ThreadType]
+    """Type of channel."""
+
+    owner_id: Snowflake  # type: ignore
+    """Creator id of the thread."""
+
+    message_count: int  # type: ignore
+    """Number of messages in a thread.
+
+    Not including the initial message or deleted messages.
+    """
+
+    member_count: int  # type: ignore
+    """Approximate count of members in a thread.
+
+    Stops counting at 50.
+    """
+
+    thread_metadata: ThreadMetadataOut  # type: ignore
+    """Thread metadata object for a thread channel."""
+
+    total_message_sent: int  # type: ignore
+    """Number of messages ever sent in a thread.
+
+    It's similar to message_count on message creation, but will not decrement
+    the number when a message is deleted.
     """
 
 

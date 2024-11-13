@@ -51,8 +51,18 @@ class ChannelType(enum.IntEnum):
     Formerly news channels.
     """
 
-    # There are could have been thread types here, but they were moved to
-    # asyncord/client/threads/models/common
+    ANNOUNCEMENT_THREAD = 10
+    """Temporary sub-channel within a GUILD_ANNOUNCEMENT channel."""
+
+    GUILD_PUBLIC_THREAD = 11
+    """Temporary sub-channel within a GUILD_TEXT channel."""
+
+    GUILD_PRIVATE_THREAD = 12
+    """Temporary sub-channel within a `GUILD_TEXT` channel.
+
+    The channel is only viewable by those invited and those with
+    the `MANAGE_THREADS` permission.
+    """
 
     GUILD_STAGE_VOICE = 13
     """Voice channel for hosting events with an audience."""

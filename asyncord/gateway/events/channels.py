@@ -8,6 +8,7 @@ from fbenum.adapter import FallbackAdapter
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.channels.models.responses import ChannelResponse, ThreadMemberResponse
 from asyncord.client.members.models.responses import MemberResponse
+from asyncord.client.threads.models.common import ThreadType
 from asyncord.client.threads.models.responses import ThreadResponse
 from asyncord.gateway.events.base import GatewayEvent
 from asyncord.snowflake import Snowflake
@@ -95,7 +96,7 @@ class ThreadCreateEvent(GatewayEvent, ChannelResponse):
     """
 
     newly_created: bool
-    """when a thread is created"""
+    """When a thread is created."""
 
     thread_member: ThreadMemberResponse | None = None
     """Is sent when the user is added to a private thread."""
@@ -109,12 +110,27 @@ class ThreadUpdateEvent(GatewayEvent, ChannelResponse):
     """
 
 
-class ThreadDeleteEvent(GatewayEvent, ChannelResponse):
+class ThreadDeleteEvent(GatewayEvent):
     """Sent when a thread is deleted.
 
     Reference:
     https://discord.com/developers/docs/topics/gateway-events#thread-delete
     """
+
+    id: Snowflake
+    """Channel id."""
+
+    type: FallbackAdapter[ThreadType]
+    """Type of channel."""
+
+    guild_id: Snowflake | None = None
+    """Guild id.
+
+    May be missing for some thread objects received over gateway guild dispatches.
+    """
+
+    parent_id: Snowflake
+    """Id of the parent channel for a thread."""
 
 
 class ThreadListSyncEvent(GatewayEvent):
