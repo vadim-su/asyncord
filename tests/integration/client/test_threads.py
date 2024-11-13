@@ -6,6 +6,7 @@ from asyncord.client.channels.models.requests.creation import CreateForumChannel
 from asyncord.client.channels.models.requests.updating import UpdateChannelRequest
 from asyncord.client.channels.resources import ChannelResource
 from asyncord.client.http import errors
+from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.messages.models.responses.messages import MessageResponse
 from asyncord.client.threads.models.common import ThreadType
 from asyncord.client.threads.models.requests import (
@@ -66,7 +67,7 @@ async def test_create_delete_thread(
 ) -> None:
     """Test creating and deleting a thread."""
     thread = await thread_res.create_thread(
-        thread_data=CreateThreadRequest(  # type: ignore
+        thread_data=CreateThreadRequest(
             name='test',
             type=thread_type,
         ),
@@ -87,7 +88,7 @@ async def test_create_delete_thread_from_message(
     """Test creating and deleting a thread from a message."""
     thread = await thread_res.create_thread_from_message(
         message_id=message.id,
-        thread_data=CreateThreadFromMessageRequest(  # type: ignore
+        thread_data=CreateThreadFromMessageRequest(
             name='test',
         ),
     )
@@ -150,13 +151,15 @@ async def test_post_to_forum_channel(
     """Test posting to a forum channel."""
     channel = await channel_res.create_channel(
         guild_id=integration_data.guild_id,
-        channel_data=CreateForumChannelRequest(  # type: ignore
+        channel_data=CreateForumChannelRequest(
             name='test',
             available_tags=[Tag(name='test', emoji_name='👍')],
         ),
     )
 
-    tag_id = channel.available_tags[0].id  # type: ignore
+    assert channel.available_tags
+
+    tag_id = channel.available_tags[0].id
 
     thread_res = channel_res.threads(channel_id=channel.id)
     if with_files:
@@ -166,7 +169,7 @@ async def test_post_to_forum_channel(
 
     try:
         thread = await thread_res.create_media_forum_thread(
-            thread_data=CreateMediaForumThreadRequest(  # type: ignore
+            thread_data=CreateMediaForumThreadRequest(
                 name='test thread',
                 applied_tags=[tag_id],
                 message=ThreadMessage(
@@ -183,8 +186,9 @@ async def test_post_to_forum_channel(
     assert thread.name == 'test thread'
     assert thread.type is ThreadType.GUILD_PUBLIC_THREAD
     assert not thread.thread_metadata.archived
-    assert len(thread.applied_tags) == 1  # type: ignore
-    assert thread.applied_tags[0] == tag_id  # type: ignore
+    assert thread.applied_tags
+    assert len(thread.applied_tags) == 1
+    assert thread.applied_tags[0] == tag_id
 
 
 async def test_add_tag_to_forum(
@@ -194,7 +198,7 @@ async def test_add_tag_to_forum(
     """Test adding a tag to a thread."""
     channel = await channel_res.create_channel(
         guild_id=integration_data.guild_id,
-        channel_data=CreateForumChannelRequest(  # type: ignore
+        channel_data=CreateForumChannelRequest(
             name='test',
             available_tags=[],
         ),
@@ -204,12 +208,13 @@ async def test_add_tag_to_forum(
 
     channel = await channel_res.update(
         channel_id=channel.id,
-        channel_data=UpdateChannelRequest(  # type: ignore
+        channel_data=UpdateChannelRequest(
             available_tags=[Tag(name='test')],
         ),
     )
 
-    assert len(channel.available_tags) == 1  # type: ignore
+    assert channel.available_tags
+    assert len(channel.available_tags) == 1
 
 
 async def test_add_tag_to_thread(
@@ -219,13 +224,14 @@ async def test_add_tag_to_thread(
     """Test adding a tag to a thread."""
     channel = await channel_res.create_channel(
         guild_id=integration_data.guild_id,
-        channel_data=CreateForumChannelRequest(  # type: ignore
+        channel_data=CreateForumChannelRequest(
             name='test',
             available_tags=[Tag(name='test')],
         ),
     )
 
-    tag_id = channel.available_tags[0].id  # type: ignore
+    assert channel.available_tags
+    tag_id = channel.available_tags[0].id
     thread_res = channel_res.threads(channel_id=channel.id)
 
     try:
@@ -248,7 +254,9 @@ async def test_add_tag_to_thread(
         )
 
         thread = await thread_res.get(thread_id=thread.id)
-        assert len(thread.applied_tags) == 1  # type: ignore
+
+        assert thread.applied_tags
+        assert len(thread.applied_tags) == 1
     finally:
         await channel_res.delete(channel_id=channel.id)
 
@@ -282,7 +290,7 @@ async def test_update_thread(thread_res: ThreadResource, thread: ThreadResponse)
     """Test updating a thread."""
     thread = await thread_res.update(
         thread_id=thread.id,
-        thread_data=UpdateThreadRequest(  # type: ignore
+        thread_data=UpdateThreadRequest(
             name='updated',
             archived=True,
             locked=True,
@@ -298,7 +306,7 @@ async def test_send_message(thread_res: ThreadResource, thread: ThreadResponse) 
     """Test sending a message to a thread."""
     message_res = thread_res.messages(thread_id=thread.id)
     message = await message_res.create(
-        message_data=ThreadMessage(  # type: ignore
+        message_data=CreateMessageRequest(
             content='test',
         ),
     )
