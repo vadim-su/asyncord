@@ -24,6 +24,7 @@ from asyncord.client.models.automoderation import (
     TriggerMetadata,
     TriggerType,
 )
+from asyncord.client.threads.models.responses import ThreadsResponse
 from asyncord.client.users.resources import UserResource
 from tests.conftest import IntegrationTestData
 
@@ -432,3 +433,12 @@ async def test_get_vanity_url(
     """
     with pytest.raises(errors.ClientError, match='Missing Access'):
         assert await guilds_res.get_vanity_url(integration_data.guild_id)
+
+
+async def test_get_active_threads(
+    guilds_res: GuildResource,
+    integration_data: IntegrationTestData,
+) -> None:
+    """Test getting active threads."""
+    active_threads = await guilds_res.get_active_threads(guild_id=integration_data.guild_id)
+    assert isinstance(active_threads, ThreadsResponse)

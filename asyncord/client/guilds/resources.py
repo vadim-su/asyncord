@@ -36,6 +36,7 @@ from asyncord.client.models.automoderation import AutoModerationRule
 from asyncord.client.resources import APIResource
 from asyncord.client.roles.resources import RoleResource
 from asyncord.client.scheduled_events.resources import ScheduledEventsResource
+from asyncord.client.threads.models.responses import ThreadsResponse
 from asyncord.typedefs import CURRENT_USER, list_model
 from asyncord.urls import REST_API_URL
 
@@ -721,3 +722,16 @@ class GuildResource(APIResource):  # noqa: PLR0904
         url = self.guilds_url / str(guild_id) / 'vanity-url'
         resp = await self._http_client.get(url=url)
         return VanityUrlInviteResponse.model_validate(resp.body)
+
+    async def get_active_threads(self, guild_id: SnowflakeInputType) -> ThreadsResponse:
+        """Get the active theads for a guild.
+
+        Yeah, this endpoint is weird. We can only get the active threads for a guild,
+        not a channel.
+
+        Returns:
+            Thread list resource for the channel.
+        """
+        url = self.guilds_url / str(guild_id) / 'threads' / 'active'
+        resp = await self._http_client.get(url=url)
+        return ThreadsResponse.model_validate(resp.body)

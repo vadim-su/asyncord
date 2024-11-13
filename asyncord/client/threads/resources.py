@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 __all__ = ('ThreadResource',)
 
 
-class ThreadResource(APIResource):  # noqa: PLR0904
+class ThreadResource(APIResource):
     """Resource to interact with threads.
 
     Attributes:
@@ -37,7 +37,6 @@ class ThreadResource(APIResource):  # noqa: PLR0904
     """
 
     channels_url = REST_API_URL / 'channels'
-    guilds_url = REST_API_URL / 'guilds'
 
     def __init__(self, http_client: HttpClient, channel_id: SnowflakeInputType) -> None:
         """Initialize the thread resource."""
@@ -61,19 +60,6 @@ class ThreadResource(APIResource):  # noqa: PLR0904
         url = self.channels_url / str(thread_id)
         resp = await self._http_client.get(url=url)
         return ThreadResponse.model_validate(resp.body)
-
-    async def get_active_threads(self, guild_id: SnowflakeInputType) -> ThreadsResponse:
-        """Get the active theads.
-
-        Yeah, this endpoint is weird. We can only get the active threads for a guild,
-        not a channel.
-
-        Returns:
-            Thread list resource for the channel.
-        """
-        url = self.guilds_url / str(guild_id) / 'threads' / 'active'
-        resp = await self._http_client.get(url=url)
-        return ThreadsResponse.model_validate(resp.body)
 
     async def get_archived_threads(
         self,

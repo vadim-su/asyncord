@@ -31,15 +31,6 @@ async def test_get_thread(
     assert isinstance(thread, ThreadResponse)
 
 
-async def test_get_active_threads(
-    thread_res: ThreadResource,
-    integration_data: IntegrationTestData,
-) -> None:
-    """Test getting active threads."""
-    active_threads = await thread_res.get_active_threads(guild_id=integration_data.guild_id)
-    assert isinstance(active_threads, ThreadsResponse)
-
-
 async def test_get_archived_threads(thread_res: ThreadResource) -> None:
     """Test getting archived threads."""
     archived_threads = await thread_res.get_archived_threads()
