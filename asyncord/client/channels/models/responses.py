@@ -359,7 +359,7 @@ class ChannelResponse(BaseModel):
 
     def to_thread(self) -> ThreadResponse:
         """Convert channel response to thread response object."""
-        return ThreadResponse.model_validate(self)
+        return ThreadResponse.model_validate(self.model_dump())
 
 
 class ThreadResponse(ChannelResponse):

@@ -88,7 +88,7 @@ class ChannelPinsUpdateEvent(GatewayEvent):
     """the time at which the most recent pinned message was pinned"""
 
 
-class ThreadCreateEvent(GatewayEvent, ChannelResponse):
+class ThreadCreateEvent(GatewayEvent, ThreadResponse):
     """Sent when a thread is created or when the current user is added to a private thread.
 
     Reference:
@@ -102,7 +102,7 @@ class ThreadCreateEvent(GatewayEvent, ChannelResponse):
     """Is sent when the user is added to a private thread."""
 
 
-class ThreadUpdateEvent(GatewayEvent, ChannelResponse):
+class ThreadUpdateEvent(GatewayEvent, ThreadResponse):
     """Sent when a thread is updated.
 
     Reference:
