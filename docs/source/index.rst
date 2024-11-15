@@ -35,7 +35,7 @@ Asyncord makes bot development seamless and enjoyable by closely following the o
 
 To install the library, run the following command::
 
-    pip install asyncord
+   pip install asyncord
 
 That's it! You're ready to start building your Discord bot. 🤖
 
@@ -51,5 +51,6 @@ This project is licensed under the MIT License. For more information, please ref
 
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Contents:
+   :maxdepth: 2
+
+   getting_started
