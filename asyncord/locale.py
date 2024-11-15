@@ -48,4 +48,8 @@ class Locale(enum.StrEnum):
 
 
 type LocaleInputType = Annotated[str | Locale, Annotated[Locale, Field(min_length=2)]]
-"""Type of locale input."""
+"""Type of locale input.
+
+We use this type in all requests that require a locale input to allow user use
+either the locale string or the `Locale` enum.
+"""
