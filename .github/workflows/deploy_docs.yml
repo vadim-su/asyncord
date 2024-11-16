@@ -23,18 +23,10 @@ jobs:
         uses: astral-sh/setup-uv@v3
 
       - name: Install dependencies
-        run: |
-          uv sync --group docs
-
-      - name: Install make
-        run: |
-          sudo apt update
-          sudo apt install -y make
+        run: uv sync --group docs
 
       - name: Build docs
-        run: |
-          uv run make dirhtml
-        working-directory: ./docs
+        run: mkdocs build
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
@@ -42,6 +34,7 @@ jobs:
         with:
           playbook: docs/deploy/run_deploy.yaml
           key: ${{ secrets.DEPLOY_KEY }}
-          options: |
-            --inventory docs/deploy/hosts.ini
+          inventory: |
+            [vadim_one]
+            vadim.one ansible_port=4242 ansible_user=service
           requirements: docs/deploy/galaxy-requirements.yml

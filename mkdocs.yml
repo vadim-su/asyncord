@@ -1,0 +1,105 @@
+site_name: Asyncord
+site_url: https://asyncord.dev
+
+repo_url: https://github.com/vadim-su/asyncord
+repo_name: vadim-su/asyncord
+
+copyright: Copyright &copy; 2024 Vadim Suharnikov
+
+extra:
+  analytics:
+    provider: custom
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/Fgzpwtwdtm
+    - icon: fontawesome/brands/github
+      link: https://github.com/vadim-su/asyncord
+
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+      cache_safe: true
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  favicon: assets/favicon.ico
+  icon:
+    logo: material/snake
+    annotation: material/star-four-points-circle
+
+  palette:
+   # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      primary: orange
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: deep-purple
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.expand
+
+    - toc.follow
+    - toc.integrate
+
+    - search
+    - search.suggest
+
+    - content.code.annotate

@@ -1,24 +1,16 @@
-.. Asyncord documentation master file, created by
-   sphinx-quickstart on Thu Sep 26 19:13:20 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+# Welcome to Asyncord
 
-🚀 Asyncord
-===========
+<p align="center">
+  <img src="assets/logo_thumbnail.png" alt="Asyncord Logo">
+</p>
 
-.. image:: ../../assets/logo_thumbnail.png
-   :alt: Asyncord Logo
-   :align: center
-
-📚 Introduction
-===============
+# 📚 Introduction
 
 Welcome to Asyncord, the next-generation library for building powerful and efficient Discord bots with Python!
 
 Asyncord makes bot development seamless and enjoyable by closely following the official Discord API. It ensures your bots are fast and responsive. Whether you're a seasoned developer or a beginner, Asyncord provides the tools and documentation to create bots that handle everything from simple commands to complex interactions.
 
-🌟 Key Features
-===============
+# 🌟 Key Features
 
 - ⚡ **Fully Asynchronous**: Asyncord is built with asynchronous programming from the ground up.
 
@@ -30,27 +22,18 @@ Asyncord makes bot development seamless and enjoyable by closely following the o
 
 - 📖 **Clarity and Comprehensibility**: Asyncord is designed to be more clear and understandable than other libraries, as it closely follows the official Discord API documentation. This adherence makes it easier for developers to implement and maintain their bots.
 
-🛠️ Installing
-=============
+# 🛠️ Installing
 
-To install the library, run the following command::
+To install the library, run the following command:
 
-   pip install asyncord
+```bash
+pip install asyncord
+```
 
 That's it! You're ready to start building your Discord bot. 🤖
 
-🤝 Contributing
-===============
+# 🤝 Contributing
+Contributions of all sizes are welcome. We appreciate any help, whether it's fixing a bug, improving the documentation, or adding a new feature. If you're interested in contributing, please read our contributing guidelines to get started. 🚀
 
-Contributions of all sizes are welcome. We appreciate any help, whether it's fixing a bug, improving the documentation, or adding a new feature. If you're interested in contributing, please read our `contributing guidelines <../../../CONTRIBUTING.md>`_ to get started. 🚀
-
-📜 License
-==========
-
-This project is licensed under the MIT License. For more information, please refer to the `LICENSE <../../../LICENSE>`_ file. 📄
-
-
-.. toctree::
-   :maxdepth: 2
-
-   getting_started
+# 📜 License
+This project is licensed under the MIT License. For more information, please refer to the LICENSE file. 📄
