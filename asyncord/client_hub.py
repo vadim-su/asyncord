@@ -8,7 +8,7 @@ import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 import aiohttp
 
@@ -63,44 +63,6 @@ class ClientHub:
 
         logger.info('New ClientHub instance created.')  # Added logging
 
-    @classmethod
-    @asynccontextmanager
-    async def connect(
-        cls,
-        auth: str | AuthStrategy | None = None,
-        ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
-        session: aiohttp.ClientSession | None = None,
-        dispatcher: EventDispatcher | None = None,
-        http_client: HttpClient | None = None,
-    ) -> AsyncGenerator[ClientGroup, None]:
-        """Create a set of clients only for a single token.
-
-        Use this method if you want to run only one application with a single token.
-        In general, it is what you need.
-
-        Args:
-            auth: Auth strategy to use for authentication.
-                If str is passed, it is treated as a bot token.
-                If None is passed, you need to pass a custom http_client.
-            ratelimit_strategy: Rate limit strategy to use.
-                if didn't pass, default backoff strategy is used.
-                if passed None, no rate limit strategy is used.
-            session: Client session.
-            dispatcher: Event dispatcher to use for the clients.
-            http_client: HTTP client.
-
-        Returns:
-            A set of clients to interact with Discord.
-        """
-        async with cls(session=session) as hub:
-            yield hub.create_client_group(
-                group_name='default',
-                auth=auth,
-                ratelimit_strategy=ratelimit_strategy,
-                dispatcher=dispatcher,
-                http_client=http_client,
-            )
-
     def create_client_group(
         self,
         group_name: str,
@@ -145,7 +107,7 @@ class ClientHub:
             dispatcher.add_argument('gateway', client_group.gateway_client)
             dispatcher.add_argument('client_groups', self.client_groups)
         else:
-            logger.warning('Event dispatcher is passed. Make sure to add the required arguments.')
+            logger.info('Event dispatcher is passed. Make sure to add the required arguments.')
 
         self.client_groups[group_name] = client_group
         return client_group
@@ -178,14 +140,6 @@ class ClientHub:
         """Log unclosed session for debugging."""
         if not self.session.closed:
             logger.warning('Unclosed client session detected', extra={'markup': True})
-
-    async def __aenter__(self) -> Self:
-        """Enter the context manager."""
-        return self
-
-    async def __aexit__(self, _exc_type, _exc, _tb) -> None:  # noqa: ANN001
-        """Exit the context manager."""
-        await self.start()
 
     def _build_client_group(
         self,
@@ -289,3 +243,41 @@ class ClientGroup:
     async def close(self) -> None:
         """Close the connection to the Discord client."""
         await self.gateway_client.close()
+
+
+@asynccontextmanager
+async def connect(
+    auth: str | AuthStrategy | None = None,
+    ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
+    session: aiohttp.ClientSession | None = None,
+    dispatcher: EventDispatcher | None = None,
+    http_client: HttpClient | None = None,
+) -> AsyncGenerator[ClientGroup, None]:
+    """Create a set of clients only for a single token.
+
+    Use this method if you want to run only one application with a single token.
+    In general, it is what you need.
+
+    Args:
+        auth: Auth strategy to use for authentication.
+            If str is passed, it is treated as a bot token.
+            If None is passed, you need to pass a custom http_client.
+        ratelimit_strategy: Rate limit strategy to use.
+            if didn't pass, default backoff strategy is used.
+            if passed None, no rate limit strategy is used.
+        session: Client session.
+        dispatcher: Event dispatcher to use for the clients.
+        http_client: HTTP client.
+
+    Returns:
+        A set of clients to interact with Discord.
+    """
+    hub = ClientHub(session=session)
+    yield hub.create_client_group(
+        group_name='default',
+        auth=auth,
+        ratelimit_strategy=ratelimit_strategy,
+        dispatcher=dispatcher,
+        http_client=http_client,
+    )
+    await hub.start()
