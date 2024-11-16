@@ -103,3 +103,15 @@ theme:
     - search.suggest
 
     - content.code.annotate
+
+nav:
+  - Welcome to Asyncord: index.md
+  - Getting Started: getting_started.md
+  - Reference:
+    - Overview: reference/overview.md
+    - Client: reference/client.md
+  - Commands: commands.md
+  - Events: events.md
+  - FAQ: faq.md
+  - Support: support.md
+  - Changelog: changelog.md

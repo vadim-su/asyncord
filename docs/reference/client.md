@@ -182,3 +182,5 @@ By default, dispatcher can pass the two default arguments:
 - `client` - the rest client instance, to process with rest api of discord
 - `gateway` - the gateway instance, to interact and manage different discord
     events using websocket connection
+- `client_groups` - the dictionary of all client groups, where the key is the name of the group
+    and the value is the group of clients

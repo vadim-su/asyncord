@@ -66,19 +66,14 @@ Don't forget to replace `YOUR SECRET TOKEN` with your bot's token.
 You can get the token by creating a bot application on the
 [Discord Developer Portal](https://discord.com/developers/applications).
 
-## Next Steps
+## More Examples
 
-For more examples you can check out the [examples](https://github.com/vadim-su/asyncord/tree/main/examples)
-directory in the repository. We already have some examples there:
+For more examples, you can check out the [examples](https://github.com/vadim-su/asyncord/tree/main/examples) directory in the repository. We already have some examples there:
 
-#### Echo
-Is a simple bot that echoes messages back to the channel. Full example of previous code.
+- **Echo**: A simple bot that echoes messages back to the channel. Full example of previous code.
 
-#### Gallery
-This bot run periodic tasks to archive old forum posts.
+- **Gallery**: This bot runs periodic tasks to archive old forum posts.
 
-#### Levels
-This bot tracks user messages and assigns levels based on the number of messages sent.
+- **Levels**: This bot tracks user messages and assigns levels based on the number of messages sent.
 
-#### Help Desk
-This example shows how to create a help desk bot that assigns tags to users help requests.
+- **Help Desk**: This example shows how to create a help desk bot that assigns tags to users' help requests.
