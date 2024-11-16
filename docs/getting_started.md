@@ -20,7 +20,7 @@ import asyncio
 
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.rest import RestClient # (1)!
-from asyncord.client_hub import ClientHub
+from asyncord.client_hub import connect
 from asyncord.gateway.events.messages import MessageCreateEvent
 
 API_TOKEN: str = 'YOUR_SECRET_TOKEN'
@@ -40,7 +40,7 @@ async def on_message(message: MessageCreateEvent, client: RestClient) -> None:
 
 async def main(api_token: str) -> None:
     """Main function to run the bot."""
-    async with ClientHub.connect(api_token) as cli_group:
+    async with connect(api_token) as cli_group:
         cli_group.dispatcher.add_handler(on_message) # (3)!
 
 if __name__ == '__main__':
