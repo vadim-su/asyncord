@@ -110,8 +110,4 @@ nav:
   - Reference:
     - Overview: reference/overview.md
     - Client: reference/client.md
-  - Commands: commands.md
-  - Events: events.md
   - FAQ: faq.md
-  - Support: support.md
-  - Changelog: changelog.md

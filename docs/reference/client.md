@@ -147,6 +147,10 @@ The example below illustrates this:
     1. In this case, you need to specify the event type explicitly as the first
     argument of the `add_handler` method. It is not recommended to use this approach.
 
+    ???+ warning
+        The second approach is not recommended because it is less readable and
+        can be removed in future versions of the library.
+
 ### Handler arguments
 
 The handler function should accept the event object as the first argument.
@@ -184,3 +188,36 @@ By default, dispatcher can pass the two default arguments:
     events using websocket connection
 - `client_groups` - the dictionary of all client groups, where the key is the name of the group
     and the value is the group of clients
+
+
+## How to get main resources?
+
+To access main resources such as guilds, channels, or users, you need to obtain
+the rest client instance from the handler or client group. Once you have the rest client,
+you can retrieve the desired objects. For example:
+
+```python
+from asyncord.client_hub import connect
+from asyncord.client.rest import RestClient
+
+async def main():
+    async with connect(API_TOKEN) as cli_group:
+        # Getting the rest client instance
+        rest_client = cli_group.client
+
+        # Getting the guild and channel resources objects
+        guild = await rest_client.guilds.get('guild_id')
+        channel = await rest_client.channels.get('channel_id')
+```
+Here are some resources you can retrieve using the rest client:
+
+- `guilds`
+- `users`
+- `channels`
+- `applications`
+- `interactions`
+- `invites`
+- `stage_instances`
+- `webhooks`
+- `auth`
+- `stickers`
