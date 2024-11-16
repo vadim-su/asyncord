@@ -205,7 +205,7 @@ class BaseMessage(BaseModel):
     @classmethod
     def inject_embed_attachments(
         cls,
-        attachments: ListAttachmentType | SingleAttachmentType | None | Any,  # noqa: ANN401
+        attachments: ListAttachmentType | SingleAttachmentType | Any | None,  # noqa: ANN401
         info: ValidationInfo,
     ) -> list[Any] | None:
         """Inject embed attachments into the data.

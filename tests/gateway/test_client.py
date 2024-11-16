@@ -34,11 +34,11 @@ from asyncord.gateway.message import (
 def test_init(  # noqa: PLR0917, PLR0913
     token: BotTokenAuthStrategy | Literal['token'],
     session: aiohttp.ClientSession,
-    conn_data: None | ConnectionData,
+    conn_data: ConnectionData | None,
     intents: Intent,
     heartbeat_class: type[Heartbeat] | HeartbeatFactory | None,
-    dispatcher: None | EventDispatcher,
-    name: None | Literal['TestClient'],
+    dispatcher: EventDispatcher | None,
+    name: Literal['TestClient'] | None,
     mocker: MockFixture,
 ) -> None:
     """Test initializing the GatewayClient.

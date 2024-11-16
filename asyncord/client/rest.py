@@ -34,7 +34,7 @@ class RestClient:
     def __init__(
         self,
         auth: str | AuthStrategy | None,
-        ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
+        ratelimit_strategy: RateLimitStrategy | UnsetType | None = Unset,
         session: aiohttp.ClientSession | None = None,
         http_client: HttpClient | None = None,
     ) -> None:
@@ -102,7 +102,7 @@ class RestClient:
 
     def _init_ratelimit_strategy(
         self,
-        ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
+        ratelimit_strategy: RateLimitStrategy | UnsetType | None = Unset,
     ) -> None:
         """Initialize the rate limit strategy.
 

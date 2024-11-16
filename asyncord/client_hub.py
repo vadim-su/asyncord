@@ -67,7 +67,7 @@ class ClientHub:
         self,
         group_name: str,
         auth: str | AuthStrategy | None = None,
-        ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
+        ratelimit_strategy: RateLimitStrategy | UnsetType | None = Unset,
         dispatcher: EventDispatcher | None = None,
         http_client: HttpClient | None = None,
     ) -> ClientGroup:
@@ -145,7 +145,7 @@ class ClientHub:
         self,
         group_name: str,
         auth: str | AuthStrategy | None,
-        ratelimit_strategy: RateLimitStrategy | None | UnsetType,
+        ratelimit_strategy: RateLimitStrategy | UnsetType | None,
         session: aiohttp.ClientSession | None,
         dispatcher: EventDispatcher | None,
         http_client: HttpClient | None,
@@ -248,7 +248,7 @@ class ClientGroup:
 @asynccontextmanager
 async def connect(
     auth: str | AuthStrategy | None = None,
-    ratelimit_strategy: RateLimitStrategy | None | UnsetType = Unset,
+    ratelimit_strategy: RateLimitStrategy | UnsetType | None = Unset,
     session: aiohttp.ClientSession | None = None,
     dispatcher: EventDispatcher | None = None,
     http_client: HttpClient | None = None,
