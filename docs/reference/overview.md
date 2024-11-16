@@ -11,9 +11,14 @@ a well-structured and maintainable codebase.
 
 Resources in Asyncord follow a general structure that includes the following components:
 
-- **Resource** (e.g., `ChannelResource`): Represents a specific Discord resource, such as a channel, user, or message. Resources are responsible for managing the data associated with the resource and interacting with the Discord API to perform operations.
+- **Resource** (e.g., `ChannelResource`): Represents a specific Discord resource,
+such as a channel, user, or message. Resources are responsible for managing the data associated
+with the resource and interacting with the Discord API to perform operations.
 
-- **Models**: Represents the data structure of the resource. Models define the fields and properties associated with the resource and provide methods for data validation and serialization. Can be splitted into `requests` and `responses` models. Also can contain super general models in `common` module.
+- **Models**: Represents the data structure of the resource. Models define the
+fields and properties associated with the resource and provide methods for data validation
+and serialization. Can be splitted into `requests` and `responses` models.
+Also can contain super general models in `common` module.
 
 In general, the structure of a resource module looks like this:
 
