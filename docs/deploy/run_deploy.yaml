@@ -4,7 +4,7 @@
 
   vars:
     project_name: "asyncord_docs"
-    docs_build_dir: "site"
+    docs_build_dir: "../../site"
     project_dir: "{{ ansible_env.HOME }}/{{ project_name }}"
 
   tasks:
