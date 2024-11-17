@@ -1,4 +1,4 @@
-# 📖 Getting Started
+# Getting Started
 
 ## First Things First
 If you have any questions or need help,

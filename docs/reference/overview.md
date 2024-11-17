@@ -5,7 +5,7 @@
 The `asyncord` project is organized into several key modules, each responsible for different aspects of the library.
 The `client` module handles client-side operations and resources, while the `gateway` module manages the connection
 to the Discord Gateway. Additional utility modules provide logging, type definitions, and URL management, ensuring
-a well-structured and maintainable codebase.
+a well-structured and maintainable codebase. In general, all modules are designed to be reflective of the Discord API.
 
 ## Resource General Structure
 
