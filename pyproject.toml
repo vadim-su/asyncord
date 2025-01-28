@@ -80,6 +80,7 @@ indent-width = 4
 target-version = "py312"
 extend-exclude = [".git", ".vscode", ".devcontainer", ".github", ".venv"]
 
+[tool.ruff.lint]
 preview = true
 select = [
     # Pyflakes
