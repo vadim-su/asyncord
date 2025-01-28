@@ -81,5 +81,5 @@ async def test_delete_all_reactions_for_emoji(reactions_res: ReactionResource) -
 
 async def test_delete_fail_on_user_id_without_emoji(reactions_res: ReactionResource) -> None:
     """Test deleting a reaction with a user id but no emoji."""
-    with pytest.raises(ValueError, match='Cannot delete a reaction for a user without an emoji.'):
+    with pytest.raises(ValueError, match=r'Cannot delete a reaction for a user without an emoji.'):
         await reactions_res.delete(user_id='123')
