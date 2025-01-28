@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.rest import RestClient
-from asyncord.client_hub import ClientHub, connect
+from asyncord.client_hub import connect
 from asyncord.gateway.events.base import ReadyEvent
 from asyncord.gateway.events.messages import MessageCreateEvent
 
