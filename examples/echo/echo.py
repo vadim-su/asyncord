@@ -1,18 +1,22 @@
 """A simple echo bot that echoes messages back to the channel."""
 
 import asyncio
+import logging
 import os
 
 from dotenv import load_dotenv
 
 from asyncord.client.messages.models.requests.messages import CreateMessageRequest
 from asyncord.client.rest import RestClient
-from asyncord.client_hub import ClientHub
+from asyncord.client_hub import ClientHub, connect
 from asyncord.gateway.events.base import ReadyEvent
 from asyncord.gateway.events.messages import MessageCreateEvent
 
 load_dotenv()
-API_TOKEN = os.getenv('API_TOKEN')
+
+logging.basicConfig(level=logging.INFO)
+
+API_TOKEN = os.environ['API_TOKEN']
 
 
 async def on_ready(event: ReadyEvent) -> None:  # noqa: RUF029
@@ -40,7 +44,7 @@ async def on_message(message: MessageCreateEvent, client: RestClient) -> None:
 
 async def main(api_token: str) -> None:
     """Main function to run the bot."""
-    async with ClientHub.connect(api_token) as client:
+    async with connect(api_token) as client:
         # Dispatcher detects the event type by the first argument
         # and calls the handler with the event object
         client.dispatcher.add_handler(on_ready)
