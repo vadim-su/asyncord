@@ -245,9 +245,9 @@ class GatewayClient:
 
     async def _handle_message(self, message: GatewayMessageType) -> None:
         if isinstance(message, DispatchMessage):
-            self.logger.info('Dispatching event: %s', message.event_name)
+            self.logger.debug('Dispatching event: %s', message.event_name)
         else:
-            self.logger.info('Received message: %s', message.opcode.name)
+            self.logger.debug('Received message: %s', message.opcode.name)
 
         opcode = message.opcode
         handler = self._opcode_handlers.get(opcode)

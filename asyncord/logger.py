@@ -30,7 +30,7 @@ def setup_logging(name: str) -> None:
     base_logger = logging.getLogger(name)
 
     base_logger.addHandler(queue_handler)
-    base_logger.setLevel(logging.INFO)
+    base_logger.propagate = False
 
 
 class NameLoggerAdapter(logging.LoggerAdapter):

@@ -464,7 +464,7 @@ async def test__handle_message_dispatch(gw_client: GatewayClient, mocker: MockFi
     mock_logger = mocker.patch.object(gw_client, 'logger')
     message = DispatchMessage(op=GatewayMessageOpcode.DISPATCH, t='TestEvent', d={}, s=1)
     await gw_client._handle_message(message)
-    mock_logger.info.assert_called_once_with('Dispatching event: %s', message.event_name)
+    mock_logger.debug.assert_called_once_with('Dispatching event: %s', message.event_name)
 
 
 async def test__handle_message_non_dispatch(gw_client: GatewayClient, mocker: MockFixture) -> None:
@@ -476,7 +476,7 @@ async def test__handle_message_non_dispatch(gw_client: GatewayClient, mocker: Mo
         d=HelloMessageData(heartbeat_interval=1000),
     )
     await gw_client._handle_message(message)
-    mock_logger.info.assert_called_once_with('Received message: %s', message.opcode.name)
+    mock_logger.debug.assert_called_once_with('Received message: %s', message.opcode.name)
 
 
 async def test__handle_message_with_opcode_handler(gw_client: GatewayClient, mocker: MockFixture) -> None:
