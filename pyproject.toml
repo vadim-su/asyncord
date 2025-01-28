@@ -80,7 +80,6 @@ indent-width = 4
 target-version = "py312"
 extend-exclude = [".git", ".vscode", ".devcontainer", ".github", ".venv"]
 
-[tool.ruff.lint]
 preview = true
 select = [
     # Pyflakes
@@ -133,8 +132,6 @@ select = [
     "SIM",
     # flake8-tidy-imports
     "TID",
-    # flake8-type-checking
-    "TCH",
     # flake8-use-pathlib
     "PTH",
     # eradicate
@@ -146,10 +143,6 @@ select = [
 ]
 
 ignore = [
-    # https://github.com/charliermarsh/ruff/discussions/4542
-    # Missing type annotation for {name} in method
-    "ANN101",
-    "ANN102",
     # Package dosctring check
     "D104",
     # Checks for string literals that are explicitly concatenated (using `+` operator)
@@ -158,11 +151,6 @@ ignore = [
     'SLF001',
     # First argument of a method should be named `self`
     "N805",
-    # It's not work properly for pydantic models
-    # Move standard library import `datetime` into a type-checking block
-    "TCH001",
-    "TCH002",
-    "TCH003",
     # Ternary operator make code less readable
     # Use ternary operator {} instead of `if`-`else`-
     "SIM108",
