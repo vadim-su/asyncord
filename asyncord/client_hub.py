@@ -101,13 +101,14 @@ class ClientHub:
             dispatcher=dispatcher,
             http_client=http_client,
         )
-        if not dispatcher:
+        if dispatcher:
+            logger.info('Event dispatcher is passed. Make sure to add the required arguments like client, gateway, and client_groups.')
+        else:
             dispatcher = client_group.dispatcher
             dispatcher.add_argument('client', client_group.rest_client)
             dispatcher.add_argument('gateway', client_group.gateway_client)
             dispatcher.add_argument('client_groups', self.client_groups)
-        else:
-            logger.info('Event dispatcher is passed. Make sure to add the required arguments.')
+
 
         self.client_groups[group_name] = client_group
         return client_group
