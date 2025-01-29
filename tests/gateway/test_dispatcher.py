@@ -170,6 +170,9 @@ async def test_dispatch_logs_exception(
     """Test that dispatch logs an exception if one is raised in the handler."""
     event = CustomEvent()
 
+    logger = logging.getLogger('asyncord')
+    logger.propagate = True
+
     async def handler(event: CustomEvent) -> None:
         raise Exception('Test exception')
 

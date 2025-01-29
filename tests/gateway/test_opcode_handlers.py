@@ -36,6 +36,10 @@ async def test_dispatch_unhandled_event(
     """Test dispatching an unhandled event."""
     handler = DispatchHandler(client, logging.getLogger('asyncord.gateway.client.opcode_handlers'))
     message = DispatchMessage(t='unhandled_event', d={}, s=1)  # type: ignore
+
+    logger = logging.getLogger('asyncord')
+    logger.propagate = True
+
     with caplog.at_level(logging.WARNING):
         await handler.handle(message)
     assert 'Unhandled event: unhandled_event' in caplog.text

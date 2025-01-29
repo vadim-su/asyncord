@@ -36,6 +36,9 @@ async def test_connect_with_dispatcher(mocker: MockerFixture, caplog: pytest.Log
     mock_client_group_class = mocker.patch('asyncord.client_hub.ClientGroup')
     mock_client_group_class.return_value.close = AsyncMock()
 
+    logger = logging.getLogger('asyncord')
+    logger.propagate = True
+
     with caplog.at_level(logging.INFO):
         async with hub_context:
             pass

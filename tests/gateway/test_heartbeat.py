@@ -126,6 +126,9 @@ async def test_run_with_exception(
     )
     mock_sleep = mocker.patch('asyncio.sleep', return_value=None)
 
+    logger = logging.getLogger('asyncord')
+    logger.propagate = True
+
     interval = datetime.timedelta(seconds=1)
     with caplog.at_level(logging.ERROR):
         await heartbeat._run(interval)
@@ -149,6 +152,9 @@ async def test_run_with_timeout(
         side_effect=TimeoutError(),
     )
     mock_sleep = mocker.patch('asyncio.sleep', return_value=None)
+
+    logger = logging.getLogger('asyncord')
+    logger.propagate = True
 
     interval = datetime.timedelta(seconds=1)
     with caplog.at_level(logging.ERROR):
@@ -193,6 +199,9 @@ async def test_wait_heartbeat_ack_no_ack_received(
 
     mock_send_heartbeat = mocker.patch.object(heartbeat.client, 'send_heartbeat', return_value=None)
     mock_wait_for = mocker.patch('asyncio.wait_for', side_effect=TimeoutError())
+
+    logger = logging.getLogger('asyncord')
+    logger.propagate = True
 
     with caplog.at_level(logging.ERROR):
         await heartbeat._wait_heartbeat_ack()
