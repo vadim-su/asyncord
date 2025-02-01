@@ -25,18 +25,15 @@ async def test_create_command(commands_res: CommandResource) -> None:
         description_localizations={'en-US': 'Test Command Description'},
         options=[
             ApplicationCommandStringOption(
-                type=AppCommandOptionType.STRING,
                 name='test-option',
                 description='test option description',
             ),
             ApplicationCommandIntegerOption(
-                type=AppCommandOptionType.INTEGER,
                 name='test-option-2',
                 description='test option description 2',
                 required=True,
             ),
             ApplicationCommandStringOption(
-                type=AppCommandOptionType.STRING,
                 name='test-option-3',
                 description='test option description 3',
                 choices=[
@@ -72,17 +69,14 @@ async def test_create_subcommand_group(commands_res: CommandResource) -> None:
         description='test command description',
         options=[
             ApplicationCommandSubCommandGroupOption(
-                type=AppCommandOptionType.SUB_COMMAND_GROUP,
                 name='test-subcommand-group',
                 description='test subcommand group description',
                 options=[
                     ApplicationCommandSubCommandOption(
-                        type=AppCommandOptionType.SUB_COMMAND,
                         name='test-subcommand',
                         description='test subcommand description',
                         options=[
                             ApplicationCommandIntegerOption(
-                                type=AppCommandOptionType.INTEGER,
                                 name='test-option',
                                 description='test option description',
                                 required=True,

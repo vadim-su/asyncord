@@ -6,9 +6,9 @@ https://discord.com/developers/docs/interactions/application-commands
 
 from __future__ import annotations
 
-from typing import Annotated, Final, Literal
+from typing import Annotated, Final, Literal, Self
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
 from asyncord.client.channels.models.common import ChannelType
 from asyncord.client.commands.models.common import (
@@ -90,6 +90,17 @@ class BaseApplicationCommandOption(BaseModel):
 
     required: bool = False
     """Indicates whether the option is required. Defaults to False."""
+
+    @model_validator(mode='after')
+    def set_type_field_set(self) -> Self:
+        """Set `type` field in `model_fields_set`.
+
+        Add `type` to `model_fields_set` to make `dict(exclude_unset)` work properly.
+        We don't need to set 'type' field because it's already set in a component subclasses class,
+        but we need to send it to Discord excluding another unset fields.
+        """
+        self.model_fields_set.add('type')
+        return self
 
 
 class ApplicationCommandSubCommandOption(BaseApplicationCommandOption):
